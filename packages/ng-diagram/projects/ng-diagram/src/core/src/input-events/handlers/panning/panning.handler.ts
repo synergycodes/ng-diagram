@@ -10,6 +10,9 @@ export class PanningEventHandler extends EventHandler<PanningEvent> {
   private lastPoint: Point | undefined;
 
   handle(event: PanningEvent): void {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     switch (event.phase) {
       case 'start': {
         this.lastPoint = event.lastInputPoint;
@@ -34,5 +37,14 @@ export class PanningEventHandler extends EventHandler<PanningEvent> {
         break;
       }
     }
+  }
+
+  override cancel(): boolean {
+    if (!this.flow.actionStateManager.isPanning()) {
+      return false;
+    }
+    this.lastPoint = undefined;
+    this.flow.actionStateManager.clearPanning();
+    return true;
   }
 }

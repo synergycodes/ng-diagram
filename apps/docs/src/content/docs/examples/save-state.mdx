@@ -35,3 +35,9 @@ This example demonstrates how to implement save and restore functionality for th
 - **Save:** Serializes and stores the current diagram state.
 - **Load:** Restores the diagram from the saved state.
 - **Clear:** Removes the saved state from local storage.
+
+### When to Use This Approach
+
+This example keeps the default model and saves snapshots on demand with `toJSON()` — the simplest way to add save/load buttons to an app. If you want the model itself to live in your own storage layer (persist on every change, connect to a store or a backend), implement a custom `ModelAdapter` instead — see the [Custom Model example](/docs/examples/custom-model/).
+
+**Learn more:** [State Management guide →](/docs/guides/state-management/)

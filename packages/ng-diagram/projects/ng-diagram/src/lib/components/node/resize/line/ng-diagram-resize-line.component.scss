@@ -10,6 +10,10 @@
   &.resize-line {
     position: absolute;
 
+    &--inactive {
+      pointer-events: none;
+    }
+
     &--top::before,
     &--bottom::before {
       width: 100%;

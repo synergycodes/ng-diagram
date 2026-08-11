@@ -216,6 +216,37 @@ export class NgDiagramService extends NgDiagramBaseService {
   }
 
   // ==============================
+  // Interaction Control
+  // ==============================
+
+  /**
+   * Aborts the in-progress gesture (linking, drag, resize, rotate or pan):
+   * removes its listeners immediately, restores the state it modified
+   * (positions, size, angle, temporary edge — the viewport is not rolled
+   * back) and fires the corresponding "ended" event with the `cancelled`
+   * reason.
+   *
+   * No-op when nothing is active, when the gesture is already completing, or
+   * while a transaction is active (refused with a console warning — cancel
+   * after it settles).
+   *
+   * Bound to Escape by default via the `cancelInteraction` shortcut action —
+   * see {@link configureShortcuts}.
+   *
+   * @example
+   * ```typescript
+   * ngDiagramService.cancelActiveInteraction();
+   * ```
+   *
+   * @returns Promise resolving to whether anything was torn down
+   *
+   * @since 1.3.0
+   */
+  cancelActiveInteraction(): Promise<boolean> {
+    return this.flowCore.cancelActiveInteraction();
+  }
+
+  // ==============================
   // Event Management
   // ==============================
 
@@ -356,6 +387,9 @@ export class NgDiagramService extends NgDiagramBaseService {
    * All state updates within the callback are batched and applied atomically.
    *
    * @param callback The function to execute within the transaction.
+   * @returns A promise that resolves with the transaction result once the
+   * transaction has been committed to the model (returned since 1.3.0; safe to
+   * ignore when not needed).
    *
    * @example
    * this.ngDiagramService.transaction(() => {
@@ -363,7 +397,7 @@ export class NgDiagramService extends NgDiagramBaseService {
    *   this.ngDiagramModelService.addEdges([edge1]);
    * });
    */
-  transaction(callback: () => void): void;
+  transaction(callback: () => void): Promise<TransactionResult>;
   /**
    * @since 0.9.0
    *
@@ -384,21 +418,13 @@ export class NgDiagramService extends NgDiagramBaseService {
   transaction(
     callback: (() => void) | (() => Promise<void>),
     options?: TransactionOptions
-  ): void | Promise<TransactionResult> {
-    let isAsync = false;
-    const wrappedCallback: TransactionCallback = () => {
-      const result = callback();
-      if (result instanceof Promise) {
-        isAsync = true;
-      }
-      return result;
-    };
-
-    const promise = this.flowCore.transaction(wrappedCallback, options ?? {});
-
-    if (options || isAsync) {
-      return promise;
-    }
+  ): Promise<TransactionResult> {
+    // Always return the commit promise — do not branch on `result instanceof
+    // Promise` to detect sync callbacks: the check is realm-sensitive (a promise
+    // created outside the Zone.js-patched realm, e.g. in a test driver or an
+    // iframe, fails it) and would silently discard the commit promise.
+    const wrappedCallback: TransactionCallback = () => callback();
+    return this.flowCore.transaction(wrappedCallback, options ?? {});
   }
 
   // ==============================
@@ -413,39 +439,69 @@ export class NgDiagramService extends NgDiagramBaseService {
    * Invalidating a node also re-measures all its ports.
    *
    * @param options Optional. Specifies which elements to re-measure.
+   * @returns A promise that resolves once the triggered re-measurements have settled —
+   * the invalidated elements' `size`, `measuredPorts` and `measuredLabels` then read
+   * fresh (returned since 1.3.0; safe to ignore).
+   *
+   * @remarks
+   * Resolution is settle-based, like the transaction `waitForMeasurements` option: a
+   * discovery window opens and a rolling debounce waits for measurements to stop.
+   *
+   * - The promise never hangs: an element that delivers no new measurement (unmounted,
+   *   zero-size, or unchanged) settles on window expiry; when nothing matching the
+   *   request is observed, it resolves immediately.
+   * - Concurrent measurements settle together with these, and updates in flight at
+   *   call time are waited out, so the promise may resolve slightly later.
+   * - Do not await this inside an active transaction (re-measurements apply only at
+   *   commit, so the promise resolves before the fresh geometry lands) or inside a
+   *   middleware (the update pipeline is not re-entrant — the await deadlocks).
+   *   Fire-and-forget is safe in both.
    *
    * @example
-   * // Re-measure the entire diagram
+   * // Re-measure specific nodes (including their ports) and wait for fresh geometry
+   * await ngDiagramService.invalidateMeasurements({ nodes: [{ nodeId: 'node-1' }] });
+   *
+   * // Re-measure labels on specific edges
+   * await ngDiagramService.invalidateMeasurements({ edges: [{ edgeId: 'edge-1' }] });
+   *
+   * // Re-measure the entire diagram, fire-and-forget
    * ngDiagramService.invalidateMeasurements();
-   *
-   * // Re-measure specific nodes (including their ports)
-   * ngDiagramService.invalidateMeasurements({
-   *   nodes: [{ nodeId: 'node-1' }],
-   * });
-   *
-   * // Re-measure all labels on specific edges
-   * ngDiagramService.invalidateMeasurements({
-   *   edges: [{ edgeId: 'edge-1' }],
-   * });
    *
    * @since 1.2.3
    */
-  invalidateMeasurements(options?: InvalidateMeasurementsOptions): void {
+  invalidateMeasurements(options?: InvalidateMeasurementsOptions): Promise<void> {
+    const entityIds = this.invalidateObservedElements(options);
+
+    // Nothing observed matched the request — no measurement to wait for. This also
+    // keeps fire-and-forget calls on an uninitialized diagram a silent no-op.
+    if (entityIds.length === 0) {
+      return Promise.resolve();
+    }
+
+    // Deliberately not `async`: an uninitialized diagram must throw at the call site,
+    // not surface an unhandled rejection on a fire-and-forget call.
+    return this.flowCore.trackMeasurements(entityIds);
+  }
+
+  /**
+   * Re-observes the targeted elements and returns the prefixed entity IDs
+   * (`node:<id>` / `edge:<id>`) that actually had observed elements.
+   */
+  private invalidateObservedElements(options?: InvalidateMeasurementsOptions): string[] {
     if (!options) {
-      this.batchResizeObserver.invalidateAll();
-      return;
+      return this.batchResizeObserver.invalidateAll();
     }
 
-    if (options.nodes) {
-      for (const { nodeId } of options.nodes) {
-        this.batchResizeObserver.invalidateNode(nodeId);
-      }
+    const entityIds: string[] = [];
+
+    for (const { nodeId } of options.nodes ?? []) {
+      entityIds.push(...this.batchResizeObserver.invalidateNode(nodeId));
     }
 
-    if (options.edges) {
-      for (const { edgeId } of options.edges) {
-        this.batchResizeObserver.invalidateEdgeLabels(edgeId);
-      }
+    for (const { edgeId } of options.edges ?? []) {
+      entityIds.push(...this.batchResizeObserver.invalidateEdgeLabels(edgeId));
     }
+
+    return entityIds;
   }
 }

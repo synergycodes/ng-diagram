@@ -1,5 +1,5 @@
 import { ElementRef, inject, Injectable } from '@angular/core';
-import { Port } from '../../../core/src';
+import { MeasuredPortProperty, Port } from '../../../core/src';
 import { findParentWithClass } from '../../utils/find-parent-with-class';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 
@@ -43,7 +43,7 @@ export class UpdatePortsService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly diagramElement = inject(ElementRef<HTMLElement>);
 
-  getPortData(port: HTMLElement): Required<Pick<Port, 'size' | 'position'>> | null {
+  getPortData(port: HTMLElement): Required<Pick<Port, MeasuredPortProperty>> | null {
     const nodeElement = findParentWithClass(port, 'ng-diagram-node');
     if (!nodeElement) {
       console.error(PORT_PARENT_NOT_FOUND_ERROR(port.id));
@@ -53,7 +53,7 @@ export class UpdatePortsService {
     return this.measurePort(port, nodeElement.getBoundingClientRect(), this.getScale());
   }
 
-  getNodePortsData(nodeId: string): Required<Pick<Port, 'id' | 'size' | 'position'>>[] {
+  getNodePortsData(nodeId: string): Required<Pick<Port, 'id' | MeasuredPortProperty>>[] {
     const node = this.diagramElement.nativeElement.querySelector(
       `.ng-diagram-node[data-node-id="${nodeId}"]`
     ) as HTMLElement;
@@ -63,7 +63,7 @@ export class UpdatePortsService {
     }
 
     const ports = node.querySelectorAll('[data-port-id]') as NodeListOf<HTMLElement>;
-    const portsData: Required<Pick<Port, 'id' | 'size' | 'position'>>[] = [];
+    const portsData: Required<Pick<Port, 'id' | MeasuredPortProperty>>[] = [];
     const nodeRect = node.getBoundingClientRect();
     const scale = this.getScale();
 
@@ -81,7 +81,7 @@ export class UpdatePortsService {
     return portsData;
   }
 
-  private measurePort(port: HTMLElement, nodeRect: DOMRect, scale: number): Required<Pick<Port, 'size' | 'position'>> {
+  private measurePort(port: HTMLElement, nodeRect: DOMRect, scale: number): Required<Pick<Port, MeasuredPortProperty>> {
     const portRect = port.getBoundingClientRect();
 
     const width = portRect.width / scale;

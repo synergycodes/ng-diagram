@@ -6,6 +6,7 @@ export * from './get-port-flow-position';
 export * from './group-size';
 export * from './is-group';
 export * from './measurement-validation';
+export * from './object-properties';
 export * from './rects-points-sizes';
 export * from './semaphore';
 export * from './snap-node-position';

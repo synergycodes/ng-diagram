@@ -1,4 +1,6 @@
+import { clearLinkingForGesture } from './linking-gesture';
 import type { CommandHandler, Node, Point } from '../../../types';
+import type { InternalLinkingActionState } from '../../../types/action-state.interface';
 import { getPortFlowPosition } from '../../../utils';
 import { createFinalEdge, validateConnection } from './utils';
 
@@ -7,9 +9,11 @@ export interface FinishLinkingCommand {
   position?: Point;
 }
 
-const clearTemporaryEdge = async (commandHandler: CommandHandler): Promise<void> => {
+// Empty 'finishLinking' pass: the emitter turns the linking state into an
+// edgeDrawEnded event and the commit's redraw erases the temporary edge.
+// Callers clear the state themselves (stamped, in their finally).
+export const runCancelledFinishPass = async (commandHandler: CommandHandler): Promise<void> => {
   await commandHandler.flowCore.applyUpdate({}, 'finishLinking');
-  commandHandler.flowCore.actionStateManager.clearLinking();
 };
 
 const validateTarget = (
@@ -38,56 +42,66 @@ const validateTarget = (
 };
 
 export const finishLinking = async (commandHandler: CommandHandler, command: FinishLinkingCommand): Promise<void> => {
-  const linking = commandHandler.flowCore.actionStateManager.linking;
+  const linking = commandHandler.flowCore.actionStateManager.linking as InternalLinkingActionState | undefined;
   const temporaryEdge = linking?.temporaryEdge;
 
   if (!linking) {
     return;
   }
 
-  if (!temporaryEdge) {
-    await clearTemporaryEdge(commandHandler);
-    return;
+  // Claims the teardown — a cancelLinking racing this finish must no-op instead
+  // of overwriting the reason and emitting a second edgeDrawEnded.
+  linking._finishing = true;
+  const gestureId = linking._gestureId;
+
+  // Clear in finally — a user callback below can throw, and a stranded linking
+  // state permanently blocks new links. Guard by gesture stamp, not identity:
+  // the linking object is replaced mid-gesture (moveTemporaryEdge, edges-routing).
+  try {
+    if (!temporaryEdge) {
+      await runCancelledFinishPass(commandHandler);
+      return;
+    }
+
+    linking.dropPosition = command.position ?? { x: 0, y: 0 };
+
+    const { source, sourcePort, target, targetPort } = temporaryEdge;
+    const targetNodeId = target || undefined;
+    const targetPortId = targetPort || undefined;
+
+    if (!targetNodeId) {
+      linking.cancelReason = 'noTarget';
+      await runCancelledFinishPass(commandHandler);
+      return;
+    }
+
+    if (!validateConnection(commandHandler.flowCore, source, sourcePort, targetNodeId, targetPortId, true)) {
+      linking.cancelReason = 'invalidConnection';
+      await runCancelledFinishPass(commandHandler);
+      return;
+    }
+
+    const { isValid, targetPosition } = validateTarget(commandHandler, targetNodeId, targetPortId);
+
+    if (!isValid) {
+      linking.cancelReason = 'invalidTarget';
+      await runCancelledFinishPass(commandHandler);
+      return;
+    }
+
+    await commandHandler.flowCore.applyUpdate(
+      {
+        edgesToAdd: [
+          createFinalEdge(commandHandler.flowCore.config, temporaryEdge, {
+            target: targetNodeId,
+            targetPort: targetPortId,
+            targetPosition: targetPosition || undefined,
+          }),
+        ],
+      },
+      'finishLinking'
+    );
+  } finally {
+    clearLinkingForGesture(commandHandler.flowCore.actionStateManager, gestureId);
   }
-
-  linking.dropPosition = command.position ?? { x: 0, y: 0 };
-
-  const { source, sourcePort, target, targetPort } = temporaryEdge;
-  const targetNodeId = target || undefined;
-  const targetPortId = targetPort || undefined;
-
-  if (!targetNodeId) {
-    linking.cancelReason = 'noTarget';
-    await clearTemporaryEdge(commandHandler);
-    return;
-  }
-
-  if (!validateConnection(commandHandler.flowCore, source, sourcePort, targetNodeId, targetPortId, true)) {
-    linking.cancelReason = 'invalidConnection';
-    await clearTemporaryEdge(commandHandler);
-    return;
-  }
-
-  const { isValid, targetPosition } = validateTarget(commandHandler, targetNodeId, targetPortId);
-
-  if (!isValid) {
-    linking.cancelReason = 'invalidTarget';
-    await clearTemporaryEdge(commandHandler);
-    return;
-  }
-
-  await commandHandler.flowCore.applyUpdate(
-    {
-      edgesToAdd: [
-        createFinalEdge(commandHandler.flowCore.config, temporaryEdge, {
-          target: targetNodeId,
-          targetPort: targetPortId,
-          targetPosition: targetPosition || undefined,
-        }),
-      ],
-    },
-    'finishLinking'
-  );
-
-  commandHandler.flowCore.actionStateManager.clearLinking();
 };

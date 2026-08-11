@@ -78,6 +78,7 @@ describe('startLinkingFromPosition', () => {
         sourceNodeId: '',
         sourcePortId: '',
         temporaryEdge: mockTemporaryEdge,
+        _gestureId: expect.any(Number),
       });
 
       expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinkingFromPosition');
@@ -116,6 +117,7 @@ describe('startLinkingFromPosition', () => {
         sourceNodeId: '',
         sourcePortId: '',
         temporaryEdge: mockTemporaryEdge,
+        _gestureId: expect.any(Number),
       });
     });
 
@@ -148,6 +150,7 @@ describe('startLinkingFromPosition', () => {
         sourceNodeId: '',
         sourcePortId: '',
         temporaryEdge: mockTemporaryEdge,
+        _gestureId: expect.any(Number),
       });
     });
   });

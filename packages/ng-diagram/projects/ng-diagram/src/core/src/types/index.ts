@@ -30,7 +30,7 @@ export type {
 } from './transaction.interface';
 
 // Panel position type
-export * from './panel-position.type';
+export * from './panel-position.interface';
 
 // Action state types
 export * from './action-state.interface';

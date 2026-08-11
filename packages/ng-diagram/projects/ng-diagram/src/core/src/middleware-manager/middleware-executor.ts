@@ -12,6 +12,7 @@ import type {
   Node,
 } from '../types';
 import { isSamePoint, isSameSize } from '../utils';
+import { PassSettlement } from './pass-settlement';
 
 export class MiddlewareExecutor {
   readonly flowCore: FlowCore;
@@ -146,52 +147,70 @@ export class MiddlewareExecutor {
   });
 
   private resolveMiddlewares = (): Promise<FlowState | undefined> => {
-    return new Promise<FlowState | undefined>((finalResolve) => {
-      const resolvers: ((state: FlowState) => void)[] = [];
-      const middlewaresExecutedIndexes = new Set<number>();
+    return new Promise<FlowState | undefined>((finalResolve, finalReject) => {
+      const settlement = new PassSettlement(finalResolve, finalReject);
+
+      // Fails the whole pass on a middleware error — a swallowed error would
+      // leave the pass pending forever with the update semaphore held.
+      const fail = (error: unknown) => settlement.settle({ kind: 'failed', error });
 
       const dispatch = (i: number) =>
-        new Promise<FlowState>((resolve) => {
+        new Promise<FlowState>((resolve, reject) => {
           const middleware = this.middlewareChain[i];
 
           if (!middleware) {
-            const state = this.getState();
-            finalResolve(state);
-            while (resolvers.length > 0) {
-              resolvers.pop()?.(state);
-            }
+            settlement.settle({ kind: 'completed', state: this.getState() });
             return;
           }
 
           const middlewareName = middleware.name;
 
-          if (middlewaresExecutedIndexes.has(i)) {
-            throw new Error(`Middleware ${middlewareName} executed next() multiple times`);
-          }
-          middlewaresExecutedIndexes.add(i);
+          settlement.suspend({ resolve, reject });
 
-          resolvers.push(resolve);
-
-          const next = async (stateUpdate?: FlowStateUpdate) => {
-            if (stateUpdate && Object.keys(stateUpdate).length > 0) {
-              this.applyStateUpdate(stateUpdate, middlewareName);
+          let nextCalled = false;
+          const next = (stateUpdate?: FlowStateUpdate) => {
+            let state: Promise<FlowState>;
+            if (nextCalled) {
+              const error = new Error(`Middleware ${middlewareName} executed next() multiple times`);
+              settlement.reportStrayError(error);
+              state = Promise.reject(error);
+            } else if (settlement.isSettled()) {
+              // Zombie: the pass settled while this middleware was suspended —
+              // dispatching the rest of the chain now would hijack a live pass's
+              // measurement tracking and emit phantom events. Return the pass
+              // outcome instead.
+              nextCalled = true;
+              state = settlement.lateNextResult();
+            } else {
+              nextCalled = true;
+              if (stateUpdate && Object.keys(stateUpdate).length > 0) {
+                this.applyStateUpdate(stateUpdate, middlewareName);
+              }
+              state = dispatch(i + 1);
             }
-            const state = await dispatch(i + 1);
+            // No-op rejection branch: fire-and-forget next() calls must not
+            // surface unhandled rejections when the pass fails; awaiting
+            // callers still receive the real rejection.
+            state.then(undefined, () => undefined);
             return state;
           };
-          const cancel = () => {
-            while (resolvers.length > 0) {
-              resolvers.pop()?.(this.initialState);
-            }
-            finalResolve(undefined);
-          };
+          const cancel = () => settlement.settle({ kind: 'cancelled', state: this.initialState });
 
           const context = this.getContext();
 
-          middleware.execute(context, next, cancel);
+          try {
+            const result = middleware.execute(context, next, cancel);
+            if (result && typeof result.then === 'function') {
+              result.then(undefined, fail);
+            }
+          } catch (error) {
+            fail(error);
+          }
         });
 
-      dispatch(0);
+      // Start the chain from the first middleware; mute the root promise's
+      // rejection — fail() already delivered it to the caller.
+      dispatch(0).catch(() => undefined);
     });
   };
 

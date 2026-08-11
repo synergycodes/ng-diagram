@@ -21,7 +21,9 @@ export class NodeDragStartedEmitter implements EventEmitter {
       return;
     }
 
-    const nodeIds = context.actionStateManager.dragging?.nodeIds;
+    // Prefer the pass's own capture over the (possibly newer-gesture) live
+    // state — see FlowStateUpdate.gestureNodeIds.
+    const nodeIds = context.initialUpdate.gestureNodeIds ?? context.actionStateManager.dragging?.nodeIds;
     if (!nodeIds || nodeIds.length === 0) {
       return;
     }
@@ -43,7 +45,10 @@ export class NodeDragEndedEmitter implements EventEmitter {
       return;
     }
 
-    const nodeIds = context.actionStateManager.dragging?.nodeIds;
+    const dragging = context.actionStateManager.dragging;
+    // Prefer the pass's own capture over the (possibly newer-gesture) live
+    // state — see FlowStateUpdate.gestureNodeIds.
+    const nodeIds = context.initialUpdate.gestureNodeIds ?? dragging?.nodeIds;
     if (!nodeIds || nodeIds.length === 0) {
       return;
     }
@@ -53,6 +58,9 @@ export class NodeDragEndedEmitter implements EventEmitter {
       return;
     }
 
-    eventManager.deferredEmit('nodeDragEnded', { nodes });
+    eventManager.deferredEmit('nodeDragEnded', {
+      nodes,
+      ...(dragging?.cancelReason && { cancelReason: dragging.cancelReason }),
+    });
   }
 }

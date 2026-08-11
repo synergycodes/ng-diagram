@@ -7,6 +7,7 @@ import { normalizeAngle } from './normalize-angle/normalize-angle';
 import { snapAngle } from './snap-angle/snap-angle';
 import { snapNumber } from './snap-number/snap-number';
 import { snapPoint } from './snap-point/snap-point';
+import { subtractPoints } from './subtract-points/subtract-points';
 
 /**
  * Collection of mathematical utility functions for diagram calculations.
@@ -22,5 +23,6 @@ export const NgDiagramMath = {
   snapAngle,
   snapNumber,
   snapPoint,
+  subtractPoints,
   calculateEdgePanningForce,
 };

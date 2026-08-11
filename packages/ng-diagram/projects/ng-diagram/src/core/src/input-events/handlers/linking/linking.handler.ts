@@ -1,3 +1,5 @@
+import { createLinkingState } from '../../../command-handler/commands/linking/linking-gesture';
+import type { InternalLinkingActionState } from '../../../types/action-state.interface';
 import { EventHandler } from '../event-handler';
 import { LinkingInputEvent } from './linking.event';
 
@@ -18,6 +20,9 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 
 export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
   handle(event: LinkingInputEvent): void {
+    if (this.flow.isCancellingInteraction()) {
+      return;
+    }
     switch (event.phase) {
       case 'start': {
         const sourceNodeId = event.target?.id;
@@ -25,11 +30,11 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
           throw new Error(LINKING_MISSING_TARGET_ERROR(event));
         }
 
-        this.flow.actionStateManager.linking = {
+        this.flow.actionStateManager.linking = createLinkingState({
           sourceNodeId,
           sourcePortId: event.portId,
           temporaryEdge: null,
-        };
+        });
 
         this.flow.commandHandler.emit('startLinking', {
           source: sourceNodeId,
@@ -56,6 +61,13 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
       case 'end': {
         if (!this.flow.actionStateManager.isLinking()) break;
 
+        // A taken-over end carries another pointer's coordinates — abort the
+        // linking instead of hit-testing them as the drop target.
+        if (event.takenOver) {
+          this.flow.commandHandler.emit('cancelLinking');
+          break;
+        }
+
         const flowPosition = this.flow.clientToFlowPosition(event.lastInputPoint);
 
         this.flow.commandHandler.emit('finishLinking', { position: flowPosition });
@@ -63,5 +75,16 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
         break;
       }
     }
+  }
+
+  override async cancel(): Promise<boolean> {
+    const linking = this.flow.actionStateManager.linking as InternalLinkingActionState | undefined;
+    // No linking, or a finishLinking/another cancel already owns the teardown.
+    if (!linking || linking._finishing) {
+      return false;
+    }
+
+    await this.flow.commandHandler.emit('cancelLinking');
+    return true;
   }
 }

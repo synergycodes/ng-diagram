@@ -104,6 +104,18 @@ export class Diagram {
     return this.node(nodeId).locator(`[data-port-id="${cssEscape(portId)}"]`);
   }
 
+  /** Model position of a node (flow coordinates). */
+  async nodePosition(id: string): Promise<Point> {
+    const node = await this.model.getNodeById(id);
+    if (!node) throw new Error(`node "${id}" not in model`);
+    return { x: node.position.x, y: node.position.y };
+  }
+
+  /** Center of a locator's bounding box (client px). */
+  async centerOf(locator: Locator, label: string): Promise<Point> {
+    return centerOf(await requireBox(locator, label));
+  }
+
   // ──────────────────────────────────────────────────────────────────────
   // Gestures (DOM-level)
   // ──────────────────────────────────────────────────────────────────────
@@ -128,20 +140,74 @@ export class Diagram {
     await this.pointerDrag(centerOf(src), centerOf(dst));
   }
 
+  /**
+   * Drag a resize handle (`top-left`, `bottom-right`, …) or a resize line
+   * (`top`, `right`, `bottom`, `left`) of an already selected node by the
+   * given delta (client px).
+   */
+  async dragResizeHandle(id: string, handle: string, delta: Point): Promise<void> {
+    const locator = this.node(id).locator(`.resize-handle--${handle}, .resize-line--${handle}`);
+    const box = await requireBox(locator, `resize handle "${handle}" of node "${id}"`);
+    // Grab lines off-center — the middle of a side line can overlap a port
+    const isLine = ['top', 'right', 'bottom', 'left'].includes(handle);
+    const start = isLine
+      ? {
+          x: box.x + box.width * (handle === 'left' || handle === 'right' ? 0.5 : 0.3),
+          y: box.y + box.height * (handle === 'top' || handle === 'bottom' ? 0.5 : 0.3),
+        }
+      : centerOf(box);
+    await this.pointerDrag(start, { x: start.x + delta.x, y: start.y + delta.y });
+  }
+
+  /** Drag the rotate handle of an already selected node by the given delta (client px). */
+  async dragRotateHandle(id: string, delta: Point, opts?: { settleFrame?: boolean }): Promise<void> {
+    const handle = await this.centerOf(this.node(id).locator('.ng-diagram-rotate-handle'), `rotate handle of "${id}"`);
+    await this.beginDrag(
+      handle,
+      { x: handle.x + delta.x, y: handle.y + delta.y },
+      { settleFrame: opts?.settleFrame ?? false }
+    );
+    await this.page.mouse.up();
+  }
+
   /** Pan the canvas from an empty corner by a delta. */
   async panBy(delta: Point): Promise<void> {
     const box = await requireBox(this.container, 'container');
     const start = { x: box.x + box.width - 30, y: box.y + box.height - 30 };
-    await this.pointerDrag(start, { x: start.x + delta.x, y: start.y + delta.y });
+    // Panning's end phase intentionally ignores the release point (a trailing
+    // frame of viewport travel is benign), so exact-value pan assertions need
+    // beginDrag's settle frame before the release.
+    await this.beginDrag(start, { x: start.x + delta.x, y: start.y + delta.y });
+    await this.page.mouse.up();
   }
 
-  /** Pointer drag with an intermediate move so the diagram registers a drag rather than a click. */
-  private async pointerDrag(from: Point, to: Point): Promise<void> {
+  /** Begin a drag: pointer-down plus moves WITHOUT the release — the gesture stays in flight. */
+  async beginDrag(from: Point, to: Point, opts?: { settleFrame?: boolean }): Promise<void> {
     const mid = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
     await this.page.mouse.move(from.x, from.y);
     await this.page.mouse.down();
     await this.page.mouse.move(mid.x, mid.y, { steps: 6 });
     await this.page.mouse.move(to.x, to.y, { steps: 6 });
+    if (opts?.settleFrame ?? true) {
+      // pointermove delivery is frame-aligned in Chromium — give the final
+      // coalesced move a frame to arrive before the caller proceeds
+      await this.nextFrame();
+    }
+  }
+
+  /** Waits one animation frame in the page. */
+  nextFrame(): Promise<unknown> {
+    return this.page.evaluate(() => new Promise(requestAnimationFrame));
+  }
+
+  /**
+   * Pointer drag with an intermediate move so the diagram registers a drag
+   * rather than a click. Releases without waiting a frame — the trailing
+   * coalesced pointermove is lost and the gesture's end phase must recover it
+   * from the pointerup position, like a real user's fast release.
+   */
+  private async pointerDrag(from: Point, to: Point): Promise<void> {
+    await this.beginDrag(from, to, { settleFrame: false });
     await this.page.mouse.up();
   }
 }

@@ -10,6 +10,14 @@ State tracking a node rotation operation in progress.
 
 ## Properties
 
+### cancelReason?
+
+> `optional` **cancelReason**: `"cancelled"`
+
+Set when the rotation is aborted; carried into `nodeRotateEnded`.
+
+***
+
 ### initialNodeAngle
 
 > **initialNodeAngle**: `number`

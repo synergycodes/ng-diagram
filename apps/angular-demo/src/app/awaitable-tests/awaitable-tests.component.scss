@@ -1,0 +1,127 @@
+:host {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  max-width: 90vw;
+}
+
+.awaitable-tests {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background: #ffffff;
+  border-radius: 4px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .separator {
+    color: #ccc;
+    margin: 0 -2px;
+    user-select: none;
+  }
+
+  .group-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+  }
+
+  .summary {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: monospace;
+  }
+
+  .hint {
+    font-size: 11px;
+    color: #999;
+    font-style: italic;
+  }
+}
+
+.warning {
+  font-size: 12px;
+  color: #8a6d00;
+  background: #fdf6dd;
+  border-radius: 3px;
+  padding: 4px 8px;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  font-family: monospace;
+
+  .result {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 6px;
+    border-radius: 3px;
+
+    &.pass {
+      background: #e8f5e9;
+    }
+
+    &.fail {
+      background: #ffebee;
+    }
+  }
+
+  .status {
+    flex-shrink: 0;
+  }
+
+  .name {
+    font-weight: 600;
+    min-width: 320px;
+  }
+
+  .elapsed {
+    color: #666;
+    min-width: 50px;
+    text-align: right;
+  }
+
+  .details {
+    color: #888;
+  }
+
+  .failures {
+    margin: 0;
+    padding: 0 0 0 16px;
+    color: #c62828;
+    font-size: 11px;
+  }
+}
+
+.manual {
+  font-size: 12px;
+  color: #444;
+
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #666;
+  }
+
+  ol {
+    margin: 6px 0 0;
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+}

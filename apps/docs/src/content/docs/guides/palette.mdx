@@ -13,12 +13,12 @@ The palette system consists of built-in components that can be customized to cre
 The core building block of the palette is the [`<ng-diagram-palette-item>`](/docs/api/components/ngdiagrampaletteitemcomponent) component.
 It transforms any content into a draggable palette item. This wrapper provides drag-and-drop capabilities without imposing visual constraints on the content itself.
 
-A palette item is defined by an [`NgDiagramPaletteItem`](/docs/api/components/ngdiagrampaletteitemcomponent/):
+A palette item is defined by an [`NgDiagramPaletteItem`](/docs/api/types/palette/ngdiagrampaletteitem/):
 
 ```typescript
-interface NgDiagramPaletteItem {
+interface NgDiagramPaletteItem<Data extends object = BasePaletteItemData> {
   type?: string;
-  data: T;
+  data: Data;
   resizable?: boolean;
   rotatable?: boolean;
   angle?: number;

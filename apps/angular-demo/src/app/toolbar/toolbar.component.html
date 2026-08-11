@@ -9,6 +9,7 @@
     {{ isLabelAbsolute() ? 'Label: Absolute → Relative' : 'Label: Relative → Absolute' }}
   </button>
   <button (click)="onZoomToFitClick()">Zoom to fit</button>
+  <button (click)="onResizeUnselectedGroup()">Resize Unselected Group</button>
   <button (click)="onAsyncTransactionWithMeasurementsDemo()">Async + Measurements + Zoom</button>
   <button (click)="onCreateEdgeWithLabel()">Create Edge with Label</button>
   <button (click)="saveModelClick.emit()">Save to localStorage</button>
@@ -18,4 +19,5 @@
   <button (click)="simulateModelDownloadClick.emit()">Simulate Model Download</button>
   <button (click)="enterBatchTest.emit()">Batch Test Mode</button>
   <button (click)="measurementTestEnter.emit()">Test Measurements</button>
+  <button (click)="awaitableTestEnter.emit()">Test Awaitable API</button>
 </div>

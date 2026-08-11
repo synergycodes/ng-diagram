@@ -8,10 +8,7 @@ import type { InputEventName } from '../input-events/input-events.interface';
  * @category Types/Configuration/Shortcuts
  */
 export type KeyboardMoveSelectionAction =
-  | 'keyboardMoveSelectionUp'
-  | 'keyboardMoveSelectionDown'
-  | 'keyboardMoveSelectionLeft'
-  | 'keyboardMoveSelectionRight';
+  'keyboardMoveSelectionUp' | 'keyboardMoveSelectionDown' | 'keyboardMoveSelectionLeft' | 'keyboardMoveSelectionRight';
 
 /**
  * Keyboard panning actions that map to directional events
@@ -62,7 +59,10 @@ export type KeyboardActionName =
   | KeyboardMoveSelectionAction
   | KeyboardPanAction
   | KeyboardZoomAction
-  | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll'>;
+  | Extract<
+      InputEventName,
+      'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll' | 'cancelInteraction'
+    >;
 
 /**
  * All valid action names for shortcuts
