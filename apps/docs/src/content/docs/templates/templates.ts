@@ -65,11 +65,11 @@ export const templates: Template[] = [
     type: 'regular',
     title: 'Assembly Line',
     description:
-      'Interactive production-line monitor for automotive assembly plants. A starter kit for building your own live monitoring dashboard: drag-and-drop line editing, Edit/Monitor modes with a real-time data feed, threshold-colored KPIs and sparklines, and export to PNG, SVG, or DXF for AutoCAD.',
+      'Interactive production-line monitor for manufacturing plants. A starter kit for building your own live monitoring dashboard: drag-and-drop line editing, Edit/Monitor modes with a real-time data feed, threshold-colored KPIs and sparklines, and export to PNG, SVG, or DXF for AutoCAD.',
     href: 'https://www.ngdiagram.dev/templates/assembly-line/',
     codeHref: 'https://github.com/synergycodes/ng-diagram-assembly-line',
     image: '/docs/assets/templates/assembly-line.png',
     imageAlt:
-      'Screenshot of the Assembly Line monitor: production modules connected by conveyor flows on a canvas, with live status badges, KPI grids and sparklines streaming in Monitor mode.',
+      'Screenshot of the Assembly Line monitor: production modules connected by conveyor flows on a canvas, with the module palette on the left, live status badges and KPI grids on the nodes, and a threshold editor in the properties panel.',
   },
 ];
