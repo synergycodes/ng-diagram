@@ -37,7 +37,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "gray-matter": "^4.0.3",
     "minisearch": "^7.2.0",
     "zod": "^3.25"
