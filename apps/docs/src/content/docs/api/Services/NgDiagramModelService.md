@@ -115,7 +115,7 @@ A promise that resolves once the change has been applied to the model. Inside a 
 
 ### computePartsBounds()
 
-> **computePartsBounds**(`nodes`, `edges`): [`Rect`](/docs/api/types/geometry/rect/)
+> **computePartsBounds**(`nodes`, `edges`): [`Rect`](/docs/api/types/geometry/rect/) \| `null`
 
 #### Parameters
 
@@ -133,15 +133,21 @@ Array of edges
 
 #### Returns
 
-[`Rect`](/docs/api/types/geometry/rect/)
+[`Rect`](/docs/api/types/geometry/rect/) \| `null`
 
-Bounding rectangle containing all nodes and edges
+Bounding rectangle containing all nodes and edges, or `null` when there is nothing
+to measure — both arrays are empty, no node has `measuredBounds`, and no edge has `points`.
 
 #### Since
 
 0.9.0
 
 Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
+
+Node bounds are derived from `measuredBounds` — which folds in measured ports and rotation —
+not from the raw `position`/`size` on the model. Nodes must therefore already be measured
+(rendered), and the result can extend beyond the raw node rects by the port extents.
+Edges contribute their routed `points` and measured labels.
 
 ***
 

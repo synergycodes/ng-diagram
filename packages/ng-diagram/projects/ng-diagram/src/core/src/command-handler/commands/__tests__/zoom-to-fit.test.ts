@@ -338,7 +338,48 @@ describe('zoomToFit command', () => {
 
       await zoomToFit(commandHandler, { name: 'zoomToFit', nodeIds: ['999', 'invalid'] });
 
+      expect(mockApplyUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should frame only the selected nodes away from the origin when no edges are targeted', async () => {
+      const nodes: Node[] = [
+        {
+          id: '1',
+          position: { x: 680, y: 220 },
+          size: { width: 240, height: 300 },
+          data: {},
+          measuredBounds: { x: 680, y: 220, width: 240, height: 300 },
+        },
+        {
+          id: '2',
+          position: { x: 1040, y: 260 },
+          size: { width: 240, height: 240 },
+          data: {},
+          measuredBounds: { x: 1040, y: 260, width: 240, height: 240 },
+        },
+      ];
+
+      const state: FlowState = {
+        nodes,
+        edges: [],
+        metadata: {
+          viewport: { x: 0, y: 0, scale: 1, width: 800, height: 600 },
+        },
+      };
+
+      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue(state);
+
+      await zoomToFit(commandHandler, { name: 'zoomToFit', nodeIds: ['1', '2'] });
+
       expect(mockApplyUpdate).toHaveBeenCalled();
+      const { viewport } = mockApplyUpdate.mock.calls[0][0].metadataUpdate;
+
+      // Bounds must be {680, 220, 600, 300} — not dragged back to the origin.
+      // With padding 20, available space is 760x560 → scale limited by width.
+      expect(viewport.scale).toBeCloseTo(760 / 600, 5);
+      // Viewport centers on the subset center (980, 370).
+      expect(viewport.x).toBeCloseTo(400 - 980 * viewport.scale, 5);
+      expect(viewport.y).toBeCloseTo(300 - 370 * viewport.scale, 5);
     });
   });
 
@@ -394,7 +435,7 @@ describe('zoomToFit command', () => {
 
       await zoomToFit(commandHandler, { name: 'zoomToFit' });
 
-      expect(mockApplyUpdate).toHaveBeenCalled();
+      expect(mockApplyUpdate).not.toHaveBeenCalled();
     });
 
     it('should fit nodes and edges together', async () => {
@@ -520,7 +561,7 @@ describe('zoomToFit command', () => {
 
       await zoomToFit(commandHandler, { name: 'zoomToFit' });
 
-      expect(mockApplyUpdate).toHaveBeenCalled();
+      expect(mockApplyUpdate).not.toHaveBeenCalled();
     });
 
     it('should handle node missing measuredBounds gracefully', async () => {
@@ -544,7 +585,7 @@ describe('zoomToFit command', () => {
 
       await zoomToFit(commandHandler, { name: 'zoomToFit' });
 
-      expect(mockApplyUpdate).toHaveBeenCalled();
+      expect(mockApplyUpdate).not.toHaveBeenCalled();
     });
 
     it('should not update if viewport dimensions are missing', async () => {

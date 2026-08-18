@@ -299,10 +299,10 @@ describe('rects', () => {
   });
 
   describe('unionRect', () => {
-    it('should return a zero rect for empty array', () => {
+    it('should return null for empty array', () => {
       const result = unionRect([]);
 
-      expect(result).toEqual({ x: 0, y: 0, width: 0, height: 0 });
+      expect(result).toBeNull();
     });
 
     it('should return the same rect for single rect', () => {

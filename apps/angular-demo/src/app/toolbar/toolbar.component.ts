@@ -130,6 +130,27 @@ export class ToolbarComponent {
     console.log('[demo] Group size after resize', updated?.size);
   }
 
+  /**
+   * Demonstrates computePartsBounds with a nodes-only subset (edges: []).
+   * Computes the bounds of the selected nodes (or all nodes when nothing is
+   * selected) and centers the viewport on that rect. Before the unionRect fix,
+   * the bounds of parts away from the origin leaked back to (0, 0).
+   */
+  onCenterOnPartsBoundsClick() {
+    const selectedNodes = this.ngDiagramSelectionService.selection().nodes;
+    const nodes = selectedNodes.length > 0 ? selectedNodes : this.ngDiagramModelService.nodes();
+
+    const bounds = this.ngDiagramModelService.computePartsBounds(nodes, []);
+
+    if (!bounds) {
+      console.warn('[demo] computePartsBounds returned null — no measured nodes to compute bounds for.');
+      return;
+    }
+
+    console.log('[demo] computePartsBounds of', nodes.length, 'node(s):', bounds);
+    this.ngDiagramViewportService.centerOnRect(bounds);
+  }
+
   onChangeNodeTypeClick() {
     const selectedNodes = this.ngDiagramSelectionService.selection().nodes;
 
