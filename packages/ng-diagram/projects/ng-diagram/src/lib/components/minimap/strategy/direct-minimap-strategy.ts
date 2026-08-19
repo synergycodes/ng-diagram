@@ -40,7 +40,7 @@ export class DirectMinimapStrategy implements MinimapStrategy {
   }
 
   computeDiagramBounds(): Rect {
-    return calculatePartsBounds(this.renderer.nodes(), []);
+    return calculatePartsBounds(this.renderer.nodes(), []) ?? { x: 0, y: 0, width: 0, height: 0 };
   }
 
   private invalidateCacheIfNeeded(

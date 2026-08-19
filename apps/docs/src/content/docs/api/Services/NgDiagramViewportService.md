@@ -408,6 +408,7 @@ this.viewportService.zoomToFit({ nodeIds: ['node1', 'node2'] });
 const anchor = { x: 0.5, y: 0.5 };
 const { width, height } = this.modelService.metadata().viewport;
 const bounds = this.modelService.computePartsBounds(nodes, edges);
+if (!bounds.width || !bounds.height) return; // nothing measurable to fit
 const scale = Math.min(width / bounds.width, height / bounds.height);
 const x = width * anchor.x - (bounds.x + bounds.width * anchor.x) * scale;
 const y = height * anchor.y - (bounds.y + bounds.height * anchor.y) * scale;

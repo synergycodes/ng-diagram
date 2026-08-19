@@ -274,12 +274,20 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * @since 0.9.0
    *
    * Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
+   *
+   * Node bounds are derived from `measuredBounds` — which folds in measured ports and rotation —
+   * not from the raw `position`/`size` on the model. Nodes must therefore already be measured
+   * (rendered), and the result can extend beyond the raw node rects by the port extents.
+   * Edges contribute their routed `points` and measured labels.
+   *
    * @param nodes Array of nodes
    * @param edges Array of edges
-   * @returns Bounding rectangle containing all nodes and edges
+   * @returns Bounding rectangle containing all nodes and edges. When there is nothing to
+   * measure — both arrays are empty, no node has `measuredBounds`, and no edge has `points` —
+   * returns a zero-size rectangle at the origin (`{ x: 0, y: 0, width: 0, height: 0 }`).
    */
   computePartsBounds(nodes: Node[], edges: Edge[]): Rect {
-    return calculatePartsBounds(nodes, edges);
+    return calculatePartsBounds(nodes, edges) ?? { x: 0, y: 0, width: 0, height: 0 };
   }
 
   // ===================

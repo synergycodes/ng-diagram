@@ -1,19 +1,20 @@
 import { Edge, Node, Rect } from '../types';
 import { boundingRectOfPoints, getRect, getRotatedBoundingRect, unionRect } from './rects-points-sizes';
 
-const calculateNodeBounds = (nodes: Node[]): Rect => {
+const calculateNodeBounds = (nodes: Node[]): Rect | null => {
   return unionRect(nodes.map((node) => node.measuredBounds).filter((rect): rect is Rect => rect !== undefined));
 };
 
-const calculateEdgeBounds = (edges: Edge[]): Rect => {
-  return unionRect(edges.map(getEdgeMeasuredBounds));
+const calculateEdgeBounds = (edges: Edge[]): Rect | null => {
+  return unionRect(edges.filter((edge) => edge.points?.length).map(getEdgeMeasuredBounds));
 };
 
-export const calculatePartsBounds = (nodes: Node[], edges: Edge[]): Rect => {
-  const nodeBounds = calculateNodeBounds(nodes);
-  const edgeBounds = calculateEdgeBounds(edges);
+export const calculatePartsBounds = (nodes: Node[], edges: Edge[]): Rect | null => {
+  const partsBounds = [calculateNodeBounds(nodes), calculateEdgeBounds(edges)].filter(
+    (rect): rect is Rect => rect !== null
+  );
 
-  return unionRect([nodeBounds, edgeBounds]);
+  return unionRect(partsBounds);
 };
 
 export const getEdgeMeasuredBounds = (edge: Edge): Rect => {
@@ -44,14 +45,12 @@ export const getNodeMeasuredBounds = (node: Node): Rect => {
   const localNodeRect = { x: 0, y: 0, width, height };
   const rotatedLocalRect = getRotatedBoundingRect(localNodeRect, node.angle || 0);
 
-  const allRects: Rect[] = [rotatedLocalRect];
-
-  for (const port of ports) {
+  const portRects = ports.map((port) => {
     const { x: px, y: py, width: pw, height: ph } = getRect(port);
-    allRects.push({ x: px, y: py, width: pw, height: ph });
-  }
+    return { x: px, y: py, width: pw, height: ph };
+  });
 
-  const localBounds = unionRect(allRects);
+  const localBounds = unionRect([rotatedLocalRect, ...portRects]);
 
   return {
     x: x + localBounds.x,

@@ -615,18 +615,13 @@ describe('dimensions', () => {
       });
     });
 
-    it('should handle empty nodes and edges', () => {
+    it('should return null for empty nodes and edges', () => {
       const result = calculatePartsBounds([], []);
 
-      expect(result).toEqual({
-        x: 0,
-        y: 0,
-        width: 0,
-        height: 0,
-      });
+      expect(result).toBeNull();
     });
 
-    it('should handle only nodes', () => {
+    it('should not union the origin when only nodes are provided', () => {
       const nodes: Node[] = [
         {
           id: 'node-1',
@@ -640,14 +635,14 @@ describe('dimensions', () => {
       const result = calculatePartsBounds(nodes, []);
 
       expect(result).toEqual({
-        x: 0,
-        y: 0,
-        width: 150,
-        height: 155,
+        x: 50,
+        y: 75,
+        width: 100,
+        height: 80,
       });
     });
 
-    it('should handle only edges', () => {
+    it('should not union the origin when only edges are provided', () => {
       const edges: Edge[] = [
         {
           id: 'edge-1',
@@ -664,11 +659,54 @@ describe('dimensions', () => {
       const result = calculatePartsBounds([], edges);
 
       expect(result).toEqual({
-        x: 0,
-        y: 0,
-        width: 50,
-        height: 60,
+        x: 10,
+        y: 20,
+        width: 40,
+        height: 40,
       });
+    });
+
+    it('should compute subset bounds for nodes away from the origin with no edges', () => {
+      const nodes: Node[] = [
+        {
+          id: 'node-1',
+          position: { x: 680, y: 220 },
+          size: { width: 240, height: 300 },
+          data: {},
+          measuredBounds: { x: 680, y: 220, width: 240, height: 300 },
+        },
+        {
+          id: 'node-2',
+          position: { x: 1040, y: 260 },
+          size: { width: 240, height: 240 },
+          data: {},
+          measuredBounds: { x: 1040, y: 260, width: 240, height: 240 },
+        },
+      ];
+
+      const result = calculatePartsBounds(nodes, []);
+
+      expect(result).toEqual({
+        x: 680,
+        y: 220,
+        width: 600,
+        height: 300,
+      });
+    });
+
+    it('should return null when no node is measured and there are no edges', () => {
+      const nodes: Node[] = [
+        {
+          id: 'node-1',
+          position: { x: 680, y: 220 },
+          size: { width: 240, height: 300 },
+          data: {},
+        },
+      ];
+
+      const result = calculatePartsBounds(nodes, []);
+
+      expect(result).toBeNull();
     });
 
     it('should handle nodes without measuredBounds', () => {
@@ -693,10 +731,10 @@ describe('dimensions', () => {
       const result = calculatePartsBounds(nodes, edges);
 
       expect(result).toEqual({
-        x: 0,
-        y: 0,
-        width: 150,
-        height: 150,
+        x: 100,
+        y: 100,
+        width: 50,
+        height: 50,
       });
     });
 
@@ -766,13 +804,14 @@ describe('dimensions', () => {
 
       const result = calculatePartsBounds(nodes, []);
 
-      expect(result.x).toBeCloseTo(-3.033, 1);
-      expect(result.y).toBeCloseTo(-3.033, 1);
-      expect(result.width).toBeCloseTo(106.066, 1);
-      expect(result.height).toBeCloseTo(106.066, 1);
+      expect(result).not.toBeNull();
+      expect(result!.x).toBeCloseTo(-3.033, 1);
+      expect(result!.y).toBeCloseTo(-3.033, 1);
+      expect(result!.width).toBeCloseTo(106.066, 1);
+      expect(result!.height).toBeCloseTo(106.066, 1);
     });
 
-    it('should handle edges with no points', () => {
+    it('should ignore edges with no points', () => {
       const nodes: Node[] = [
         {
           id: 'node-1',
@@ -795,10 +834,10 @@ describe('dimensions', () => {
       const result = calculatePartsBounds(nodes, edges);
 
       expect(result).toEqual({
-        x: 0,
-        y: 0,
-        width: 60,
-        height: 60,
+        x: 10,
+        y: 10,
+        width: 50,
+        height: 50,
       });
     });
   });

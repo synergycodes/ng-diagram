@@ -128,10 +128,6 @@ export const calculateBoundsFromPositions = (
   nodes: Node[],
   defaultSize: { width: number; height: number } = DEFAULT_NODE_SIZE
 ): Rect => {
-  if (nodes.length === 0) {
-    return { x: 0, y: 0, width: 0, height: 0 };
-  }
-
   const rects = nodes.map((node) => {
     const size = node.size ?? defaultSize;
     const baseRect: Rect = {
@@ -143,7 +139,7 @@ export const calculateBoundsFromPositions = (
     return getRotatedBoundingRect(baseRect, node.angle ?? 0);
   });
 
-  return unionRect(rects);
+  return unionRect(rects) ?? { x: 0, y: 0, width: 0, height: 0 };
 };
 
 /**
