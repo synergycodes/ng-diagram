@@ -115,7 +115,7 @@ A promise that resolves once the change has been applied to the model. Inside a 
 
 ### computePartsBounds()
 
-> **computePartsBounds**(`nodes`, `edges`): `null` \| [`Rect`](/docs/api/types/geometry/rect/)
+> **computePartsBounds**(`nodes`, `edges`): [`Rect`](/docs/api/types/geometry/rect/)
 
 #### Parameters
 
@@ -133,10 +133,11 @@ Array of edges
 
 #### Returns
 
-`null` \| [`Rect`](/docs/api/types/geometry/rect/)
+[`Rect`](/docs/api/types/geometry/rect/)
 
-Bounding rectangle containing all nodes and edges, or `null` when there is nothing
-to measure — both arrays are empty, no node has `measuredBounds`, and no edge has `points`.
+Bounding rectangle containing all nodes and edges. When there is nothing to
+measure — both arrays are empty, no node has `measuredBounds`, and no edge has `points` —
+returns a zero-size rectangle at the origin (`{ x: 0, y: 0, width: 0, height: 0 }`).
 
 #### Since
 

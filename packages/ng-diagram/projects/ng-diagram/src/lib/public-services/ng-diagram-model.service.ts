@@ -282,11 +282,12 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    *
    * @param nodes Array of nodes
    * @param edges Array of edges
-   * @returns Bounding rectangle containing all nodes and edges, or `null` when there is nothing
-   * to measure — both arrays are empty, no node has `measuredBounds`, and no edge has `points`.
+   * @returns Bounding rectangle containing all nodes and edges. When there is nothing to
+   * measure — both arrays are empty, no node has `measuredBounds`, and no edge has `points` —
+   * returns a zero-size rectangle at the origin (`{ x: 0, y: 0, width: 0, height: 0 }`).
    */
-  computePartsBounds(nodes: Node[], edges: Edge[]): Rect | null {
-    return calculatePartsBounds(nodes, edges);
+  computePartsBounds(nodes: Node[], edges: Edge[]): Rect {
+    return calculatePartsBounds(nodes, edges) ?? { x: 0, y: 0, width: 0, height: 0 };
   }
 
   // ===================

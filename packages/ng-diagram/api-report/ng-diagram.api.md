@@ -1030,7 +1030,7 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     addNodes(nodes: Node_2[], options?: {
         waitForMeasurements?: boolean;
     }): Promise<void>;
-    computePartsBounds(nodes: Node_2[], edges: Edge[]): Rect | null;
+    computePartsBounds(nodes: Node_2[], edges: Edge[]): Rect;
     deleteEdges(ids: string[]): Promise<void>;
     deleteNodes(ids: string[]): Promise<void>;
     readonly edges: Signal<Edge<object>[]>;

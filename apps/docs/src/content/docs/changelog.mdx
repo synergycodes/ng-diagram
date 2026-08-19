@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`computePartsBounds` no longer drags the result to the origin** — when one of the lists was empty (most commonly `computePartsBounds(nodes, [])`) or contained nothing measurable, the returned rectangle was silently unioned with a zero-size rectangle at `(0, 0)`, pulling the bounds back to the origin. The bounds now cover exactly the measurable parts; when there is nothing to measure at all, a zero-size rectangle at the origin is returned as before. The minimap now frames diagrams positioned away from the origin correctly, and `zoomToFit({ nodeIds })` fits the requested subset instead of the origin (`zoomToFit` on an empty or unmeasured diagram is a no-op) ([#793](https://github.com/synergycodes/ng-diagram/pull/793))
+
 ## [1.3.0] - 2026-08-10
 
 ### Changed
