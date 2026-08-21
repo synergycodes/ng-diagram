@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`tabbable` input on `<ng-diagram>`** — set `[tabbable]="false"` to remove the diagram's own Tab stops (the container element and the watermark link) from the page's Tab order, for example when your application manages Tab order itself with a roving tabindex on the nodes. Both elements stay clickable and keep working with screen readers, and keyboard shortcuts keep working once the diagram is focused, for example by a click. Focusable content in your own node and edge templates keeps its own Tab stops. Defaults to `true`. If you set a `tabindex` attribute on `<ng-diagram>` in your template, it no longer takes effect — the diagram now controls that attribute; use `[tabbable]="false"` instead ([#790](https://github.com/synergycodes/ng-diagram/issues/790), [#795](https://github.com/synergycodes/ng-diagram/pull/795)) — thanks [@jimmeryn](https://github.com/jimmeryn) for the issue submission! 🙏
+
 ### Fixed
 
 - **`computePartsBounds` no longer drags the result to the origin** — when one of the lists was empty (most commonly `computePartsBounds(nodes, [])`) or contained nothing measurable, the returned rectangle was silently unioned with a zero-size rectangle at `(0, 0)`, pulling the bounds back to the origin. The bounds now cover exactly the measurable parts; when there is nothing to measure at all, a zero-size rectangle at the origin is returned as before. The minimap now frames diagrams positioned away from the origin correctly, and `zoomToFit({ nodeIds })` fits the requested subset instead of the origin (`zoomToFit` on an empty or unmeasured diagram is a no-op) ([#793](https://github.com/synergycodes/ng-diagram/pull/793))

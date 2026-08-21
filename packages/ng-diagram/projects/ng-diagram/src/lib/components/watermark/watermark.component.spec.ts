@@ -6,11 +6,12 @@ import { NgDiagramPanelPosition } from '../../types/panel-position';
 import { NgDiagramWatermarkComponent } from './watermark.component';
 
 @Component({
-  template: `<ng-diagram-watermark [preferredPosition]="preferredPosition()" />`,
+  template: `<ng-diagram-watermark [preferredPosition]="preferredPosition()" [tabbable]="tabbable()" />`,
   imports: [NgDiagramWatermarkComponent],
 })
 class TestHostComponent {
   preferredPosition = signal<NgDiagramPanelPosition | undefined>(undefined);
+  tabbable = signal(true);
 }
 
 describe('NgDiagramWatermarkComponent', () => {
@@ -83,5 +84,20 @@ describe('NgDiagramWatermarkComponent', () => {
     panelPosition.set('bottom-right');
 
     expect(watermark.position()).toBe('top-left');
+  });
+
+  describe('tabbable', () => {
+    const getLink = () => fixture.nativeElement.querySelector('a') as HTMLAnchorElement;
+
+    it('leaves the link in the Tab order when tabbable is true', () => {
+      expect(getLink().getAttribute('tabindex')).toBeNull();
+    });
+
+    it('sets tabindex="-1" on the link when tabbable is false', () => {
+      host.tabbable.set(false);
+      fixture.detectChanges();
+
+      expect(getLink().getAttribute('tabindex')).toBe('-1');
+    });
   });
 });

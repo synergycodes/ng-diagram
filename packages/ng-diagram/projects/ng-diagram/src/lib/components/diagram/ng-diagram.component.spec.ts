@@ -178,6 +178,44 @@ describe('AngularAdapterDiagramComponent', () => {
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
+  describe('tabbable', () => {
+    it('renders the host with tabindex="0" by default', () => {
+      expect((fixture.nativeElement as HTMLElement).getAttribute('tabindex')).toBe('0');
+    });
+
+    it('renders the host with tabindex="-1" when tabbable is false', () => {
+      fixture.componentRef.setInput('tabbable', false);
+      fixture.detectChanges();
+
+      expect((fixture.nativeElement as HTMLElement).getAttribute('tabindex')).toBe('-1');
+    });
+
+    it.each([
+      { value: undefined, label: 'undefined (unset optional binding)', expected: '0' },
+      { value: null, label: 'null', expected: '0' },
+      { value: 'false', label: 'the string "false" (static attribute)', expected: '-1' },
+      { value: '', label: 'an empty string (bare attribute)', expected: '0' },
+    ])('resolves $label to tabindex="$expected"', ({ value, expected }) => {
+      fixture.componentRef.setInput('tabbable', value);
+      fixture.detectChanges();
+
+      expect((fixture.nativeElement as HTMLElement).getAttribute('tabindex')).toBe(expected);
+    });
+
+    it('forwards tabbable=false to the watermark link', () => {
+      fixture.componentRef.setInput('tabbable', false);
+      fixture.detectChanges();
+
+      const watermarkLink = (fixture.nativeElement as HTMLElement).querySelector('ng-diagram-watermark a');
+      expect(watermarkLink?.getAttribute('tabindex')).toBe('-1');
+    });
+
+    it('leaves the watermark link without tabindex by default', () => {
+      const watermarkLink = (fixture.nativeElement as HTMLElement).querySelector('ng-diagram-watermark a')!;
+      expect(watermarkLink.getAttribute('tabindex')).toBeNull();
+    });
+  });
+
   describe('getNodeTemplate', () => {
     it('should return null for non-existent node template', () => {
       expect(component.getNodeTemplate('non-existent')).toBeNull();
