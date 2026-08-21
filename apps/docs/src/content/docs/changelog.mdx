@@ -5,6 +5,8 @@ description: All notable changes to NgDiagram
 
 {/* This file is auto-generated during build from /CHANGELOG.md - Do not edit manually */}
 
+# Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -15,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Added
+
+- **`tabbable` input on `<ng-diagram>`** — controls whether the diagram takes part in the page's sequential Tab order. With `[tabbable]="false"` the diagram host renders with `tabindex="-1"` and the watermark link is skipped by Tab as well, so an application that manages its own Tab order (for example a roving tabindex on the nodes) gets no extra Tab stops from the diagram. Both elements stay clickable, stay in the accessibility tree, and keyboard shortcuts keep working whenever focus is inside the diagram. Defaults to `true`, which keeps the current behavior. If you removed the Tab stop by writing a `tabindex` attribute on `<ng-diagram>` yourself, switch to `[tabbable]="false"` — the diagram sets that attribute itself now, so a value written in your template no longer takes effect ([#790](https://github.com/synergycodes/ng-diagram/issues/790), [#795](https://github.com/synergycodes/ng-diagram/pull/795)) — thanks [@jimmeryn](https://github.com/jimmeryn) for the issue submission! 🙏
 
 ### Fixed
 

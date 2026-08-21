@@ -56,10 +56,12 @@ export class Diagram {
   // ──────────────────────────────────────────────────────────────────────
 
   /**
-   * Navigate to the harness. Optionally seed the model and/or config — both
-   * land on `window` before bootstrap via `addInitScript`.
+   * Navigate to the harness. Optionally seed the model, config and/or the
+   * `tabbable` input — all land on `window` before bootstrap via `addInitScript`.
    */
-  async load(options: { model?: Partial<Model>; config?: Partial<NgDiagramConfig> } = {}): Promise<void> {
+  async load(
+    options: { model?: Partial<Model>; config?: Partial<NgDiagramConfig>; tabbable?: boolean } = {}
+  ): Promise<void> {
     if (options.model !== undefined) {
       await this.page.addInitScript((m) => {
         window.__diagramSeed = m;
@@ -69,6 +71,11 @@ export class Diagram {
       await this.page.addInitScript((c) => {
         window.__diagramConfig = c;
       }, options.config);
+    }
+    if (options.tabbable !== undefined) {
+      await this.page.addInitScript((t) => {
+        window.__diagramTabbable = t;
+      }, options.tabbable);
     }
     await this.page.goto('/');
     await this.page.waitForFunction(() => window.__diagramReady === true);

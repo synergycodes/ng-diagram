@@ -40,6 +40,26 @@ All available shortcut actions with their default key bindings. See [`ShortcutAc
 | `undo`                       | <kbd>Ctrl/Cmd + Z</kbd>                   | Undo last action (not implemented by default; requires custom model)                                                |
 | `zoom`                       | <kbd>Ctrl/Cmd + Wheel</kbd>               | Increase or decrease diagram viewport scale                                                                         |
 
+## Focus and Tab Order
+
+Shortcuts only work when the focus is inside the diagram. The diagram takes the focus when the user clicks it, and it is
+also part of the page's Tab order, so the user can reach it with the <kbd>Tab</kbd> key.
+
+The diagram adds two Tab stops: the diagram itself and the watermark link.
+
+### Removing the Diagram from the Tab Order <Badge text="since v1.3.1" variant="tip" />
+
+If your application manages the focus on its own — for example with a roving `tabindex` on the nodes — set
+[`tabbable`](/docs/api/components/ngdiagramcomponent/#tabbable) to `false`. Both Tab stops then leave the Tab order:
+
+```html
+<ng-diagram [model]="model" [tabbable]="false" />
+```
+
+- Both elements stay clickable and keep working with screen readers. Only the Tab stop is removed.
+- Shortcuts keep working once the focus is inside the diagram, for example after a click.
+- Your own node templates keep their own Tab stops, so the application stays in control of them.
+
 ## Basic Usage
 
 To override, disable, or extend default shortcuts, use the [`configureShortcuts()`](/docs/api/utilities/configureshortcuts) helper:

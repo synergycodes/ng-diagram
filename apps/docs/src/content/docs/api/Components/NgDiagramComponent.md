@@ -264,6 +264,35 @@ or programmatically using the `NgDiagramNodeService` rotation methods.
 
 ***
 
+### tabbable
+
+> `readonly` **tabbable**: `InputSignalWithTransform`\<`boolean`, `unknown`\>
+
+Whether the diagram takes part in the page's sequential Tab order.
+
+When `false`, both Tab stops the diagram adds — the diagram host and the watermark
+link — leave the sequential Tab order (`tabindex="-1"`). Both stay clickable and
+programmatically focusable, and keyboard shortcuts keep working whenever focus is
+inside the diagram (click-to-focus included).
+
+Set it to `false` when the application manages the diagram's Tab order itself,
+for example with a roving tabindex on the nodes.
+
+Accepts the static attribute forms too: `tabbable` on its own means `true` and
+`tabbable="false"` means `false`. Binding `undefined` or `null` keeps the default.
+
+#### Default
+
+```ts
+true
+```
+
+#### Since
+
+1.3.1
+
+***
+
 ### viewportChanged
 
 > **viewportChanged**: `EventEmitter`\<[`ViewportChangedEvent`](/docs/api/types/events/viewportchangedevent/)\>

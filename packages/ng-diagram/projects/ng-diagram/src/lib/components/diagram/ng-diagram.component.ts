@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   effect,
@@ -109,6 +110,7 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
   ],
   host: {
     '[class.pannable]': 'viewportPannable()',
+    '[attr.tabindex]': `tabbable() ? '0' : '-1'`,
   },
 })
 export class NgDiagramComponent implements OnInit, OnDestroy {
@@ -159,6 +161,29 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 
   /** Whether panning is enabled in the diagram. */
   readonly viewportPannable = this.renderer.viewportPannable;
+
+  /**
+   * Whether the diagram takes part in the page's sequential Tab order.
+   *
+   * When `false`, both Tab stops the diagram adds — the diagram host and the watermark
+   * link — leave the sequential Tab order (`tabindex="-1"`). Both stay clickable and
+   * programmatically focusable, and keyboard shortcuts keep working whenever focus is
+   * inside the diagram (click-to-focus included).
+   *
+   * Set it to `false` when the application manages the diagram's Tab order itself,
+   * for example with a roving tabindex on the nodes.
+   *
+   * Accepts the static attribute forms too: `tabbable` on its own means `true` and
+   * `tabbable="false"` means `false`. Binding `undefined` or `null` keeps the default.
+   *
+   * @default true
+   * @since 1.3.1
+   */
+  readonly tabbable = input(true, {
+    // Angular's booleanAttribute maps null/undefined to false, which would flip the
+    // default for an unbound optional binding like [tabbable]="options?.tabbable"
+    transform: (value: unknown) => (value == null ? true : booleanAttribute(value)),
+  });
 
   /**
    * Event emitted when the diagram initialization is complete.
