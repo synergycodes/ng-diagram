@@ -4,7 +4,7 @@ import { expect, test, type Diagram } from './fixtures/diagram';
  * The `tabbable` input decides whether the diagram container takes part in the page's
  * sequential Tab order. Only a real browser can answer that — jsdom has no
  * sequential focus navigation, so the unit specs can assert the attribute but
- * never the traversal this feature is about.
+ * not the actual Tab traversal.
  */
 
 /** Buttons around the diagram, so Tab has somewhere to come from and go to. */

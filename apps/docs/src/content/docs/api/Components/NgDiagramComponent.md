@@ -271,9 +271,9 @@ or programmatically using the `NgDiagramNodeService` rotation methods.
 Whether the diagram container takes part in the page's sequential Tab order.
 
 This covers the two Tab stops the diagram itself adds: the container element and the
-watermark link. With `false` both get `tabindex="-1"` — skipped by Tab, yet still
-clickable and programmatically focusable, and every keyboard shortcut keeps working
-whenever focus is inside the diagram (click-to-focus included).
+watermark link. With `false` both render with `tabindex="-1"`, so Tab skips them, but
+they stay clickable and can be focused from code. Keyboard shortcuts keep working
+whenever focus is inside the diagram — clicking the diagram still focuses it.
 
 Focusable content rendered by your own node and edge templates is not affected and
 keeps its own Tab stops, so the application stays in control of those.
