@@ -44,6 +44,27 @@ Whether the size of the node is automatically resized based on the content.
 
 ***
 
+### computedHidden?
+
+> `readonly` `optional` **computedHidden**: `boolean`
+
+#### Remarks
+
+ComputedHidden is computed by the system and should not be set manually.
+The effective visibility applied to the node: true when its own `hidden`
+flag (or a template-level hidden binding) is set, or when any ancestor
+group is effectively hidden.
+
+#### Since
+
+1.4.0
+
+#### Inherited from
+
+[`SimpleNode`](/docs/api/types/model/simplenode/).[`computedHidden`](/docs/api/types/model/simplenode/#computedhidden)
+
+***
+
 ### computedZIndex?
 
 > `readonly` `optional` **computedZIndex**: `number`
@@ -94,6 +115,35 @@ The id of the parent node.
 #### Inherited from
 
 [`SimpleNode`](/docs/api/types/model/simplenode/).[`groupId`](/docs/api/types/model/simplenode/#groupid)
+
+***
+
+### hidden?
+
+> `optional` **hidden**: `boolean`
+
+Whether the node is hidden. Absent means visible.
+
+Hidden nodes stay mounted in the DOM as `display: none`, keep their
+geometry, do not block initialization or measurement waits, and are
+excluded from every interaction surface (hit-testing, selection,
+keyboard move, linking, zoomToFit bounds, virtualization, edge routing).
+Hiding a group hides all of its descendants; hiding a node hides the
+edges connected to it.
+
+Set by the user; the library only reads it.
+
+#### See
+
+[computedHidden](/docs/api/types/model/simplenode/#computedhidden) for the derived effective visibility.
+
+#### Since
+
+1.4.0
+
+#### Inherited from
+
+[`SimpleNode`](/docs/api/types/model/simplenode/).[`hidden`](/docs/api/types/model/simplenode/#hidden)
 
 ***
 

@@ -13,3 +13,27 @@ body {
 * {
   font-family: 'Poppins', sans-serif;
 }
+
+/*
+ * Hidden-elements demo: "reveal hidden as ghosts".
+ *
+ * The library hides effectively hidden elements with an inline
+ * `display: none` on the node/edge hosts — they stay mounted in the DOM.
+ * This debug override makes them visible as translucent ghosts to prove
+ * they are still there (with geometry intact). Interactions stay disabled:
+ * hidden elements are excluded from hit-testing regardless of CSS.
+ */
+.reveal-hidden-ghosts {
+  ng-diagram-node[style*='display: none'],
+  ng-diagram-edge[style*='display: none'] {
+    display: block !important;
+    opacity: 0.3;
+    pointer-events: none;
+    filter: grayscale(1);
+  }
+
+  ng-diagram-node[style*='display: none'] {
+    outline: 2px dashed #e91e63;
+    outline-offset: 2px;
+  }
+}

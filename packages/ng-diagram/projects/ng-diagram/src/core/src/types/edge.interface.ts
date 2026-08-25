@@ -43,6 +43,28 @@ export interface Edge<T extends DataObject = DataObject> {
    */
   selected?: boolean;
   /**
+   * Whether the edge is hidden. Absent means visible.
+   *
+   * Hidden edges stay mounted in the DOM as `display: none`, keep their
+   * geometry, do not block initialization or measurement waits, are not
+   * routed, and are excluded from selection and zoomToFit bounds. An edge is
+   * also effectively hidden when either endpoint node is effectively hidden.
+   *
+   * Set by the user; the library only reads it.
+   * @see {@link computedHidden} for the derived effective visibility.
+   * @since 1.4.0
+   */
+  hidden?: boolean;
+  /**
+   * @readonly
+   * @remarks ComputedHidden is computed by the system and should not be set manually.
+   * The effective visibility applied to the edge: true when its own `hidden`
+   * flag (or a template-level hidden binding) is set, or when either endpoint
+   * node is effectively hidden.
+   * @since 1.4.0
+   */
+  readonly computedHidden?: boolean;
+  /**
    * The type of the edge declared in edgeTemplateMap.
    */
   type?: string;

@@ -27,6 +27,11 @@ export class SpatialHash {
     const currentIds = new Set<string>();
 
     for (const node of nodes) {
+      // Effectively hidden nodes are excluded from the hash — this kills
+      // hit-testing, range queries, port snap, drop-on-group and box
+      // selection for them. Absence from currentIds removes stale entries.
+      if (node.computedHidden) continue;
+
       currentIds.add(node.id);
 
       const prevRect = this.idToRect.get(node.id);

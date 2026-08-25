@@ -36,6 +36,11 @@ export class VisibleElementsResolver {
       const node = nodesMap.get(nodeId);
       if (node && isGroup(node)) {
         for (const descendantId of this.flowCore.modelLookup.getAllDescendantIds(nodeId)) {
+          // This path bypasses the spatial hash — effectively hidden
+          // descendants must not be re-added to the render set.
+          if (nodesMap.get(descendantId)?.computedHidden) {
+            continue;
+          }
           nodeIds.add(descendantId);
         }
       }
@@ -58,6 +63,12 @@ export class VisibleElementsResolver {
     for (const nodeId of primaryVisibleIds) {
       for (const edge of this.flowCore.modelLookup.getConnectedEdges(nodeId)) {
         if (edgeIds.has(edge.id)) {
+          continue;
+        }
+
+        // This path bypasses the spatial hash — effectively hidden edges must
+        // not be rendered nor re-add their external endpoints.
+        if (edge.computedHidden) {
           continue;
         }
 

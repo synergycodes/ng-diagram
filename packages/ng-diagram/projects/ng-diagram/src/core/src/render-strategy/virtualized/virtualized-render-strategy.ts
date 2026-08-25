@@ -24,6 +24,14 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
   // Track nodes reference for optimization (skip spatialHash update during panning/zooming)
   private lastNodesRef: Node[] | null = null;
 
+  // Effective-visibility tracking: the result cache keys on element COUNTS and
+  // viewport only, so a hidden/unhidden toggle (counts unchanged) would keep
+  // serving a stale render set until the next pan/zoom. The hidden-id sets are
+  // diffed on model changes (never on viewport-only changes) to invalidate it.
+  private lastEdgesRef: Edge[] | null = null;
+  private lastHiddenNodeIds = new Set<string>();
+  private lastHiddenEdgeIds = new Set<string>();
+
   constructor(flowCore: FlowCore) {
     super(flowCore);
     this.visibleElementsResolver = new VisibleElementsResolver(flowCore);
@@ -33,14 +41,31 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
 
   init(): void {
     this.flowCore.spatialHash.process(this.flowCore.model.getNodes());
+    // Seed the visibility tracking with the initial model, or the first
+    // toggle after load would diff against empty sets and go unnoticed.
+    this.trackHiddenNodes(this.flowCore.model.getNodes());
+    this.trackHiddenEdges(this.flowCore.model.getEdges());
 
     this.flowCore.model.onChange((state) => {
+      let visibilityChanged = false;
+
       // Optimization: skip spatialHash update during panning/zooming (nodes reference stays the same)
       if (state.nodes !== this.lastNodesRef) {
         this.flowCore.spatialHash.process(state.nodes);
         this.flowCore.modelLookup.desynchronize();
         this.lastNodesRef = state.nodes;
+        visibilityChanged = this.trackHiddenNodes(state.nodes) || visibilityChanged;
       }
+
+      if (state.edges !== this.lastEdgesRef) {
+        this.lastEdgesRef = state.edges;
+        visibilityChanged = this.trackHiddenEdges(state.edges) || visibilityChanged;
+      }
+
+      if (visibilityChanged) {
+        this.cache.invalidate();
+      }
+
       this.render();
     });
 
@@ -109,4 +134,42 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
     this.cache.invalidateViewport();
     this.render();
   }
+
+  /** @returns true when the set of effectively hidden nodes changed */
+  private trackHiddenNodes(nodes: Node[]): boolean {
+    const hiddenIds = collectHiddenIds(nodes);
+    if (areSetsEqual(hiddenIds, this.lastHiddenNodeIds)) {
+      return false;
+    }
+    this.lastHiddenNodeIds = hiddenIds;
+    return true;
+  }
+
+  /** @returns true when the set of effectively hidden edges changed */
+  private trackHiddenEdges(edges: Edge[]): boolean {
+    const hiddenIds = collectHiddenIds(edges);
+    if (areSetsEqual(hiddenIds, this.lastHiddenEdgeIds)) {
+      return false;
+    }
+    this.lastHiddenEdgeIds = hiddenIds;
+    return true;
+  }
 }
+
+const collectHiddenIds = (elements: readonly { id: string; computedHidden?: boolean }[]): Set<string> => {
+  const hiddenIds = new Set<string>();
+  for (const element of elements) {
+    if (element.computedHidden) {
+      hiddenIds.add(element.id);
+    }
+  }
+  return hiddenIds;
+};
+
+const areSetsEqual = (a: Set<string>, b: Set<string>): boolean => {
+  if (a.size !== b.size) return false;
+  for (const value of a) {
+    if (!b.has(value)) return false;
+  }
+  return true;
+};

@@ -45,6 +45,7 @@ export { ZIndexDirective } from './lib/directives/z-index/z-index.directive';
 // Public directives
 export { NgDiagramMinimapNavigationDirective } from './lib/components/minimap/ng-diagram-minimap-navigation.directive';
 export { NgDiagramGroupHighlightedDirective } from './lib/directives/group-highlighted/ng-diagram-group-highlighted.directive';
+export { NgDiagramHiddenDirective } from './lib/directives/hidden/ng-diagram-hidden.directive';
 export { NgDiagramNodeSelectedDirective } from './lib/directives/node-selected/ng-diagram-node-selected.directive';
 
 // Services

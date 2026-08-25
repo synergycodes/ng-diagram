@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import { mockEdge, mockMetadata, mockNode } from '../../../test-utils';
-import type { Node } from '../../../types';
+import type { Edge, Node } from '../../../types';
 import { CommandHandler } from '../../command-handler';
 import { copy, paste } from '../copy-paste';
 
@@ -32,6 +32,9 @@ describe('Copy-Paste Commands', () => {
           metadata: mockMetadata,
         }),
         applyUpdate: vi.fn(),
+        modelLookup: {
+          getAllDescendantIds: vi.fn().mockReturnValue([]),
+        },
         config: {
           computeNodeId: mockComputeNodeId,
           computeEdgeId: mockComputeEdgeId,
@@ -718,6 +721,119 @@ describe('Copy-Paste Commands', () => {
         expect(pastedNode).toBeDefined();
         expect(pastedNode!.groupId).toBe(pastedInnerGroup!.id); // Node should still reference inner group
       });
+    });
+  });
+
+  describe('hidden elements', () => {
+    const setState = (nodes: Partial<Node>[], edges: object[] = [], descendants: Record<string, string[]> = {}) => {
+      const flowCore = commandHandler.flowCore as unknown as {
+        getState: () => object;
+        modelLookup: { getAllDescendantIds: ReturnType<typeof vi.fn> };
+      };
+      flowCore.getState = () => ({
+        nodes: nodes.map((node) => ({ ...mockNode, ...node })),
+        edges: edges.map((edge) => ({ ...mockEdge, ...edge })),
+        metadata: mockMetadata,
+      });
+      flowCore.modelLookup.getAllDescendantIds.mockImplementation((id: string) => descendants[id] ?? []);
+    };
+
+    const copiedState = () =>
+      (commandHandler.flowCore.actionStateManager as { copyPaste?: { copiedNodes: Node[]; copiedEdges: Edge[] } })
+        .copyPaste;
+
+    it('should not copy effectively hidden selected elements', async () => {
+      setState(
+        [
+          { id: 'visible', selected: true },
+          { id: 'hidden', selected: true, computedHidden: true },
+        ],
+        [
+          { id: 'hiddenEdge', source: 'visible', target: 'other', selected: true, computedHidden: true },
+          { id: 'visibleEdge', source: 'visible', target: 'other', selected: true },
+        ]
+      );
+
+      await copy(commandHandler);
+
+      expect(copiedState()!.copiedNodes.map((node) => node.id)).toEqual(['visible']);
+      expect(copiedState()!.copiedEdges.map((edge) => edge.id)).toEqual(['visibleEdge']);
+    });
+
+    it('should copy hidden descendants of a copied group together with internal edges', async () => {
+      // A collapsed group: group visible+selected, children hidden and unselected.
+      setState(
+        [
+          { id: 'group', selected: true },
+          { id: 'child1', groupId: 'group', hidden: true, computedHidden: true },
+          { id: 'child2', groupId: 'group', hidden: true, computedHidden: true },
+          { id: 'outside' },
+        ],
+        [
+          { id: 'internal', source: 'child1', target: 'child2', computedHidden: true },
+          { id: 'boundary', source: 'child1', target: 'outside', computedHidden: true },
+        ],
+        { group: ['child1', 'child2'] }
+      );
+
+      await copy(commandHandler);
+
+      expect(copiedState()!.copiedNodes.map((node) => node.id)).toEqual(['group', 'child1', 'child2']);
+      // The internal edge travels with the copied set; the boundary edge does not.
+      expect(copiedState()!.copiedEdges.map((edge) => edge.id)).toEqual(['internal']);
+    });
+
+    it('should paste hidden content deselected so no invisible selection is created', async () => {
+      setState(
+        [
+          { id: 'group', selected: true },
+          { id: 'child', groupId: 'group', hidden: true, computedHidden: true },
+        ],
+        [{ id: 'internal', source: 'group', target: 'child', computedHidden: true }],
+        { group: ['child'] }
+      );
+
+      await copy(commandHandler);
+      await paste(commandHandler, { name: 'paste' });
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      const pastedGroup = update.nodesToAdd.find((node: Node) => !node.groupId);
+      const pastedChild = update.nodesToAdd.find((node: Node) => node.groupId);
+      expect(pastedGroup!.selected).toBe(true);
+      expect(pastedChild!.selected).toBe(false);
+      expect(pastedChild!.hidden).toBe(true);
+      expect(update.edgesToAdd[0].selected).toBe(false);
+    });
+
+    it('should compute the paste-at-position offset from visible copied nodes only', async () => {
+      setState(
+        [
+          { id: 'visible', selected: true, position: { x: 100, y: 100 }, size: { width: 50, height: 50 } },
+          {
+            id: 'farHidden',
+            selected: true,
+            groupId: 'visible',
+            hidden: true,
+            computedHidden: true,
+            position: { x: 1100, y: 1100 },
+          },
+        ],
+        [],
+        { visible: ['farHidden'] }
+      );
+
+      await copy(commandHandler);
+      await paste(commandHandler, { name: 'paste', position: { x: 500, y: 500 } });
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      // One visible copied node → it centers at the cursor; the hidden member
+      // keeps its relative offset instead of dragging the center away.
+      const pastedVisible = update.nodesToAdd.find((node: Node) => !node.hidden);
+      expect(pastedVisible!.position).toEqual({ x: 500 - 25, y: 500 - 25 });
     });
   });
 });

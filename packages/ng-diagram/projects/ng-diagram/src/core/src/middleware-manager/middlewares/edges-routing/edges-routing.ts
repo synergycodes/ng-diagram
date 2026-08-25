@@ -38,6 +38,9 @@ export const checkIfShouldRouteEdges = ({
       'routing',
       'routingMode',
       'measuredLabels',
+      // Unhiding an edge must re-route it — its points can be stale from
+      // changes that happened while routing was skipped.
+      'computedHidden',
     ])
   );
 };
@@ -50,6 +53,13 @@ export const shouldRouteEdge = (
   helpers: MiddlewareContext['helpers'],
   modelActionTypes: MiddlewareContext['modelActionTypes']
 ): boolean => {
+  // Effectively hidden edges are not routed — endpoint geometry of hidden
+  // nodes is stale and must not produce paths. Unhiding re-triggers routing
+  // through the computedHidden change itself (checkIfEdgeChanged).
+  if (edge.computedHidden) {
+    return false;
+  }
+
   const isEdgeOrNodesChanged =
     helpers.checkIfEdgeAdded(edge.id) ||
     helpers.checkIfEdgeChanged(edge.id) ||

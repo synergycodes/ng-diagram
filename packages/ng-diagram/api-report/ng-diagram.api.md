@@ -185,7 +185,7 @@ export interface DiagramInitEvent {
 // @public (undocumented)
 export class DiagramSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -206,8 +206,11 @@ export interface DraggingActionState {
 // @public
 export interface Edge<T extends DataObject = DataObject> {
     // (undocumented)
+    readonly computedHidden?: boolean;
+    // (undocumented)
     readonly computedZIndex?: number;
     data: T;
+    hidden?: boolean;
     id: string;
     // (undocumented)
     readonly measuredLabels?: EdgeLabel[];
@@ -319,7 +322,7 @@ export type EdgeRoutingName = LooseAutocomplete<BuiltInEdgeRoutingName>;
 // @public (undocumented)
 export class EdgeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -668,7 +671,7 @@ export interface Model {
 }
 
 // @public
-export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'addEdgeLabelsBulk' | 'updateEdgeLabelsBulk' | 'deleteEdgeLabelsBulk' | 'addPortsBulk' | 'updatePortsBulk' | 'deletePortsBulk' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'cancelResize' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'cancelRotate' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'cancelDrag' | 'selectEnd';
+export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'addEdgeLabelsBulk' | 'updateEdgeLabelsBulk' | 'deleteEdgeLabelsBulk' | 'addPortsBulk' | 'updatePortsBulk' | 'deletePortsBulk' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'cancelResize' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'cancelRotate' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'cancelDrag' | 'selectEnd' | 'templateVisibilityChange';
 
 // @public
 export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
@@ -768,6 +771,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     readonly edgeData: Signal<Edge<object>>;
     // (undocumented)
     readonly edgeId: Signal<string>;
+    hidden: InputSignal<boolean>;
     id: InputSignal<string>;
     // (undocumented)
     readonly isVisible: Signal<boolean>;
@@ -783,7 +787,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     // (undocumented)
     get transform(): string;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseEdgeLabelComponent, "ng-diagram-base-edge-label", never, { "id": { "alias": "id"; "required": true; "isSignal": true; }; "positionOnEdge": { "alias": "positionOnEdge"; "required": true; "isSignal": true; }; }, {}, never, ["*"], true, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramBaseEdgeLabelComponent, "ng-diagram-base-edge-label", never, { "id": { "alias": "id"; "required": true; "isSignal": true; }; "positionOnEdge": { "alias": "positionOnEdge"; "required": true; "isSignal": true; }; "hidden": { "alias": "hidden"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramBaseEdgeLabelComponent, never>;
 }
@@ -925,6 +929,18 @@ export class NgDiagramGroupsService extends NgDiagramBaseService {
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramGroupsService, never>;
     // (undocumented)
     static ɵprov: i0.ɵɵInjectableDeclaration<NgDiagramGroupsService>;
+}
+
+// @public
+export class NgDiagramHiddenDirective implements OnDestroy {
+    constructor();
+    hidden: InputSignal<boolean>;
+    // @internal (undocumented)
+    ngOnDestroy(): void;
+    // (undocumented)
+    static ɵdir: i0.ɵɵDirectiveDeclaration<NgDiagramHiddenDirective, "[ngDiagramHidden]", never, { "hidden": { "alias": "ngDiagramHidden"; "required": true; "isSignal": true; }; }, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramHiddenDirective, never>;
 }
 
 // @public
@@ -1215,6 +1231,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     constructor();
     // (undocumented)
     protected hasContent: boolean;
+    hidden: InputSignal<boolean>;
     id: InputSignal<string>;
     // (undocumented)
     protected readonly isInitialized: WritableSignal<boolean>;
@@ -1236,7 +1253,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     side: InputSignal<Side>;
     type: InputSignal<"source" | "target" | "both">;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPortComponent, "ng-diagram-port", never, { "id": { "alias": "id"; "required": true; "isSignal": true; }; "type": { "alias": "type"; "required": true; "isSignal": true; }; "side": { "alias": "side"; "required": true; "isSignal": true; }; "originPoint": { "alias": "originPoint"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_4.LinkingInputDirective; inputs: { "portId": "id"; }; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPortComponent, "ng-diagram-port", never, { "id": { "alias": "id"; "required": true; "isSignal": true; }; "type": { "alias": "type"; "required": true; "isSignal": true; }; "side": { "alias": "side"; "required": true; "isSignal": true; }; "originPoint": { "alias": "originPoint"; "required": false; "isSignal": true; }; "hidden": { "alias": "hidden"; "required": false; "isSignal": true; }; }, {}, never, ["*"], true, [{ directive: typeof i1_4.LinkingInputDirective; inputs: { "portId": "id"; }; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramPortComponent, never>;
 }
@@ -1393,7 +1410,7 @@ export interface NodeRotationConfig {
 // @public (undocumented)
 export class NodeSelectionDirective extends ObjectSelectionDirective {
     // (undocumented)
-    readonly targetData: InputSignal<Edge<object> | Node_2 | undefined>;
+    readonly targetData: InputSignal<Node_2 | Edge<object> | undefined>;
     // (undocumented)
     targetType: BasePointerInputEvent['targetType'];
     // (undocumented)
@@ -1608,10 +1625,13 @@ export interface SimpleNode<T extends DataObject = DataObject> {
     angle?: number;
     autoSize?: boolean;
     // (undocumented)
+    readonly computedHidden?: boolean;
+    // (undocumented)
     readonly computedZIndex?: number;
     data: T;
     draggable?: boolean;
     groupId?: Node_2<T>['id'];
+    hidden?: boolean;
     id: string;
     // (undocumented)
     measuredBounds?: Rect;
@@ -1726,7 +1746,7 @@ export interface ZIndexConfig {
 // @public (undocumented)
 export class ZIndexDirective {
     // (undocumented)
-    data: InputSignal<Edge<object> | Node_2>;
+    data: InputSignal<Node_2 | Edge<object>>;
     // (undocumented)
     zIndex: Signal<number>;
     // (undocumented)

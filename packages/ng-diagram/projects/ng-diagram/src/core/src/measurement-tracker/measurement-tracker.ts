@@ -125,6 +125,23 @@ export class MeasurementTracker {
     this.register(entityIds, config ?? null);
   }
 
+  /**
+   * Removes entities from the current tracking round — used when an entity
+   * becomes effectively hidden, which clears its pending measurement
+   * expectations. Signals for removed ids no longer extend the observation
+   * window; settlement stays timer-driven, so the round still resolves on its
+   * own schedule.
+   *
+   * @param entityIds - Prefixed entity IDs (e.g. 'node:abc', 'edge:xyz')
+   */
+  unregisterParticipants(entityIds: string[]): void {
+    if (this.phase === 'idle') return;
+
+    for (const id of entityIds) {
+      this.participantIds.delete(id);
+    }
+  }
+
   /** Shared registration body; `null` config keeps the current window durations. */
   private register(entityIds: string[], config: MeasurementTrackingConfig | null): void {
     if (entityIds.length === 0) return;

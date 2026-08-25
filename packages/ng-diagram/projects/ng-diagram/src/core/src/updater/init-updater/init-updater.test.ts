@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { FlowCore } from '../../flow-core';
 import type { Edge, EdgeLabel, Node, Port, Size } from '../../types';
+import { TemplateVisibilityRegistry } from '../../visibility/template-visibility-registry';
 import { InitUpdater, MEASUREMENT_TIMEOUT, STABILITY_DELAY } from './init-updater';
 
 describe('InitUpdater', () => {
@@ -19,6 +20,7 @@ describe('InitUpdater', () => {
       applyPortChanges: Mock;
       applyEdgeLabelChanges: Mock;
     };
+    templateVisibilityRegistry: TemplateVisibilityRegistry;
   };
   let mockRenderedModel: { nodes: Node[]; edges: Edge[] };
 
@@ -90,6 +92,7 @@ describe('InitUpdater', () => {
         applyEdgeLabelChanges: vi.fn(),
         deleteEdgeLabel: vi.fn(),
       },
+      templateVisibilityRegistry: new TemplateVisibilityRegistry(),
     };
 
     mockRenderedModel = { nodes: [], edges: [] };
@@ -970,6 +973,192 @@ describe('InitUpdater', () => {
       expect(initUpdater.isInitialized).toBe(true);
       expect(onComplete).toHaveBeenCalledTimes(1);
       expect(mockFlowCore.setState).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('hidden elements', () => {
+    const setStateFromModel = () => {
+      mockFlowCore.getState.mockReturnValue({
+        nodes: mockRenderedModel.nodes,
+        edges: mockRenderedModel.edges,
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
+    };
+
+    it('should not wait for measurements of a hidden node', async () => {
+      const hiddenNode = { ...createMockNode('hidden1'), size: undefined, hidden: true };
+      const visibleNode = { ...createMockNode('visible1'), size: undefined };
+      mockRenderedModel = { nodes: [hiddenNode, visibleNode], edges: [] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await Promise.resolve();
+
+      // Only the visible node blocks initialization.
+      expect(initUpdater.isInitialized).toBe(false);
+
+      initUpdater.applyNodeSize('visible1', { width: 100, height: 100 });
+      await Promise.resolve();
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should finish without the measurement timeout when only hidden nodes are unmeasured', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const hiddenNode = { ...createMockNode('hidden1'), size: undefined, hidden: true };
+      mockRenderedModel = { nodes: [hiddenNode], edges: [] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+
+      await vi.advanceTimersByTimeAsync(STABILITY_DELAY);
+
+      expect(initUpdater.isInitialized).toBe(true);
+
+      // The safety timeout was cleared on finish — no warning fires later.
+      await vi.advanceTimersByTimeAsync(MEASUREMENT_TIMEOUT);
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('should not wait for descendants of a hidden group', async () => {
+      const group = { ...createMockNode('group1'), size: undefined, hidden: true, isGroup: true as const };
+      const child = { ...createMockNode('child1'), size: undefined, groupId: 'group1' };
+      mockRenderedModel = { nodes: [group, child], edges: [] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+
+      await vi.advanceTimersByTimeAsync(STABILITY_DELAY);
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should not wait for ports of a hidden node but still add them to the model', async () => {
+      const hiddenNode = { ...createMockNode('hidden1'), hidden: true };
+      mockRenderedModel = { nodes: [hiddenNode], edges: [] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+      initUpdater.addPort('hidden1', createMockPort('port1'));
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+
+      const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+      expect(setStateCall.nodes[0].measuredPorts).toHaveLength(1);
+      expect(setStateCall.nodes[0].measuredPorts[0].id).toBe('port1');
+    });
+
+    it('should not wait for labels of a hidden edge', async () => {
+      const nodeA = createMockNode('node1');
+      const nodeB = createMockNode('node2');
+      const hiddenEdge = { ...createMockEdge('edge1'), hidden: true };
+      mockRenderedModel = { nodes: [nodeA, nodeB], edges: [hiddenEdge] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+      initUpdater.addEdgeLabel('edge1', createMockEdgeLabel('label1'));
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should not wait for labels of an edge whose endpoint is hidden', async () => {
+      const hiddenNode = { ...createMockNode('node1'), hidden: true };
+      const visibleNode = createMockNode('node2');
+      const edge = createMockEdge('edge1');
+      mockRenderedModel = { nodes: [hiddenNode, visibleNode], edges: [edge] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+      initUpdater.addEdgeLabel('edge1', createMockEdgeLabel('label1'));
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should not wait for template-hidden nodes (registry source)', async () => {
+      mockFlowCore.templateVisibilityRegistry.setNodeHidden('hidden1', true);
+      const node = { ...createMockNode('hidden1'), size: undefined };
+      mockRenderedModel = { nodes: [node], edges: [] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+
+      await vi.advanceTimersByTimeAsync(STABILITY_DELAY);
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should not wait for template-hidden ports (registry source)', async () => {
+      mockFlowCore.templateVisibilityRegistry.setPortHidden('node1', 'port1', true);
+      const node = createMockNode('node1');
+      mockRenderedModel = { nodes: [node], edges: [] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+      initUpdater.addPort('node1', createMockPort('port1'));
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should stop waiting when an element becomes hidden mid-init (refreshHiddenEntities)', async () => {
+      const node = { ...createMockNode('node1'), size: undefined };
+      mockRenderedModel = { nodes: [node], edges: [] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await Promise.resolve();
+
+      expect(initUpdater.isInitialized).toBe(false);
+
+      // The template declares the node hidden after expectations were collected.
+      mockFlowCore.templateVisibilityRegistry.setNodeHidden('node1', true);
+      initUpdater.refreshHiddenEntities();
+      await Promise.resolve();
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should apply a measurement that still arrives for a hidden node without blocking on it', async () => {
+      const hiddenNode = { ...createMockNode('hidden1'), size: undefined, hidden: true };
+      mockRenderedModel = { nodes: [hiddenNode], edges: [] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+      initUpdater.applyNodeSize('hidden1', { width: 120, height: 60 });
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+
+      const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+      expect(setStateCall.nodes[0].size).toEqual({ width: 120, height: 60 });
     });
   });
 });

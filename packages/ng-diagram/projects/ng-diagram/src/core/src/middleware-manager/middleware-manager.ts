@@ -3,6 +3,7 @@ import type { FlowState, FlowStateUpdate, Middleware, MiddlewareChain, ModelActi
 import { MiddlewareExecutor } from './middleware-executor';
 import {
   createEventEmitterMiddleware,
+  createHiddenComputationMiddleware,
   createMeasurementTrackingMiddleware,
   loggerMiddleware,
   measuredBoundsMiddleware,
@@ -12,6 +13,7 @@ export class MiddlewareManager {
   private middlewareChain: MiddlewareChain = [];
   private eventEmitterMiddleware: Middleware | null = null;
   private measurementTrackingMiddleware: Middleware | null = null;
+  private hiddenComputationMiddleware: Middleware | null = null;
   readonly flowCore: FlowCore;
 
   constructor(flowCore: FlowCore, middlewares?: MiddlewareChain) {
@@ -73,13 +75,20 @@ export class MiddlewareManager {
       this.measurementTrackingMiddleware = createMeasurementTrackingMiddleware(this.flowCore.measurementTracker);
     }
 
+    if (!this.hiddenComputationMiddleware && this.flowCore.templateVisibilityRegistry) {
+      this.hiddenComputationMiddleware = createHiddenComputationMiddleware(this.flowCore.templateVisibilityRegistry);
+    }
+
     // Middleware execution order:
-    // 1. User and default middlewares - custom processing
-    // 2. measuredBoundsMiddleware - compute node bounds after all position/size changes
-    // 3. loggerMiddleware - log final state for debugging
-    // 4. measurementTrackingMiddleware - signal measurement activity
-    // 5. eventEmitterMiddleware - emit events with final state
+    // 1. hiddenComputationMiddleware - stamp effective visibility (computedHidden)
+    //    first so user middlewares and the built-in tail read fresh values
+    // 2. User and default middlewares - custom processing
+    // 3. measuredBoundsMiddleware - compute node bounds after all position/size changes
+    // 4. loggerMiddleware - log final state for debugging
+    // 5. measurementTrackingMiddleware - signal measurement activity
+    // 6. eventEmitterMiddleware - emit events with final state
     const finalChain = [
+      ...(this.hiddenComputationMiddleware ? [this.hiddenComputationMiddleware] : []),
       ...this.middlewareChain,
       measuredBoundsMiddleware,
       loggerMiddleware,

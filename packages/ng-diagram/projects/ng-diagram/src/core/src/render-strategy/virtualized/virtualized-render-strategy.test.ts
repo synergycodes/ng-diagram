@@ -40,6 +40,7 @@ describe('VirtualizedRenderStrategy', () => {
         getNodeById: vi.fn((id: string) => nodesMap.get(id)),
         getConnectedEdges: vi.fn().mockReturnValue([]),
         getAllDescendantIds: vi.fn().mockReturnValue([]),
+        desynchronize: vi.fn(),
       },
       actionStateManager: {
         isPanning: vi.fn().mockReturnValue(false),
@@ -207,6 +208,62 @@ describe('VirtualizedRenderStrategy', () => {
     });
   });
 
+  describe('hidden elements', () => {
+    it('should not include hidden descendants of a visible group', () => {
+      const groupNode = { ...mockGroupNode, id: 'g1', position: { x: 100, y: 100 }, size: { width: 200, height: 200 } };
+      const visibleChild = {
+        ...mockNode,
+        id: 'c1',
+        position: { x: 2000, y: 2000 },
+        size: { width: 50, height: 50 },
+        groupId: 'g1',
+      };
+      const hiddenChild = {
+        ...mockNode,
+        id: 'c2',
+        position: { x: 2100, y: 2100 },
+        size: { width: 50, height: 50 },
+        groupId: 'g1',
+        computedHidden: true,
+      };
+      const nodes: Node[] = [groupNode, visibleChild, hiddenChild];
+      const edges: Edge[] = [];
+      spatialHash.process(nodes);
+      updateNodesMap(nodes);
+      vi.mocked(mockFlowCore.modelLookup.getAllDescendantIds).mockImplementation((groupId: string) => {
+        if (groupId === 'g1') return ['c1', 'c2'];
+        return [];
+      });
+
+      const result = strategy.process(nodes, edges, defaultViewport);
+
+      expect(result.nodes.map((n) => n.id)).toContain('g1');
+      expect(result.nodes.map((n) => n.id)).toContain('c1');
+      expect(result.nodes.map((n) => n.id)).not.toContain('c2');
+    });
+
+    it('should not render a hidden edge nor pull in its external endpoint', () => {
+      const nodes: Node[] = [
+        { ...mockNode, id: '1', position: { x: 100, y: 100 }, size: { width: 50, height: 50 } },
+        { ...mockNode, id: '2', position: { x: 2000, y: 2000 }, size: { width: 50, height: 50 } },
+      ];
+      const hiddenEdge: Edge = { ...mockEdge, id: 'e1', source: '1', target: '2', computedHidden: true };
+      const edges: Edge[] = [hiddenEdge];
+      spatialHash.process(nodes);
+      updateNodesMap(nodes);
+      vi.mocked(mockFlowCore.modelLookup.getConnectedEdges).mockImplementation((nodeId: string) => {
+        if (nodeId === '1') return [hiddenEdge];
+        return [];
+      });
+
+      const result = strategy.process(nodes, edges, defaultViewport);
+
+      expect(result.edges.map((e) => e.id)).not.toContain('e1');
+      expect(result.nodes.map((n) => n.id)).toContain('1');
+      expect(result.nodes.map((n) => n.id)).not.toContain('2');
+    });
+  });
+
   describe('viewport with pan and zoom', () => {
     it('should correctly calculate viewport rect when panned', () => {
       const nodes: Node[] = [
@@ -333,6 +390,128 @@ describe('VirtualizedRenderStrategy', () => {
 
       // New Sets should be created when node count changes
       expect(result1.nodeIds).not.toBe(result2.nodeIds);
+    });
+  });
+
+  describe('visibility-toggle cache invalidation', () => {
+    interface MutableState {
+      nodes: Node[];
+      edges: Edge[];
+      metadata: { viewport: Viewport };
+    }
+
+    /**
+     * Wires the strategy's init() with a mock model so the onChange handler
+     * (which owns the visibility-diff cache invalidation) actually runs — the
+     * result cache keys on element counts + viewport, so a hidden toggle must
+     * invalidate it explicitly.
+     */
+    function initStrategy(state: MutableState): (nextState: MutableState) => MutableState {
+      let onChangeCallback: ((state: MutableState) => void) | undefined;
+      const flowCore = mockFlowCore as unknown as Record<string, unknown>;
+      flowCore['model'] = {
+        onChange: (callback: (state: MutableState) => void) => {
+          onChangeCallback = callback;
+        },
+        getNodes: () => state.nodes,
+        getEdges: () => state.edges,
+        getMetadata: () => state.metadata,
+      };
+      flowCore['getState'] = () => state;
+      flowCore['renderer'] = { draw: vi.fn() };
+      flowCore['initUpdater'] = { start: vi.fn() };
+      flowCore['commandHandler'] = { emit: vi.fn() };
+
+      strategy.init();
+
+      return (nextState: MutableState) => {
+        state = nextState;
+        updateNodesMap(nextState.nodes);
+        onChangeCallback?.(nextState);
+        return state;
+      };
+    }
+
+    const createNodes = (hiddenIds: string[] = []): Node[] =>
+      ['1', '2'].map((id, index) => ({
+        ...mockNode,
+        id,
+        position: { x: 100 + index * 100, y: 100 },
+        size: { width: 50, height: 50 },
+        computedHidden: hiddenIds.includes(id) ? true : undefined,
+      }));
+
+    it('should render a node immediately after it is unhidden, without a viewport change', () => {
+      const hiddenState = { nodes: createNodes(['2']), edges: [], metadata: { viewport: defaultViewport } };
+      updateNodesMap(hiddenState.nodes);
+      const fireChange = initStrategy(hiddenState);
+
+      let result = strategy.process(hiddenState.nodes, hiddenState.edges, defaultViewport);
+      expect(result.nodes.map((n) => n.id)).toEqual(['1']);
+
+      // Unhide node 2 — counts and viewport are unchanged, only computedHidden flips.
+      const visibleState = { nodes: createNodes(), edges: [], metadata: { viewport: defaultViewport } };
+      fireChange(visibleState);
+
+      result = strategy.process(visibleState.nodes, visibleState.edges, defaultViewport);
+      expect(result.nodes.map((n) => n.id).sort()).toEqual(['1', '2']);
+      expect(strategy.isNodeRendered('2')).toBe(true);
+    });
+
+    it('should stop rendering a node after it is hidden, without a viewport change', () => {
+      const visibleState = { nodes: createNodes(), edges: [], metadata: { viewport: defaultViewport } };
+      updateNodesMap(visibleState.nodes);
+      const fireChange = initStrategy(visibleState);
+
+      let result = strategy.process(visibleState.nodes, visibleState.edges, defaultViewport);
+      expect(result.nodes.map((n) => n.id).sort()).toEqual(['1', '2']);
+
+      const hiddenState = { nodes: createNodes(['2']), edges: [], metadata: { viewport: defaultViewport } };
+      fireChange(hiddenState);
+
+      result = strategy.process(hiddenState.nodes, hiddenState.edges, defaultViewport);
+      expect(result.nodes.map((n) => n.id)).toEqual(['1']);
+      expect(strategy.isNodeRendered('2')).toBe(false);
+    });
+
+    it('should invalidate when hidden ids swap while counts stay identical', () => {
+      const stateA = { nodes: createNodes(['2']), edges: [], metadata: { viewport: defaultViewport } };
+      updateNodesMap(stateA.nodes);
+      const fireChange = initStrategy(stateA);
+
+      let result = strategy.process(stateA.nodes, stateA.edges, defaultViewport);
+      expect(result.nodes.map((n) => n.id)).toEqual(['1']);
+
+      // Hide 1, unhide 2 in the same pass — hidden COUNT is unchanged.
+      const stateB = { nodes: createNodes(['1']), edges: [], metadata: { viewport: defaultViewport } };
+      fireChange(stateB);
+
+      result = strategy.process(stateB.nodes, stateB.edges, defaultViewport);
+      expect(result.nodes.map((n) => n.id)).toEqual(['2']);
+    });
+
+    it('should invalidate when an edge visibility toggles', () => {
+      const nodes = createNodes();
+      const edge: Edge = { ...mockEdge, id: 'e1', source: '1', target: '2' };
+      (mockFlowCore.modelLookup.getConnectedEdges as ReturnType<typeof vi.fn>).mockImplementation((nodeId: string) =>
+        nodeId === '1' || nodeId === '2' ? [stateRef.edges[0]] : []
+      );
+      let stateRef: MutableState = {
+        nodes,
+        edges: [{ ...edge, computedHidden: true } as Edge],
+        metadata: { viewport: defaultViewport },
+      };
+      updateNodesMap(nodes);
+      const fireChange = initStrategy(stateRef);
+
+      let result = strategy.process(stateRef.nodes, stateRef.edges, defaultViewport);
+      expect(result.edges).toEqual([]);
+
+      stateRef = { nodes, edges: [edge], metadata: { viewport: defaultViewport } };
+      fireChange(stateRef);
+
+      result = strategy.process(stateRef.nodes, stateRef.edges, defaultViewport);
+      expect(result.edges.map((e) => e.id)).toEqual(['e1']);
     });
   });
 });

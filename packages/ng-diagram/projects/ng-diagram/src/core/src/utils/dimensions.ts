@@ -2,13 +2,23 @@ import { Edge, Node, Rect } from '../types';
 import { boundingRectOfPoints, getRect, getRotatedBoundingRect, unionRect } from './rects-points-sizes';
 
 const calculateNodeBounds = (nodes: Node[]): Rect | null => {
-  return unionRect(nodes.map((node) => node.measuredBounds).filter((rect): rect is Rect => rect !== undefined));
+  return unionRect(
+    nodes
+      .filter((node) => !node.computedHidden)
+      .map((node) => node.measuredBounds)
+      .filter((rect): rect is Rect => rect !== undefined)
+  );
 };
 
 const calculateEdgeBounds = (edges: Edge[]): Rect | null => {
-  return unionRect(edges.filter((edge) => edge.points?.length).map(getEdgeMeasuredBounds));
+  return unionRect(edges.filter((edge) => !edge.computedHidden && edge.points?.length).map(getEdgeMeasuredBounds));
 };
 
+/**
+ * Bounds of the given nodes and edges together. Effectively hidden elements
+ * are excluded — their stale measuredBounds must not inflate zoomToFit or
+ * minimap bounds. Returns null when nothing measurable remains.
+ */
 export const calculatePartsBounds = (nodes: Node[], edges: Edge[]): Rect | null => {
   const partsBounds = [calculateNodeBounds(nodes), calculateEdgeBounds(edges)].filter(
     (rect): rect is Rect => rect !== null

@@ -763,4 +763,50 @@ describe('MeasurementTracker', () => {
       expect(tracker.hasPendingMeasurements()).toBe(false);
     });
   });
+
+  describe('unregisterParticipants()', () => {
+    it('should stop signals for removed participants from extending the window', () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      tracker.unregisterParticipants(['node:node1']);
+
+      // Signals for the removed id no longer extend the discovery window.
+      vi.advanceTimersByTime(15);
+      tracker.signalObserverActivity('node:node1');
+
+      vi.advanceTimersByTime(35);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should keep other participants tracked', () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1', 'node:node2']);
+
+      tracker.unregisterParticipants(['node:node1']);
+
+      // node2 still extends the window.
+      vi.advanceTimersByTime(15);
+      tracker.signalObserverActivity('node:node2');
+
+      vi.advanceTimersByTime(35);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+    });
+
+    it('should be a no-op when idle', () => {
+      expect(() => tracker.unregisterParticipants(['node:node1'])).not.toThrow();
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+
+    it('should still settle on the timer after all participants are removed', () => {
+      tracker.requestTracking({ discoveryWindowMs: 50 });
+      tracker.registerParticipants(['node:node1']);
+
+      tracker.unregisterParticipants(['node:node1']);
+      expect(tracker.hasPendingMeasurements()).toBe(true);
+
+      vi.advanceTimersByTime(50);
+      expect(tracker.hasPendingMeasurements()).toBe(false);
+    });
+  });
 });

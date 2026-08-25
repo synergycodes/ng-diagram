@@ -236,6 +236,41 @@ describe('finishLinking', () => {
     expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
+  it('should clear temporary edge when target node is effectively hidden', async () => {
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockValidateConnection.mockReturnValue(true);
+    mockFlowCore.getNodeById.mockReturnValue({ ...mockTargetNode, computedHidden: true });
+
+    await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } });
+
+    expect(mockFlowCore.actionStateManager.linking!.cancelReason).toBe('invalidTarget');
+    expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishLinking');
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
+  it('should clear temporary edge when target port is template-hidden', async () => {
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockValidateConnection.mockReturnValue(true);
+    mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
+    (mockFlowCore as unknown as { templateVisibilityRegistry: unknown }).templateVisibilityRegistry = {
+      isPortHidden: (nodeId: string, portId: string) => nodeId === 'target-node' && portId === 'target-port',
+    };
+
+    await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } });
+
+    expect(mockFlowCore.actionStateManager.linking!.cancelReason).toBe('invalidTarget');
+    expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishLinking');
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
   it('should clear temporary edge when target position cannot be determined', async () => {
     mockFlowCore.actionStateManager.linking = {
       sourceNodeId: 'source-node',

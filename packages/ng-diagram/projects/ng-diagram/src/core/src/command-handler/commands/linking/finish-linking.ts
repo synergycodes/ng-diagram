@@ -27,7 +27,16 @@ const validateTarget = (
     return { isValid: false, targetNode: null, targetPosition: null };
   }
 
-  if (targetPortId && targetNode.measuredPorts?.find((port) => port.id === targetPortId)?.type === 'source') {
+  // Effectively hidden nodes and hidden ports are not linking targets.
+  if (targetNode.computedHidden) {
+    return { isValid: false, targetNode, targetPosition: null };
+  }
+
+  if (
+    targetPortId &&
+    (targetNode.measuredPorts?.find((port) => port.id === targetPortId)?.type === 'source' ||
+      commandHandler.flowCore.templateVisibilityRegistry?.isPortHidden(targetNode.id, targetPortId))
+  ) {
     return { isValid: false, targetNode, targetPosition: null };
   }
 

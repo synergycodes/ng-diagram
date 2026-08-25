@@ -51,6 +51,7 @@ import { InitUpdater } from './updater/init-updater/init-updater';
 import { InternalUpdater } from './updater/internal-updater/internal-updater';
 import { Updater } from './updater/updater.interface';
 import { deepMerge, Semaphore } from './utils';
+import { TemplateVisibilityRegistry } from './visibility/template-visibility-registry';
 
 export class FlowCore {
   private _model: ModelAdapter;
@@ -72,6 +73,7 @@ export class FlowCore {
   readonly eventManager: EventManager;
   readonly shortcutManager: ShortcutManager;
   readonly measurementTracker: MeasurementTracker;
+  readonly templateVisibilityRegistry: TemplateVisibilityRegistry;
 
   private readonly interactionCoordinator: InteractionCoordinator;
   private readonly directRenderStrategy: DirectRenderStrategy;
@@ -108,6 +110,20 @@ export class FlowCore {
     this.portBatchProcessor = new PortBatchProcessor(this.getNodeById.bind(this));
     this.labelBatchProcessor = new LabelBatchProcessor(this.getEdgeById.bind(this));
     this.measurementTracker = new MeasurementTracker();
+    this.templateVisibilityRegistry = new TemplateVisibilityRegistry();
+    // Template-declared hidden state lives outside the model, so its changes
+    // must run their own middleware pass to re-stamp computedHidden. During
+    // initialization they additionally prune measurement expectations so a
+    // template-hidden element does not block init until the safety timeout.
+    this.templateVisibilityRegistry.onNodeOrEdgeVisibilityChange = () => {
+      this.initUpdater.refreshHiddenEntities();
+      this.applyUpdate({}, 'templateVisibilityChange').catch((error) => {
+        console.error('[ngDiagram] Failed to apply template visibility change.', error);
+      });
+    };
+    this.templateVisibilityRegistry.onPortOrLabelVisibilityChange = () => {
+      this.initUpdater.refreshHiddenEntities();
+    };
     this.edgeRoutingManager = new EdgeRoutingManager(
       this.config.edgeRouting.defaultRouting,
       () => this.config.edgeRouting || {}

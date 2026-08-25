@@ -264,6 +264,30 @@ describe('BoxSelectionEventHandler', () => {
         });
       });
 
+      it('should not select an edge with computedHidden even when both endpoints are inside the box', () => {
+        const hiddenEdge = { ...mockEdge, id: 'hiddenEdge', source: 'node1', target: 'node2', computedHidden: true };
+        mockModel.getEdges.mockReturnValue([edge1, hiddenEdge]);
+        mockSpatialHash.queryIds.mockReturnValue(new Set(['node1', 'node2']));
+
+        const startEvent = getSampleBoxSelectionEvent({
+          phase: 'start',
+          lastInputPoint: { x: 50, y: 50 },
+        });
+        instance.handle(startEvent);
+
+        const endEvent = getSampleBoxSelectionEvent({
+          phase: 'end',
+          lastInputPoint: { x: 450, y: 250 },
+        });
+        instance.handle(endEvent);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
+          nodeIds: ['node1', 'node2'],
+          edgeIds: ['edge1'],
+          multiSelection: false,
+        });
+      });
+
       it('should select multiple edges when multiple connected nodes are selected', () => {
         mockSpatialHash.queryIds.mockReturnValue(new Set(['node2', 'node3', 'node4']));
 

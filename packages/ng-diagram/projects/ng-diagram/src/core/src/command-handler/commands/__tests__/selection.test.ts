@@ -265,5 +265,37 @@ describe('Selection Commands', () => {
 
       expect(commandHandler.flowCore.applyUpdate).not.toHaveBeenCalled();
     });
+
+    it('should not select nodes and edges with computedHidden', () => {
+      const nodes = [
+        { ...mockNode, id: '1', selected: false },
+        { ...mockNode, id: '2', selected: false, computedHidden: true },
+      ];
+      const edges = [
+        { ...mockEdge, id: 'e1', selected: false },
+        { ...mockEdge, id: 'e2', selected: false, computedHidden: true },
+      ];
+      const commandHandler = createCommandHandler(nodes, edges);
+
+      selectAll(commandHandler);
+
+      expect(commandHandler.flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [{ id: '1', selected: true }],
+          edgesToUpdate: [{ id: 'e1', selected: true }],
+        },
+        'changeSelection'
+      );
+    });
+
+    it('should not apply update when all nodes and edges have computedHidden', () => {
+      const nodes = [{ ...mockNode, id: '1', selected: false, computedHidden: true }];
+      const edges = [{ ...mockEdge, id: 'e1', selected: false, computedHidden: true }];
+      const commandHandler = createCommandHandler(nodes, edges);
+
+      selectAll(commandHandler);
+
+      expect(commandHandler.flowCore.applyUpdate).not.toHaveBeenCalled();
+    });
   });
 });

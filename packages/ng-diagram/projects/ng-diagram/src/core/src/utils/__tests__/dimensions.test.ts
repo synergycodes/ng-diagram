@@ -811,6 +811,101 @@ describe('dimensions', () => {
       expect(result!.height).toBeCloseTo(106.066, 1);
     });
 
+    it('should exclude nodes with computedHidden from the bounds', () => {
+      const nodes: Node[] = [
+        {
+          id: 'node-1',
+          position: { x: 0, y: 0 },
+          size: { width: 50, height: 50 },
+          data: {},
+          measuredBounds: { x: 0, y: 0, width: 50, height: 50 },
+        },
+        {
+          id: 'node-2',
+          position: { x: 1000, y: 1000 },
+          size: { width: 50, height: 50 },
+          data: {},
+          measuredBounds: { x: 1000, y: 1000, width: 50, height: 50 },
+          computedHidden: true,
+        },
+      ];
+
+      const result = calculatePartsBounds(nodes, []);
+
+      expect(result).toEqual({
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 50,
+      });
+    });
+
+    it('should exclude edges with computedHidden from the bounds', () => {
+      const nodes: Node[] = [
+        {
+          id: 'node-1',
+          position: { x: 0, y: 0 },
+          size: { width: 50, height: 50 },
+          data: {},
+          measuredBounds: { x: 0, y: 0, width: 50, height: 50 },
+        },
+      ];
+
+      const edges: Edge[] = [
+        {
+          id: 'edge-1',
+          source: 'node-1',
+          target: 'node-2',
+          data: {},
+          points: [
+            { x: 500, y: 500 },
+            { x: 1000, y: 1000 },
+          ],
+          computedHidden: true,
+        },
+      ];
+
+      const result = calculatePartsBounds(nodes, edges);
+
+      expect(result).toEqual({
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 50,
+      });
+    });
+
+    it('should return null when all elements have computedHidden', () => {
+      const nodes: Node[] = [
+        {
+          id: 'node-1',
+          position: { x: 0, y: 0 },
+          size: { width: 50, height: 50 },
+          data: {},
+          measuredBounds: { x: 0, y: 0, width: 50, height: 50 },
+          computedHidden: true,
+        },
+      ];
+
+      const edges: Edge[] = [
+        {
+          id: 'edge-1',
+          source: 'node-1',
+          target: 'node-2',
+          data: {},
+          points: [
+            { x: 10, y: 20 },
+            { x: 50, y: 60 },
+          ],
+          computedHidden: true,
+        },
+      ];
+
+      const result = calculatePartsBounds(nodes, edges);
+
+      expect(result).toBeNull();
+    });
+
     it('should ignore edges with no points', () => {
       const nodes: Node[] = [
         {

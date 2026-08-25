@@ -16,6 +16,23 @@ Interface representing an edge (connection) between nodes in the flow diagram
 
 ## Properties
 
+### computedHidden?
+
+> `readonly` `optional` **computedHidden**: `boolean`
+
+#### Remarks
+
+ComputedHidden is computed by the system and should not be set manually.
+The effective visibility applied to the edge: true when its own `hidden`
+flag (or a template-level hidden binding) is set, or when either endpoint
+node is effectively hidden.
+
+#### Since
+
+1.4.0
+
+***
+
 ### computedZIndex?
 
 > `readonly` `optional` **computedZIndex**: `number`
@@ -34,6 +51,29 @@ With `zOrder`: uses the explicit value plus connected node elevation.
 > **data**: `T`
 
 The data associated with the edge.
+
+***
+
+### hidden?
+
+> `optional` **hidden**: `boolean`
+
+Whether the edge is hidden. Absent means visible.
+
+Hidden edges stay mounted in the DOM as `display: none`, keep their
+geometry, do not block initialization or measurement waits, are not
+routed, and are excluded from selection and zoomToFit bounds. An edge is
+also effectively hidden when either endpoint node is effectively hidden.
+
+Set by the user; the library only reads it.
+
+#### See
+
+[computedHidden](/docs/api/types/model/edge/#computedhidden) for the derived effective visibility.
+
+#### Since
+
+1.4.0
 
 ***
 

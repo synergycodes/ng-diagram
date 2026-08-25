@@ -117,8 +117,10 @@ export interface SelectAllCommand {
 
 export const selectAll = async (commandHandler: CommandHandler) => {
   const { modelLookup } = commandHandler.flowCore;
-  const allNodeIds = Array.from(modelLookup.nodesMap.keys());
-  const allEdgeIds = Array.from(modelLookup.edgesMap.keys());
+  // Effectively hidden elements are not selectable — selecting invisible
+  // content would let keyboard actions manipulate it sight unseen.
+  const allNodeIds = [...modelLookup.nodesMap.values()].filter((node) => !node.computedHidden).map((node) => node.id);
+  const allEdgeIds = [...modelLookup.edgesMap.values()].filter((edge) => !edge.computedHidden).map((edge) => edge.id);
   const update = changeSelection(modelLookup, allNodeIds, allEdgeIds);
   await applySelectionUpdate(commandHandler, update);
 };

@@ -31,6 +31,9 @@ describe('startLinking', () => {
     actionStateManager: {
       linking: LinkingActionState | null;
     };
+    templateVisibilityRegistry?: {
+      isPortHidden: ReturnType<typeof vi.fn>;
+    };
   };
 
   beforeEach(() => {
@@ -72,6 +75,28 @@ describe('startLinking', () => {
     });
   });
 
+  describe('when source node is effectively hidden', () => {
+    it('should log a warning and not apply any update', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      mockFlowCore.getNodeById.mockReturnValue({ ...mockNode, id: 'hidden-node', computedHidden: true });
+
+      const command: StartLinkingCommand = {
+        name: 'startLinking',
+        source: 'hidden-node',
+      };
+
+      await startLinking(mockCommandHandler, command);
+
+      expect(warnSpy).toHaveBeenCalledWith(
+        '[ngDiagram] startLinking ignored: source node "hidden-node" is effectively hidden.'
+      );
+      expect(mockFlowCore.actionStateManager.linking).toBeNull();
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+    });
+  });
+
   describe('when source node exists', () => {
     const sourceNode: Node = {
       ...mockNode,
@@ -108,6 +133,25 @@ describe('startLinking', () => {
         await startLinking(mockCommandHandler, command);
 
         expect(mockFlowCore.getNodeById).toHaveBeenCalledWith('source-node');
+        expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('when sourcePort is hidden in templateVisibilityRegistry', () => {
+      it('should return early and not apply any update', async () => {
+        const isPortHidden = vi.fn().mockReturnValue(true);
+        mockFlowCore.templateVisibilityRegistry = { isPortHidden };
+
+        const command: StartLinkingCommand = {
+          name: 'startLinking',
+          source: 'source-node',
+          sourcePort: 'source-port',
+        };
+
+        await startLinking(mockCommandHandler, command);
+
+        expect(isPortHidden).toHaveBeenCalledWith('source-node', 'source-port');
+        expect(mockFlowCore.actionStateManager.linking).toBeNull();
         expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
       });
     });

@@ -64,8 +64,10 @@ export class BoxSelectionEventHandler extends EventHandler<BoxSelectionEvent> {
       getNodesInRect(this.flow, rect, this.flow.config.boxSelection.partialInclusion).map((node) => node.id)
     );
 
+    // Endpoint containment comes from the spatial hash (hidden nodes already
+    // excluded), but an edge can be hidden on its own — filter it here.
     const edgesBetweenIds = edges
-      .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target))
+      .filter((edge) => !edge.computedHidden && nodeIds.has(edge.source) && nodeIds.has(edge.target))
       .map((edge) => edge.id);
 
     this.flow.commandHandler.emit('select', {

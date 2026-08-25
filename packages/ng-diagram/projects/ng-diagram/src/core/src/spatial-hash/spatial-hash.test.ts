@@ -128,4 +128,46 @@ describe('SpatialHash', () => {
 
     expect(result).toEqual(['1', '2', '3']);
   });
+
+  describe('computedHidden nodes', () => {
+    const visibleNode = {
+      ...mockNode,
+      id: 'visible',
+      position: { x: 0, y: 0 },
+      size: { width: 20, height: 20 },
+    } satisfies Node;
+    const hiddenNode = {
+      ...mockNode,
+      id: 'hidden',
+      position: { x: 100, y: 100 },
+      size: { width: 20, height: 20 },
+      computedHidden: true,
+    } satisfies Node;
+    const hugeRange = { x: -1000, y: -1000, width: 3000, height: 3000 };
+
+    it('should skip nodes with computedHidden when processing', () => {
+      spatialHash.process([visibleNode, hiddenNode]);
+
+      expect(spatialHash.queryIds(hugeRange)).toEqual(['visible']);
+      expect(spatialHash.query(hugeRange).map((rect) => rect.id)).toEqual(['visible']);
+    });
+
+    it('should remove a previously hashed node when it reappears with computedHidden', () => {
+      spatialHash.process([visibleNode, { ...hiddenNode, computedHidden: false }]);
+      expect(spatialHash.queryIds(hugeRange).sort()).toEqual(['hidden', 'visible']);
+
+      spatialHash.process([visibleNode, hiddenNode]);
+
+      expect(spatialHash.queryIds(hugeRange)).toEqual(['visible']);
+    });
+
+    it('should re-add a node when processed again without computedHidden', () => {
+      spatialHash.process([visibleNode, hiddenNode]);
+      expect(spatialHash.queryIds(hugeRange)).toEqual(['visible']);
+
+      spatialHash.process([visibleNode, { ...hiddenNode, computedHidden: false }]);
+
+      expect(spatialHash.queryIds(hugeRange).sort()).toEqual(['hidden', 'visible']);
+    });
+  });
 });

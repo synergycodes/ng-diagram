@@ -81,15 +81,21 @@ describe('SignalModelAdapter', () => {
 
   describe('toJSON', () => {
     it('should strip runtime properties by default', () => {
-      service.updateNodes([{ ...mockNodes[0], selected: true, computedZIndex: 1 }]);
-      service.updateEdges([{ ...mockEdges[0], sourcePosition: { x: 1, y: 2 }, computedZIndex: 1 }]);
+      service.updateNodes([{ ...mockNodes[0], selected: true, computedZIndex: 1, hidden: true, computedHidden: true }]);
+      service.updateEdges([
+        { ...mockEdges[0], sourcePosition: { x: 1, y: 2 }, computedZIndex: 1, hidden: true, computedHidden: true },
+      ]);
 
       const { nodes, edges } = JSON.parse(service.toJSON());
 
       expect(nodes[0].selected).toBeUndefined();
       expect(nodes[0].computedZIndex).toBeUndefined();
+      expect(nodes[0].computedHidden).toBeUndefined();
+      expect(nodes[0].hidden).toBe(true);
       expect(edges[0].sourcePosition).toBeUndefined();
       expect(edges[0].computedZIndex).toBeUndefined();
+      expect(edges[0].computedHidden).toBeUndefined();
+      expect(edges[0].hidden).toBe(true);
     });
 
     it('should keep the authored free-endpoint position of a dangling edge', () => {

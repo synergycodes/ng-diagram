@@ -17,7 +17,16 @@ export const startLinking = async (commandHandler: CommandHandler, command: Star
     return;
   }
 
-  if (sourcePortId && sourceNode.measuredPorts?.find((port) => port.id === sourcePortId)?.type === 'target') {
+  if (sourceNode.computedHidden) {
+    console.warn(`[ngDiagram] startLinking ignored: source node "${sourceNodeId}" is effectively hidden.`);
+    return;
+  }
+
+  if (
+    sourcePortId &&
+    (sourceNode.measuredPorts?.find((port) => port.id === sourcePortId)?.type === 'target' ||
+      commandHandler.flowCore.templateVisibilityRegistry?.isPortHidden(sourceNodeId, sourcePortId))
+  ) {
     return;
   }
 
