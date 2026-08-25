@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Copying a group now includes its content** — `copy`/`cut` cascade to all descendants of the copied nodes and to the edges connecting copied nodes, so pasting a group reproduces its children and internal wiring (previously a pasted group was empty). Cutting a collapsed group no longer destroys its hidden children — they travel through the clipboard with it. Effectively hidden *selected* elements are skipped by copy (consistent with `deleteSelection`), and pasted hidden content is not selected, so pasting cannot create an invisible selection; the paste-at-cursor position is computed from the visible pasted content only (NGD-101)
+- **Copying a group now includes its content** — `copy`/`cut` cascade to all descendants of the copied nodes and to the edges connecting copied nodes, so pasting a group reproduces its children and internal wiring (previously a pasted group was empty). Cutting a collapsed group no longer destroys its hidden children — they travel through the clipboard with it. Effectively hidden _selected_ elements are skipped by copy (consistent with `deleteSelection`), and pasted hidden content is not selected, so pasting cannot create an invisible selection; the paste-at-cursor position is computed from the visible pasted content only (NGD-101)
 
 ### Added
 

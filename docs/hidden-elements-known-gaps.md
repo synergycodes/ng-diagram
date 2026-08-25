@@ -28,13 +28,13 @@ Hiding a node/edge removes it from the virtualized render set, which destroys th
 template that declares the binding — the state could then never be un-declared (or, before the
 fix, oscillated hide/unhide indefinitely). With virtualization enabled the directive is an
 ignored no-op with a one-time console warning. Use the model-level `hidden` flag instead.
-Port and label `hidden` inputs are unaffected (they live on templates of *visible* owners and
+Port and label `hidden` inputs are unaffected (they live on templates of _visible_ owners and
 are re-declared on remount).
 
 ### Minimap draws hidden nodes (NGD-107, separate task)
 
 `DirectMinimapStrategy.computeMinimapNodes` does not filter `computedHidden`, while the
-minimap *bounds* (via `calculatePartsBounds`) do — hidden dots can render outside the bounds
+minimap _bounds_ (via `calculatePartsBounds`) do — hidden dots can render outside the bounds
 rectangle. Tracked as NGD-107.
 
 ### Visibility-diff tracking costs O(N) per model change under virtualization
@@ -85,8 +85,8 @@ Accepted: the pre-init window is not a supported query window.
   later unhidden. The stickiness itself pre-exists for visible groups; hidden just makes it
   invisible until it surprises. Candidate fix: refuse (or auto-clear) highlight on hidden targets.
 - **Group tearing with a non-draggable visible ancestor** — for a selected group with
-  `draggable: false`, its *visible* descendants still move with a drag (pre-existing behavior)
-  while its *hidden* descendants now stay (they require a moving ancestor). The two halves
+  `draggable: false`, its _visible_ descendants still move with a drag (pre-existing behavior)
+  while its _hidden_ descendants now stay (they require a moving ancestor). The two halves
   diverge. Either both should move or neither; needs a decision on what `draggable: false` on a
   group means for its children.
 - **Hide-then-unhide before pointer release teleports the node** — while a dragged node is
@@ -119,12 +119,12 @@ Accepted: the pre-init window is not a supported query window.
   the pre-existing behavior of `computedZIndex` and `measuredBounds`: system-computed props
   are stamped only by middleware passes, and mutating the model adapter directly is
   documented as unsupported (state-management guide). Set `hidden` through the services.
-- **A user middleware that writes `hidden`/`groupId`** runs *after* the `hidden-computation`
+- **A user middleware that writes `hidden`/`groupId`** runs _after_ the `hidden-computation`
   middleware, so its change is not re-stamped within the same pass. No built-in middleware
   does this. Candidate fix if it ever matters: re-run the visibility stamp at the tail of the
   chain when hidden-relevant props changed after it.
 - **`TemplateVisibilityRegistry` lifetime is tied to `FlowCore`.** Swapping the entire model
-  content through the *same* adapter instance (never done by `initializeModel` flows, which
+  content through the _same_ adapter instance (never done by `initializeModel` flows, which
   create a fresh `FlowCore`) keeps the registry, so stale template-hidden entries for reused
   ids could linger. `registry.clear()` exists but currently has no production caller.
   Known leak windows for individual entries (`hidden: true` outliving its declarer): the
@@ -161,7 +161,7 @@ Round 2 found the prose ahead of (or behind) the code in a few places — each i
   conditional-visibility guide, `SimpleNode`/`GroupNode`/`Edge` JSDoc, the `NgDiagramHiddenDirective`
   JSDoc and the CHANGELOG — while this very file documents the programmatic exceptions
   (`select()`, z-order, `centerOnNode`, groups APIs, `rotateNodeTo`, `resizeNode`). Reword to
-  "every *interactive* surface" and reference the programmatic-API policy.
+  "every _interactive_ surface" and reference the programmatic-API policy.
 - **`SimpleNode.hidden` JSDoc says "stay mounted in the DOM as `display: none`" unqualified** —
   false under virtualization. The guide carries the qualifier; the API reference (generated from
   the type JSDoc) does not.
@@ -179,10 +179,10 @@ Round 2 found the prose ahead of (or behind) the code in a few places — each i
 
 ## Test coverage map (for the classes of bug this feature attracted)
 
-| Bug class | Guarded by |
-| --- | --- |
-| Own-state vs cascade (exclusion at wrong altitude) | `movable-selection.test.ts`, `delete-selection.test.ts`, `copy-paste.test.ts`/`cut.test.ts` hidden describes, drop-on-group e2e |
-| Derived-state staleness | `hidden-computation.test.ts`, virtualization visibility-invalidation tests, virtualization unhide e2e |
-| Chokepoint bypasses | per-surface exclusion tests (spatial hash, selectAll, box selection, linking, bounds, routing, resolver), keyboard-actions gate spec |
-| Lifecycle windows | `ng-diagram-hidden.directive.spec.ts` (replace/reinit/virtualization), port spec virtualized-out case |
-| Reactive vs snapshot reads | convention: reactive consumers must read `nodes()`/`edges()` signals, never `getNodeById` inside `computed()` (see the demo toolbar) |
+| Bug class                                          | Guarded by                                                                                                                           |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Own-state vs cascade (exclusion at wrong altitude) | `movable-selection.test.ts`, `delete-selection.test.ts`, `copy-paste.test.ts`/`cut.test.ts` hidden describes, drop-on-group e2e      |
+| Derived-state staleness                            | `hidden-computation.test.ts`, virtualization visibility-invalidation tests, virtualization unhide e2e                                |
+| Chokepoint bypasses                                | per-surface exclusion tests (spatial hash, selectAll, box selection, linking, bounds, routing, resolver), keyboard-actions gate spec |
+| Lifecycle windows                                  | `ng-diagram-hidden.directive.spec.ts` (replace/reinit/virtualization), port spec virtualized-out case                                |
+| Reactive vs snapshot reads                         | convention: reactive consumers must read `nodes()`/`edges()` signals, never `getNodeById` inside `computed()` (see the demo toolbar) |

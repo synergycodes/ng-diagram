@@ -13,7 +13,7 @@ that is missing. Paths are relative to `packages/ng-diagram/projects/ng-diagram/
 
 ## High
 
-### 1. `computedHidden` stamps on *added* nodes/edges are reverted by `internal-id-assignment`
+### 1. `computedHidden` stamps on _added_ nodes/edges are reverted by `internal-id-assignment`
 
 `hidden-computation` runs first in the chain (`core/src/middleware-manager/middleware-manager.ts:90`)
 and stamps added elements via `nodesToAdd`/`edgesToAdd` — which the executor applies as a **full
@@ -32,16 +32,16 @@ Reachable through public API:
   survives on the pasted node with nothing to ever recompute it: permanently invisible **and**
   `selected: true` — the invisible-selection state the feature promises impossible.
 
-Diagnostic signature: adding a hidden *group* hides its pre-existing children (they travel via
+Diagnostic signature: adding a hidden _group_ hides its pre-existing children (they travel via
 `nodesToUpdate`, which merges) while the added group itself stays visible.
 
 Why the suite misses it: toggle/init paths use `nodesToUpdate`/model-load; `internalIdMiddleware`
 early-returns when nothing was added; `hidden-computation.test.ts` uses a mocked context and never
 runs the real chain. `measuredBoundsMiddleware` uses the same `nodesToAdd` pattern **safely**
-because it runs *after* `internalId` — only `hidden-computation` violates the ordering constraint.
+because it runs _after_ `internalId` — only `hidden-computation` violates the ordering constraint.
 
 **Fix direction**: run the stamp after `internal-id-assignment` (or make `internalIdMiddleware`
-re-emit from the *current* update rather than `initialUpdate`). **Missing test**: an integration
+re-emit from the _current_ update rather than `initialUpdate`). **Missing test**: an integration
 test that runs the real `BUILTIN_MIDDLEWARES` chain end-to-end for `addNodes`/`addEdges`/`paste`
 with hidden content.
 

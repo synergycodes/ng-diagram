@@ -163,9 +163,7 @@ test.describe('hidden elements', () => {
     await diagram.selection.select(['dragged', 'hidden-b']);
     await diagram.dragNode('dragged', { x: 450, y: 50 });
 
-    await expect
-      .poll(async () => (await diagram.model.getNodeById('dragged'))?.groupId)
-      .toBe('group');
+    await expect.poll(async () => (await diagram.model.getNodeById('dragged'))?.groupId).toBe('group');
 
     // The invisible selected node was not re-parented by the drop.
     const hidden = await diagram.model.getNodeById('hidden-b');
