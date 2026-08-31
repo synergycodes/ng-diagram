@@ -421,12 +421,16 @@ describe('VirtualizedRenderStrategy', () => {
       flowCore['renderer'] = { draw: vi.fn() };
       flowCore['initUpdater'] = { start: vi.fn() };
       flowCore['commandHandler'] = { emit: vi.fn() };
+      // In production the hidden-computation middleware bumps this whenever a
+      // pass changed effective visibility; the tests bump it with fireChange.
+      flowCore['visibilityVersion'] = 0;
 
       strategy.init();
 
       return (nextState: MutableState) => {
         state = nextState;
         updateNodesMap(nextState.nodes);
+        flowCore['visibilityVersion'] = (flowCore['visibilityVersion'] as number) + 1;
         onChangeCallback?.(nextState);
         return state;
       };

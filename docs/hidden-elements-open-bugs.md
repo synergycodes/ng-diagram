@@ -1,10 +1,11 @@
-# Hidden elements — open bugs (round-2 audit, not yet fixed)
+# Hidden elements — open bugs (round-2 audit)
 
-**Date**: 2026-08-25
+**Date**: 2026-08-25 (triage decisions and fixes applied 2026-08-27)
 **Status**: Confirmed by a second adversarial audit of the hidden-elements feature (NGD-101) and
-of the first round of bug fixes. **None of these are fixed yet** — this file is the triage list.
-Non-bug findings from the same audit live in
-[hidden-elements-known-gaps.md](./hidden-elements-known-gaps.md).
+of the first round of bug fixes. Triage outcome: **#1, #2, #4, #5, #6, #9 fixed** (this branch),
+**#8 tracked separately as NGD-317** (pre-existing shape, fix on its own branch), **#3 and #7
+accepted as won't-fix** (see the entries for rationale). Non-bug findings from the same audit live
+in [hidden-elements-known-gaps.md](./hidden-elements-known-gaps.md).
 
 All 3,154 unit tests and the e2e suite pass with these bugs present — each entry notes the test
 that is missing. Paths are relative to `packages/ng-diagram/projects/ng-diagram/src`.
@@ -13,7 +14,23 @@ that is missing. Paths are relative to `packages/ng-diagram/projects/ng-diagram/
 
 ## High
 
-### 1. `computedHidden` stamps on _added_ nodes/edges are reverted by `internal-id-assignment`
+### 1. ~~`computedHidden` stamps on _added_ nodes/edges are reverted by `internal-id-assignment`~~ — FIXED (2026-08-27)
+
+**Fixed** as a side effect of the middleware re-ordering requested in review: the visibility stamp
+now runs as two instances — a pre-pass one (same-pass consumers) and a **finalize** instance at the
+start of the internal tail, after `internal-id-assignment` and all user middlewares — so stamps on
+added elements land in the committed state, and `hidden`/`groupId` writes by user middlewares are
+stamped in the same pass. Regression net added:
+`hidden-computation.chain.integration.test.ts` runs the REAL MiddlewareManager + executor +
+internal-id-assignment for `addNodes`/`addEdges`/paste-like adds and the user-middleware case.
+
+**Additionally hardened** (2026-08-27): `internalIdMiddleware` itself no longer re-emits the whole
+elements from the pristine `initialUpdate` — it now emits `nodesToUpdate`/`edgesToUpdate`
+**patches** carrying only `{ id, _internalId }`, so it can never again revert properties another
+middleware stamped on added elements earlier in the pass (the entire failure class, not just the
+`computedHidden` instance). Its unit tests were rewritten to the patch contract.
+
+Original finding (for the record):
 
 `hidden-computation` runs first in the chain (`core/src/middleware-manager/middleware-manager.ts:90`)
 and stamps added elements via `nodesToAdd`/`edgesToAdd` — which the executor applies as a **full
@@ -45,7 +62,16 @@ re-emit from the _current_ update rather than `initialUpdate`). **Missing test**
 test that runs the real `BUILTIN_MIDDLEWARES` chain end-to-end for `addNodes`/`addEdges`/`paste`
 with hidden content.
 
-### 2. `NgDiagramService.startLinking()` on a hidden node leaves phantom linking state
+### 2. ~~`NgDiagramService.startLinking()` on a hidden node leaves phantom linking state~~ — FIXED (2026-08-27)
+
+**Fixed** on both layers: the `startLinking` command now clears the handler-installed preliminary
+linking state on **every** refusal path (missing node, hidden source, target-typed/registry-hidden
+port, unresolvable position) via a `refuse()` helper, and `ManualLinkingService.startLinking()`
+validates the node (exists, not effectively hidden) **before** attaching its four document
+listeners or emitting anything. Tests: refusal-clears-state suite in `start-linking.test.ts`,
+hidden/missing-node refusals in `manual-linking.service.spec.ts`.
+
+Original finding (for the record):
 
 The linking handler installs `actionStateManager.linking` **before** emitting the command
 (`core/src/input-events/handlers/linking/linking.handler.ts:33-42`); the command's hidden-source
@@ -68,7 +94,11 @@ normal pointer link.
 
 ## Medium
 
-### 3. Unhide mid-drag: the late joiner corrupts the gesture
+### 3. Unhide mid-drag: the late joiner corrupts the gesture — WON'T FIX (accepted 2026-08-27)
+
+Triage decision: not worth the gesture-bookkeeping complexity for a one-in-a-million interleaving
+(a still-selected node must be unhidden by app logic in the middle of an active drag). Revisit if
+it ever surfaces in practice.
 
 `draggableSelection()` is recomputed every `continue`, so a still-selected node unhidden mid-drag
 joins the move set — but `gesture.initialPositions` and `dragging.nodeIds` were captured once at
@@ -81,7 +111,17 @@ peers are already offset, breaking the selection's relative geometry.
 mid-gesture), or register late joiners into `initialPositions`/`dragging.nodeIds` on entry.
 **Missing test**: unhide-mid-drag + Escape.
 
-### 4. Hiding the gesture's element mid-gesture under virtualization strands lifecycle state
+### 4. ~~Hiding the gesture's element mid-gesture under virtualization strands lifecycle state~~ — FIXED (2026-08-27)
+
+**Fixed**: all four destroyed-mid-gesture escape hatches (`pointer-move-selection`, `resize`,
+`rotate`, `linking` directives) now run the full `FlowCore.cancelActiveInteraction()` flow instead
+of a bare action-state clear — paired `…Ended` events with the `cancelled` reason, group-highlight
+clear, and geometry rollback. When the cancel is refused (e.g. an active transaction) they fall
+back to the previous bare clear so the state can never leak, and they skip the fallback while
+another cancel owns the state mid-rollback. Tests: destroy-mid-gesture + refused-cancel fallback
+cases in each directive's spec.
+
+Original finding (for the record):
 
 The hide unmounts the element immediately (render-set exclusion + prompt cache invalidation), and
 every gesture directive's destroyed-mid-gesture escape hatch clears action state **without the
@@ -95,7 +135,14 @@ mounted).
 (emit the stop/cancelled pass, clear highlight). **Missing test**: virtualization e2e hiding the
 dragged/resized/linked node mid-gesture, asserting paired lifecycle events.
 
-### 5. `finishLinking` never re-validates the source's visibility
+### 5. ~~`finishLinking` never re-validates the source's visibility~~ — FIXED (2026-08-27)
+
+**Fixed**: `finishLinking` re-checks the source's `computedHidden` right after the no-target check
+and cancels the gesture with the existing `'cancelled'` reason (no API change) — no edge is
+created from a source that was hidden mid-gesture. Test: hidden-source-mid-gesture case in
+`finish-linking.test.ts`.
+
+Original finding (for the record):
 
 Hide the source after linking started: the target validates
 (`core/src/command-handler/commands/linking/finish-linking.ts:31`), the edge is created, and the
@@ -105,7 +152,15 @@ phantom invisible edge. Asymmetric with the target rule and with `startLinking`'
 **Fix direction**: re-check the source in `validateTarget`/`finishLinking` and cancel with an
 appropriate reason. **Missing test**: hide source between start and finish.
 
-### 6. The temporary edge keeps rendering from a hidden source
+### 6. ~~The temporary edge keeps rendering from a hidden source~~ — FIXED (2026-08-27)
+
+**Fixed** in both places: `BaseRenderStrategy.render()` appends the temporary edge only while its
+source is not effectively hidden, and the `edges-routing` middleware skips re-routing it in the
+same condition (its stale geometry is never drawn). Combined with #4's cancel-on-unmount, hiding
+the source mid-gesture now tears the rubber band down in both render modes. Tests:
+`base-render-strategy.test.ts` (skip/append) and the hidden-source case in `edges-routing.test.ts`.
+
+Original finding (for the record):
 
 It lives in action state, bypasses `hidden-computation`, is appended unconditionally after
 `process()` (`core/src/render-strategy/base-render-strategy.ts:21-25`) and keeps being re-routed
@@ -115,7 +170,11 @@ in both render modes.
 **Fix direction**: follows from #5 (cancel the gesture when the source hides), or skip
 rendering/routing the temporary edge while its source is effectively hidden.
 
-### 7. Model-driven `hidden` during init still stalls the 2 s timeout
+### 7. Model-driven `hidden` during init still stalls the 2 s timeout — WON'T FIX (accepted 2026-08-27)
+
+Triage decision: hiding nodes by racing model updates against initialization is not a supported
+pattern — apps should set `hidden` in the initial model or apply it from `onInit`. The 2 s
+force-finish already self-heals with a warning.
 
 `InitUpdater.refreshHiddenEntities()` is wired only to the template-registry callbacks
 (`core/src/flow-core.ts:118-126`); a `updateNode(id, { hidden: true })` landing before init
@@ -126,7 +185,11 @@ warning.
 `applyUpdate`) while `!initUpdater.isInitialized`. **Missing test**: init-updater test hiding a
 node via a model update mid-init.
 
-### 8. `zoomToFit({ nodeIds: [hiddenId] })` fits the entire edge network
+### 8. `zoomToFit({ nodeIds: [hiddenId] })` fits the entire edge network — TRACKED AS NGD-317 (2026-08-27)
+
+Triage decision: pre-existing shape, fix on a separate branch —
+[NGD-317](https://app.clickup.com/t/86cbanwwx) in the ngDiagram backlog carries the full
+description, repro and fix direction.
 
 Passing only `nodeIds` leaves `targetEdges` as **all** edges
 (`core/src/command-handler/commands/zoom-to-fit.ts:63-65`); the hidden node contributes null
@@ -138,7 +201,17 @@ bounds, the full edge network doesn't → the viewport frames everything, silent
 target nodes (or none). **Missing test**: `zoomToFit` with hidden-only and mixed `nodeIds` in a
 diagram with edges.
 
-### 9. `getMovableSelection` walks `getParentChain` per hidden node per pointermove frame
+### 9. ~~`getMovableSelection` walks `getParentChain` per hidden node per pointermove frame~~ — FIXED (2026-08-27)
+
+**Fixed**: `getMovableSelection` no longer calls `getParentChain`. Hidden members of the expanded
+selection are now kept when they are descendants of a moving root — resolved via
+`modelLookup.getAllDescendantIds` over the moving roots (the same `groupId`-link expansion the
+visibility computation uses), with a fast path returning early when nothing in the set is hidden.
+No `isGroup` enforcement, no per-frame `console.error` spam, and hidden children behind a
+non-group parent link move with the drag instead of being stranded. Test: regression case with a
+non-group parent link + `console.error` spy in `movable-selection.test.ts`.
+
+Original finding (for the record):
 
 `core/src/input-events/handlers/movable-selection.ts:28`. `getParentChain` enforces `isGroup` and
 `console.error`s (`MODEL_INTEGRITY_*`) on violations, while the other visibility producers
@@ -163,3 +236,8 @@ Verified identical at `origin/main`; listed for awareness, tracked separately if
   **original** nodes (`copy-paste.ts` id-map fallback `nodeIdMap.get(edge.source) || edge.source`).
 - **`NgDiagramClipboardService.paste(position)` makes `position` required**, so the command's
   default offset-paste branch (+20/+20) is unreachable from the public service.
+- **`linking.spec.ts` raced the effect-scheduled model signals** — the spec's single-shot
+  `model.edges()` read right after pointerup loses to Angular's effect flush (the DOM retry
+  before it is satisfied by the *temporary* linking edge). Verified failing on pristine `main`
+  with a freshly built dist; earlier "passes" ran against stale served bundles. Hardened on
+  2026-08-27 with a retrying `expect.poll` on the model.

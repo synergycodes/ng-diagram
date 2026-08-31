@@ -30,6 +30,8 @@ describe('startLinking', () => {
     };
     actionStateManager: {
       linking: LinkingActionState | null;
+      isLinking: ReturnType<typeof vi.fn>;
+      clearLinking: ReturnType<typeof vi.fn>;
     };
     templateVisibilityRegistry?: {
       isPortHidden: ReturnType<typeof vi.fn>;
@@ -39,6 +41,14 @@ describe('startLinking', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
+    const actionStateManager = {
+      linking: null as LinkingActionState | null,
+      isLinking: vi.fn(() => actionStateManager.linking !== null),
+      clearLinking: vi.fn(() => {
+        actionStateManager.linking = null;
+      }),
+    };
+
     mockFlowCore = {
       getNodeById: vi.fn(),
       applyUpdate: vi.fn().mockResolvedValue(undefined),
@@ -47,9 +57,7 @@ describe('startLinking', () => {
           temporaryEdgeDataBuilder: vi.fn(),
         },
       },
-      actionStateManager: {
-        linking: null,
-      },
+      actionStateManager,
     };
 
     mockCommandHandler = {
@@ -339,6 +347,82 @@ describe('startLinking', () => {
         });
         expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startLinking');
       });
+    });
+  });
+
+  describe('refusal with preliminary linking state installed', () => {
+    // The pointer/manual handlers install a preliminary linking state BEFORE
+    // the command runs. Every refusal path must clear it, or isLinking() stays
+    // true forever and blocks all subsequent linking.
+    const preliminaryState = { temporaryEdge: null } as unknown as LinkingActionState;
+
+    beforeEach(() => {
+      mockFlowCore.actionStateManager.linking = preliminaryState;
+    });
+
+    it('should clear the preliminary state when the source node does not exist', async () => {
+      mockFlowCore.getNodeById.mockReturnValue(null);
+
+      await startLinking(mockCommandHandler, { name: 'startLinking', source: 'nonexistent-node' });
+
+      expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+      expect(mockFlowCore.actionStateManager.linking).toBeNull();
+    });
+
+    it('should clear the preliminary state when the source node is effectively hidden', async () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      mockFlowCore.getNodeById.mockReturnValue({ ...mockNode, id: 'hidden-node', computedHidden: true });
+
+      await startLinking(mockCommandHandler, { name: 'startLinking', source: 'hidden-node' });
+
+      expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+      expect(mockFlowCore.actionStateManager.linking).toBeNull();
+
+      warnSpy.mockRestore();
+    });
+
+    it('should clear the preliminary state when the source port is target-typed', async () => {
+      mockFlowCore.getNodeById.mockReturnValue({
+        ...mockNode,
+        id: 'source-node',
+        measuredPorts: [{ ...mockPort, id: 'target-port', type: 'target', side: 'left' }],
+      });
+
+      await startLinking(mockCommandHandler, {
+        name: 'startLinking',
+        source: 'source-node',
+        sourcePort: 'target-port',
+      });
+
+      expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+      expect(mockFlowCore.actionStateManager.linking).toBeNull();
+    });
+
+    it('should clear the preliminary state when the source port is registry-hidden', async () => {
+      mockFlowCore.getNodeById.mockReturnValue({
+        ...mockNode,
+        id: 'source-node',
+        measuredPorts: [{ ...mockPort, id: 'source-port', type: 'source', side: 'right' }],
+      });
+      mockFlowCore.templateVisibilityRegistry = { isPortHidden: vi.fn().mockReturnValue(true) };
+
+      await startLinking(mockCommandHandler, {
+        name: 'startLinking',
+        source: 'source-node',
+        sourcePort: 'source-port',
+      });
+
+      expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+      expect(mockFlowCore.actionStateManager.linking).toBeNull();
+    });
+
+    it('should clear the preliminary state when no start position can be resolved', async () => {
+      mockFlowCore.getNodeById.mockReturnValue({ ...mockNode, id: 'source-node', position: undefined });
+
+      await startLinking(mockCommandHandler, { name: 'startLinking', source: 'source-node' });
+
+      expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+      expect(mockFlowCore.actionStateManager.linking).toBeNull();
     });
   });
 

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../flow-core';
 import type { Node } from '../../types';
 import { getMovableSelection } from './movable-selection';
@@ -11,25 +11,27 @@ describe('getMovableSelection', () => {
     ...overrides,
   });
 
-  /** Minimal flow mock: resolves parent chains from the given nodes' groupId links. */
+  /** Minimal flow mock: resolves descendants from the given nodes' groupId links. */
   const createFlow = (selectedWithChildren: Node[]): FlowCore => {
-    const byId = new Map(selectedWithChildren.map((node) => [node.id, node]));
-    const getParentChain = (nodeId: string): Node[] => {
-      const chain: Node[] = [];
-      let current = byId.get(nodeId);
-      while (current?.groupId) {
-        const parent = byId.get(current.groupId);
-        if (!parent) break;
-        chain.push(parent);
-        current = parent;
+    const getAllDescendantIds = (rootId: string): string[] => {
+      const result: string[] = [];
+      const queue = [rootId];
+      while (queue.length) {
+        const current = queue.shift()!;
+        for (const node of selectedWithChildren) {
+          if (node.groupId === current) {
+            result.push(node.id);
+            queue.push(node.id);
+          }
+        }
       }
-      return chain;
+      return result;
     };
 
     return {
       modelLookup: {
         getSelectedNodesWithChildren: () => selectedWithChildren,
-        getParentChain,
+        getAllDescendantIds,
       },
     } as unknown as FlowCore;
   };
@@ -77,6 +79,21 @@ describe('getMovableSelection', () => {
     const node = createNode('a', { selected: true, draggable: false });
 
     expect(getMovableSelection(createFlow([node]))).toEqual([]);
+  });
+
+  it('should move hidden descendants reached through a non-group parent link without integrity errors', () => {
+    // Model-integrity edge case: a child whose groupId points at a plain node.
+    // Effective visibility and the selection expansion both follow raw groupId
+    // links, so the movable set must too — previously this path went through
+    // getParentChain, which enforces isGroup and console.errors per frame.
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const group = createNode('group', { selected: true, isGroup: true } as Partial<Node>);
+    const plainMiddle = createNode('middle', { groupId: 'group' });
+    const hiddenLeaf = createNode('leaf', { groupId: 'middle', computedHidden: true });
+
+    expect(getMovableSelection(createFlow([group, plainMiddle, hiddenLeaf]))).toEqual([group, plainMiddle, hiddenLeaf]);
+    expect(errorSpy).not.toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 
   it('should include a hidden selected node that is also a descendant of a visible selected group', () => {

@@ -7,6 +7,24 @@ const HIDDEN_RELEVANT_NODE_PROPS = ['hidden', 'groupId'];
 /** Edge property changes that can alter effective visibility. */
 const HIDDEN_RELEVANT_EDGE_PROPS = ['hidden', 'source', 'target'];
 
+export interface HiddenComputationOptions {
+  /** Distinct middleware name for the pre-pass and finalize instances. */
+  name: string;
+  /**
+   * When true, entries of removed nodes/edges are dropped from the
+   * {@link TemplateVisibilityRegistry} (silently — the elements are gone, no
+   * recompute pass is needed for them). Enabled on the pre-pass instance only.
+   */
+  cleanupRemovedEntries?: boolean;
+  /**
+   * Invoked when the pass actually changed some element's effective
+   * visibility. Consumers that cache render output keyed on things that do
+   * not change on a visibility toggle (e.g. the virtualized result cache)
+   * use it as an O(1) invalidation signal.
+   */
+  onVisibilityChanged?: () => void;
+}
+
 /**
  * Stamps the system-computed `computedHidden` property on nodes and edges.
  *
@@ -17,17 +35,45 @@ const HIDDEN_RELEVANT_EDGE_PROPS = ['hidden', 'source', 'target'];
  * hidden. Every downstream consumer (rendering, spatial hash, selection,
  * routing, bounds, virtualization) reads `computedHidden` — never raw flags.
  *
- * Runs before all user middlewares so they and the built-in tail see fresh
- * effective visibility within the same pass.
+ * The middleware runs TWICE per pass, as two instances:
+ * - a **pre-pass** instance before the whole chain, so same-pass consumers
+ *   (edges-routing, user middlewares, the built-in tail) see fresh effective
+ *   visibility for changes carried by the initial update;
+ * - a **finalize** instance at the start of the internal tail, so writes made
+ *   by user middlewares (`hidden`, `groupId`, `source`, `target`) are also
+ *   stamped within the same pass, and stamps on ADDED elements survive
+ *   middlewares that re-emit `nodesToAdd`/`edgesToAdd` from the initial
+ *   update (e.g. internal-id-assignment).
+ *
+ * The recompute is idempotent and diff-based: when the pre-pass already
+ * stamped everything, the finalize instance emits nothing.
  *
  * @internal
  */
 export const createHiddenComputationMiddleware = (
-  registry: TemplateVisibilityRegistry
-): Middleware<'hidden-computation'> => ({
-  name: 'hidden-computation',
+  registry: TemplateVisibilityRegistry,
+  { name, cleanupRemovedEntries = false, onVisibilityChanged }: HiddenComputationOptions
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Middleware<any> => ({
+  name,
   execute: (context, next) => {
     const { state, modelActionTypes, helpers } = context;
+
+    // Elements removed from the model take their template-hidden declarations
+    // with them — otherwise a later element reusing the id would be silently
+    // hidden by a stale entry.
+    if (cleanupRemovedEntries) {
+      if (helpers.anyNodesRemoved()) {
+        for (const node of helpers.getRemovedNodes()) {
+          registry.removeNodeEntries(node.id);
+        }
+      }
+      if (helpers.anyEdgesRemoved()) {
+        for (const edge of helpers.getRemovedEdges()) {
+          registry.removeEdgeEntries(edge.id);
+        }
+      }
+    }
 
     const shouldRecompute =
       modelActionTypes.includes('init') ||
@@ -72,6 +118,10 @@ export const createHiddenComputationMiddleware = (
       } else {
         edgesToUpdate.push({ id: edge.id, computedHidden: hidden });
       }
+    }
+
+    if (nodesToAdd.length || nodesToUpdate.length || edgesToAdd.length || edgesToUpdate.length) {
+      onVisibilityChanged?.();
     }
 
     next({

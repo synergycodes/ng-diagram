@@ -76,6 +76,23 @@ export class TemplateVisibilityRegistry {
     return this.hiddenLabels.get(edgeId)?.has(labelId) ?? false;
   }
 
+  /**
+   * Silently drops every entry owned by a removed node (its own hidden
+   * declaration and its ports'). No change callbacks fire — the element is
+   * gone, so there is nothing to recompute or re-render for it; the goal is
+   * only that a future element reusing the id starts visible.
+   */
+  removeNodeEntries(nodeId: string): void {
+    this.hiddenNodes.delete(nodeId);
+    this.hiddenPorts.delete(nodeId);
+  }
+
+  /** See {@link removeNodeEntries} — same cleanup for a removed edge. */
+  removeEdgeEntries(edgeId: string): void {
+    this.hiddenEdges.delete(edgeId);
+    this.hiddenLabels.delete(edgeId);
+  }
+
   clear(): void {
     this.hiddenNodes.clear();
     this.hiddenEdges.clear();

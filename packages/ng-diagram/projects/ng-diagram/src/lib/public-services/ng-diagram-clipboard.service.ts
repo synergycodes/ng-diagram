@@ -22,6 +22,11 @@ import { NgDiagramBaseService } from './ng-diagram-base.service';
 export class NgDiagramClipboardService extends NgDiagramBaseService {
   /**
    * Copies the current selection to the clipboard.
+   *
+   * @remarks Since 1.4.0 the copy cascades: all descendants of the copied nodes travel with them
+   * (including hidden children of a collapsed group), together with the edges connecting copied
+   * nodes. Effectively hidden *selected* elements are skipped — consistent with `deleteSelection`.
+   *
    * @returns A promise that resolves once the selection has been copied.
    */
   copy(): Promise<void> {
@@ -30,6 +35,10 @@ export class NgDiagramClipboardService extends NgDiagramBaseService {
 
   /**
    * Cuts the current selection to the clipboard.
+   *
+   * @remarks Same cascade semantics as {@link copy} — a cut collapsed group takes its hidden
+   * children through the clipboard and pasting restores them.
+   *
    * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */
   cut(): Promise<void> {

@@ -14,6 +14,7 @@ export class MiddlewareManager {
   private eventEmitterMiddleware: Middleware | null = null;
   private measurementTrackingMiddleware: Middleware | null = null;
   private hiddenComputationMiddleware: Middleware | null = null;
+  private hiddenComputationFinalizeMiddleware: Middleware | null = null;
   readonly flowCore: FlowCore;
 
   constructor(flowCore: FlowCore, middlewares?: MiddlewareChain) {
@@ -76,20 +77,34 @@ export class MiddlewareManager {
     }
 
     if (!this.hiddenComputationMiddleware && this.flowCore.templateVisibilityRegistry) {
-      this.hiddenComputationMiddleware = createHiddenComputationMiddleware(this.flowCore.templateVisibilityRegistry);
+      const onVisibilityChanged = () => this.flowCore.notifyVisibilityChanged();
+      this.hiddenComputationMiddleware = createHiddenComputationMiddleware(this.flowCore.templateVisibilityRegistry, {
+        name: 'hidden-computation',
+        cleanupRemovedEntries: true,
+        onVisibilityChanged,
+      });
+      this.hiddenComputationFinalizeMiddleware = createHiddenComputationMiddleware(
+        this.flowCore.templateVisibilityRegistry,
+        { name: 'hidden-computation-finalize', onVisibilityChanged }
+      );
     }
 
     // Middleware execution order:
     // 1. hiddenComputationMiddleware - stamp effective visibility (computedHidden)
-    //    first so user middlewares and the built-in tail read fresh values
+    //    first so user/default middlewares (e.g. edges-routing) read fresh values
     // 2. User and default middlewares - custom processing
-    // 3. measuredBoundsMiddleware - compute node bounds after all position/size changes
-    // 4. loggerMiddleware - log final state for debugging
-    // 5. measurementTrackingMiddleware - signal measurement activity
-    // 6. eventEmitterMiddleware - emit events with final state
+    // 3. hiddenComputationFinalizeMiddleware - re-stamp so writes made by user
+    //    middlewares (hidden/groupId/source/target) and stamps on added
+    //    elements (which internal-id-assignment re-emits from the initial
+    //    update) land in the committed state; no-op when 1. already covered it
+    // 4. measuredBoundsMiddleware - compute node bounds after all position/size changes
+    // 5. loggerMiddleware - log final state for debugging
+    // 6. measurementTrackingMiddleware - signal measurement activity
+    // 7. eventEmitterMiddleware - emit events with final state
     const finalChain = [
       ...(this.hiddenComputationMiddleware ? [this.hiddenComputationMiddleware] : []),
       ...this.middlewareChain,
+      ...(this.hiddenComputationFinalizeMiddleware ? [this.hiddenComputationFinalizeMiddleware] : []),
       measuredBoundsMiddleware,
       loggerMiddleware,
       ...(this.measurementTrackingMiddleware ? [this.measurementTrackingMiddleware] : []),

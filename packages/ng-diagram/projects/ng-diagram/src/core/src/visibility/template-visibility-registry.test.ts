@@ -74,6 +74,34 @@ describe('TemplateVisibilityRegistry', () => {
     expect(onChange).toHaveBeenCalledTimes(3);
   });
 
+  it('should silently drop all entries of a removed node without change callbacks', () => {
+    const onChange = vi.fn();
+    registry.setNodeHidden('n', true);
+    registry.setPortHidden('n', 'p', true);
+    registry.onNodeOrEdgeVisibilityChange = onChange;
+    registry.onPortOrLabelVisibilityChange = onChange;
+
+    registry.removeNodeEntries('n');
+
+    expect(registry.isNodeHidden('n')).toBe(false);
+    expect(registry.isPortHidden('n', 'p')).toBe(false);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('should silently drop all entries of a removed edge without change callbacks', () => {
+    const onChange = vi.fn();
+    registry.setEdgeHidden('e', true);
+    registry.setLabelHidden('e', 'l', true);
+    registry.onNodeOrEdgeVisibilityChange = onChange;
+    registry.onPortOrLabelVisibilityChange = onChange;
+
+    registry.removeEdgeEntries('e');
+
+    expect(registry.isEdgeHidden('e')).toBe(false);
+    expect(registry.isLabelHidden('e', 'l')).toBe(false);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it('should clear all state', () => {
     registry.setNodeHidden('n', true);
     registry.setEdgeHidden('e', true);

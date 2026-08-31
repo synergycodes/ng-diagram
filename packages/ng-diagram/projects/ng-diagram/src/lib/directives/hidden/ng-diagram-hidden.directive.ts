@@ -27,7 +27,8 @@ const VIRTUALIZATION_WARNING =
  * (hidden ancestor group, hidden edge endpoint) says so — every source feeds
  * the same effective visibility. Hidden elements stay mounted as
  * `display: none`, never block initialization or measurement waits, and are
- * excluded from every interaction surface.
+ * excluded from every interactive surface (programmatic APIs such as
+ * `select` do not filter hidden elements).
  *
  * Not supported with virtualization: a hidden element leaves the virtualized
  * render set, which destroys the template declaring the binding. With

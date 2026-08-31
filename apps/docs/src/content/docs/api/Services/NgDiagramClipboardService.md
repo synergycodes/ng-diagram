@@ -34,6 +34,12 @@ Copies the current selection to the clipboard.
 
 A promise that resolves once the selection has been copied.
 
+#### Remarks
+
+Since 1.4.0 the copy cascades: all descendants of the copied nodes travel with them
+(including hidden children of a collapsed group), together with the edges connecting copied
+nodes. Effectively hidden *selected* elements are skipped — consistent with `deleteSelection`.
+
 ***
 
 ### cut()
@@ -47,6 +53,11 @@ Cuts the current selection to the clipboard.
 `Promise`\<`void`\>
 
 A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
+
+#### Remarks
+
+Same cascade semantics as [copy](/docs/api/services/ngdiagramclipboardservice/#copy) — a cut collapsed group takes its hidden
+children through the clipboard and pasting restores them.
 
 ***
 

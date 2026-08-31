@@ -32,11 +32,13 @@ describe('RotateHandleDirective (shared touch marker ownership)', () => {
   let directive: RotateHandleDirective;
   let touchState: TouchEventsStateService;
   let clearRotation: ReturnType<typeof vi.fn>;
+  let cancelActiveInteraction: ReturnType<typeof vi.fn>;
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
   let unregister: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     clearRotation = vi.fn();
+    cancelActiveInteraction = vi.fn().mockResolvedValue(true);
     unregister = vi.fn();
     registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
 
@@ -52,6 +54,8 @@ describe('RotateHandleDirective (shared touch marker ownership)', () => {
       isInitialized: () => true,
       provide: () => ({
         actionStateManager: { clearRotation },
+        cancelActiveInteraction,
+        isCancellingInteraction: () => false,
         registerInteractionCleanup,
       }),
     };
@@ -78,6 +82,7 @@ describe('RotateHandleDirective (shared touch marker ownership)', () => {
     fixture.destroy();
 
     expect(touchState.currentEvent()).toBe(DiagramEventName.Panning);
+    expect(cancelActiveInteraction).not.toHaveBeenCalled();
     expect(clearRotation).not.toHaveBeenCalled();
   });
 
@@ -91,13 +96,27 @@ describe('RotateHandleDirective (shared touch marker ownership)', () => {
     expect(unregister).toHaveBeenCalledTimes(1);
   });
 
-  it('clears its own marker and the rotation state when destroyed mid-gesture', () => {
+  it('clears its own marker and cancels the gesture when destroyed mid-gesture', async () => {
     directive.onPointerDown(makePointerEvent());
     expect(touchState.currentEvent()).toBe(DiagramEventName.Rotate);
 
     fixture.destroy();
 
     expect(touchState.currentEvent()).toBeNull();
+    // The full cancel flow pairs nodeRotateStarted with a cancelled Ended
+    // event — the bare state clear must stay out of its way.
+    expect(cancelActiveInteraction).toHaveBeenCalled();
+    await Promise.resolve();
+    expect(clearRotation).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the bare state clear when the destroy-time cancel is refused', async () => {
+    cancelActiveInteraction.mockResolvedValue(false);
+    directive.onPointerDown(makePointerEvent());
+
+    fixture.destroy();
+
+    await Promise.resolve();
     expect(clearRotation).toHaveBeenCalled();
   });
 

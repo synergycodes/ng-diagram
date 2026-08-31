@@ -75,6 +75,25 @@ export class FlowCore {
   readonly measurementTracker: MeasurementTracker;
   readonly templateVisibilityRegistry: TemplateVisibilityRegistry;
 
+  /**
+   * Monotonic counter bumped whenever a middleware pass changed some
+   * element's effective visibility (`computedHidden`). Render caches keyed on
+   * things a visibility toggle does not change (element counts, viewport)
+   * compare it as an O(1) invalidation signal.
+   * @internal
+   */
+  private _visibilityVersion = 0;
+
+  /** @internal */
+  get visibilityVersion(): number {
+    return this._visibilityVersion;
+  }
+
+  /** @internal */
+  notifyVisibilityChanged(): void {
+    this._visibilityVersion++;
+  }
+
   private readonly interactionCoordinator: InteractionCoordinator;
   private readonly directRenderStrategy: DirectRenderStrategy;
   private readonly virtualizedRenderStrategy: VirtualizedRenderStrategy;

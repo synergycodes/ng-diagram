@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Edge, FlowStateUpdate, MiddlewareContext, Node } from '../../../types';
 import { TemplateVisibilityRegistry } from '../../../visibility/template-visibility-registry';
-import { createHiddenComputationMiddleware } from './hidden-computation';
+import { createHiddenComputationMiddleware, HiddenComputationOptions } from './hidden-computation';
 
 describe('hiddenComputationMiddleware', () => {
   let registry: TemplateVisibilityRegistry;
@@ -32,6 +32,8 @@ describe('hiddenComputationMiddleware', () => {
       addedNodes = [] as Node[],
       addedEdges = [] as Edge[],
       nodesRemoved = false,
+      removedNodes = [] as Node[],
+      removedEdges = [] as Edge[],
     } = {}
   ): MiddlewareContext =>
     ({
@@ -40,7 +42,10 @@ describe('hiddenComputationMiddleware', () => {
       helpers: {
         anyNodesAdded: vi.fn().mockReturnValue(addedNodes.length > 0),
         anyEdgesAdded: vi.fn().mockReturnValue(addedEdges.length > 0),
-        anyNodesRemoved: vi.fn().mockReturnValue(nodesRemoved),
+        anyNodesRemoved: vi.fn().mockReturnValue(nodesRemoved || removedNodes.length > 0),
+        anyEdgesRemoved: vi.fn().mockReturnValue(removedEdges.length > 0),
+        getRemovedNodes: vi.fn().mockReturnValue(removedNodes),
+        getRemovedEdges: vi.fn().mockReturnValue(removedEdges),
         getAddedNodes: vi.fn().mockReturnValue(addedNodes),
         getAddedEdges: vi.fn().mockReturnValue(addedEdges),
         checkIfAnyNodePropsChanged: vi
@@ -52,8 +57,12 @@ describe('hiddenComputationMiddleware', () => {
       },
     }) as unknown as MiddlewareContext;
 
-  const execute = (context: MiddlewareContext) => {
-    createHiddenComputationMiddleware(registry).execute(context, nextMock, () => null);
+  const execute = (context: MiddlewareContext, options: Partial<HiddenComputationOptions> = {}) => {
+    createHiddenComputationMiddleware(registry, { name: 'hidden-computation', ...options }).execute(
+      context,
+      nextMock,
+      () => null
+    );
     return nextMock.mock.calls[0]?.[0] as FlowStateUpdate | undefined;
   };
 
@@ -181,5 +190,48 @@ describe('hiddenComputationMiddleware', () => {
       { id: 'a', computedHidden: true },
       { id: 'child', computedHidden: true },
     ]);
+  });
+
+  it('should invoke onVisibilityChanged only when effective visibility actually changed', () => {
+    const onVisibilityChanged = vi.fn();
+    const changed = createContext([createNode('a', { hidden: true })], [], { changedNodeProps: ['hidden'] });
+    execute(changed, { onVisibilityChanged });
+    expect(onVisibilityChanged).toHaveBeenCalledTimes(1);
+
+    nextMock.mockClear();
+    const unchanged = createContext([createNode('a', { hidden: true, computedHidden: true })], [], {
+      changedNodeProps: ['hidden'],
+    });
+    execute(unchanged, { onVisibilityChanged });
+    expect(onVisibilityChanged).toHaveBeenCalledTimes(1);
+  });
+
+  describe('registry cleanup for removed elements', () => {
+    it('should drop registry entries of removed nodes and edges when cleanup is enabled', () => {
+      registry.setNodeHidden('gone', true);
+      registry.setPortHidden('gone', 'p', true);
+      registry.setEdgeHidden('goneEdge', true);
+      registry.setLabelHidden('goneEdge', 'l', true);
+
+      const context = createContext([], [], {
+        removedNodes: [createNode('gone')],
+        removedEdges: [createEdge('goneEdge', 'a', 'b')],
+      });
+      execute(context, { cleanupRemovedEntries: true });
+
+      expect(registry.isNodeHidden('gone')).toBe(false);
+      expect(registry.isPortHidden('gone', 'p')).toBe(false);
+      expect(registry.isEdgeHidden('goneEdge')).toBe(false);
+      expect(registry.isLabelHidden('goneEdge', 'l')).toBe(false);
+    });
+
+    it('should not touch the registry when cleanup is disabled (finalize instance)', () => {
+      registry.setNodeHidden('gone', true);
+
+      const context = createContext([], [], { removedNodes: [createNode('gone')] });
+      execute(context);
+
+      expect(registry.isNodeHidden('gone')).toBe(true);
+    });
   });
 });

@@ -35,7 +35,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
       environment: mockEnvironment,
       modelLookup: {
         getSelectedNodesWithChildren: vi.fn().mockReturnValue([mockNode]),
-        getParentChain: vi.fn().mockReturnValue([]),
+        getAllDescendantIds: vi.fn().mockReturnValue([]),
       },
       model: {
         getMetadata: vi.fn().mockReturnValue({
@@ -465,8 +465,8 @@ describe('KeyboardMoveSelectionEventHandler', () => {
           group,
           hiddenChild,
         ]);
-        (mockFlowCore.modelLookup.getParentChain as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
-          id === 'child' ? [group] : []
+        (mockFlowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+          id === 'group' ? ['child'] : []
         );
 
         const event = getSampleKeyboardMoveEvent({ direction: 'right' });
@@ -485,8 +485,8 @@ describe('KeyboardMoveSelectionEventHandler', () => {
           hiddenGroup,
           hiddenChild,
         ]);
-        (mockFlowCore.modelLookup.getParentChain as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
-          id === 'child' ? [hiddenGroup] : []
+        (mockFlowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+          id === 'group' ? ['child'] : []
         );
 
         const event = getSampleKeyboardMoveEvent({ direction: 'right' });

@@ -22,7 +22,12 @@ export abstract class BaseRenderStrategy implements RenderStrategy {
 
     const { nodes: visibleNodes, edges: visibleEdges } = this.process(nodes, edges, metadata.viewport);
 
-    const finalEdges = temporaryEdge?.temporary ? [...visibleEdges, temporaryEdge] : visibleEdges;
+    // The temporary edge lives in action state, so hidden-computation never
+    // stamps it — check its source here, or hiding the source mid-gesture
+    // leaves a rubber band dangling from nothing.
+    const isTemporaryEdgeVisible =
+      temporaryEdge?.temporary && !this.flowCore.getNodeById(temporaryEdge.source)?.computedHidden;
+    const finalEdges = isTemporaryEdgeVisible ? [...visibleEdges, temporaryEdge] : visibleEdges;
 
     this.performanceLogger.withPerformanceLogging(
       () => this.flowCore.renderer.draw(visibleNodes, finalEdges, metadata.viewport),

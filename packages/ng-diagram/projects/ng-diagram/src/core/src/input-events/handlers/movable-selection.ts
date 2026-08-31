@@ -10,21 +10,37 @@ import type { Node } from '../../types';
  * descendants of a visible moved ancestor are the exception — they travel
  * with it (e.g. the hidden children of a dragged collapsed group), otherwise
  * unhiding would reveal them left behind outside the group.
+ *
+ * Ancestry is resolved through the same descendants map that builds the
+ * selection set (plain `groupId` links, no `isGroup` enforcement) — NOT via
+ * `getParentChain`, which enforces `isGroup`, logs model-integrity errors on
+ * violations (per pointermove frame during a drag), and would strand hidden
+ * children that effective visibility considers covered.
  */
 export const getMovableSelection = (flow: FlowCore): Node[] => {
   const selectedWithChildren = flow.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
 
   // Roots that actually move: selected, visible and draggable.
-  const movingRootIds = new Set(
-    selectedWithChildren
-      .filter((node) => node.selected && !node.computedHidden && (node.draggable ?? true))
-      .map((node) => node.id)
+  const movingRoots = selectedWithChildren.filter(
+    (node) => node.selected && !node.computedHidden && (node.draggable ?? true)
   );
+
+  const hasHidden = selectedWithChildren.some((node) => node.computedHidden);
+  if (!hasHidden) {
+    return selectedWithChildren.filter((node) => node.draggable ?? true);
+  }
+
+  // Every descendant of a moving root travels with it, hidden or not.
+  const coveredByMovingRoots = new Set<string>();
+  for (const root of movingRoots) {
+    for (const descendantId of flow.modelLookup.getAllDescendantIds(root.id)) {
+      coveredByMovingRoots.add(descendantId);
+    }
+  }
 
   return selectedWithChildren.filter((node) => {
     if (!(node.draggable ?? true)) return false;
     if (!node.computedHidden) return true;
-    // Hidden node: moves only as a descendant of a moving visible ancestor.
-    return flow.modelLookup.getParentChain(node.id).some((ancestor) => movingRootIds.has(ancestor.id));
+    return coveredByMovingRoots.has(node.id);
   });
 };

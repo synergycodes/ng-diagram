@@ -84,6 +84,15 @@ export const finishLinking = async (commandHandler: CommandHandler, command: Fin
       return;
     }
 
+    // The source can become effectively hidden mid-gesture (a model update
+    // while the user drags). Mirror startLinking's guard — a hidden source
+    // must not silently produce an invisible edge.
+    if (commandHandler.flowCore.getNodeById(source)?.computedHidden) {
+      linking.cancelReason = 'cancelled';
+      await runCancelledFinishPass(commandHandler);
+      return;
+    }
+
     if (!validateConnection(commandHandler.flowCore, source, sourcePort, targetNodeId, targetPortId, true)) {
       linking.cancelReason = 'invalidConnection';
       await runCancelledFinishPass(commandHandler);

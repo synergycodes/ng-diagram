@@ -16,6 +16,15 @@ export class ManualLinkingService {
 
   /** Call this method to start linking from your custom logic */
   startLinking(node: Node, portId?: string) {
+    // Validate BEFORE attaching document listeners or emitting — an
+    // effectively hidden source is refused by the startLinking command, and
+    // listeners attached here would be orphaned until the next click.
+    const currentNode = this.flowCoreProvider.provide().getNodeById(node.id);
+    if (!currentNode || currentNode.computedHidden) {
+      console.warn(`[ngDiagram] startLinking ignored: source node "${node.id}" is missing or effectively hidden.`);
+      return;
+    }
+
     // A previous manual linking still in flight would leave its document
     // listeners and its interaction-cleanup entry orphaned — latest call wins.
     this.removeListeners();
