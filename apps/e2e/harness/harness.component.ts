@@ -34,6 +34,7 @@ declare global {
       <ng-diagram
         [model]="model()"
         [config]="config"
+        [tabbable]="tabbable"
         [nodeTemplateMap]="nodeTemplateMap"
         [edgeTemplateMap]="edgeTemplateMap"
         (diagramInit)="onDiagramInit()"
@@ -63,6 +64,7 @@ export class HarnessComponent {
 
   readonly model = signal(initializeModel(window.__diagramSeed ?? DEFAULT_E2E_MODEL));
   readonly config = window.__diagramConfig ?? {};
+  readonly tabbable = window.__diagramTabbable ?? true;
   readonly nodeTemplateMap = new NgDiagramNodeTemplateMap([['resize-sides', ResizeSidesNodeComponent]]);
   readonly edgeTemplateMap = new NgDiagramEdgeTemplateMap([['labelled', LabelledEdgeComponent]]);
 
