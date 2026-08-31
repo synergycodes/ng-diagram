@@ -42,8 +42,8 @@ export interface HiddenComputationOptions {
  * - a **finalize** instance at the start of the internal tail, so writes made
  *   by user middlewares (`hidden`, `groupId`, `source`, `target`) are also
  *   stamped within the same pass, and stamps on ADDED elements survive
- *   middlewares that re-emit `nodesToAdd`/`edgesToAdd` from the initial
- *   update (e.g. internal-id-assignment).
+ *   middlewares that overwrite added elements wholesale (`nodesToAdd`/
+ *   `edgesToAdd` replace the element, they don't merge).
  *
  * The recompute is idempotent and diff-based: when the pre-pass already
  * stamped everything, the finalize instance emits nothing.

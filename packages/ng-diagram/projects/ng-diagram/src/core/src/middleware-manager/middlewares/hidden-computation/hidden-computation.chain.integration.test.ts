@@ -3,11 +3,10 @@
  *
  * These run the REAL MiddlewareManager + MiddlewareExecutor with the real
  * internal-id-assignment middleware — the combination the unit tests (mocked
- * contexts) cannot reach. Regression net for the "computedHidden stamps on
- * added elements reverted by internal-id-assignment" bug: internalIdMiddleware
- * re-emits nodesToAdd/edgesToAdd from the pristine initial update, so a stamp
- * applied only BEFORE it never reaches the committed state — the finalize
- * instance at the tail must land it.
+ * contexts) cannot reach. They guard the ordering contract for computedHidden
+ * stamps on ADDED elements: a middleware between the pre-pass instance and the
+ * finalize instance can overwrite an added element wholesale, so the finalize
+ * instance at the tail must land the stamp in the committed state.
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';

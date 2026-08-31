@@ -84,8 +84,8 @@ describe('getMovableSelection', () => {
   it('should move hidden descendants reached through a non-group parent link without integrity errors', () => {
     // Model-integrity edge case: a child whose groupId points at a plain node.
     // Effective visibility and the selection expansion both follow raw groupId
-    // links, so the movable set must too — previously this path went through
-    // getParentChain, which enforces isGroup and console.errors per frame.
+    // links, so the movable set must too — and it must not spam integrity
+    // errors per pointermove frame.
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const group = createNode('group', { selected: true, isGroup: true } as Partial<Node>);
     const plainMiddle = createNode('middle', { groupId: 'group' });

@@ -77,9 +77,9 @@ describe('InternalIdMiddleware', () => {
     expect(nextMock).toHaveBeenCalledTimes(1);
     const stateUpdate = nextMock.mock.calls[0][0];
 
-    // Patches carry ONLY id + _internalId. Re-emitting full objects (the old
-    // behavior) reverted properties other middlewares stamped on added
-    // elements earlier in the pass (e.g. computedHidden).
+    // Patches carry ONLY id + _internalId. Re-emitting full objects would
+    // revert properties other middlewares stamped on added elements earlier
+    // in the pass (e.g. computedHidden).
     expect(stateUpdate.nodesToAdd).toBeUndefined();
     expect(stateUpdate.nodesToUpdate).toHaveLength(2);
     expect(Object.keys(stateUpdate.nodesToUpdate![0]).sort()).toEqual(['_internalId', 'id']);

@@ -95,8 +95,8 @@ export class MiddlewareManager {
     // 2. User and default middlewares - custom processing
     // 3. hiddenComputationFinalizeMiddleware - re-stamp so writes made by user
     //    middlewares (hidden/groupId/source/target) and stamps on added
-    //    elements (which internal-id-assignment re-emits from the initial
-    //    update) land in the committed state; no-op when 1. already covered it
+    //    elements overwritten mid-chain (nodesToAdd/edgesToAdd replace, not
+    //    merge) land in the committed state; no-op when 1. already covered it
     // 4. measuredBoundsMiddleware - compute node bounds after all position/size changes
     // 5. loggerMiddleware - log final state for debugging
     // 6. measurementTrackingMiddleware - signal measurement activity
