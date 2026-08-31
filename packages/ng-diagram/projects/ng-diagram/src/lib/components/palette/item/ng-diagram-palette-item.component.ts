@@ -57,18 +57,14 @@ export class NgDiagramPaletteItemComponent {
   }
 
   /**
-   * Clones the preview element and appends it to document.body so that setDragImage
+   * Appends a scaled clone of the preview to document.body so that setDragImage
    * is immune to ancestor overflow:hidden clipping. The clone is removed on the next frame.
    */
   private setDragPreviewImage(event: DragEvent) {
-    const previewHtmlElement = this.paletteItemPreviewComponent()?.preview();
-    if (!previewHtmlElement?.nativeElement || !event.dataTransfer) {
+    const clone = this.paletteItemPreviewComponent()?.createDragImage();
+    if (!clone || !event.dataTransfer) {
       return;
     }
-
-    const clone = previewHtmlElement.nativeElement.cloneNode(true) as HTMLElement;
-    clone.classList.add('dragged-node');
-    clone.style.position = 'fixed';
 
     document.body.appendChild(clone);
 

@@ -1,5 +1,7 @@
-<div #preview [class.dragged-node]="isSafari" [style.zoom]="isSafari ? scale() : null">
-  <div [class.dragged-node]="!isSafari" [style.transform]="!isSafari ? scaleTransform : null">
+<!-- Exactly one div carries `dragged-node`, which parks it off-screen and gives it a shrink-to-fit
+     width; createDragImage() scales the matching element of the clone, so the two must stay in sync. -->
+<div #preview [class.dragged-node]="isSafari">
+  <div [class.dragged-node]="!isSafari">
     <ng-content></ng-content>
   </div>
 </div>

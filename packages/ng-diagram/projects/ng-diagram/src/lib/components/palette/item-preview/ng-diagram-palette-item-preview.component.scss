@@ -1,3 +1,13 @@
+// The preview is parked off-screen; the host clips it so it neither paints over the palette
+// nor extends the page's scrollable area, whether or not the embedding app positions an ancestor.
+:host {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  height: 0;
+}
+
+// `left: -1000px` also keeps the shrink-to-fit width of the parked copy from collapsing to the host width.
 .dragged-node {
   position: absolute;
   background-color: transparent;

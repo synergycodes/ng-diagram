@@ -6,8 +6,8 @@ prev: false
 title: "NgDiagramPaletteItemPreviewComponent"
 ---
 
-The `NgDiagramPaletteItemPreviewComponent` is responsible for rendering a live preview of a palette item
-when it is being dragged or hovered in the palette.
+The `NgDiagramPaletteItemPreviewComponent` defines the preview of a palette item shown while it is
+dragged onto the canvas.
 
 ## Example usage
 ```html
