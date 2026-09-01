@@ -1,8 +1,9 @@
 import { Component, signal, type WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { NgDiagramViewportService } from '../../../public-services/ng-diagram-viewport.service';
 import { EnvironmentProviderService } from '../../../services/environment-provider/environment-provider.service';
+import { PaletteService } from '../../../services/palette/palette.service';
 import { NgDiagramPaletteItemPreviewComponent } from './ng-diagram-palette-item-preview.component';
 
 @Component({
@@ -22,11 +23,14 @@ function zoomOf(element: HTMLElement): string {
 }
 
 function setup(scale: number | WritableSignal<number>) {
+  const previewId = signal<string | null>(null);
+
   TestBed.configureTestingModule({
     imports: [HostComponent],
     providers: [
       { provide: NgDiagramViewportService, useValue: { scale: typeof scale === 'number' ? signal(scale) : scale } },
-      { provide: EnvironmentProviderService, useValue: { generateId: () => 'preview-id' } },
+      { provide: EnvironmentProviderService, useValue: { generateId: () => 'preview-id', browser: 'Chrome' } },
+      { provide: PaletteService, useValue: { previewId } },
     ],
   });
 
@@ -36,10 +40,20 @@ function setup(scale: number | WritableSignal<number>) {
   const host = fixture.nativeElement.querySelector('ng-diagram-palette-item-preview') as HTMLElement;
   const component = fixture.debugElement.children[0].componentInstance as NgDiagramPaletteItemPreviewComponent;
 
-  return { host, component, preview: component.preview()!.nativeElement };
+  return { host, component, previewId, preview: component.preview()!.nativeElement };
 }
 
 describe('NgDiagramPaletteItemPreviewComponent', () => {
+  beforeEach(() => {
+    // jsdom has no CSS object; the default path under test is the CSS-zoom one.
+    vi.stubGlobal('CSS', { supports: vi.fn(() => true) });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
   describe('parked preview', () => {
     it('stays at natural size — the viewport zoom is not applied to it', () => {
       const { preview } = setup(5);
@@ -52,6 +66,14 @@ describe('NgDiagramPaletteItemPreviewComponent', () => {
       const { preview } = setup(5);
 
       expect(preview.classList.contains('dragged-node')).toBe(true);
+    });
+
+    it('sits inside the clipping wrapper, out of any application stylesheet reach on the host', () => {
+      const { host, preview } = setup(5);
+
+      const clip = host.querySelector(':scope > .preview-clip');
+      expect(clip).not.toBeNull();
+      expect(preview.parentElement).toBe(clip);
     });
 
     it('keeps the content rendered so it can be cloned at dragstart', () => {
@@ -86,10 +108,24 @@ describe('NgDiagramPaletteItemPreviewComponent', () => {
       expect(zoomOf(preview)).toBe('');
     });
 
-    it('keeps the dragged-node park offset on the clone, so it scales off-screen with the zoom', () => {
+    // A fixed offset (like the parked copy's -1000px) stops working once the content is wider
+    // than the offset; anchoring the right edge to the viewport's left edge works at any width.
+    it('parks the clone by geometry: right edge on the viewport edge, content on its natural lines', () => {
+      const { component } = setup(2);
+
+      const clone = component.createDragImage()!;
+
+      expect(clone.style.left).toBe('auto');
+      expect(clone.style.right).toBe('100vw');
+      expect(clone.style.width).toBe('max-content');
+    });
+
+    // Rasterization cost grows with the square of the zoom inside the synchronous dragstart, so
+    // the applied zoom is capped — browsers downscale oversized drag bitmaps anyway.
+    it('caps the applied zoom at 3', () => {
       const { component } = setup(10);
 
-      expect(component.createDragImage()!.classList.contains('dragged-node')).toBe(true);
+      expect(zoomOf(component.createDragImage()!)).toBe('3');
     });
 
     it('reads the viewport scale at call time', () => {
@@ -100,10 +136,32 @@ describe('NgDiagramPaletteItemPreviewComponent', () => {
 
       expect(zoomOf(component.createDragImage()!)).toBe('0.36');
     });
+
+    it('without CSS zoom support, wraps the clone in a box sized to the scaled content', () => {
+      vi.stubGlobal('CSS', { supports: vi.fn(() => false) });
+      const { component, preview } = setup(2);
+      // jsdom lays nothing out, so give the parked preview a concrete size to scale.
+      vi.spyOn(preview, 'offsetWidth', 'get').mockReturnValue(340);
+      vi.spyOn(preview, 'offsetHeight', 'get').mockReturnValue(200);
+
+      const wrapper = component.createDragImage()!;
+      const clone = wrapper.firstElementChild as HTMLElement;
+
+      // setDragImage rasterizes the wrapper's box; the transform paints the clone into it.
+      expect(wrapper.style.position).toBe('fixed');
+      expect(wrapper.style.right).toBe('100vw');
+      expect(wrapper.style.width).toBe('680px');
+      expect(wrapper.style.height).toBe('400px');
+      expect(clone.style.transform).toBe('scale(2)');
+      expect(clone.style.transformOrigin).toBe('top left');
+      // The stylesheet would still park the clone at -1000px inside the wrapper — neutralized.
+      expect(clone.style.position).toBe('static');
+      expect(clone.style.left).toBe('auto');
+    });
   });
 
-  describe('scaleTransform (deprecated)', () => {
-    it('still reports the current viewport scale', () => {
+  describe('deprecated members', () => {
+    it('scaleTransform still reports the current viewport scale', () => {
       const scale = signal(2);
       const { component } = setup(scale);
 
@@ -112,6 +170,29 @@ describe('NgDiagramPaletteItemPreviewComponent', () => {
       scale.set(3);
 
       expect(component.scaleTransform).toBe('scale(3)');
+    });
+
+    it('scale still exposes the viewport scale to subclasses', () => {
+      const { component } = setup(2.5);
+
+      expect(component['scale']()).toBe(2.5);
+    });
+
+    it('isVisible still follows the palette preview id', () => {
+      const { component, previewId } = setup(1);
+
+      expect(component['isVisible']()).toBe(false);
+
+      previewId.set('preview-id');
+
+      expect(component['isVisible']()).toBe(true);
+    });
+
+    it('isChrome and isSafari still report the detected browser', () => {
+      const { component } = setup(1);
+
+      expect(component['isChrome']).toBe(true);
+      expect(component['isSafari']).toBe(false);
     });
   });
 });

@@ -16,6 +16,16 @@ dragged onto the canvas.
 </ng-diagram-palette-item-preview>
 ```
 
+## Properties
+
+### preview
+
+> `readonly` **preview**: `Signal`\<`undefined` \| `ElementRef`\<`HTMLElement`\>\>
+
+The parked, natural-size copy of the preview content. It sits off-screen inside a clipped,
+zero-height wrapper, so its position on the page is meaningless — read its natural size or
+content from it, not its location.
+
 ## Accessors
 
 ### scaleTransform

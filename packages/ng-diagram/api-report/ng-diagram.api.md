@@ -1209,8 +1209,15 @@ export class NgDiagramPaletteItemPreviewComponent {
     createDragImage(): HTMLElement | null;
     // (undocumented)
     readonly id: string;
-    // (undocumented)
+    // @deprecated (undocumented)
+    protected readonly isChrome: boolean;
+    // @deprecated (undocumented)
+    protected readonly isSafari: boolean;
+    // @deprecated (undocumented)
+    protected readonly isVisible: Signal<boolean>;
     readonly preview: Signal<ElementRef<HTMLElement> | undefined>;
+    // @deprecated (undocumented)
+    protected readonly scale: Signal<number>;
     // @deprecated (undocumented)
     get scaleTransform(): string;
     // (undocumented)

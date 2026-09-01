@@ -15,12 +15,12 @@ import { Palette } from './palette/palette.component';
   imports: [NgDiagramComponent, NgDiagramBackgroundComponent, Palette],
   providers: [provideNgDiagram()],
   template: `
+    <palette-container [model]="paletteModel" />
     <div class="not-content diagram">
       <ng-diagram [model]="model" [config]="config">
         <ng-diagram-background />
       </ng-diagram>
     </div>
-    <palette-container [model]="paletteModel" />
   `,
   styleUrls: ['./diagram.component.scss'],
 })
@@ -34,7 +34,7 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
-        padding: [150, 150, 150, 265],
+        padding: [150, 150, 150, 150],
       },
     },
   } satisfies NgDiagramConfig;

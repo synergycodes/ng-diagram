@@ -49,7 +49,9 @@ declare global {
             <ng-diagram-palette-item [item]="paletteItem">
               <div class="palette-item" data-testid="palette-item">{{ paletteItem.type }}</div>
               <ng-diagram-palette-item-preview>
-                <div class="palette-preview" data-testid="palette-preview">{{ paletteItem.type }}</div>
+                <div class="palette-preview" [class.wide]="paletteItem.type === 'wide'" data-testid="palette-preview">
+                  {{ paletteItem.type }}
+                </div>
               </ng-diagram-palette-item-preview>
             </ng-diagram-palette-item>
           }
@@ -102,16 +104,21 @@ declare global {
         border: 1px solid #333;
       }
 
-      /*
-       * Fixed size, so the drag image's expected dimensions are exact. The width also decides when
-       * an unclipped preview would reach back over its -1000px park offset: that happens at
-       * scale > (2000 - width) / width, i.e. ~4.9x here, which is inside the zoom range under test.
-       */
+      /* Fixed size, so the drag image's expected dimensions are exact. */
       .palette-preview {
         width: 340px;
         height: 200px;
         border: 2px solid #333;
         box-sizing: border-box;
+      }
+
+      /*
+       * Wider than both a fixed 1000px park offset and the viewport: parking by offset would put
+       * this preview's right edge on-screen, and a shrink-to-fit drag image would wrap its lines.
+       */
+      .palette-preview.wide {
+        width: 1300px;
+        height: 60px;
       }
     `,
   ],
@@ -131,6 +138,7 @@ export class HarnessComponent {
   readonly paletteItems: NgDiagramPaletteItem[] = [
     { type: 'alpha', data: { label: 'Alpha' } },
     { type: 'beta', data: { label: 'Beta' } },
+    { type: 'wide', data: { label: 'Wide' } },
   ];
   readonly tabbable = window.__diagramTabbable ?? true;
   readonly nodeTemplateMap = new NgDiagramNodeTemplateMap([
