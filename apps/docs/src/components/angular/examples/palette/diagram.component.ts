@@ -26,8 +26,20 @@ import { Palette } from './palette/palette.component';
 })
 export class DiagramComponent {
   paletteModel: NgDiagramPaletteItem[] = [
-    { data: { label: 'Default Node' }, resizable: true, rotatable: true },
-    { data: { label: 'Default Group' }, resizable: true, isGroup: true },
+    {
+      data: { label: 'Default Node' },
+      resizable: true,
+      rotatable: true,
+      size: { width: 180, height: 45 },
+      autoSize: false,
+    },
+    {
+      data: { label: 'Default Group' },
+      resizable: true,
+      isGroup: true,
+      size: { width: 200, height: 150 },
+      autoSize: false,
+    },
   ];
 
   config = {
