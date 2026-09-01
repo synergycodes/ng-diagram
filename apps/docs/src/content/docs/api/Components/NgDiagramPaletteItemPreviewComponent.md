@@ -22,9 +22,8 @@ dragged onto the canvas.
 
 > `readonly` **preview**: `Signal`\<`undefined` \| `ElementRef`\<`HTMLElement`\>\>
 
-The parked, natural-size copy of the preview content. It sits off-screen inside a clipped,
-zero-height wrapper, so its position on the page is meaningless — read its natural size or
-content from it, not its location.
+The element holding the preview content. It is not rendered in the page flow, so read the
+preview's natural size or content from it — its position is meaningless.
 
 ## Accessors
 

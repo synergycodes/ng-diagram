@@ -56,8 +56,8 @@ test.describe('palette', () => {
     await expect(diagram.palettePanel).toBeVisible();
   });
 
-  // The containment NGD-318 relies on: each parked copy sits inside an internal wrapper that
-  // clips it. This pins the load-bearing styles — deleting them fails here, not in production.
+  // Each parked copy sits inside an internal wrapper that clips it; the clip is what keeps the
+  // copy from painting over the page and from growing its scroll area.
   test('every parked preview is clipped by its internal wrapper', async ({ diagram }) => {
     await diagram.load({ palette: true });
 
@@ -75,8 +75,8 @@ test.describe('palette', () => {
     }
   });
 
-  // Symptom A of NGD-318: the off-screen copy reached back over its park offset and painted on
-  // top of the palette items. The wide preview would do that at any zoom if the clip ever fell.
+  // An unclipped copy paints over the palette items — a narrow one once the zoom outgrows its
+  // park offset, the wide one at any zoom.
   test('no preview paints over the palette at any zoom level', async ({ diagram }) => {
     await diagram.load({ palette: true, config: { zoom: { max: 10 } } });
 
@@ -98,8 +98,8 @@ test.describe('palette', () => {
     }
   });
 
-  // Symptom B of NGD-318: the off-screen copy escaped every ancestor's overflow and enlarged the
-  // document, putting scrollbars on a page that should not scroll at all.
+  // An unclipped copy escapes every ancestor's overflow and enlarges the document, putting
+  // scrollbars on a page that should not scroll at all.
   test('zooming the diagram does not enlarge the page', async ({ diagram }) => {
     await diagram.load({ palette: true, config: { zoom: { max: 10 } } });
     const before = await pageScrollSize(diagram);
