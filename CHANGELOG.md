@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Deprecated
+
+- `NgDiagramPaletteItemPreviewComponent.scaleTransform` — the drag image is scaled internally, so this value is no longer used. It will be removed in the next major version ([#NNN](https://github.com/synergycodes/ng-diagram/pull/NNN))
+
 ### Changed
 
+- **`ng-diagram-palette-item-preview` owns its own box** — the preview host renders as a zero-height block that clips its content (`display: block; height: 0; overflow: hidden; position: relative`), so the off-screen copy it holds stays contained whatever the surrounding app does. The host takes no vertical space and paints nothing, but it is a block: inline content placed next to it inside a palette item now starts on a new line. Do not restyle the host — its layout is what keeps the preview contained ([#NNN](https://github.com/synergycodes/ng-diagram/pull/NNN))
 - **Copying a group now includes its content** — `copy`/`cut` cascade to all descendants of the copied nodes and to the edges connecting copied nodes, so pasting a group reproduces its children and internal wiring (previously a pasted group was empty). Cutting a collapsed group no longer destroys its hidden children — they travel through the clipboard with it. Effectively hidden _selected_ elements are skipped by copy (consistent with `deleteSelection`), and pasted hidden content is not selected, so pasting cannot create an invisible selection; the paste-at-cursor position is computed from the visible pasted content only ([#799](https://github.com/synergycodes/ng-diagram/pull/799))
 
 ### Added
@@ -20,7 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **Palette preview no longer bleeds over the palette or stretches the page** — the off-screen copy of each `ng-diagram-palette-item-preview` is kept at its natural size and clipped by its own host, so at high zoom levels it no longer paints over the palette items, and it no longer adds scrollbars to the page in apps whose palette panel has no positioned ancestor. The drag image still follows the viewport zoom ([#NNN](https://github.com/synergycodes/ng-diagram/pull/NNN))
+- **Palette preview no longer bleeds over the palette or stretches the page** — the off-screen copy of each `ng-diagram-palette-item-preview` is kept at its natural size and clipped by its own host, so at high zoom levels it no longer paints over the palette items, and it no longer adds scrollbars to the page in apps whose palette panel has no positioned ancestor ([#NNN](https://github.com/synergycodes/ng-diagram/pull/NNN))
+- **Palette drag image matches the preview it shows** — the image shown under the cursor while dragging a palette item is now exactly the size of the scaled preview, instead of being built from a zero-sized element whose content sat outside it. Scaling no longer takes a different code path per browser, so the drag image behaves the same everywhere ([#NNN](https://github.com/synergycodes/ng-diagram/pull/NNN))
 - **Zero-size measurements no longer corrupt geometry** — hiding a rendered element with CSS `display: none` makes ResizeObserver report 0×0, which used to overwrite the node's `size` and the measured geometry of its ports and labels in the model; both-zero reports are now rejected on the runtime apply paths (a degenerate-but-visible measurement like 200×0 still applies), and the initialization force-finish no longer writes collected invalid measurements over existing geometry ([#799](https://github.com/synergycodes/ng-diagram/pull/799))
 - **`computePartsBounds` no longer drags the result to the origin** — when one of the lists was empty (most commonly `computePartsBounds(nodes, [])`) or contained nothing measurable, the returned rectangle was silently unioned with a zero-size rectangle at `(0, 0)`, pulling the bounds back to the origin. The bounds now cover exactly the measurable parts; when there is nothing to measure at all, a zero-size rectangle at the origin is returned as before. The minimap now frames diagrams positioned away from the origin correctly, and `zoomToFit({ nodeIds })` fits the requested subset instead of the origin (`zoomToFit` on an empty or unmeasured diagram is a no-op) ([#793](https://github.com/synergycodes/ng-diagram/pull/793))
 

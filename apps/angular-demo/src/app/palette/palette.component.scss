@@ -1,9 +1,10 @@
+// Deliberately unpositioned and laid out in flow, the way a real app shell holds its side panel.
+// A positioned ancestor would accidentally become the containing block for anything the library
+// parks off-screen, and would hide a whole class of bugs from this playground.
 :host {
-  position: absolute;
-  left: 0;
-  top: 0;
+  flex: 0 0 auto;
   width: 300px;
-  height: 100vh;
+  height: 100%;
   background: var(--ngd-ui-bg-primary-default);
   padding: 16px;
   box-sizing: border-box;

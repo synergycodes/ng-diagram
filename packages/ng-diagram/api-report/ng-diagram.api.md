@@ -1210,9 +1210,9 @@ export class NgDiagramPaletteItemPreviewComponent {
     // (undocumented)
     readonly id: string;
     // (undocumented)
-    protected readonly isSafari: boolean;
-    // (undocumented)
     readonly preview: Signal<ElementRef<HTMLElement> | undefined>;
+    // @deprecated (undocumented)
+    get scaleTransform(): string;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPaletteItemPreviewComponent, "ng-diagram-palette-item-preview", never, {}, {}, never, ["*"], true, never>;
     // (undocumented)

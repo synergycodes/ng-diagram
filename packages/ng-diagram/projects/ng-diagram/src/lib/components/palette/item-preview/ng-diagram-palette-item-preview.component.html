@@ -1,7 +1,3 @@
-<!-- Exactly one div carries `dragged-node`, which parks it off-screen and gives it a shrink-to-fit
-     width; createDragImage() scales the matching element of the clone, so the two must stay in sync. -->
-<div #preview [class.dragged-node]="isSafari">
-  <div [class.dragged-node]="!isSafari">
-    <ng-content></ng-content>
-  </div>
+<div #preview class="dragged-node">
+  <ng-content></ng-content>
 </div>

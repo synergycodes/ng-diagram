@@ -34,6 +34,8 @@ export interface DiagramHandle {
 export interface HarnessBridge {
   __diagramSeed?: Partial<Model>;
   __diagramConfig?: Partial<NgDiagramConfig>;
+  /** Renders the palette panel next to the diagram. Off by default so other specs keep a full-viewport canvas. */
+  __diagramPalette?: boolean;
   __diagramTabbable?: boolean;
   __diagram?: DiagramHandle;
   __diagramReady?: boolean;

@@ -31,7 +31,13 @@ export class NgDiagramPaletteItemPreviewComponent {
   readonly id = this.environment.generateId();
   readonly preview: Signal<ElementRef<HTMLElement> | undefined> = viewChild('preview');
 
-  protected readonly isSafari = this.environment.browser === 'Safari';
+  /**
+   * @deprecated The drag image is scaled internally, so this value is no longer used. It will be
+   * removed in the next major version.
+   */
+  get scaleTransform(): string {
+    return `scale(${this.scale()})`;
+  }
 
   /**
    * Returns a detached clone of the preview content scaled to the current viewport zoom, ready for
@@ -47,22 +53,11 @@ export class NgDiagramPaletteItemPreviewComponent {
     }
 
     const clone = previewElement.cloneNode(true) as HTMLElement;
-    clone.classList.add('dragged-node');
     clone.style.position = 'fixed';
-
-    // The parked preview is kept at natural size, so the zoom is applied to the clone only.
-    // Safari scales through `zoom` on the outer element, other browsers through `transform` on the
-    // inner one — each branch styles the element the template marked as `dragged-node`.
-    const scale = String(this.scale());
-    if (this.isSafari) {
-      clone.style.zoom = scale;
-    } else {
-      const inner = clone.firstElementChild as HTMLElement | null;
-      if (inner) {
-        inner.style.transform = `scale(${scale})`;
-        inner.style.transformOrigin = 'top left';
-      }
-    }
+    // `zoom` is layout-affecting, so the clone's own box grows with the scaled content. setDragImage
+    // rasterizes the element it is handed, and a `transform` would leave that box at natural size
+    // while painting outside it. Scaling `left: -1000px` too keeps the clone off-screen at any zoom.
+    clone.style.zoom = String(this.scale());
 
     return clone;
   }

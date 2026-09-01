@@ -1,4 +1,5 @@
 <div class="diagram-container" [class.reveal-hidden-ghosts]="revealHiddenGhosts()">
+  <app-palette [model]="paletteModel" />
   <ng-diagram
     [nodeTemplateMap]="nodeTemplateMap"
     [edgeTemplateMap]="edgeTemplateMap"
@@ -46,5 +47,4 @@
       (simulateModelDownloadClick)="onSimulateModelDownload()"
     />
   }
-  <app-palette [model]="paletteModel" />
 </div>
