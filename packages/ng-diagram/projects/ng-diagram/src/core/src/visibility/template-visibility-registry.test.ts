@@ -101,18 +101,4 @@ describe('TemplateVisibilityRegistry', () => {
     expect(registry.isLabelHidden('e', 'l')).toBe(false);
     expect(onChange).not.toHaveBeenCalled();
   });
-
-  it('should clear all state', () => {
-    registry.setNodeHidden('n', true);
-    registry.setEdgeHidden('e', true);
-    registry.setPortHidden('n', 'p', true);
-    registry.setLabelHidden('e', 'l', true);
-
-    registry.clear();
-
-    expect(registry.isNodeHidden('n')).toBe(false);
-    expect(registry.isEdgeHidden('e')).toBe(false);
-    expect(registry.isPortHidden('n', 'p')).toBe(false);
-    expect(registry.isLabelHidden('e', 'l')).toBe(false);
-  });
 });

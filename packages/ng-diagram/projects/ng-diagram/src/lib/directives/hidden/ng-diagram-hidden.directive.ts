@@ -56,6 +56,7 @@ export class NgDiagramHiddenDirective implements OnDestroy {
   /** Owner identity captured on first apply — guards teardown of replaced elements. */
   private ownerInternalId: unknown;
   private warnedVirtualization = false;
+  private warnedOutsideTemplate = false;
 
   constructor() {
     effect(() => {
@@ -113,7 +114,10 @@ export class NgDiagramHiddenDirective implements OnDestroy {
 
     const owner = this.resolveOwner();
     if (!owner) {
-      console.warn(OUTSIDE_TEMPLATE_WARNING);
+      if (!this.warnedOutsideTemplate) {
+        this.warnedOutsideTemplate = true;
+        console.warn(OUTSIDE_TEMPLATE_WARNING);
+      }
       return;
     }
 

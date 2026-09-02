@@ -2,7 +2,7 @@ import type { Model } from 'ng-diagram';
 import { expect, test } from './fixtures/diagram';
 
 /**
- * Hidden elements (NGD-101): a model-level `hidden` flag on nodes and edges.
+ * Hidden elements: a model-level `hidden` flag on nodes and edges.
  * Hidden elements stay mounted as display: none, never block initialization,
  * and are excluded from interactions.
  */

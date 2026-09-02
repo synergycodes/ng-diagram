@@ -135,7 +135,12 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
       if (!this.isRegistered || !edgeId) return;
       // Runtime toggles; the initial value is written in ngOnInit BEFORE the
       // label registers for measurement.
-      this.flowCoreProvider.provide().templateVisibilityRegistry?.setLabelHidden(edgeId, this.id(), hidden);
+      // Angular 18 backward compatibility: the write can synchronously complete
+      // initialization and reach setState, and signal writes inside an effect
+      // throw NG0600 before Angular 19.
+      untracked(() => {
+        this.flowCoreProvider.provide().templateVisibilityRegistry?.setLabelHidden(edgeId, this.id(), hidden);
+      });
     });
   }
 

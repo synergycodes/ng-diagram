@@ -93,13 +93,6 @@ export class TemplateVisibilityRegistry {
     this.hiddenLabels.delete(edgeId);
   }
 
-  clear(): void {
-    this.hiddenNodes.clear();
-    this.hiddenEdges.clear();
-    this.hiddenPorts.clear();
-    this.hiddenLabels.clear();
-  }
-
   /** @returns true when the stored state actually changed */
   private setFlag(set: Set<string>, id: string, hidden: boolean): boolean {
     if (hidden) {
