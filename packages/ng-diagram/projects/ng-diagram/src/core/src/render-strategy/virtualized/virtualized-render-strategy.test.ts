@@ -3,6 +3,7 @@ import type { FlowCore } from '../../flow-core';
 import { SpatialHash } from '../../spatial-hash/spatial-hash';
 import { mockEdge, mockGroupNode, mockNode } from '../../test-utils';
 import type { Edge, Node, Viewport, VirtualizationConfig } from '../../types';
+import { ChangeGeneration } from '../../utils';
 import { VirtualizedRenderStrategy } from './virtualized-render-strategy';
 
 describe('VirtualizedRenderStrategy', () => {
@@ -423,14 +424,15 @@ describe('VirtualizedRenderStrategy', () => {
       flowCore['commandHandler'] = { emit: vi.fn() };
       // In production the hidden-computation middleware bumps this whenever a
       // pass changed effective visibility; the tests bump it with fireChange.
-      flowCore['visibilityVersion'] = 0;
+      const visibilityGeneration = new ChangeGeneration();
+      flowCore['visibilityGeneration'] = visibilityGeneration;
 
       strategy.init();
 
       return (nextState: MutableState) => {
         state = nextState;
         updateNodesMap(nextState.nodes);
-        flowCore['visibilityVersion'] = (flowCore['visibilityVersion'] as number) + 1;
+        visibilityGeneration.bump();
         onChangeCallback?.(nextState);
         return state;
       };

@@ -1122,6 +1122,23 @@ describe('InitUpdater', () => {
       expect(initUpdater.isInitialized).toBe(true);
     });
 
+    it('should not wait for template-hidden labels (registry source)', async () => {
+      mockFlowCore.templateVisibilityRegistry.setLabelHidden('edge1', 'label1', true);
+      const node = createMockNode('node1');
+      const edge = createMockEdge('edge1');
+      mockRenderedModel = { nodes: [node], edges: [edge] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+      initUpdater.addEdgeLabel('edge1', createMockEdgeLabel('label1'));
+
+      vi.advanceTimersByTime(STABILITY_DELAY);
+      await vi.runAllTimersAsync();
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
     it('should stop waiting when an element becomes hidden mid-init (refreshHiddenEntities)', async () => {
       const node = { ...createMockNode('node1'), size: undefined };
       mockRenderedModel = { nodes: [node], edges: [] };

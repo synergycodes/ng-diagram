@@ -11,13 +11,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../flow-core';
 import type { Edge, FlowState, Middleware, Node } from '../../../types';
+import { ChangeGeneration } from '../../../utils';
 import { TemplateVisibilityRegistry } from '../../../visibility/template-visibility-registry';
 import { MiddlewareManager } from '../../middleware-manager';
 import { internalIdMiddleware } from '../internal-id-assignment/internal-id-assignment';
 
 describe('hidden-computation through the real middleware chain', () => {
   let registry: TemplateVisibilityRegistry;
-  let notifyVisibilityChanged: ReturnType<typeof vi.fn>;
+  let visibilityGeneration: ChangeGeneration;
   let nodesMap: Map<string, Node>;
   let edgesMap: Map<string, Edge>;
   let flowCore: FlowCore;
@@ -47,7 +48,7 @@ describe('hidden-computation through the real middleware chain', () => {
 
   const createManager = (extraMiddlewares: Middleware[] = []) => {
     registry = new TemplateVisibilityRegistry();
-    notifyVisibilityChanged = vi.fn();
+    visibilityGeneration = new ChangeGeneration();
     nodesMap = new Map();
     edgesMap = new Map();
     idCounter = 0;
@@ -63,7 +64,7 @@ describe('hidden-computation through the real middleware chain', () => {
         connectedEdgesMap: new Map(),
       },
       templateVisibilityRegistry: registry,
-      notifyVisibilityChanged,
+      visibilityGeneration,
       config: { debugMode: false },
       environment: { generateId: () => `gen-${idCounter++}` },
       // eventManager / measurementTracker deliberately absent — the manager
@@ -100,7 +101,7 @@ describe('hidden-computation through the real middleware chain', () => {
     expect(added.computedHidden).toBe(true);
     // internal-id-assignment ran too — both stamps must coexist.
     expect((added as Node & { _internalId?: string })._internalId).toBeDefined();
-    expect(notifyVisibilityChanged).toHaveBeenCalled();
+    expect(visibilityGeneration.version).toBeGreaterThan(0);
   });
 
   it('should commit computedHidden on a node added into a hidden group', async () => {
@@ -163,13 +164,33 @@ describe('hidden-computation through the real middleware chain', () => {
     expect(state.edges.find((e) => e.id === 'e')!.computedHidden).toBe(true);
   });
 
-  it('should not notify visibility changes on passes that do not affect visibility', async () => {
+  it('should keep the selected flag when an element becomes hidden (hiding does not deselect)', async () => {
+    // deleteSelection's skip-hidden rule and copy/paste both build on this:
+    // hiding only stamps computedHidden, it never touches selection state.
+    const manager = createManager();
+    const node = createNode('a', { selected: true });
+    const edge = createEdge('e', 'a', 'b', { selected: true });
+
+    const state = await run(manager, stateOf([node], [edge]), { nodesToUpdate: [{ id: 'a', hidden: true }] }, [
+      'updateNodes',
+    ]);
+
+    const hiddenNode = state.nodes.find((n) => n.id === 'a')!;
+    expect(hiddenNode.computedHidden).toBe(true);
+    expect(hiddenNode.selected).toBe(true);
+    // The edge went effectively hidden through its endpoint — also still selected.
+    const hiddenEdge = state.edges.find((e) => e.id === 'e')!;
+    expect(hiddenEdge.computedHidden).toBe(true);
+    expect(hiddenEdge.selected).toBe(true);
+  });
+
+  it('should not bump the visibility generation on passes that do not affect visibility', async () => {
     const manager = createManager();
     const node = createNode('a');
 
     await run(manager, stateOf([node]), { nodesToUpdate: [{ id: 'a', position: { x: 9, y: 9 } }] }, ['updateNodes']);
 
-    expect(notifyVisibilityChanged).not.toHaveBeenCalled();
+    expect(visibilityGeneration.version).toBe(0);
   });
 
   it('should drop registry entries of removed elements during the pass', async () => {

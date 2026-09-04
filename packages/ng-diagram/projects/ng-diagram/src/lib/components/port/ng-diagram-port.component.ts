@@ -1,5 +1,6 @@
 import {
   AfterContentInit,
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -104,15 +105,18 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
    * A hidden port stays mounted as `display: none`, creates no measurement
    * expectation (it never blocks initialization or `waitForMeasurements`),
    * and is excluded as a linking target and port-snap candidate. Unhiding
-   * re-measures it through the existing ResizeObserver path.
+   * re-measures it automatically.
    *
    * Edges attached to a hidden port keep the port's last measured geometry
    * as their anchor; hide the edge itself via its `hidden` flag if it should
    * disappear with the port.
    *
+   * Accepts the static attribute form too: a bare `hidden` attribute means
+   * hidden, matching native HTML semantics.
+   *
    * @since 1.4.0
    */
-  hidden = input<boolean>(false);
+  hidden = input(false, { transform: booleanAttribute });
 
   get portClass(): string {
     const originClass = originPointClassMap[this.originPoint()] || 'center';
@@ -174,13 +178,10 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       const nodeData = untracked(() => this.nodeData());
       if (!this.isInitialized() || !nodeData) return;
       // Runtime toggles; the initial value is written in ngOnInit BEFORE the
-      // port registers for measurement.
-      // Angular 18 backward compatibility: the write can synchronously complete
-      // initialization and reach setState, and signal writes inside an effect
-      // throw NG0600 before Angular 19.
-      untracked(() => {
-        this.flowCoreProvider.provide().templateVisibilityRegistry?.setPortHidden(nodeData.id, this.id(), hidden);
-      });
+      // port registers for measurement. The registry write only schedules a
+      // coalesced flush (FlowCore defers the prune and the middleware pass to
+      // a microtask), so it is safe inside the reactive context.
+      this.flowCoreProvider.provide().templateVisibilityRegistry?.setPortHidden(nodeData.id, this.id(), hidden);
     });
   }
 

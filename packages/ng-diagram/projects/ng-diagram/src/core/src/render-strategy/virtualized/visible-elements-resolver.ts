@@ -75,7 +75,10 @@ export class VisibleElementsResolver {
         edges.push(edge);
         edgeIds.add(edge.id);
 
-        // Add external nodes (endpoints not in primary visible set)
+        // Add external nodes (endpoints not in primary visible set). These are
+        // never effectively hidden: an edge with a hidden endpoint is itself
+        // hidden (skipped above), so buildNodeList needs no re-filter. If that
+        // derivation rule ever gains an override, this path must filter too.
         if (!primaryVisibleIds.has(edge.source)) {
           externalNodeIds.add(edge.source);
         }

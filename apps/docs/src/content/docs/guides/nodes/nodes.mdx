@@ -129,3 +129,15 @@ By default, nodes use **automatic sizing** ([`autoSize: true`](/docs/api/types/m
 
 To set a manual size for a node, you must explicitly set [`autoSize: false`](/docs/api/types/model/simplenode#autosize). Without this, the [`size`](/docs/api/types/model/simplenode#size) property will be overridden by the automatic sizing behavior.
 :::
+
+## Visibility
+
+Nodes can be hidden without removing them from the model via the optional [`hidden`](/docs/api/types/model/simplenode#hidden) flag:
+
+```typescript
+await this.modelService.updateNode('node-1', { hidden: true });
+```
+
+A hidden node keeps its geometry, hides every edge connected to it, and is excluded from interactive surfaces (hit-testing, selection, `zoomToFit`, the minimap). Hiding a group hides all of its descendants. The system-computed [`computedHidden`](/docs/api/types/model/simplenode#computedhidden) property exposes the resulting effective visibility.
+
+See [Conditional Visibility](/docs/guides/conditional-visibility) for the full semantics, template-driven hiding, and how visibility interacts with measurement and virtualization.

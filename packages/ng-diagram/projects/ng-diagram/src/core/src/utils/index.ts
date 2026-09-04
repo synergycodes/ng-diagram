@@ -1,3 +1,4 @@
+export * from './change-generation';
 export * from './compute-floating-edge-side';
 export * from './constants';
 export * from './deep-merge';

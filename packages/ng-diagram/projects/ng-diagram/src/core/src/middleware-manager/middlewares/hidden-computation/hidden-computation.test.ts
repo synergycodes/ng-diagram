@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Edge, FlowStateUpdate, MiddlewareContext, Node } from '../../../types';
+import { ChangeGeneration } from '../../../utils';
 import { TemplateVisibilityRegistry } from '../../../visibility/template-visibility-registry';
 import { createHiddenComputationMiddleware, HiddenComputationOptions } from './hidden-computation';
 
@@ -192,18 +193,18 @@ describe('hiddenComputationMiddleware', () => {
     ]);
   });
 
-  it('should invoke onVisibilityChanged only when effective visibility actually changed', () => {
-    const onVisibilityChanged = vi.fn();
+  it('should bump the visibility generation only when effective visibility actually changed', () => {
+    const visibilityGeneration = new ChangeGeneration();
     const changed = createContext([createNode('a', { hidden: true })], [], { changedNodeProps: ['hidden'] });
-    execute(changed, { onVisibilityChanged });
-    expect(onVisibilityChanged).toHaveBeenCalledTimes(1);
+    execute(changed, { visibilityGeneration });
+    expect(visibilityGeneration.version).toBe(1);
 
     nextMock.mockClear();
     const unchanged = createContext([createNode('a', { hidden: true, computedHidden: true })], [], {
       changedNodeProps: ['hidden'],
     });
-    execute(unchanged, { onVisibilityChanged });
-    expect(onVisibilityChanged).toHaveBeenCalledTimes(1);
+    execute(unchanged, { visibilityGeneration });
+    expect(visibilityGeneration.version).toBe(1);
   });
 
   describe('registry cleanup for removed elements', () => {

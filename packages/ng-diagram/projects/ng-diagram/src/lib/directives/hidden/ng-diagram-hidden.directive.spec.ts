@@ -166,4 +166,27 @@ describe('NgDiagramHiddenDirective', () => {
     expect(registry.isNodeHidden('node1')).toBe(false);
     warnSpy.mockRestore();
   });
+
+  it('should be an ignored no-op with a one-shot console warning outside a node or edge template', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    // Neither NgDiagramNodeComponent nor NgDiagramEdgeComponent in the
+    // injector — the binding has no owner to resolve.
+    setup({});
+
+    fixture.componentInstance.hidden.set(true);
+    fixture.detectChanges();
+
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy.mock.calls[0][0]).toContain('inside a node or edge template');
+
+    // Repeated toggles do not flood the console, and destroy is a no-op.
+    fixture.componentInstance.hidden.set(false);
+    fixture.detectChanges();
+    fixture.componentInstance.hidden.set(true);
+    fixture.detectChanges();
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+
+    fixture.destroy();
+    warnSpy.mockRestore();
+  });
 });

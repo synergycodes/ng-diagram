@@ -1,4 +1,5 @@
 import {
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -67,12 +68,14 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
    *
    * A hidden label stays mounted as `display: none` and creates no
    * measurement expectation (it never blocks initialization or
-   * `waitForMeasurements`). Unhiding re-measures it through the existing
-   * ResizeObserver path.
+   * `waitForMeasurements`). Unhiding re-measures it automatically.
+   *
+   * Accepts the static attribute form too: a bare `hidden` attribute means
+   * hidden, matching native HTML semantics.
    *
    * @since 1.4.0
    */
-  hidden = input<boolean>(false);
+  hidden = input(false, { transform: booleanAttribute });
 
   readonly edgeData = computed(() => this.edgeComponent.edge());
   readonly points = computed(() => this.edgeData()?.points);
@@ -134,13 +137,10 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
       const edgeId = untracked(() => this.edgeId());
       if (!this.isRegistered || !edgeId) return;
       // Runtime toggles; the initial value is written in ngOnInit BEFORE the
-      // label registers for measurement.
-      // Angular 18 backward compatibility: the write can synchronously complete
-      // initialization and reach setState, and signal writes inside an effect
-      // throw NG0600 before Angular 19.
-      untracked(() => {
-        this.flowCoreProvider.provide().templateVisibilityRegistry?.setLabelHidden(edgeId, this.id(), hidden);
-      });
+      // label registers for measurement. The registry write only schedules a
+      // coalesced flush (FlowCore defers the prune and the middleware pass to
+      // a microtask), so it is safe inside the reactive context.
+      this.flowCoreProvider.provide().templateVisibilityRegistry?.setLabelHidden(edgeId, this.id(), hidden);
     });
   }
 

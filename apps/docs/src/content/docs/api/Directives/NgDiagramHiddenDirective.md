@@ -37,6 +37,9 @@ use the model-level `hidden` flag instead.
 
 ### hidden
 
-> **hidden**: `InputSignal`\<`boolean`\>
+> **hidden**: `InputSignalWithTransform`\<`boolean`, `unknown`\>
 
 Whether the node or edge owning this template is hidden.
+
+Accepts the static attribute form too: a bare `ngDiagramHidden` (no
+binding) means hidden, matching native HTML `hidden` semantics.

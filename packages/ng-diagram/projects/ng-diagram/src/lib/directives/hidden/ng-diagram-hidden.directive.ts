@@ -1,4 +1,4 @@
-import { Directive, effect, inject, input, OnDestroy, untracked } from '@angular/core';
+import { booleanAttribute, Directive, effect, inject, input, OnDestroy, untracked } from '@angular/core';
 import { NgDiagramEdgeComponent } from '../../components/edge/ng-diagram-edge.component';
 import { NgDiagramNodeComponent } from '../../components/node/ng-diagram-node.component';
 import { FlowCoreProviderService } from '../../services';
@@ -46,8 +46,11 @@ const VIRTUALIZATION_WARNING =
 export class NgDiagramHiddenDirective implements OnDestroy {
   /**
    * Whether the node or edge owning this template is hidden.
+   *
+   * Accepts the static attribute form too: a bare `ngDiagramHidden` (no
+   * binding) means hidden, matching native HTML `hidden` semantics.
    */
-  hidden = input.required<boolean>({ alias: 'ngDiagramHidden' });
+  hidden = input.required<boolean, unknown>({ alias: 'ngDiagramHidden', transform: booleanAttribute });
 
   private readonly nodeComponent = inject(NgDiagramNodeComponent, { optional: true });
   private readonly edgeComponent = inject(NgDiagramEdgeComponent, { optional: true });

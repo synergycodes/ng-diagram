@@ -97,6 +97,31 @@ test.describe('hidden elements', () => {
       .toEqual({ nodes: ['node-c', 'visible-a'], edges: ['edge-ac'] });
   });
 
+  test('zoomToFit ignores hidden elements and refits once they are unhidden', async ({ diagram }) => {
+    await diagram.load({
+      model: {
+        nodes: [
+          { id: 'near-a', position: { x: 0, y: 0 }, data: {} },
+          { id: 'near-b', position: { x: 200, y: 120 }, data: {} },
+          { id: 'far-hidden', position: { x: 6000, y: 4000 }, hidden: true, data: {} },
+        ],
+        edges: [],
+      },
+    });
+
+    await diagram.viewport.zoomToFit();
+    const fittedToVisible = await diagram.viewport.viewport();
+
+    // The far node joins the fit only once unhidden — if the hidden node's
+    // stale bounds inflated the fit, both scales would be equal.
+    await diagram.model.updateNode('far-hidden', { hidden: false });
+    await expect.poll(async () => (await diagram.model.getNodeById('far-hidden'))?.size?.width ?? 0).toBeGreaterThan(0);
+    await diagram.viewport.zoomToFit();
+    const fittedToAll = await diagram.viewport.viewport();
+
+    expect(fittedToVisible.scale).toBeGreaterThan(fittedToAll.scale * 2);
+  });
+
   test('hidden children move with their dragged group', async ({ diagram }) => {
     const collapsedGroup: Partial<Model> = {
       nodes: [

@@ -31,6 +31,7 @@ vi.mock('./updater/init-updater/init-updater', () => ({
       }
     }),
     isInitialized: false,
+    refreshHiddenEntities: vi.fn(),
   })),
 }));
 
@@ -813,6 +814,78 @@ describe('FlowCore', () => {
       releasePass();
       await vi.advanceTimersByTimeAsync(1000);
       await Promise.all([commit, tracked]);
+    });
+  });
+
+  describe('template visibility flush coalescing', () => {
+    let applyUpdateSpy: ReturnType<typeof vi.spyOn>;
+    const refreshMock = () => flowCore.initUpdater.refreshHiddenEntities as Mock;
+
+    beforeEach(() => {
+      applyUpdateSpy = vi.spyOn(flowCore, 'applyUpdate').mockResolvedValue(undefined) as ReturnType<typeof vi.spyOn>;
+      refreshMock().mockClear();
+    });
+
+    it('should run one prune and one pass for many node/edge registry writes in the same tick', async () => {
+      flowCore.templateVisibilityRegistry.setNodeHidden('a', true);
+      flowCore.templateVisibilityRegistry.setNodeHidden('b', true);
+      flowCore.templateVisibilityRegistry.setEdgeHidden('e', true);
+
+      // Nothing runs synchronously — the writers may be inside an Angular
+      // reactive context where a synchronous pass would write signals (NG0600).
+      expect(refreshMock()).not.toHaveBeenCalled();
+      expect(applyUpdateSpy).not.toHaveBeenCalled();
+
+      await flushMicrotasks();
+
+      expect(refreshMock()).toHaveBeenCalledTimes(1);
+      expect(applyUpdateSpy).toHaveBeenCalledTimes(1);
+      expect(applyUpdateSpy).toHaveBeenCalledWith({}, 'templateVisibilityChange');
+    });
+
+    it('should run the prune without a pass for port/label-only registry writes', async () => {
+      flowCore.templateVisibilityRegistry.setPortHidden('n', 'p', true);
+      flowCore.templateVisibilityRegistry.setLabelHidden('e', 'l', true);
+
+      await flushMicrotasks();
+
+      expect(refreshMock()).toHaveBeenCalledTimes(1);
+      expect(applyUpdateSpy).not.toHaveBeenCalled();
+    });
+
+    it('should run one pass when node and port writes land in the same tick', async () => {
+      flowCore.templateVisibilityRegistry.setPortHidden('n', 'p', true);
+      flowCore.templateVisibilityRegistry.setNodeHidden('n', true);
+
+      await flushMicrotasks();
+
+      expect(refreshMock()).toHaveBeenCalledTimes(1);
+      expect(applyUpdateSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should re-arm exactly one follow-up for a write landing while the pass is running', async () => {
+      applyUpdateSpy.mockImplementationOnce(async () => {
+        // A registry write landing mid-pass (e.g. a component reacting to the
+        // state the pass is committing).
+        flowCore.templateVisibilityRegistry.setNodeHidden('late', true);
+      });
+
+      flowCore.templateVisibilityRegistry.setNodeHidden('a', true);
+      await flushMicrotasks();
+      await flushMicrotasks();
+
+      expect(applyUpdateSpy).toHaveBeenCalledTimes(2);
+      expect(refreshMock()).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not run a queued flush after the FlowCore is destroyed', async () => {
+      flowCore.templateVisibilityRegistry.setNodeHidden('a', true);
+      flowCore.destroy();
+
+      await flushMicrotasks();
+
+      expect(refreshMock()).not.toHaveBeenCalled();
+      expect(applyUpdateSpy).not.toHaveBeenCalled();
     });
   });
 });

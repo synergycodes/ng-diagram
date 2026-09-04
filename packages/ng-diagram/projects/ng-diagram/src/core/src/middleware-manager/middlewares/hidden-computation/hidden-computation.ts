@@ -1,4 +1,5 @@
 import { FlowStateUpdate, Middleware } from '../../../types';
+import type { ChangeGeneration } from '../../../utils';
 import { computeHiddenNodeIds, isEdgeEffectivelyHidden } from '../../../visibility/effective-visibility';
 import type { TemplateVisibilityRegistry } from '../../../visibility/template-visibility-registry';
 
@@ -7,9 +8,8 @@ const HIDDEN_RELEVANT_NODE_PROPS = ['hidden', 'groupId'];
 /** Edge property changes that can alter effective visibility. */
 const HIDDEN_RELEVANT_EDGE_PROPS = ['hidden', 'source', 'target'];
 
-export interface HiddenComputationOptions {
-  /** Distinct middleware name for the pre-pass and finalize instances. */
-  name: string;
+export interface HiddenComputationOptions<TName extends string = string> {
+  name: TName;
   /**
    * When true, entries of removed nodes/edges are dropped from the
    * {@link TemplateVisibilityRegistry} (silently — the elements are gone, no
@@ -17,12 +17,12 @@ export interface HiddenComputationOptions {
    */
   cleanupRemovedEntries?: boolean;
   /**
-   * Invoked when the pass actually changed some element's effective
+   * Bumped when the pass actually changed some element's effective
    * visibility. Consumers that cache render output keyed on things that do
    * not change on a visibility toggle (e.g. the virtualized result cache)
-   * use it as an O(1) invalidation signal.
+   * compare its version as an O(1) invalidation signal.
    */
-  onVisibilityChanged?: () => void;
+  visibilityGeneration?: ChangeGeneration;
 }
 
 /**
@@ -50,11 +50,10 @@ export interface HiddenComputationOptions {
  *
  * @internal
  */
-export const createHiddenComputationMiddleware = (
+export const createHiddenComputationMiddleware = <TName extends string>(
   registry: TemplateVisibilityRegistry,
-  { name, cleanupRemovedEntries = false, onVisibilityChanged }: HiddenComputationOptions
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Middleware<any> => ({
+  { name, cleanupRemovedEntries = false, visibilityGeneration }: HiddenComputationOptions<TName>
+): Middleware<TName> => ({
   name,
   execute: (context, next) => {
     const { state, modelActionTypes, helpers } = context;
@@ -121,7 +120,7 @@ export const createHiddenComputationMiddleware = (
     }
 
     if (nodesToAdd.length || nodesToUpdate.length || edgesToAdd.length || edgesToUpdate.length) {
-      onVisibilityChanged?.();
+      visibilityGeneration?.bump();
     }
 
     next({

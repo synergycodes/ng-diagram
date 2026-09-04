@@ -77,15 +77,15 @@ export class MiddlewareManager {
     }
 
     if (!this.hiddenComputationMiddleware && this.flowCore.templateVisibilityRegistry) {
-      const onVisibilityChanged = () => this.flowCore.notifyVisibilityChanged();
+      const visibilityGeneration = this.flowCore.visibilityGeneration;
       this.hiddenComputationMiddleware = createHiddenComputationMiddleware(this.flowCore.templateVisibilityRegistry, {
         name: 'hidden-computation',
         cleanupRemovedEntries: true,
-        onVisibilityChanged,
+        visibilityGeneration,
       });
       this.hiddenComputationFinalizeMiddleware = createHiddenComputationMiddleware(
         this.flowCore.templateVisibilityRegistry,
-        { name: 'hidden-computation-finalize', onVisibilityChanged }
+        { name: 'hidden-computation-finalize', visibilityGeneration }
       );
     }
 

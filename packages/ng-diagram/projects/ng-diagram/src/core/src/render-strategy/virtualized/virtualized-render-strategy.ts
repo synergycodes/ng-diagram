@@ -27,9 +27,9 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
   // Effective-visibility tracking: the result cache keys on element COUNTS and
   // viewport only, so a hidden/unhidden toggle (counts unchanged) would keep
   // serving a stale render set until the next pan/zoom. The hidden-computation
-  // middleware bumps flowCore.visibilityVersion whenever effective visibility
-  // actually changed — an O(1) signal checked per model change, keeping this
-  // hot path free of per-element work.
+  // middleware bumps flowCore.visibilityGeneration whenever effective
+  // visibility actually changed — an O(1) signal checked per model change,
+  // keeping this hot path free of per-element work.
   private lastVisibilityVersion = 0;
 
   constructor(flowCore: FlowCore) {
@@ -41,7 +41,7 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
 
   init(): void {
     this.flowCore.spatialHash.process(this.flowCore.model.getNodes());
-    this.lastVisibilityVersion = this.flowCore.visibilityVersion;
+    this.lastVisibilityVersion = this.flowCore.visibilityGeneration.version;
 
     this.flowCore.model.onChange((state) => {
       // Optimization: skip spatialHash update during panning/zooming (nodes reference stays the same)
@@ -51,8 +51,8 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
         this.lastNodesRef = state.nodes;
       }
 
-      if (this.flowCore.visibilityVersion !== this.lastVisibilityVersion) {
-        this.lastVisibilityVersion = this.flowCore.visibilityVersion;
+      if (this.flowCore.visibilityGeneration.version !== this.lastVisibilityVersion) {
+        this.lastVisibilityVersion = this.flowCore.visibilityGeneration.version;
         this.cache.invalidate();
       }
 

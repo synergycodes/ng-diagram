@@ -11,6 +11,7 @@ import { EventEmitter } from '@angular/core';
 import * as i0 from '@angular/core';
 import { Injector } from '@angular/core';
 import { InputSignal } from '@angular/core';
+import { InputSignalWithTransform } from '@angular/core';
 import { OnDestroy } from '@angular/core';
 import { OnInit } from '@angular/core';
 import { Provider } from '@angular/core';
@@ -771,7 +772,7 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     readonly edgeData: Signal<Edge<object>>;
     // (undocumented)
     readonly edgeId: Signal<string>;
-    hidden: InputSignal<boolean>;
+    hidden: InputSignalWithTransform<boolean, unknown>;
     id: InputSignal<string>;
     // (undocumented)
     readonly isVisible: Signal<boolean>;
@@ -934,7 +935,7 @@ export class NgDiagramGroupsService extends NgDiagramBaseService {
 // @public
 export class NgDiagramHiddenDirective implements OnDestroy {
     constructor();
-    hidden: InputSignal<boolean>;
+    hidden: InputSignalWithTransform<boolean, unknown>;
     // @internal (undocumented)
     ngOnDestroy(): void;
     // (undocumented)
@@ -1231,7 +1232,7 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
     constructor();
     // (undocumented)
     protected hasContent: boolean;
-    hidden: InputSignal<boolean>;
+    hidden: InputSignalWithTransform<boolean, unknown>;
     id: InputSignal<string>;
     // (undocumented)
     protected readonly isInitialized: WritableSignal<boolean>;
