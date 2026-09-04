@@ -26,13 +26,15 @@ export interface DiagramHandle {
 
 /**
  * The contract between Playwright tests and the harness. Tests:
- *   1. Optionally set `__diagramSeed` / `__diagramConfig` via `addInitScript`.
+ *   1. Optionally set `__diagramSeed` / `__diagramConfig` / `__diagramTabbable`
+ *      via `addInitScript`.
  *   2. Wait for `__diagramReady` to become `true`.
  *   3. Drive the diagram through `__diagram`.
  */
 export interface HarnessBridge {
   __diagramSeed?: Partial<Model>;
   __diagramConfig?: Partial<NgDiagramConfig>;
+  __diagramTabbable?: boolean;
   __diagram?: DiagramHandle;
   __diagramReady?: boolean;
 }

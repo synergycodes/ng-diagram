@@ -8,7 +8,7 @@ const changelogPath = join(__dirname, '../../../CHANGELOG.md');
 const changelogContent = readFileSync(changelogPath, 'utf-8');
 
 // Remove the first H1 heading (Starlight will provide it from frontmatter)
-const contentWithoutTitle = changelogContent.replace(/^#\s+Changelog\n\n/, '');
+const contentWithoutTitle = changelogContent.replace(/^#\s+Changelog\r?\n\r?\n/, '');
 
 // Create the MDX file with frontmatter
 const mdxContent = `---
