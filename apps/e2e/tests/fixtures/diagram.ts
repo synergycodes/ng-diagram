@@ -56,11 +56,11 @@ export class Diagram {
   // ──────────────────────────────────────────────────────────────────────
 
   /**
-   * Navigate to the harness. Optionally seed the model, config and/or the
+   * Navigate to the harness. Optionally seed the model, config, the palette and/or the
    * `tabbable` input — all land on `window` before bootstrap via `addInitScript`.
    */
   async load(
-    options: { model?: Partial<Model>; config?: Partial<NgDiagramConfig>; tabbable?: boolean } = {}
+    options: { model?: Partial<Model>; config?: Partial<NgDiagramConfig>; palette?: boolean; tabbable?: boolean } = {}
   ): Promise<void> {
     if (options.model !== undefined) {
       await this.page.addInitScript((m) => {
@@ -71,6 +71,11 @@ export class Diagram {
       await this.page.addInitScript((c) => {
         window.__diagramConfig = c;
       }, options.config);
+    }
+    if (options.palette) {
+      await this.page.addInitScript(() => {
+        window.__diagramPalette = true;
+      });
     }
     if (options.tabbable !== undefined) {
       await this.page.addInitScript((t) => {
@@ -87,6 +92,16 @@ export class Diagram {
 
   get container(): Locator {
     return this.page.getByTestId('diagram-container');
+  }
+
+  /** The harness palette panel. Only rendered when the diagram is loaded with `{ palette: true }`. */
+  get palettePanel(): Locator {
+    return this.page.getByTestId('palette-panel');
+  }
+
+  /** The off-screen copies of the palette previews, one per palette item. */
+  get parkedPalettePreviews(): Locator {
+    return this.page.locator('ng-diagram-palette-item-preview .dragged-node');
   }
 
   /** All rendered nodes — matches the `data-node-id` attribute emitted by ng-diagram. */

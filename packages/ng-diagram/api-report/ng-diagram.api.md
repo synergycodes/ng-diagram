@@ -1205,19 +1205,20 @@ export class NgDiagramPaletteItemComponent {
 
 // @public
 export class NgDiagramPaletteItemPreviewComponent {
+    // @internal
+    createDragImage(): HTMLElement | null;
     // (undocumented)
     readonly id: string;
-    // (undocumented)
+    // @deprecated (undocumented)
     protected readonly isChrome: boolean;
-    // (undocumented)
+    // @deprecated (undocumented)
     protected readonly isSafari: boolean;
-    // (undocumented)
+    // @deprecated (undocumented)
     protected readonly isVisible: Signal<boolean>;
-    // (undocumented)
     readonly preview: Signal<ElementRef<HTMLElement> | undefined>;
-    // (undocumented)
+    // @deprecated (undocumented)
     protected readonly scale: Signal<number>;
-    // (undocumented)
+    // @deprecated (undocumented)
     get scaleTransform(): string;
     // (undocumented)
     static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramPaletteItemPreviewComponent, "ng-diagram-palette-item-preview", never, {}, {}, never, ["*"], true, never>;

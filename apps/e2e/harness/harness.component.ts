@@ -9,6 +9,9 @@ import {
   NgDiagramModelService,
   NgDiagramNodeService,
   NgDiagramNodeTemplateMap,
+  type NgDiagramPaletteItem,
+  NgDiagramPaletteItemComponent,
+  NgDiagramPaletteItemPreviewComponent,
   NgDiagramSelectionService,
   NgDiagramService,
   NgDiagramViewportService,
@@ -29,20 +32,43 @@ declare global {
   selector: 'harness-root',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
+  imports: [
+    NgDiagramComponent,
+    NgDiagramBackgroundComponent,
+    NgDiagramPaletteItemComponent,
+    NgDiagramPaletteItemPreviewComponent,
+  ],
   providers: [provideNgDiagram()],
   template: `
-    <div class="diagram-container" data-testid="diagram-container">
-      <ng-diagram
-        [model]="model()"
-        [config]="config"
-        [tabbable]="tabbable"
-        [nodeTemplateMap]="nodeTemplateMap"
-        [edgeTemplateMap]="edgeTemplateMap"
-        (diagramInit)="onDiagramInit()"
-      >
-        <ng-diagram-background type="grid"></ng-diagram-background>
-      </ng-diagram>
+    <div class="shell" [class.with-palette]="showPalette">
+      @if (showPalette) {
+        <!-- Deliberately unpositioned: an app whose palette panel establishes no containing block
+             is the shape in which an unclipped preview reaches the document's scroll area. -->
+        <div class="palette-panel" data-testid="palette-panel">
+          @for (paletteItem of paletteItems; track paletteItem.type) {
+            <ng-diagram-palette-item [item]="paletteItem">
+              <div class="palette-item" data-testid="palette-item">{{ paletteItem.type }}</div>
+              <ng-diagram-palette-item-preview>
+                <div class="palette-preview" [class.wide]="paletteItem.type === 'wide'" data-testid="palette-preview">
+                  {{ paletteItem.type }}
+                </div>
+              </ng-diagram-palette-item-preview>
+            </ng-diagram-palette-item>
+          }
+        </div>
+      }
+      <div class="diagram-container" data-testid="diagram-container">
+        <ng-diagram
+          [model]="model()"
+          [config]="config"
+          [tabbable]="tabbable"
+          [nodeTemplateMap]="nodeTemplateMap"
+          [edgeTemplateMap]="edgeTemplateMap"
+          (diagramInit)="onDiagramInit()"
+        >
+          <ng-diagram-background type="grid"></ng-diagram-background>
+        </ng-diagram>
+      </div>
     </div>
   `,
   styles: [
@@ -51,6 +77,48 @@ declare global {
         width: 100vw;
         height: 100vh;
         background: #fafafa;
+      }
+
+      .shell.with-palette {
+        display: flex;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .shell.with-palette .diagram-container {
+        flex: 1;
+        width: auto;
+        height: auto;
+      }
+
+      .palette-panel {
+        width: 240px;
+        padding: 16px;
+        box-sizing: border-box;
+        background: #fff;
+      }
+
+      .palette-item {
+        width: 100%;
+        height: 40px;
+        border: 1px solid #333;
+      }
+
+      /* Fixed size, so the drag image's expected dimensions are exact. */
+      .palette-preview {
+        width: 340px;
+        height: 200px;
+        border: 2px solid #333;
+        box-sizing: border-box;
+      }
+
+      /*
+       * Wider than both a fixed 1000px park offset and the viewport: parking by offset would put
+       * this preview's right edge on-screen, and a shrink-to-fit drag image would wrap its lines.
+       */
+      .palette-preview.wide {
+        width: 1300px;
+        height: 60px;
       }
     `,
   ],
@@ -66,6 +134,12 @@ export class HarnessComponent {
 
   readonly model = signal(initializeModel(window.__diagramSeed ?? DEFAULT_E2E_MODEL));
   readonly config = window.__diagramConfig ?? {};
+  readonly showPalette = window.__diagramPalette ?? false;
+  readonly paletteItems: NgDiagramPaletteItem[] = [
+    { type: 'alpha', data: { label: 'Alpha' } },
+    { type: 'beta', data: { label: 'Beta' } },
+    { type: 'wide', data: { label: 'Wide' } },
+  ];
   readonly tabbable = window.__diagramTabbable ?? true;
   readonly nodeTemplateMap = new NgDiagramNodeTemplateMap([
     ['resize-sides', ResizeSidesNodeComponent],

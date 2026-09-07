@@ -96,10 +96,10 @@ export class AppComponent {
 
   config: NgDiagramConfig = {
     zoom: {
-      max: 2,
+      // Left at the library default (10x) so high-zoom rendering is reachable here.
       zoomToFit: {
         onInit: true,
-        padding: [50, 50, 100, 350],
+        padding: [50, 50, 100, 50],
       },
     },
     resize: {
