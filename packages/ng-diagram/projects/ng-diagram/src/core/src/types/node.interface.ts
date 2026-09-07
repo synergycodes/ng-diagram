@@ -59,6 +59,35 @@ export interface SimpleNode<T extends DataObject = DataObject> {
    */
   selected?: boolean;
   /**
+   * Whether the node is hidden. Absent means visible.
+   *
+   * Hidden nodes keep their geometry, do not block initialization or
+   * measurement waits, and are excluded from every interactive surface
+   * (hit-testing, select-all, box selection, keyboard move, drag, linking,
+   * zoomToFit bounds, edge routing). In the default render mode they stay
+   * mounted in the DOM as `display: none`; with virtualization enabled they
+   * are unmounted instead (geometry survives in the model and re-measures on
+   * unhide). Hiding a group hides all of its descendants; hiding a node hides
+   * the edges connected to it.
+   *
+   * Programmatic APIs (e.g. `select`, `centerOnNode`, z-order commands) do
+   * not filter hidden elements — acting on them is the caller's prerogative.
+   *
+   * Set by the user; the library only reads it.
+   * @see {@link computedHidden} for the derived effective visibility.
+   * @since 1.4.0
+   */
+  hidden?: boolean;
+  /**
+   * @readonly
+   * @remarks ComputedHidden is computed by the system and should not be set manually.
+   * The effective visibility applied to the node: true when its own `hidden`
+   * flag (or a template-level hidden binding) is set, or when any ancestor
+   * group is effectively hidden.
+   * @since 1.4.0
+   */
+  readonly computedHidden?: boolean;
+  /**
    * The size of the node.
    */
   size?: Size;

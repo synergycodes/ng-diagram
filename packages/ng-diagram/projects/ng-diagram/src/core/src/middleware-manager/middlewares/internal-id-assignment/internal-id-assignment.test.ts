@@ -1,11 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mockEnvironment } from '../../../test-utils';
-import type { MiddlewareContext } from '../../../types';
+import type { Edge, MiddlewareContext, Node } from '../../../types';
 import { internalIdMiddleware } from './internal-id-assignment';
 
 describe('InternalIdMiddleware', () => {
   let context: MiddlewareContext;
   let nextMock: ReturnType<typeof vi.fn>;
+
+  const setAdded = (nodes: Partial<Node>[] = [], edges: Partial<Edge>[] = []) => {
+    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(nodes.length > 0);
+    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(edges.length > 0);
+    context.helpers.getAddedNodes = vi.fn().mockReturnValue(nodes);
+    context.helpers.getAddedEdges = vi.fn().mockReturnValue(edges);
+  };
 
   beforeEach(() => {
     nextMock = vi.fn();
@@ -32,6 +39,8 @@ describe('InternalIdMiddleware', () => {
       helpers: {
         anyNodesAdded: vi.fn().mockReturnValue(false),
         anyEdgesAdded: vi.fn().mockReturnValue(false),
+        getAddedNodes: vi.fn().mockReturnValue([]),
+        getAddedEdges: vi.fn().mockReturnValue([]),
         checkIfAnyNodePropsChanged: vi.fn().mockReturnValue(false),
         checkIfAnyEdgePropsChanged: vi.fn().mockReturnValue(false),
         getAffectedNodeIds: vi.fn().mockReturnValue([]),
@@ -49,8 +58,7 @@ describe('InternalIdMiddleware', () => {
   });
 
   it('should not modify state when no nodes or edges are added', async () => {
-    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(false);
-    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(false);
+    setAdded([], []);
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
 
@@ -58,315 +66,118 @@ describe('InternalIdMiddleware', () => {
     expect(nextMock).toHaveBeenCalledTimes(1);
   });
 
-  it('should generate _internalId for nodes without existing _internalId', async () => {
-    const mockNodes = [
+  it('should emit _internalId PATCHES for added nodes, never re-emitting the whole objects', async () => {
+    setAdded([
       { id: 'node1', position: { x: 0, y: 0 }, data: {} },
       { id: 'node2', position: { x: 10, y: 10 }, data: {} },
-    ];
-
-    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = { nodesToAdd: mockNodes };
+    ]);
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledTimes(1);
     const stateUpdate = nextMock.mock.calls[0][0];
 
-    expect(stateUpdate).toBeDefined();
-    expect(stateUpdate.nodesToAdd).toHaveLength(2);
-
-    // Check that _internalId was generated with correct format
-    expect(stateUpdate.nodesToAdd![0]._internalId).toMatch(
+    // Patches carry ONLY id + _internalId. Re-emitting full objects would
+    // revert properties other middlewares stamped on added elements earlier
+    // in the pass (e.g. computedHidden).
+    expect(stateUpdate.nodesToAdd).toBeUndefined();
+    expect(stateUpdate.nodesToUpdate).toHaveLength(2);
+    expect(Object.keys(stateUpdate.nodesToUpdate![0]).sort()).toEqual(['_internalId', 'id']);
+    expect(stateUpdate.nodesToUpdate![0].id).toBe('node1');
+    expect(stateUpdate.nodesToUpdate![0]._internalId).toMatch(
       /^node1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
     );
-    expect(stateUpdate.nodesToAdd![1]._internalId).toMatch(
+    expect(stateUpdate.nodesToUpdate![1]._internalId).toMatch(
       /^node2-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
     );
-
-    // Check that other properties are preserved
-    expect(stateUpdate.nodesToAdd![0].id).toBe('node1');
-    expect(stateUpdate.nodesToAdd![0].position).toEqual({ x: 0, y: 0 });
-    expect(stateUpdate.nodesToAdd![1].id).toBe('node2');
-    expect(stateUpdate.nodesToAdd![1].position).toEqual({ x: 10, y: 10 });
   });
 
-  it('should always generate new _internalId even if already present', async () => {
-    const mockNodes = [
-      {
-        id: 'node1',
-        position: { x: 0, y: 0 },
-        data: {},
-        _internalId: 'existing-internal-id',
-      },
-    ];
-
-    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = { nodesToAdd: mockNodes };
+  it('should always generate a new _internalId even if the added node carries one', async () => {
+    setAdded([{ id: 'node1', position: { x: 0, y: 0 }, data: {}, _internalId: 'existing-internal-id' } as Node]);
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
 
-    expect(nextMock).toHaveBeenCalledTimes(1);
     const stateUpdate = nextMock.mock.calls[0][0];
 
-    // Should generate a new _internalId, not preserve the existing one
-    // This prevents duplicated keys when copying a copy
-    expect(stateUpdate.nodesToAdd![0]._internalId).not.toBe('existing-internal-id');
-    expect(stateUpdate.nodesToAdd![0]._internalId).toMatch(
+    // A copied copy must not keep the original's key — trackBy would dedupe.
+    expect(stateUpdate.nodesToUpdate![0]._internalId).not.toBe('existing-internal-id');
+    expect(stateUpdate.nodesToUpdate![0]._internalId).toMatch(
       /^node1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
     );
   });
 
-  it('should generate unique _internalIds for multiple nodes', async () => {
-    const mockNodes = [
+  it('should generate unique _internalIds across added nodes', async () => {
+    setAdded([
       { id: 'node1', position: { x: 0, y: 0 }, data: {} },
-      { id: 'node1', position: { x: 10, y: 10 }, data: {} }, // Same id, different position
-    ];
-
-    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = { nodesToAdd: mockNodes };
-
-    // Mock different UUIDs for sequential calls
-    const randomUUIDMock = vi
+      { id: 'node2', position: { x: 10, y: 10 }, data: {} },
+    ]);
+    const generateIdMock = vi
       .spyOn(context.environment, 'generateId')
       .mockReturnValueOnce('550e8400-e29b-41d4-a716-446655440000')
       .mockReturnValueOnce('6ba7b810-9dad-11d1-80b4-00c04fd430c8');
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
 
-    expect(nextMock).toHaveBeenCalledTimes(1);
     const stateUpdate = nextMock.mock.calls[0][0];
+    expect(stateUpdate.nodesToUpdate![0]._internalId).not.toBe(stateUpdate.nodesToUpdate![1]._internalId);
 
-    expect(stateUpdate.nodesToAdd![0]._internalId).toBeDefined();
-    expect(stateUpdate.nodesToAdd![1]._internalId).toBeDefined();
-    expect(stateUpdate.nodesToAdd![0]._internalId).not.toBe(stateUpdate.nodesToAdd![1]._internalId);
-
-    randomUUIDMock.mockRestore();
+    generateIdMock.mockRestore();
   });
 
-  it('should preserve other initialUpdate properties', async () => {
-    const mockNodes = [{ id: 'node1', position: { x: 0, y: 0 }, data: {} }];
-
-    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = {
-      nodesToAdd: mockNodes,
-      edgesToAdd: [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }],
-      metadataUpdate: { viewport: { x: 100, y: 100, scale: 1.5 } },
-    };
+  it('should emit _internalId patches for added edges', async () => {
+    setAdded(
+      [],
+      [
+        { id: 'edge1', source: 'node1', target: 'node2', data: {} },
+        { id: 'edge2', source: 'node2', target: 'node3', data: {} },
+      ]
+    );
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
 
-    expect(nextMock).toHaveBeenCalledTimes(1);
     const stateUpdate = nextMock.mock.calls[0][0];
 
-    expect(stateUpdate.nodesToAdd).toBeDefined();
-    expect(stateUpdate.edgesToAdd).toBeDefined();
-    expect(stateUpdate.edgesToAdd![0].id).toBe('edge1');
-    expect(stateUpdate.edgesToAdd![0]._internalId).toMatch(
+    expect(stateUpdate.edgesToAdd).toBeUndefined();
+    expect(stateUpdate.nodesToUpdate).toBeUndefined();
+    expect(stateUpdate.edgesToUpdate).toHaveLength(2);
+    expect(Object.keys(stateUpdate.edgesToUpdate![0]).sort()).toEqual(['_internalId', 'id']);
+    expect(stateUpdate.edgesToUpdate![0]._internalId).toMatch(
       /^edge1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
     );
-    expect(stateUpdate.metadataUpdate).toEqual(context.initialUpdate.metadataUpdate);
-  });
-
-  it('should handle empty nodesToAdd array', async () => {
-    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = { nodesToAdd: [] };
-
-    await internalIdMiddleware.execute(context, nextMock, () => null);
-
-    expect(nextMock).toHaveBeenCalledTimes(1);
-    const stateUpdate = nextMock.mock.calls[0][0];
-
-    expect(stateUpdate.nodesToAdd).toEqual([]);
-  });
-
-  it('should handle undefined nodesToAdd', async () => {
-    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = {};
-
-    await internalIdMiddleware.execute(context, nextMock, () => null);
-
-    expect(nextMock).toHaveBeenCalledTimes(1);
-    const stateUpdate = nextMock.mock.calls[0][0];
-
-    expect(stateUpdate.nodesToAdd).toBeUndefined();
-  });
-
-  it('should generate _internalId with correct UUID format', async () => {
-    const mockNodes = [{ id: 'test-node', position: { x: 0, y: 0 }, data: {} }];
-
-    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = { nodesToAdd: mockNodes };
-
-    // Use a predictable UUID so the regex is deterministic
-    const randomUUIDMock = vi
-      .spyOn(context.environment, 'generateId')
-      .mockReturnValue('550e8400-e29b-41d4-a716-446655440000');
-
-    await internalIdMiddleware.execute(context, nextMock, () => null);
-
-    const stateUpdate = nextMock.mock.calls[0][0];
-    const internalId = stateUpdate.nodesToAdd![0]._internalId as string;
-
-    // Should match pattern: nodeId-uuid
-    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-    const fullPattern = /^test-node-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
-
-    expect(internalId).toMatch(fullPattern);
-
-    // Extract UUID part and verify it's a valid UUID
-    const uuidPart = internalId.replace('test-node-', '');
-    expect(uuidPart).toMatch(uuidPattern);
-
-    randomUUIDMock.mockRestore();
-  });
-
-  it('should handle nodes with complex data structures', async () => {
-    const mockNodes = [
-      {
-        id: 'complex-node',
-        position: { x: 100, y: 200 },
-        data: {
-          label: 'Test Node',
-          metadata: { type: 'custom', version: 1 },
-          nested: { deep: { value: 'test' } },
-        },
-        type: 'custom',
-        selected: true,
-        size: { width: 100, height: 50 },
-      },
-    ];
-
-    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = { nodesToAdd: mockNodes };
-
-    await internalIdMiddleware.execute(context, nextMock, () => null);
-
-    expect(nextMock).toHaveBeenCalledTimes(1);
-    const stateUpdate = nextMock.mock.calls[0][0];
-
-    expect(stateUpdate.nodesToAdd![0]._internalId).toBeDefined();
-    expect(stateUpdate.nodesToAdd![0]._internalId).toMatch(
-      /^complex-node-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-    );
-
-    // Verify all other properties are preserved
-    expect(stateUpdate.nodesToAdd![0].id).toBe('complex-node');
-    expect(stateUpdate.nodesToAdd![0].position).toEqual({ x: 100, y: 200 });
-    expect(stateUpdate.nodesToAdd![0].data).toEqual(mockNodes[0].data);
-    expect(stateUpdate.nodesToAdd![0].type).toBe('custom');
-    expect(stateUpdate.nodesToAdd![0].selected).toBe(true);
-    expect(stateUpdate.nodesToAdd![0].size).toEqual({ width: 100, height: 50 });
-  });
-
-  it('should generate _internalId for edges when edges are added', async () => {
-    const mockEdges = [
-      { id: 'edge1', source: 'node1', target: 'node2', data: {} },
-      { id: 'edge2', source: 'node2', target: 'node3', data: {} },
-    ];
-
-    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = { edgesToAdd: mockEdges };
-
-    await internalIdMiddleware.execute(context, nextMock, () => null);
-
-    expect(nextMock).toHaveBeenCalledTimes(1);
-    const stateUpdate = nextMock.mock.calls[0][0];
-
-    expect(stateUpdate.edgesToAdd).toHaveLength(2);
-    expect(stateUpdate.edgesToAdd![0]._internalId).toMatch(
-      /^edge1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-    );
-    expect(stateUpdate.edgesToAdd![1]._internalId).toMatch(
+    expect(stateUpdate.edgesToUpdate![1]._internalId).toMatch(
       /^edge2-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
     );
-
-    expect(stateUpdate.edgesToAdd![0].id).toBe('edge1');
-    expect(stateUpdate.edgesToAdd![0].source).toBe('node1');
-    expect(stateUpdate.edgesToAdd![0].target).toBe('node2');
   });
 
-  it('should always generate new _internalId for edges even if already present', async () => {
-    const mockEdges = [
-      {
-        id: 'edge1',
-        source: 'node1',
-        target: 'node2',
-        data: {},
-        _internalId: 'existing-internal-id',
-      },
-    ];
-
-    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = { edgesToAdd: mockEdges };
+  it('should always generate a new _internalId for edges even if already present', async () => {
+    setAdded([], [{ id: 'edge1', source: 'node1', target: 'node2', data: {}, _internalId: 'existing' } as Edge]);
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
 
-    expect(nextMock).toHaveBeenCalledTimes(1);
     const stateUpdate = nextMock.mock.calls[0][0];
+    expect(stateUpdate.edgesToUpdate![0]._internalId).not.toBe('existing');
+  });
 
-    expect(stateUpdate.edgesToAdd![0]._internalId).not.toBe('existing-internal-id');
-    expect(stateUpdate.edgesToAdd![0]._internalId).toMatch(
-      /^edge1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+  it('should patch nodes and edges added in the same pass', async () => {
+    setAdded(
+      [{ id: 'node1', position: { x: 0, y: 0 }, data: {} }],
+      [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }]
     );
-  });
-
-  it('should handle edges added without nodes', async () => {
-    const mockEdges = [{ id: 'edge1', source: 'node1', target: 'node2', data: {} }];
-
-    context.helpers.anyNodesAdded = vi.fn().mockReturnValue(false);
-    context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = { edgesToAdd: mockEdges };
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
 
-    expect(nextMock).toHaveBeenCalledTimes(1);
     const stateUpdate = nextMock.mock.calls[0][0];
-
-    expect(stateUpdate.edgesToAdd).toHaveLength(1);
-    expect(stateUpdate.edgesToAdd![0]._internalId).toBeDefined();
-    expect(stateUpdate.nodesToAdd).toBeUndefined();
+    expect(stateUpdate.nodesToUpdate).toHaveLength(1);
+    expect(stateUpdate.edgesToUpdate).toHaveLength(1);
   });
 
-  it('should always generate new _internalId for all nodes', async () => {
-    const mockNodes = [
-      { id: 'node1', position: { x: 0, y: 0 }, data: {} },
-      {
-        id: 'node2',
-        position: { x: 10, y: 10 },
-        data: {},
-        _internalId: 'old-id-that-should-be-replaced',
-      },
-      { id: 'node3', position: { x: 20, y: 20 }, data: {} },
-    ];
-
+  it('should emit an empty update when the added helpers report nothing despite the flags', async () => {
     context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
-    context.initialUpdate = { nodesToAdd: mockNodes };
-
-    // Mock different UUIDs for each node
-    const randomUUIDMock = vi
-      .spyOn(context.environment, 'generateId')
-      .mockReturnValueOnce('550e8400-e29b-41d4-a716-446655440000')
-      .mockReturnValueOnce('6ba7b810-9dad-11d1-80b4-00c04fd430c8')
-      .mockReturnValueOnce('7c9e6679-7425-40de-944b-e07fc1f90ae7');
+    context.helpers.getAddedNodes = vi.fn().mockReturnValue([]);
 
     await internalIdMiddleware.execute(context, nextMock, () => null);
 
     expect(nextMock).toHaveBeenCalledTimes(1);
-    const stateUpdate = nextMock.mock.calls[0][0];
-
-    // All nodes should get new _internalId values
-    expect(stateUpdate.nodesToAdd![0]._internalId).toMatch(
-      /^node1-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-    );
-    expect(stateUpdate.nodesToAdd![1]._internalId).not.toBe('old-id-that-should-be-replaced');
-    expect(stateUpdate.nodesToAdd![1]._internalId).toMatch(
-      /^node2-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-    );
-    expect(stateUpdate.nodesToAdd![2]._internalId).toMatch(
-      /^node3-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-    );
-
-    randomUUIDMock.mockRestore();
+    expect(nextMock.mock.calls[0][0]).toEqual({});
   });
 });

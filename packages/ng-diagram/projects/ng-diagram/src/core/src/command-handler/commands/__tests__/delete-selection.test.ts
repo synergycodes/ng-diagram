@@ -8,7 +8,7 @@ describe('Delete Selection Command', () => {
 
   beforeEach(() => {
     const mockModelLookup = {
-      getSelectedNodesWithChildren: vi.fn().mockReturnValue([]),
+      getAllDescendantIds: vi.fn().mockReturnValue([]),
     };
 
     flowCore = {
@@ -34,7 +34,6 @@ describe('Delete Selection Command', () => {
     ];
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
-    (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([nodes[0]]);
 
     commandHandler.emit('deleteSelection');
 
@@ -55,7 +54,6 @@ describe('Delete Selection Command', () => {
     ];
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
-    (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([]);
 
     commandHandler.emit('deleteSelection');
 
@@ -74,7 +72,6 @@ describe('Delete Selection Command', () => {
     ];
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
-    (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([nodes[1]]);
 
     commandHandler.emit('deleteSelection');
 
@@ -99,12 +96,9 @@ describe('Delete Selection Command', () => {
     ];
 
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
-
-    (flowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
-      nodes[0], // grandparent
-      nodes[1], // parent
-      nodes[2], // child
-    ]);
+    (flowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+      id === 'grandparent' ? ['parent', 'child'] : []
+    );
 
     commandHandler.emit('deleteSelection');
 
@@ -115,5 +109,84 @@ describe('Delete Selection Command', () => {
       },
       'deleteSelection'
     );
+  });
+
+  describe('hidden elements', () => {
+    it('should not delete effectively hidden selected nodes', () => {
+      const nodes = [
+        { id: 'visible', selected: true },
+        { id: 'hidden', selected: true, computedHidden: true },
+      ];
+
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges: [], metadata: {} });
+
+      commandHandler.emit('deleteSelection');
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        { nodesToRemove: ['visible'], edgesToRemove: [] },
+        'deleteSelection'
+      );
+    });
+
+    it('should not delete effectively hidden selected edges', () => {
+      const edges = [
+        { id: 'visibleEdge', selected: true, source: 'a', target: 'b' },
+        { id: 'hiddenEdge', selected: true, computedHidden: true, source: 'a', target: 'b' },
+      ];
+
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes: [], edges, metadata: {} });
+
+      commandHandler.emit('deleteSelection');
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        { nodesToRemove: [], edgesToRemove: ['visibleEdge'] },
+        'deleteSelection'
+      );
+    });
+
+    it('should not delete anything when only hidden elements are selected', () => {
+      const nodes = [{ id: 'hidden', selected: true, computedHidden: true }];
+      const edges = [{ id: 'hiddenEdge', selected: true, computedHidden: true, source: 'a', target: 'b' }];
+
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+
+      commandHandler.emit('deleteSelection');
+
+      expect(flowCore.applyUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should delete hidden descendants of a deleted visible group', () => {
+      // A collapsed group: the group is visible and selected, its children hidden.
+      const nodes = [
+        { id: 'group', selected: true },
+        { id: 'child', selected: false, computedHidden: true, groupId: 'group' },
+      ];
+
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges: [], metadata: {} });
+      (flowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+        id === 'group' ? ['child'] : []
+      );
+
+      commandHandler.emit('deleteSelection');
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        { nodesToRemove: ['group', 'child'], edgesToRemove: [] },
+        'deleteSelection'
+      );
+    });
+
+    it('should delete hidden edges connected to deleted nodes so they do not dangle', () => {
+      const nodes = [{ id: 'node1', selected: true }];
+      const edges = [{ id: 'hiddenEdge', selected: false, computedHidden: true, source: 'node1', target: 'other' }];
+
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+
+      commandHandler.emit('deleteSelection');
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        { nodesToRemove: ['node1'], edgesToRemove: ['hiddenEdge'] },
+        'deleteSelection'
+      );
+    });
   });
 });

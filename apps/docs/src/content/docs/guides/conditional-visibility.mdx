@@ -1,0 +1,102 @@
+---
+title: Conditional Visibility
+description: How to hide nodes, edges, ports and labels — the hidden flag, template inputs, @if, and why raw CSS display none is discouraged
+version: 'since v1.4.0'
+sidebar:
+  badge: New
+---
+
+ngDiagram treats hidden content as a first-class concept. Nodes and edges can be hidden through the model, every template can hide its element declaratively, and ports and edge labels have their own `hidden` inputs — all without blocking initialization or corrupting measurements.
+
+## Hiding nodes and edges with the `hidden` flag
+
+Set `hidden` in the model or toggle it at runtime:
+
+```typescript
+// Collapse a group: hide its children (the group hides descendants automatically
+// when the group itself is hidden — here we keep the group visible and hide
+// the children explicitly)
+await this.modelService.updateNodes(childIds.map((id) => ({ id, hidden: true })));
+
+// Expand
+await this.modelService.updateNodes(childIds.map((id) => ({ id, hidden: false })));
+```
+
+Hiding a **group** hides all of its descendants; hiding a **node** hides every edge connected to it. There is no need to touch the edges yourself.
+
+:::caution
+Upgrading from a version before 1.4.0: the library now owns the `hidden` property name on nodes and edges. If your application already stored `hidden: true` on elements for its own purposes, those elements will disappear from the diagram after the upgrade.
+:::
+
+## Hiding nodes and edges with the `ngDiagramHidden` directive
+
+Use the `NgDiagramHiddenDirective` inside a node or edge template when visibility is view-state rather than model data:
+
+```html
+<!-- inside a custom node template -->
+<div class="my-node" [ngDiagramHidden]="collapsed()">
+  <!-- content -->
+</div>
+```
+
+Model flag, template binding, or inheritance — **any source hides the element**, and everything downstream reads the same effective visibility.
+
+For bulk operations prefer the model `hidden` flag: a single `updateNodes` call updates any number of elements in one pass, while template bindings are per-element (their updates are coalesced per change-detection cycle, but the model path is still the cheaper and virtualization-safe choice).
+
+## Hiding ports and edge labels with the `hidden` input
+
+Ports and labels are declared in templates, not in the model, so they are hidden declaratively — independently of their owner:
+
+```html
+<ng-diagram-port id="out" side="right" type="source" [hidden]="!editMode()" />
+
+<ng-diagram-base-edge-label [id]="labelId" [positionOnEdge]="0.5" [hidden]="!showLabels()">
+  <!-- label content -->
+</ng-diagram-base-edge-label>
+```
+
+The static attribute form works too — a bare `hidden` attribute means hidden, matching native HTML semantics.
+
+A hidden port is not a linking target or a port-snap candidate, and starting a link from it is ignored. **Edges attached to a hidden port keep the port's last measured geometry as their anchor** — if the edge should disappear with the port, hide the edge itself via its `hidden` flag.
+
+## Choosing a pattern
+
+Three patterns hide content, with different semantics:
+
+| Pattern                 | Element exists?     | Measurement-safe?                   | When to use                                                                                                                                                     |
+| ----------------------- | ------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hidden` flag / input   | Yes, `display:none` | ✅ No init cost, instant re-measure | Expand/collapse, edit modes, filtering — anything toggled at runtime                                                                                            |
+| `@if` (unmounting)      | No                  | ✅ Never registers for measurement  | Content that should genuinely not exist. Note: an unmounted port disappears from `measuredPorts`, so attached edges lose their anchor and fall back to the node |
+| raw CSS `display: none` | Yes                 | ⚠️ Discouraged                      | Avoid. Initialization cannot tell "hidden" from "not measured yet", so every load pays the measurement timeout (2 s) before finishing                           |
+
+The `hidden` flag/input is the supported pattern: the declarative signal is what lets the measurement system skip the element at init and clear pending expectations when it is hidden at runtime.
+
+## How it works
+
+### `hidden` vs `computedHidden`
+
+- **`hidden`**: an optional flag on nodes and edges that you set. Absent means visible.
+- **`computedHidden`**: the **effective visibility** computed by the system. A node is effectively hidden when its own flag (or a template-level binding) is set **or any ancestor group is hidden**; an edge is effectively hidden when its own flag/binding is set **or either endpoint node is effectively hidden**. This property is read-only and not persisted.
+
+### What hiding does
+
+Effectively hidden elements:
+
+- stay mounted in the DOM as `display: none` — they keep their geometry and re-measure automatically when unhidden;
+- never block initialization or `waitForMeasurements`;
+- are excluded from every _interactive_ surface: hit-testing, `selectAll`, keyboard move, drag, box selection, linking, `zoomToFit` bounds, the minimap, virtualization and edge routing. Programmatic APIs (`select`, `centerOnNode`, `bringToFront`/`sendToBack`, group APIs) deliberately do **not** filter hidden elements — acting on them is your call;
+- keep their `selected` flag (hiding does not deselect), but cannot be moved, and `deleteSelection` skips hidden selected elements. Deleting a visible group still deletes its hidden children, and deleting a node still removes its hidden edges.
+
+The library never sets an inline `display` value on **visible** nodes, edges or labels, so your own CSS stays in charge of them. (Ports are the one exception: the port component has always managed its own inline `display` as part of its rendering lifecycle — use the port's `hidden` input rather than CSS to hide it.)
+
+## Virtualization
+
+With [virtualization](/docs/guides/virtualization) enabled, effectively hidden elements are **unmounted** (removed from the virtualized render set) rather than kept as `display: none`. This is functionally equivalent — geometry, ports and labels survive in the model and re-measure on unhide — with one consequence: `NgDiagramHiddenDirective` is **not supported under virtualization**, because hiding would unmount the very template that declares the binding. The directive is then ignored with a console warning — use the model-level `hidden` flag instead. The `hidden` inputs on ports and edge labels keep working (their owner stays mounted while visible).
+
+## Clipboard
+
+Copying (or cutting) nodes also copies their descendants and the edges between copied nodes — so a collapsed group travels through the clipboard with its hidden children and internal wiring intact. Effectively hidden _selected_ elements are skipped by copy, consistent with `deleteSelection`. Pasted hidden content is not selected, so a paste can never create an invisible selection.
+
+## Persistence
+
+`hidden` is your data — it survives `toJSON()` and model initialization. `computedHidden` is a runtime property and is stripped automatically.

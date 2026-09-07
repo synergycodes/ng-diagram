@@ -9,7 +9,7 @@ title: "stripEdgeRuntimeProperties"
 > **stripEdgeRuntimeProperties**(`edge`): [`Edge`](/docs/api/types/model/edge/)
 
 Strips runtime-computed properties from an edge
-(`sourcePosition`, `targetPosition`, `measuredLabels`, `computedZIndex`, `_internalId`).
+(`sourcePosition`, `targetPosition`, `measuredLabels`, `computedZIndex`, `computedHidden`, `_internalId`).
 
 These properties are recomputed during initialization and stale values
 from persistence cause the measurement system to skip fresh DOM measurement.

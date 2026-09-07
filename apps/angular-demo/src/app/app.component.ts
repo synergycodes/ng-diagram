@@ -40,6 +40,7 @@ import { defaultModel } from './data/default-model';
 import { downloadedModel } from './data/downloaded-model';
 import { generateDynamicPortsTestModel } from './data/dynamic-ports-test-model';
 import { generateModel } from './data/generate-model';
+import { createHiddenElementsModel } from './data/hidden-elements-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
 import { virtualizationConfigOverrides, virtualizationTestConfig } from './data/virtualization-test.config';
@@ -47,11 +48,13 @@ import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.com
 import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
 import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
 import { DefaultLabelledEdgeComponent } from './edge-template/default-labelled-edge/default-labelled-edge.component';
+import { HiddenLabelEdgeComponent } from './edge-template/hidden-label-edge/hidden-label-edge.component';
 import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
 import { MeasurementTestsComponent } from './measurement-tests/measurement-tests.component';
 import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap-node/image-minimap-node.component';
 import { PaletteComponent } from './palette/palette.component';
 import { BatchTestToolbarComponent } from './toolbar/batch-test-toolbar.component';
+import { HiddenElementsToolbarComponent } from './toolbar/hidden-elements-toolbar.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
 const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
@@ -63,6 +66,7 @@ const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
   imports: [
     ToolbarComponent,
     BatchTestToolbarComponent,
+    HiddenElementsToolbarComponent,
     MeasurementTestsComponent,
     AwaitableTestsComponent,
     PaletteComponent,
@@ -85,6 +89,7 @@ export class AppComponent {
     ['labelled-edge', LabelledEdgeComponent],
     ['dashed-edge', DashedEdgeComponent],
     ['default-labelled-edge', DefaultLabelledEdgeComponent],
+    ['hidden-label-edge', HiddenLabelEdgeComponent],
   ]);
 
   minimapNodeTemplateMap = new NgDiagramMinimapNodeTemplateMap([['image', ImageMinimapNodeComponent]]);
@@ -168,6 +173,26 @@ export class AppComponent {
   }
 
   private savedModelData: Partial<{ nodes: Node[]; edges: Edge[] }> | null = null;
+
+  hiddenElementsDemoMode = signal(false);
+
+  /** Hidden-elements demo: reveals hidden elements as translucent ghosts. */
+  revealHiddenGhosts = signal(false);
+
+  enterHiddenElementsDemo(): void {
+    this.savedModelData = this.modelData();
+    this.hiddenElementsDemoMode.set(true);
+    this.modelData.set(createHiddenElementsModel());
+  }
+
+  exitHiddenElementsDemo(): void {
+    this.hiddenElementsDemoMode.set(false);
+    this.revealHiddenGhosts.set(false);
+    if (this.savedModelData) {
+      this.modelData.set(this.savedModelData);
+      this.savedModelData = null;
+    }
+  }
 
   enterBatchTest(): void {
     this.savedModelData = this.modelData();

@@ -206,3 +206,17 @@ import MultipleLabels from '@components/angular/edges/labels/multiple-labels/mul
 <MultipleLabels />
 
 <CodeSnippet relativePath="edges/labels/multiple-labels/multiple-labels-edge.component.ts" />
+
+## Visibility
+
+Labels are declared in templates, so they are hidden declaratively through the `hidden` input — independently of their owning edge:
+
+```html
+<ng-diagram-base-edge-label [id]="labelId" [positionOnEdge]="0.5" [hidden]="!showLabels()">
+  <!-- label content -->
+</ng-diagram-base-edge-label>
+```
+
+The static attribute form works too — a bare `hidden` attribute means hidden, matching native HTML semantics. A hidden label stays mounted, keeps its measured geometry, and never blocks initialization.
+
+See [Conditional Visibility](/docs/guides/conditional-visibility) for the full semantics and how hiding interacts with measurement.

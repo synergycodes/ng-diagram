@@ -13,7 +13,7 @@ import { MinimapNodeCache } from './minimap-node-cache';
 
 /**
  * Minimap strategy for direct (non-virtualized) rendering mode.
- * All rendered nodes are displayed on the minimap.
+ * All effectively visible rendered nodes are displayed on the minimap.
  * Diagram bounds are computed from rendered nodes using measuredBounds.
  */
 @Injectable()
@@ -29,14 +29,21 @@ export class DirectMinimapStrategy implements MinimapStrategy {
   ): MinimapNodeData[] {
     this.invalidateCacheIfNeeded(styleFn, templateMap);
 
-    return this.renderer.nodes().map((node) =>
-      this.cache.getOrCompute(node, () => ({
-        bounds: extractNodeBounds(node),
-        diagramNode: node,
-        nodeStyle: styleFn?.(node) ?? {},
-        template: node.type ? (templateMap.get(node.type) ?? null) : null,
-      }))
-    );
+    // Effectively hidden nodes stay mounted on the canvas (display: none), so
+    // they are still present in renderer.nodes() — visibility must be read
+    // from computedHidden. Filtering before the map covers default rectangles
+    // and custom templates alike (templates render only for computed data).
+    return this.renderer
+      .nodes()
+      .filter((node) => !node.computedHidden)
+      .map((node) =>
+        this.cache.getOrCompute(node, () => ({
+          bounds: extractNodeBounds(node),
+          diagramNode: node,
+          nodeStyle: styleFn?.(node) ?? {},
+          template: node.type ? (templateMap.get(node.type) ?? null) : null,
+        }))
+      );
   }
 
   computeDiagramBounds(): Rect {

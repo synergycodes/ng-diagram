@@ -116,6 +116,7 @@ describe('Edge Routing Helper Functions', () => {
         'routing',
         'routingMode',
         'measuredLabels',
+        'computedHidden',
       ]);
     });
 
@@ -197,6 +198,27 @@ describe('Edge Routing Helper Functions', () => {
 
       expect(result).toBe(true);
       expect(mockHelpers.checkIfEdgeAdded).toHaveBeenCalledWith('edge-4');
+    });
+
+    it('should return false for an edge with computedHidden even when the edge or nodes changed', () => {
+      const edge: Edge = { ...mockEdge, id: 'edge-1', computedHidden: true };
+      mockHelpers.checkIfEdgeAdded = vi.fn().mockReturnValue(true);
+      mockHelpers.checkIfEdgeChanged = vi.fn().mockReturnValue(true);
+      mockHelpers.checkIfNodeChanged = vi.fn().mockReturnValue(true);
+
+      const result = shouldRouteEdge(edge, mockHelpers, ['updateEdges']);
+
+      expect(result).toBe(false);
+    });
+
+    it('should return false for an edge with computedHidden even on init', () => {
+      const edge: Edge = { ...mockEdge, computedHidden: true };
+      mockHelpers.checkIfEdgeChanged = vi.fn().mockReturnValue(false);
+      mockHelpers.checkIfNodeChanged = vi.fn().mockReturnValue(false);
+
+      const result = shouldRouteEdge(edge, mockHelpers, ['init']);
+
+      expect(result).toBe(false);
     });
   });
 

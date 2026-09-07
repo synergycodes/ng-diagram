@@ -715,6 +715,81 @@ describe('Resize Node Command', () => {
       );
     });
 
+    it('should exclude effectively hidden children from the resize constraints', async () => {
+      mockIsGroup.mockReturnValue(true);
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
+        id: 'group1',
+        size: { width: 400, height: 300 },
+        position: { x: 100, y: 100 },
+        isGroup: true,
+        selected: true,
+        highlighted: false,
+      } as GroupNode);
+
+      const visibleChild = { id: 'visible', position: { x: 120, y: 120 }, size: { width: 50, height: 50 } };
+      const hiddenChild = {
+        id: 'hidden',
+        position: { x: 900, y: 900 },
+        size: { width: 100, height: 100 },
+        computedHidden: true,
+      };
+      (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue([visibleChild, hiddenChild]);
+      mockCalculateGroupBounds.mockReturnValue({ left: 120, top: 120, right: 170, bottom: 170 });
+
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: 'group1',
+        size: { width: 200, height: 200 },
+        position: { x: 100, y: 100 },
+      });
+
+      // The bounds floor is computed from visible children only — a collapsed
+      // group must not be blocked by invisible content.
+      expect(mockCalculateGroupBounds).toHaveBeenCalledWith([visibleChild], expect.anything(), expect.anything());
+    });
+
+    it('should fall back to single node resize when all children are hidden', async () => {
+      mockIsGroup.mockReturnValue(true);
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({
+        id: 'group1',
+        size: { width: 400, height: 300 },
+        position: { x: 100, y: 100 },
+        isGroup: true,
+        selected: true,
+        highlighted: false,
+      } as GroupNode);
+
+      const hiddenChild = {
+        id: 'hidden',
+        position: { x: 900, y: 900 },
+        size: { width: 100, height: 100 },
+        computedHidden: true,
+      };
+      (flowCore.modelLookup.getNodeChildren as ReturnType<typeof vi.fn>).mockReturnValue([hiddenChild]);
+
+      await resizeNode(commandHandler, {
+        name: 'resizeNode',
+        id: 'group1',
+        size: { width: 200, height: 200 },
+        position: { x: 100, y: 100 },
+      });
+
+      // No constraint math runs against invisible content.
+      expect(mockCalculateGroupBounds).not.toHaveBeenCalled();
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToUpdate: [
+            {
+              id: 'group1',
+              size: { width: 200, height: 200 },
+              position: { x: 100, y: 100 },
+            },
+          ],
+        },
+        'resizeNode'
+      );
+    });
+
     it('should fallback to single node resize when group has no children', async () => {
       mockIsGroup.mockReturnValue(true);
       (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockReturnValue({

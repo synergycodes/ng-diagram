@@ -4,6 +4,7 @@ import { TransactionContext } from '../../../types/transaction.interface';
 import { Point } from '../../../types/utils';
 import { isGroup, isSamePoint, sortNodesByZIndex } from '../../../utils';
 import { EventHandler } from '../event-handler';
+import { getMovableSelection } from '../movable-selection';
 import { PointerMoveSelectionEvent } from './pointer-move-selection.event';
 
 export const MOVE_THRESHOLD = 5; // px of pointer travel before a click becomes a drag
@@ -50,7 +51,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       }
       case 'continue': {
         const selectedNodesWithChildren = this.draggableSelection();
-        const selectedNodes = this.flow.modelLookup.getSelectedNodes();
+        const selectedNodes = this.visibleSelection();
         // Un-awaited handle() calls interleave at every await (see EventHandler.handle)
         // — snapshot values before the first suspension and re-validate the gesture
         // after it, or moves get double-applied.
@@ -219,9 +220,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
 
   /** Selected nodes (with children) that can actually be dragged. */
   private draggableSelection(): Node[] {
-    return this.flow.modelLookup
-      .getSelectedNodesWithChildren({ directOnly: false })
-      .filter((node) => node.draggable ?? true);
+    return getMovableSelection(this.flow);
   }
 
   private updateGroupHighlightOnDrag(tx: TransactionContext, point: Point, selectedNodes: Node[]): void {
@@ -255,9 +254,19 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
     return sortedGroups[0];
   }
 
+  /**
+   * The visible selected nodes — the set group interactions act on.
+   * A still-selected but effectively hidden node did not take part in the
+   * gesture and must not be re-parented (addToGroup/removeFromGroup) or
+   * influence the group highlight.
+   */
+  private visibleSelection(): Node[] {
+    return this.flow.modelLookup.getSelectedNodes().filter((node) => !node.computedHidden);
+  }
+
   private async handleDrop(point: Point) {
     const topLevelGroupNode = this.getTopGroupAtPoint(point);
-    const selectedNodes = this.flow.modelLookup.getSelectedNodes();
+    const selectedNodes = this.visibleSelection();
 
     if (!topLevelGroupNode) {
       for (const node of selectedNodes) {

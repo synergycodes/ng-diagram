@@ -44,6 +44,27 @@ Whether the size of the node is automatically resized based on the content.
 
 ***
 
+### computedHidden?
+
+> `readonly` `optional` **computedHidden**: `boolean`
+
+#### Remarks
+
+ComputedHidden is computed by the system and should not be set manually.
+The effective visibility applied to the node: true when its own `hidden`
+flag (or a template-level hidden binding) is set, or when any ancestor
+group is effectively hidden.
+
+#### Since
+
+1.4.0
+
+#### Inherited from
+
+[`SimpleNode`](/docs/api/types/model/simplenode/).[`computedHidden`](/docs/api/types/model/simplenode/#computedhidden)
+
+***
+
 ### computedZIndex?
 
 > `readonly` `optional` **computedZIndex**: `number`
@@ -94,6 +115,40 @@ The id of the parent node.
 #### Inherited from
 
 [`SimpleNode`](/docs/api/types/model/simplenode/).[`groupId`](/docs/api/types/model/simplenode/#groupid)
+
+***
+
+### hidden?
+
+> `optional` **hidden**: `boolean`
+
+Whether the node is hidden. Absent means visible.
+
+Hidden nodes keep their geometry, do not block initialization or
+measurement waits, and are excluded from every interactive surface
+(hit-testing, select-all, box selection, keyboard move, drag, linking,
+zoomToFit bounds, edge routing). In the default render mode they stay
+mounted in the DOM as `display: none`; with virtualization enabled they
+are unmounted instead (geometry survives in the model and re-measures on
+unhide). Hiding a group hides all of its descendants; hiding a node hides
+the edges connected to it.
+
+Programmatic APIs (e.g. `select`, `centerOnNode`, z-order commands) do
+not filter hidden elements — acting on them is the caller's prerogative.
+
+Set by the user; the library only reads it.
+
+#### See
+
+[computedHidden](/docs/api/types/model/simplenode/#computedhidden) for the derived effective visibility.
+
+#### Since
+
+1.4.0
+
+#### Inherited from
+
+[`SimpleNode`](/docs/api/types/model/simplenode/).[`hidden`](/docs/api/types/model/simplenode/#hidden)
 
 ***
 

@@ -36,6 +36,11 @@ export class VisibleElementsResolver {
       const node = nodesMap.get(nodeId);
       if (node && isGroup(node)) {
         for (const descendantId of this.flowCore.modelLookup.getAllDescendantIds(nodeId)) {
+          // This path bypasses the spatial hash — effectively hidden
+          // descendants must not be re-added to the render set.
+          if (nodesMap.get(descendantId)?.computedHidden) {
+            continue;
+          }
           nodeIds.add(descendantId);
         }
       }
@@ -61,10 +66,19 @@ export class VisibleElementsResolver {
           continue;
         }
 
+        // This path bypasses the spatial hash — effectively hidden edges must
+        // not be rendered nor re-add their external endpoints.
+        if (edge.computedHidden) {
+          continue;
+        }
+
         edges.push(edge);
         edgeIds.add(edge.id);
 
-        // Add external nodes (endpoints not in primary visible set)
+        // Add external nodes (endpoints not in primary visible set). These are
+        // never effectively hidden: an edge with a hidden endpoint is itself
+        // hidden (skipped above), so buildNodeList needs no re-filter. If that
+        // derivation rule ever gains an override, this path must filter too.
         if (!primaryVisibleIds.has(edge.source)) {
           externalNodeIds.add(edge.source);
         }

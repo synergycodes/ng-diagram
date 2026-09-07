@@ -26,27 +26,33 @@ export function assignInternalId<T extends Pick<Node, 'id'>>(
  * The _internalId is used by Angular's trackBy function to force view recreation when nodes
  * or edges with the same id are deleted and re-added. This ensures that ng-diagram-port and
  * edge label components properly reinitialize and get measured correctly.
+ *
+ * Emits `nodesToUpdate`/`edgesToUpdate` PATCHES carrying only `_internalId`
+ * (never a re-emit of the initial update): re-adding the whole element objects
+ * from `initialUpdate` would silently revert any property another middleware
+ * stamped on the added elements earlier in the pass.
  * @internal
  */
 export const internalIdMiddleware: Middleware = {
   name: 'internal-id-assignment',
   execute: async (context, next) => {
-    const { helpers, initialUpdate, environment } = context;
+    const { helpers, environment } = context;
 
     if (!helpers.anyNodesAdded() && !helpers.anyEdgesAdded()) {
       next();
       return;
     }
 
-    const nodesToAdd = initialUpdate.nodesToAdd?.map((node) => assignInternalId(node, () => environment.generateId()));
-    const edgesToAdd = initialUpdate.edgesToAdd?.map((edge) => assignInternalId(edge, () => environment.generateId()));
+    const nodesToUpdate: FlowStateUpdate['nodesToUpdate'] = helpers
+      .getAddedNodes()
+      .map((node) => assignInternalId({ id: node.id }, () => environment.generateId()));
+    const edgesToUpdate: FlowStateUpdate['edgesToUpdate'] = helpers
+      .getAddedEdges()
+      .map((edge) => assignInternalId({ id: edge.id }, () => environment.generateId()));
 
-    const stateUpdate: FlowStateUpdate = {
-      ...initialUpdate,
-      ...(nodesToAdd ? { nodesToAdd } : {}),
-      ...(edgesToAdd ? { edgesToAdd } : {}),
-    };
-
-    next(stateUpdate);
+    next({
+      ...(nodesToUpdate.length ? { nodesToUpdate } : {}),
+      ...(edgesToUpdate.length ? { edgesToUpdate } : {}),
+    });
   },
 };

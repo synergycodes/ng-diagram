@@ -27,7 +27,16 @@ const validateTarget = (
     return { isValid: false, targetNode: null, targetPosition: null };
   }
 
-  if (targetPortId && targetNode.measuredPorts?.find((port) => port.id === targetPortId)?.type === 'source') {
+  // Effectively hidden nodes and hidden ports are not linking targets.
+  if (targetNode.computedHidden) {
+    return { isValid: false, targetNode, targetPosition: null };
+  }
+
+  if (
+    targetPortId &&
+    (targetNode.measuredPorts?.find((port) => port.id === targetPortId)?.type === 'source' ||
+      commandHandler.flowCore.templateVisibilityRegistry?.isPortHidden(targetNode.id, targetPortId))
+  ) {
     return { isValid: false, targetNode, targetPosition: null };
   }
 
@@ -71,6 +80,15 @@ export const finishLinking = async (commandHandler: CommandHandler, command: Fin
 
     if (!targetNodeId) {
       linking.cancelReason = 'noTarget';
+      await runCancelledFinishPass(commandHandler);
+      return;
+    }
+
+    // The source can become effectively hidden mid-gesture (a model update
+    // while the user drags). Mirror startLinking's guard — a hidden source
+    // must not silently produce an invisible edge.
+    if (commandHandler.flowCore.getNodeById(source)?.computedHidden) {
+      linking.cancelReason = 'cancelled';
       await runCancelledFinishPass(commandHandler);
       return;
     }

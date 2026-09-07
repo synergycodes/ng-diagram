@@ -280,11 +280,15 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * (rendered), and the result can extend beyond the raw node rects by the port extents.
    * Edges contribute their routed `points` and measured labels.
    *
+   * @remarks Since 1.4.0, effectively hidden elements (`computedHidden`) are excluded — their
+   * stale geometry does not inflate the result. An input consisting only of hidden elements
+   * yields the same zero-size rectangle at the origin as an unmeasured input.
+   *
    * @param nodes Array of nodes
    * @param edges Array of edges
-   * @returns Bounding rectangle containing all nodes and edges. When there is nothing to
-   * measure — both arrays are empty, no node has `measuredBounds`, and no edge has `points` —
-   * returns a zero-size rectangle at the origin (`{ x: 0, y: 0, width: 0, height: 0 }`).
+   * @returns Bounding rectangle containing all visible nodes and edges. When there is nothing to
+   * measure — both arrays are empty, no visible node has `measuredBounds`, and no visible edge
+   * has `points` — returns a zero-size rectangle at the origin (`{ x: 0, y: 0, width: 0, height: 0 }`).
    */
   computePartsBounds(nodes: Node[], edges: Edge[]): Rect {
     return calculatePartsBounds(nodes, edges) ?? { x: 0, y: 0, width: 0, height: 0 };

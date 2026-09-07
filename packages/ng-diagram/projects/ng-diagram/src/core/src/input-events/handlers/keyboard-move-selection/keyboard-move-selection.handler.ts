@@ -1,6 +1,7 @@
 import { Bounds, Direction, DIRECTIONS, Node, Point } from '../../../types';
 import { getRotatedBoundingRect, snapNodePosition } from '../../../utils';
 import { EventHandler } from '../event-handler';
+import { getMovableSelection } from '../movable-selection';
 import { KeyboardMoveSelectionEvent } from './keyboard-move-selection.event';
 
 /** @internal */
@@ -23,9 +24,7 @@ const DIRECTION_VECTORS: Record<Direction, Point> = {
 
 export class KeyboardMoveSelectionEventHandler extends EventHandler<KeyboardMoveSelectionEvent> {
   handle(event: KeyboardMoveSelectionEvent): void {
-    const nodesToMove = this.flow.modelLookup
-      .getSelectedNodesWithChildren({ directOnly: false })
-      .filter((node) => node.draggable ?? true);
+    const nodesToMove = getMovableSelection(this.flow);
     if (nodesToMove.length === 0) {
       return;
     }

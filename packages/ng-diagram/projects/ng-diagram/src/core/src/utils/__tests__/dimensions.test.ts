@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Edge, Node } from '../../types';
+import { TemplateVisibilityRegistry } from '../../visibility/template-visibility-registry';
 import { calculatePartsBounds, getEdgeMeasuredBounds, getNodeMeasuredBounds } from '../dimensions';
 
 describe('dimensions', () => {
@@ -571,6 +572,74 @@ describe('dimensions', () => {
         height: 130,
       });
     });
+
+    it('should exclude registry-hidden ports from the bounds', () => {
+      const registry = new TemplateVisibilityRegistry();
+      registry.setPortHidden('node-1', 'port-1', true);
+
+      const node: Node = {
+        id: 'node-1',
+        position: { x: 100, y: 100 },
+        size: { width: 100, height: 100 },
+        data: {},
+        measuredPorts: [
+          // Measured earlier, hidden afterwards — must not extend the frame.
+          {
+            id: 'port-1',
+            position: { x: -10, y: 50 },
+            size: { width: 20, height: 10 },
+            type: 'both',
+            nodeId: 'node-1',
+            side: 'left',
+          },
+          {
+            id: 'port-2',
+            position: { x: 90, y: 45 },
+            size: { width: 20, height: 10 },
+            type: 'both',
+            nodeId: 'node-1',
+            side: 'right',
+          },
+        ],
+      };
+
+      const result = getNodeMeasuredBounds(node, registry);
+
+      expect(result).toEqual({
+        x: 100,
+        y: 100,
+        width: 110,
+        height: 100,
+      });
+    });
+
+    it('should include all ports when no registry is provided', () => {
+      const node: Node = {
+        id: 'node-1',
+        position: { x: 100, y: 100 },
+        size: { width: 100, height: 100 },
+        data: {},
+        measuredPorts: [
+          {
+            id: 'port-1',
+            position: { x: -10, y: 50 },
+            size: { width: 20, height: 10 },
+            type: 'both',
+            nodeId: 'node-1',
+            side: 'left',
+          },
+        ],
+      };
+
+      const result = getNodeMeasuredBounds(node);
+
+      expect(result).toEqual({
+        x: 90,
+        y: 100,
+        width: 110,
+        height: 100,
+      });
+    });
   });
 
   describe('calculatePartsBounds', () => {
@@ -809,6 +878,101 @@ describe('dimensions', () => {
       expect(result!.y).toBeCloseTo(-3.033, 1);
       expect(result!.width).toBeCloseTo(106.066, 1);
       expect(result!.height).toBeCloseTo(106.066, 1);
+    });
+
+    it('should exclude nodes with computedHidden from the bounds', () => {
+      const nodes: Node[] = [
+        {
+          id: 'node-1',
+          position: { x: 0, y: 0 },
+          size: { width: 50, height: 50 },
+          data: {},
+          measuredBounds: { x: 0, y: 0, width: 50, height: 50 },
+        },
+        {
+          id: 'node-2',
+          position: { x: 1000, y: 1000 },
+          size: { width: 50, height: 50 },
+          data: {},
+          measuredBounds: { x: 1000, y: 1000, width: 50, height: 50 },
+          computedHidden: true,
+        },
+      ];
+
+      const result = calculatePartsBounds(nodes, []);
+
+      expect(result).toEqual({
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 50,
+      });
+    });
+
+    it('should exclude edges with computedHidden from the bounds', () => {
+      const nodes: Node[] = [
+        {
+          id: 'node-1',
+          position: { x: 0, y: 0 },
+          size: { width: 50, height: 50 },
+          data: {},
+          measuredBounds: { x: 0, y: 0, width: 50, height: 50 },
+        },
+      ];
+
+      const edges: Edge[] = [
+        {
+          id: 'edge-1',
+          source: 'node-1',
+          target: 'node-2',
+          data: {},
+          points: [
+            { x: 500, y: 500 },
+            { x: 1000, y: 1000 },
+          ],
+          computedHidden: true,
+        },
+      ];
+
+      const result = calculatePartsBounds(nodes, edges);
+
+      expect(result).toEqual({
+        x: 0,
+        y: 0,
+        width: 50,
+        height: 50,
+      });
+    });
+
+    it('should return null when all elements have computedHidden', () => {
+      const nodes: Node[] = [
+        {
+          id: 'node-1',
+          position: { x: 0, y: 0 },
+          size: { width: 50, height: 50 },
+          data: {},
+          measuredBounds: { x: 0, y: 0, width: 50, height: 50 },
+          computedHidden: true,
+        },
+      ];
+
+      const edges: Edge[] = [
+        {
+          id: 'edge-1',
+          source: 'node-1',
+          target: 'node-2',
+          data: {},
+          points: [
+            { x: 10, y: 20 },
+            { x: 50, y: 60 },
+          ],
+          computedHidden: true,
+        },
+      ];
+
+      const result = calculatePartsBounds(nodes, edges);
+
+      expect(result).toBeNull();
     });
 
     it('should ignore edges with no points', () => {

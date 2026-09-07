@@ -25,6 +25,30 @@ The `NgDiagramPortComponent` represents a single port on a node within the diagr
 
 ## Properties
 
+### hidden
+
+> **hidden**: `InputSignalWithTransform`\<`boolean`, `unknown`\>
+
+Whether the port is hidden. Defaults to false.
+
+A hidden port stays mounted as `display: none`, creates no measurement
+expectation (it never blocks initialization or `waitForMeasurements`),
+and is excluded as a linking target and port-snap candidate. Unhiding
+re-measures it automatically.
+
+Edges attached to a hidden port keep the port's last measured geometry
+as their anchor; hide the edge itself via its `hidden` flag if it should
+disappear with the port.
+
+Accepts the static attribute form too: a bare `hidden` attribute means
+hidden, matching native HTML semantics.
+
+#### Since
+
+1.4.0
+
+***
+
 ### id
 
 > **id**: `InputSignal`\<`string`\>

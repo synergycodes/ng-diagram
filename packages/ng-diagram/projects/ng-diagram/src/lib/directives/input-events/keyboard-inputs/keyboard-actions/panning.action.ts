@@ -18,7 +18,9 @@ export class PanningAction implements KeyboardAction {
     return (
       flowCore.config.viewportPanningEnabled &&
       shortcut.actionName.startsWith('keyboardPan') &&
-      flowCore.modelLookup.getSelectedNodes().length === 0
+      // Mirror of MovingAction: a selection of only effectively hidden nodes
+      // cannot be moved, so the arrows fall through to panning.
+      !flowCore.modelLookup.getSelectedNodes().some((node) => !node.computedHidden)
     );
   }
 

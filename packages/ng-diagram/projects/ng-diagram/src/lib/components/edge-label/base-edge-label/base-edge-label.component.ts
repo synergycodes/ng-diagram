@@ -1,4 +1,5 @@
 import {
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -41,6 +42,9 @@ import { NgDiagramBaseEdgeComponent } from '../../edge/base-edge/base-edge.compo
   host: {
     '[style.transform]': 'transform',
     '[style.visibility]': 'isVisible() ? null : "hidden"',
+    // Declarative hidden input — the label stays mounted so unhiding
+    // re-measures through the existing ResizeObserver path.
+    '[style.display]': 'hidden() ? "none" : null',
   },
 })
 export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
@@ -58,6 +62,20 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
    * The relative position of the label along the edge (from 0 to 1).
    */
   positionOnEdge = input.required<EdgeLabel['positionOnEdge']>();
+
+  /**
+   * Whether the label is hidden. Defaults to false.
+   *
+   * A hidden label stays mounted as `display: none` and creates no
+   * measurement expectation (it never blocks initialization or
+   * `waitForMeasurements`). Unhiding re-measures it automatically.
+   *
+   * Accepts the static attribute form too: a bare `hidden` attribute means
+   * hidden, matching native HTML semantics.
+   *
+   * @since 1.4.0
+   */
+  hidden = input(false, { transform: booleanAttribute });
 
   readonly edgeData = computed(() => this.edgeComponent.edge());
   readonly points = computed(() => this.edgeData()?.points);
@@ -95,6 +113,8 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     return `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%)`;
   }
 
+  private isRegistered = false;
+
   constructor() {
     effect(() => {
       const newPositionOnEdge = this.positionOnEdge();
@@ -111,6 +131,17 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
           ]);
       }
     });
+
+    effect(() => {
+      const hidden = this.hidden();
+      const edgeId = untracked(() => this.edgeId());
+      if (!this.isRegistered || !edgeId) return;
+      // Runtime toggles; the initial value is written in ngOnInit BEFORE the
+      // label registers for measurement. The registry write only schedules a
+      // coalesced flush (FlowCore defers the prune and the middleware pass to
+      // a microtask), so it is safe inside the reactive context.
+      this.flowCoreProvider.provide().templateVisibilityRegistry?.setLabelHidden(edgeId, this.id(), hidden);
+    });
   }
 
   /** @internal */
@@ -118,6 +149,14 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     this.lastPositionOnEdge.set(this.positionOnEdge());
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.ownerInternalId = (this.edgeData() as any)?._internalId;
+
+    // Declare hidden state BEFORE registering for measurement so a hidden
+    // label never creates an init measurement expectation.
+    if (this.hidden()) {
+      this.flowCoreProvider.provide().templateVisibilityRegistry?.setLabelHidden(this.edgeId(), this.id(), true);
+    }
+    this.isRegistered = true;
+
     this.flowCoreProvider.provide().updater.addEdgeLabel(this.edgeId(), {
       id: this.id(),
       positionOnEdge: this.positionOnEdge(),
@@ -156,6 +195,9 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
     if (this.ownerInternalId && (currentEdge as any)._internalId !== this.ownerInternalId) {
       return;
     }
+
+    // This instance owns the registry entry — clear its hidden declaration.
+    flowCore.templateVisibilityRegistry?.setLabelHidden(edgeId, this.id(), false);
 
     flowCore.updater.deleteEdgeLabel(edgeId, this.id());
   }

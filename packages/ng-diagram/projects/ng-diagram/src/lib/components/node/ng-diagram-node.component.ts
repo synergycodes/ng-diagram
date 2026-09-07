@@ -13,6 +13,12 @@ import { FlowCoreProviderService, UpdatePortsService } from '../../services';
   templateUrl: './ng-diagram-node.component.html',
   styleUrl: './ng-diagram-node.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    // Effectively hidden nodes stay mounted as display: none so unhiding
+    // re-measures through the existing ResizeObserver path. Visible nodes get
+    // no inline display value — user CSS stays in charge.
+    '[style.display]': 'node().computedHidden ? "none" : null',
+  },
   hostDirectives: [
     { directive: NodeSizeDirective, inputs: ['node'] },
     { directive: NodePositionDirective, inputs: ['node'] },

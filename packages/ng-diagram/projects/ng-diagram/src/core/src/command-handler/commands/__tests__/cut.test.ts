@@ -11,6 +11,7 @@ describe('Cut Command', () => {
   beforeEach(() => {
     const mockModelLookup = {
       getSelectedNodesWithChildren: vi.fn().mockReturnValue([]),
+      getAllDescendantIds: vi.fn().mockReturnValue([]),
     };
 
     const mockConfig = {
@@ -128,5 +129,55 @@ describe('Cut Command', () => {
 
     // Verify config functions were called
     expect(flowCore.config.computeNodeId).toHaveBeenCalled();
+  });
+
+  describe('hidden elements', () => {
+    it('should neither copy nor delete a hidden selected node (consistent cut)', async () => {
+      const nodes = [{ id: 'hidden', selected: true, computedHidden: true, position: { x: 0, y: 0 } }];
+
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges: [], metadata: {} });
+
+      await cut(commandHandler);
+
+      // Nothing visible was selected: no clipboard content, no deletion.
+      expect(flowCore.applyUpdate).not.toHaveBeenCalled();
+      const copyPaste = (flowCore.actionStateManager as { copyPaste?: { copiedNodes: unknown[] } }).copyPaste;
+      expect(copyPaste?.copiedNodes).toEqual([]);
+    });
+
+    it('should round-trip a collapsed group: hidden children are copied and deleted with it', async () => {
+      const nodes = [
+        { id: 'group', selected: true, position: { x: 0, y: 0 } },
+        {
+          id: 'child',
+          selected: false,
+          groupId: 'group',
+          hidden: true,
+          computedHidden: true,
+          position: { x: 5, y: 5 },
+        },
+      ];
+      const edges = [{ id: 'internal', selected: false, source: 'group', target: 'child', computedHidden: true }];
+
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+      (flowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+        id === 'group' ? ['child'] : []
+      );
+
+      await cut(commandHandler);
+
+      // Clipboard carries the whole subtree including the hidden child…
+      const copyPaste = (
+        flowCore.actionStateManager as { copyPaste?: { copiedNodes: { id: string }[]; copiedEdges: { id: string }[] } }
+      ).copyPaste;
+      expect(copyPaste!.copiedNodes.map((node) => node.id)).toEqual(['group', 'child']);
+      expect(copyPaste!.copiedEdges.map((edge) => edge.id)).toEqual(['internal']);
+
+      // …and the deletion removes the same subtree — nothing is lost or leaks.
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        { nodesToRemove: ['group', 'child'], edgesToRemove: ['internal'] },
+        'deleteSelection'
+      );
+    });
   });
 });

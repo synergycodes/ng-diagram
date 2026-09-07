@@ -24,6 +24,7 @@ title: "ng-diagram"
 ## Directives
 
 - [NgDiagramGroupHighlightedDirective](/docs/api/directives/ngdiagramgrouphighlighteddirective/)
+- [NgDiagramHiddenDirective](/docs/api/directives/ngdiagramhiddendirective/)
 - [NgDiagramMinimapNavigationDirective](/docs/api/directives/ngdiagramminimapnavigationdirective/)
 - [NgDiagramNodeSelectedDirective](/docs/api/directives/ngdiagramnodeselecteddirective/)
 

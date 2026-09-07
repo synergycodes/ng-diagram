@@ -327,4 +327,99 @@ describe('MeasurementTrackingMiddleware', () => {
       expect(signalSpy).toHaveBeenCalledWith('edge:edge1');
     });
   });
+
+  describe('hidden elements', () => {
+    it('should not register effectively hidden added entities as participants', () => {
+      measurementTracker.requestTracking();
+      const registerSpy = vi.spyOn(measurementTracker, 'registerParticipants');
+
+      context.helpers.anyNodesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.anyEdgesAdded = vi.fn().mockReturnValue(true);
+      context.helpers.getAddedNodes = vi.fn().mockReturnValue([
+        { id: 'visible', position: { x: 0, y: 0 }, data: {} },
+        { id: 'hidden', position: { x: 0, y: 0 }, data: {}, computedHidden: true },
+      ]);
+      context.helpers.getAddedEdges = vi
+        .fn()
+        .mockReturnValue([{ id: 'hiddenEdge', source: 'a', target: 'b', data: {}, computedHidden: true }]);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(registerSpy).toHaveBeenCalledWith(['node:visible']);
+    });
+
+    it('should not register changed entities that are effectively hidden', () => {
+      measurementTracker.requestTracking();
+      const registerSpy = vi.spyOn(measurementTracker, 'registerParticipants');
+
+      context.nodesMap = new Map([
+        ['visible', { id: 'visible', position: { x: 0, y: 0 }, data: {} }],
+        ['hidden', { id: 'hidden', position: { x: 0, y: 0 }, data: {}, computedHidden: true }],
+      ]) as MiddlewareContext['nodesMap'];
+      context.helpers.getChangedNodeIds = vi.fn().mockReturnValue(['visible', 'hidden']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(registerSpy).toHaveBeenCalledWith(['node:visible']);
+    });
+
+    it('should unregister entities hidden in the same first pass', () => {
+      measurementTracker.requestTracking();
+      const unregisterSpy = vi.spyOn(measurementTracker, 'unregisterParticipants');
+
+      context.nodesMap = new Map([
+        ['hidden', { id: 'hidden', position: { x: 0, y: 0 }, data: {}, computedHidden: true }],
+      ]) as MiddlewareContext['nodesMap'];
+      context.helpers.getChangedNodeIds = vi.fn().mockReturnValue(['hidden']);
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(unregisterSpy).toHaveBeenCalledWith(['node:hidden']);
+    });
+
+    it('should unregister entities that became hidden while a round is pending', () => {
+      measurementTracker.requestTracking();
+      measurementTracker.registerParticipants(['node:node1', 'edge:edge1']);
+      const unregisterSpy = vi.spyOn(measurementTracker, 'unregisterParticipants');
+
+      context.nodesMap = new Map([
+        ['node1', { id: 'node1', position: { x: 0, y: 0 }, data: {}, computedHidden: true }],
+      ]) as MiddlewareContext['nodesMap'];
+      context.edgesMap = new Map([
+        ['edge1', { id: 'edge1', source: 'a', target: 'b', data: {}, computedHidden: true }],
+      ]) as MiddlewareContext['edgesMap'];
+      context.helpers.getAffectedNodeIds = vi
+        .fn()
+        .mockImplementation((props: string[]) => (props.includes('computedHidden') ? ['node1'] : []));
+      context.helpers.getAffectedEdgeIds = vi
+        .fn()
+        .mockImplementation((props: string[]) => (props.includes('computedHidden') ? ['edge1'] : []));
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(unregisterSpy).toHaveBeenCalledWith(['node:node1', 'edge:edge1']);
+    });
+
+    it('should not unregister entities that became visible while a round is pending', () => {
+      measurementTracker.requestTracking();
+      measurementTracker.registerParticipants(['node:node1']);
+      const unregisterSpy = vi.spyOn(measurementTracker, 'unregisterParticipants');
+
+      context.nodesMap = new Map([
+        ['node1', { id: 'node1', position: { x: 0, y: 0 }, data: {}, computedHidden: false }],
+      ]) as MiddlewareContext['nodesMap'];
+      context.helpers.getAffectedNodeIds = vi
+        .fn()
+        .mockImplementation((props: string[]) => (props.includes('computedHidden') ? ['node1'] : []));
+
+      const middleware = createMeasurementTrackingMiddleware(measurementTracker);
+      middleware.execute(context, nextMock, () => null);
+
+      expect(unregisterSpy).toHaveBeenCalledWith([]);
+    });
+  });
 });

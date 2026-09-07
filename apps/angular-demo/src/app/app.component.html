@@ -1,4 +1,4 @@
-<div class="diagram-container">
+<div class="diagram-container" [class.reveal-hidden-ghosts]="revealHiddenGhosts()">
   <ng-diagram
     [nodeTemplateMap]="nodeTemplateMap"
     [edgeTemplateMap]="edgeTemplateMap"
@@ -31,11 +31,14 @@
     <app-measurement-tests (exit)="exitMeasurementTest()" />
   } @else if (awaitableTestMode()) {
     <app-awaitable-tests (exit)="exitAwaitableTest()" />
+  } @else if (hiddenElementsDemoMode()) {
+    <app-hidden-elements-toolbar (exit)="exitHiddenElementsDemo()" (revealGhosts)="revealHiddenGhosts.set($event)" />
   } @else {
     <app-toolbar
       (enterBatchTest)="enterBatchTest()"
       (measurementTestEnter)="enterMeasurementTest()"
       (awaitableTestEnter)="enterAwaitableTest()"
+      (hiddenElementsDemoEnter)="enterHiddenElementsDemo()"
       (testVirtualizationClick)="enableVirtualizationTest()"
       (reinitializeModelClick)="onReinitializeModel()"
       (saveModelClick)="onSaveModel()"

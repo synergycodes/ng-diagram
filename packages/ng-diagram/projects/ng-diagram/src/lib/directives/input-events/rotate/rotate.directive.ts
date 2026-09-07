@@ -28,10 +28,19 @@ export class RotateHandleDirective implements OnDestroy {
   ngOnDestroy() {
     const wasMidGesture = this.gestureActive;
     this.removeListeners();
-    // Destroyed mid-gesture (e.g. the node was deleted while rotating): the pointerup
-    // will never be routed, so the rotation state must be cleared here.
+    // Destroyed mid-gesture (the node was deleted or hidden while rotating):
+    // the pointerup will never be routed. Run the full cancel flow — paired
+    // nodeRotateEnded ('cancelled') and angle rollback — not a bare state
+    // clear that strands Started events without Ended ones.
     if (wasMidGesture && this.flowCoreProvider.isInitialized()) {
-      this.flowCoreProvider.provide().actionStateManager.clearRotation();
+      const flowCore = this.flowCoreProvider.provide();
+      void flowCore.cancelActiveInteraction().then((cancelled) => {
+        // Refused cancel (e.g. active transaction): fall back to the bare
+        // clear. Skip while another cancel owns the state mid-rollback.
+        if (!cancelled && !flowCore.isCancellingInteraction()) {
+          flowCore.actionStateManager.clearRotation();
+        }
+      });
     }
   }
 

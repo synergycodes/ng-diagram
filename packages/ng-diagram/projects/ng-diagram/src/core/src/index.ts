@@ -9,6 +9,7 @@ export * from './math';
 export * from './shortcut-manager';
 export * from './types';
 export * from './utils';
+export * from './visibility/template-visibility-registry';
 
 export * from './middleware-manager/middlewares';
 

@@ -20,7 +20,7 @@ during initialization (and, for the default model created by
 
 ⚠️ **Use at your own risk.** The default ([stripEdgeRuntimeProperties](/docs/api/utilities/stripedgeruntimeproperties/))
 exists because stale runtime values (`sourcePosition`, `targetPosition`,
-`measuredLabels`, `computedZIndex`, `_internalId`) loaded from persistence
+`measuredLabels`, `computedZIndex`, `computedHidden`, `_internalId`) loaded from persistence
 can and probably will break the diagram — e.g. edges rendered at outdated
 positions or duplicated internal ids. The default already preserves the
 authored free-endpoint position of a dangling edge (empty `source`/`target`),
@@ -41,7 +41,7 @@ during initialization (and, for the default model created by
 
 ⚠️ **Use at your own risk.** The default ([stripNodeRuntimeProperties](/docs/api/utilities/stripnoderuntimeproperties/))
 exists because stale runtime values (`selected`, `measuredPorts`,
-`measuredBounds`, `computedZIndex`, `_internalId`) loaded from persistence
+`measuredBounds`, `computedZIndex`, `computedHidden`, `_internalId`) loaded from persistence
 can and probably will break the diagram — e.g. skipped DOM measurements,
 wrong z-ordering, or duplicated internal ids. Overriding this function and
 keeping such properties is unsupported territory; prefer wrapping the

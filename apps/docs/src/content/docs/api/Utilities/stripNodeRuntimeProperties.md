@@ -9,7 +9,7 @@ title: "stripNodeRuntimeProperties"
 > **stripNodeRuntimeProperties**(`node`): [`Node`](/docs/api/types/model/node/)
 
 Strips runtime-computed properties from a node
-(`selected`, `measuredPorts`, `measuredBounds`, `computedZIndex`, `_internalId`).
+(`selected`, `measuredPorts`, `measuredBounds`, `computedZIndex`, `computedHidden`, `_internalId`).
 
 These properties are recomputed during initialization and stale values
 from persistence cause the measurement system to skip fresh DOM measurement.

@@ -2,6 +2,7 @@ import type { EventManager } from '../../../../event-manager/event-manager';
 import type { DiagramInitEvent } from '../../../../event-manager/event-types';
 import type { Edge, MiddlewareContext, Node } from '../../../../types';
 import { isValidPosition, isValidSize } from '../../../../utils/measurement-validation';
+import type { TemplateVisibilityRegistry } from '../../../../visibility/template-visibility-registry';
 import type { EventEmitter } from './event-emitter.interface';
 
 /**
@@ -10,10 +11,14 @@ import type { EventEmitter } from './event-emitter.interface';
  * - When 'init' fires, most items should already be measured thanks to the InitUpdater
  * - But late arrivals (race condition during finish) may still be processing
  * - So we still need to track and wait for any remaining unmeasured items
+ * - Effectively hidden elements are display: none — they never deliver valid
+ *   measurements and must not keep the event waiting
  * - Safety hatch: If measurements don't complete within timeout, emit anyway with warning
  */
 export class DiagramInitEmitter implements EventEmitter {
   name = 'DiagramInitEmitter';
+
+  constructor(private readonly templateVisibilityRegistry?: TemplateVisibilityRegistry) {}
 
   private unmeasuredNodes = new Set<string>();
   private unmeasuredNodePorts = new Set<string>();
@@ -92,13 +97,14 @@ export class DiagramInitEmitter implements EventEmitter {
 
     for (const nodeId of renderedNodeIds) {
       const node = nodesMap.get(nodeId);
-      if (!node) continue;
+      if (!node || node.computedHidden) continue;
 
       if (!isValidSize(node.size)) {
         this.unmeasuredNodes.add(nodeId);
       }
 
       for (const port of node.measuredPorts ?? []) {
+        if (this.templateVisibilityRegistry?.isPortHidden(nodeId, port.id)) continue;
         if (!isValidSize(port.size) || !isValidPosition(port.position)) {
           this.unmeasuredNodePorts.add(`${nodeId}:${port.id}`);
         }
@@ -107,9 +113,10 @@ export class DiagramInitEmitter implements EventEmitter {
 
     for (const edgeId of renderedEdgeIds) {
       const edge = edgesMap.get(edgeId);
-      if (!edge) continue;
+      if (!edge || edge.computedHidden) continue;
 
       for (const label of edge.measuredLabels ?? []) {
+        if (this.templateVisibilityRegistry?.isLabelHidden(edgeId, label.id)) continue;
         if (!isValidSize(label.size) || !isValidPosition(label.position)) {
           this.unmeasuredEdgeLabels.add(`${edgeId}:${label.id}`);
         }
@@ -219,7 +226,8 @@ export class DiagramInitEmitter implements EventEmitter {
 
     console.warn(
       `[DiagramInitEmitter] Measurement timeout reached from last measurement. Emitting diagramInit event anyway.` +
-        ` Ensure the model provided to ng-diagram was created with initializeModel() or initializeModelAdapter() (for custom ModelAdapter).`
+        ` Ensure the model provided to ng-diagram was created with initializeModel() or initializeModelAdapter() (for custom ModelAdapter).` +
+        ` To intentionally hide elements, use the \`hidden\` flag on nodes/edges or the \`hidden\` input on ports and edge labels — hidden elements create no measurement expectations.`
     );
     console.warn(`Total unmeasured elements: ${totalUnmeasured}`);
 

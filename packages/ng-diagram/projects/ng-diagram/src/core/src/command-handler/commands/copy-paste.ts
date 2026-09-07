@@ -1,6 +1,7 @@
 import { NgDiagramMath } from '../../math';
 import type { CommandHandler, Edge, FlowConfig, FlowStateUpdate, Node, Point } from '../../types';
 import { snapNodePosition } from '../../utils';
+import { computeHiddenNodeIds, isEdgeEffectivelyHidden } from '../../visibility/effective-visibility';
 
 const OFFSET = 20;
 
@@ -86,7 +87,8 @@ const createPastedNodes = (
   config: FlowConfig,
   copiedNodes: Node[],
   offset: Point,
-  nodeIdMap: Map<string, string>
+  nodeIdMap: Map<string, string>,
+  hiddenCopiedNodeIds: Set<string>
 ): Node[] => {
   copiedNodes.forEach((node) => {
     const newNodeId = config.computeNodeId();
@@ -105,7 +107,9 @@ const createPastedNodes = (
         x: node.position.x + offset.x,
         y: node.position.y + offset.y,
       },
-      selected: true,
+      // Hidden pasted content must not become an invisible selection the next
+      // Delete or arrow key would act on sight unseen.
+      selected: !hiddenCopiedNodeIds.has(node.id),
     };
 
     // Update port nodeIds
@@ -118,7 +122,12 @@ const createPastedNodes = (
 /**
  * Create new edges with updated IDs and references
  */
-const createPastedEdges = (config: FlowConfig, copiedEdges: Edge[], nodeIdMap: Map<string, string>): Edge[] => {
+const createPastedEdges = (
+  config: FlowConfig,
+  copiedEdges: Edge[],
+  nodeIdMap: Map<string, string>,
+  hiddenCopiedNodeIds: Set<string>
+): Edge[] => {
   return copiedEdges.map((edge) => {
     const newEdgeId = config.computeEdgeId();
     const newEdge: Edge = {
@@ -126,7 +135,8 @@ const createPastedEdges = (config: FlowConfig, copiedEdges: Edge[], nodeIdMap: M
       id: newEdgeId,
       source: nodeIdMap.get(edge.source) || edge.source,
       target: nodeIdMap.get(edge.target) || edge.target,
-      selected: true,
+      // See createPastedNodes — hidden pasted edges stay deselected.
+      selected: !isEdgeEffectivelyHidden(edge, hiddenCopiedNodeIds),
     };
 
     return newEdge;
@@ -163,9 +173,29 @@ const createDeselectUpdates = (
 
 export const copy = async (commandHandler: CommandHandler) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
+  const { modelLookup } = commandHandler.flowCore;
 
-  const copiedNodes = nodes.filter((node) => node.selected);
-  const copiedEdges = edges.filter((edge) => edge.selected);
+  // Roots: visible selected nodes. Hidden selected elements are skipped —
+  // consistent with deleteSelection, so `cut` neither copies nor deletes them.
+  const copiedNodeIds = new Set(nodes.filter((node) => node.selected && !node.computedHidden).map((node) => node.id));
+
+  // Cascade: descendants of copied nodes travel with them regardless of their
+  // own hidden state (e.g. the hidden children of a copied collapsed group) —
+  // mirroring deleteSelection, so cut/paste round-trips a collapsed group.
+  for (const id of [...copiedNodeIds]) {
+    for (const descendantId of modelLookup.getAllDescendantIds(id)) {
+      copiedNodeIds.add(descendantId);
+    }
+  }
+
+  const copiedNodes = nodes.filter((node) => copiedNodeIds.has(node.id));
+
+  // Edges: explicitly selected visible edges, plus every edge fully inside the
+  // copied node set (the internal wiring of copied groups, hidden or not).
+  const copiedEdges = edges.filter(
+    (edge) =>
+      (edge.selected && !edge.computedHidden) || (copiedNodeIds.has(edge.source) && copiedNodeIds.has(edge.target))
+  );
 
   commandHandler.flowCore.actionStateManager.copyPaste = {
     copiedNodes,
@@ -189,13 +219,34 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
   const { nodes, edges } = commandHandler.flowCore.getState();
   const nodeIdMap = new Map<string, string>();
 
-  // Calculate paste offset
-  const offset = calculatePasteOffset(copyPasteState.copiedNodes, command);
+  // Effective visibility WITHIN the copied set (original ids): the copied
+  // snapshots carry user `hidden` flags; the template registry does not apply
+  // to content that does not exist yet.
+  const hiddenCopiedNodeIds = computeHiddenNodeIds(copyPasteState.copiedNodes);
+
+  // Calculate paste offset from the visible copied nodes only — invisible
+  // members must not pull the pasted content away from the cursor.
+  const visibleCopiedNodes = copyPasteState.copiedNodes.filter((node) => !hiddenCopiedNodeIds.has(node.id));
+  const offset = calculatePasteOffset(
+    visibleCopiedNodes.length > 0 ? visibleCopiedNodes : copyPasteState.copiedNodes,
+    command
+  );
 
   // Create new nodes and edges
-  const newNodes = createPastedNodes(commandHandler.flowCore.config, copyPasteState.copiedNodes, offset, nodeIdMap);
+  const newNodes = createPastedNodes(
+    commandHandler.flowCore.config,
+    copyPasteState.copiedNodes,
+    offset,
+    nodeIdMap,
+    hiddenCopiedNodeIds
+  );
   applySnappingToNodes(newNodes, commandHandler.flowCore.config);
-  const newEdges = createPastedEdges(commandHandler.flowCore.config, copyPasteState.copiedEdges, nodeIdMap);
+  const newEdges = createPastedEdges(
+    commandHandler.flowCore.config,
+    copyPasteState.copiedEdges,
+    nodeIdMap,
+    hiddenCopiedNodeIds
+  );
 
   // Create deselect updates
   const { nodesToUpdate, edgesToUpdate } = createDeselectUpdates(nodes, edges);

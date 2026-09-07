@@ -9,6 +9,7 @@ import {
 
 export interface LabelledEdgeData {
   label: string;
+  labelHidden?: boolean;
 }
 
 /** Custom edge template composing the public default label chip — the chip must look and behave the same as inside the default edge. */
@@ -19,7 +20,7 @@ export interface LabelledEdgeData {
   imports: [NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent, NgDiagramDefaultEdgeLabelComponent],
   template: `
     <ng-diagram-base-edge [edge]="edge()">
-      <ng-diagram-base-edge-label [id]="'edge-label'" [positionOnEdge]="0.5">
+      <ng-diagram-base-edge-label [id]="'edge-label'" [positionOnEdge]="0.5" [hidden]="labelHidden()">
         <ng-diagram-default-edge-label>{{ label() }}</ng-diagram-default-edge-label>
       </ng-diagram-base-edge-label>
     </ng-diagram-base-edge>
@@ -29,4 +30,5 @@ export class LabelledEdgeComponent implements NgDiagramEdgeTemplate<LabelledEdge
   edge = input.required<Edge<LabelledEdgeData>>();
 
   readonly label = computed(() => this.edge().data?.label ?? '');
+  readonly labelHidden = computed(() => this.edge().data?.labelHidden === true);
 }

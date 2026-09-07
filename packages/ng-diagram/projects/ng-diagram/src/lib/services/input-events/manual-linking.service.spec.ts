@@ -8,14 +8,17 @@ import { ManualLinkingService } from './manual-linking.service';
 
 describe('ManualLinkingService', () => {
   let service: ManualLinkingService;
+  let emitStart: ReturnType<typeof vi.fn>;
   let emitContinue: ReturnType<typeof vi.fn>;
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
+  let getNodeById: ReturnType<typeof vi.fn>;
   let unregister: ReturnType<typeof vi.fn>;
   let registeredCleanups: (() => void)[];
 
   const node = { id: 'n1', type: 'node', position: { x: 0, y: 0 }, data: {} } as Node;
 
   beforeEach(() => {
+    emitStart = vi.fn();
     emitContinue = vi.fn();
     unregister = vi.fn();
     registeredCleanups = [];
@@ -23,13 +26,14 @@ describe('ManualLinkingService', () => {
       registeredCleanups.push(cleanup);
       return unregister;
     });
+    getNodeById = vi.fn().mockReturnValue(node);
 
     TestBed.configureTestingModule({
       providers: [
         ManualLinkingService,
         {
           provide: LinkingEventService,
-          useValue: { emitStart: vi.fn(), emitContinue, emitEnd: vi.fn() },
+          useValue: { emitStart, emitContinue, emitEnd: vi.fn() },
         },
         {
           provide: CursorPositionTrackerService,
@@ -37,7 +41,7 @@ describe('ManualLinkingService', () => {
         },
         {
           provide: FlowCoreProviderService,
-          useValue: { isInitialized: () => true, provide: () => ({ registerInteractionCleanup }) },
+          useValue: { isInitialized: () => true, provide: () => ({ registerInteractionCleanup, getNodeById }) },
         },
       ],
     });
@@ -73,5 +77,33 @@ describe('ManualLinkingService', () => {
 
     document.dispatchEvent(new Event('pointermove'));
     expect(emitContinue).toHaveBeenCalledTimes(1);
+  });
+
+  it('refuses to start linking from an effectively hidden node without attaching listeners', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    getNodeById.mockReturnValue({ ...node, computedHidden: true });
+
+    service.startLinking(node);
+
+    // No emit, no listeners, no cleanup registration — the command would
+    // refuse anyway and the listeners would be orphaned until the next click.
+    expect(emitStart).not.toHaveBeenCalled();
+    expect(registerInteractionCleanup).not.toHaveBeenCalled();
+    document.dispatchEvent(new Event('pointermove'));
+    expect(emitContinue).not.toHaveBeenCalled();
+
+    warnSpy.mockRestore();
+  });
+
+  it('refuses to start linking when the node no longer exists in the model', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    getNodeById.mockReturnValue(undefined);
+
+    service.startLinking(node);
+
+    expect(emitStart).not.toHaveBeenCalled();
+    expect(registerInteractionCleanup).not.toHaveBeenCalled();
+
+    warnSpy.mockRestore();
   });
 });

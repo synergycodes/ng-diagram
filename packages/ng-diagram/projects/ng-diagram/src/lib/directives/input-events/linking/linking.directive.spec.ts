@@ -29,6 +29,7 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
   let directive: LinkingInputDirective;
   let touchState: TouchEventsStateService;
   let clearLinking: ReturnType<typeof vi.fn>;
+  let cancelActiveInteraction: ReturnType<typeof vi.fn>;
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
   let unregister: ReturnType<typeof vi.fn>;
   let linkingEventService: {
@@ -39,6 +40,7 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
 
   beforeEach(() => {
     clearLinking = vi.fn();
+    cancelActiveInteraction = vi.fn().mockResolvedValue(true);
     unregister = vi.fn();
     registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
 
@@ -52,6 +54,8 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
       isInitialized: () => true,
       provide: () => ({
         actionStateManager: { clearLinking, isLinking: () => false },
+        cancelActiveInteraction,
+        isCancellingInteraction: () => false,
         registerInteractionCleanup,
       }),
     };
@@ -76,6 +80,7 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
     fixture.destroy();
 
     expect(touchState.currentEvent()).toBe(DiagramEventName.Panning);
+    expect(cancelActiveInteraction).not.toHaveBeenCalled();
     expect(clearLinking).not.toHaveBeenCalled();
   });
 
@@ -89,12 +94,28 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
     expect(unregister).toHaveBeenCalledTimes(1);
   });
 
-  it('clears its own marker and the linking state when destroyed mid-gesture', () => {
+  it('clears its own marker and cancels the gesture when destroyed mid-gesture', async () => {
     directive.onPointerDown(makePointerEvent());
 
     fixture.destroy();
 
     expect(touchState.currentEvent()).toBeNull();
+    // The full cancel flow erases the temporary edge and pairs edgeDrawStarted
+    // with edgeDrawEnded ('cancelled') — the bare clear must stay out of its way.
+    expect(cancelActiveInteraction).toHaveBeenCalled();
+    await Promise.resolve();
+    expect(clearLinking).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the bare state clear when the destroy-time cancel is refused', async () => {
+    // A stranded linking state permanently disables linking, because
+    // shouldHandle refuses to start while isLinking() is true.
+    cancelActiveInteraction.mockResolvedValue(false);
+    directive.onPointerDown(makePointerEvent());
+
+    fixture.destroy();
+
+    await Promise.resolve();
     expect(clearLinking).toHaveBeenCalled();
   });
 

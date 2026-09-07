@@ -83,7 +83,8 @@ export type ModelActionType =
   | 'moveNodesStart'
   | 'moveNodesStop'
   | 'cancelDrag'
-  | 'selectEnd';
+  | 'selectEnd'
+  | 'templateVisibilityChange';
 
 /**
  * The complete state of the flow diagram.

@@ -25,6 +25,25 @@ The `NgDiagramBaseEdgeLabelComponent` is responsible for displaying a label at a
 
 ## Properties
 
+### hidden
+
+> **hidden**: `InputSignalWithTransform`\<`boolean`, `unknown`\>
+
+Whether the label is hidden. Defaults to false.
+
+A hidden label stays mounted as `display: none` and creates no
+measurement expectation (it never blocks initialization or
+`waitForMeasurements`). Unhiding re-measures it automatically.
+
+Accepts the static attribute form too: a bare `hidden` attribute means
+hidden, matching native HTML semantics.
+
+#### Since
+
+1.4.0
+
+***
+
 ### id
 
 > **id**: `InputSignal`\<`string`\>

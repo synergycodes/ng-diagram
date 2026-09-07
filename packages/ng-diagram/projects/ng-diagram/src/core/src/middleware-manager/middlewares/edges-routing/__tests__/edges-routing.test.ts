@@ -477,6 +477,43 @@ describe('Edges Routing Middleware', () => {
       expect(mockActionStateManager.linking.temporaryEdge.computedZIndex).toBe(customZIndex);
     });
 
+    it('should not re-route the temporary edge when its source is effectively hidden', () => {
+      const temporaryEdge = {
+        ...mockEdge,
+        id: 'temp-edge',
+        source: 'node-1',
+        target: '',
+        targetPosition: { x: 200, y: 200 },
+        points: [],
+        temporary: true,
+      };
+
+      mockActionStateManager.linking = {
+        sourceNodeId: 'node-1',
+        sourcePortId: '',
+        temporaryEdge,
+      };
+
+      const newState = {
+        ...initialState,
+        nodes: [{ ...mockNode, id: 'node-1', position: { x: 100, y: 100 }, computedHidden: true }],
+        edges: [],
+        metadata: mockMetadata,
+      };
+
+      nodesMap.clear();
+      newState.nodes.forEach((node) => nodesMap.set(node.id, node));
+      context.state = newState;
+      context.modelActionTypes = ['init'];
+
+      edgesRoutingMiddleware.execute(context, nextMock, () => null);
+
+      // The temporary edge keeps its (stale) state untouched — the render
+      // layer skips it entirely while the source is hidden.
+      expect(mockActionStateManager.linking.temporaryEdge).toBe(temporaryEdge);
+      expect(mockActionStateManager.linking.temporaryEdge.computedZIndex).toBeUndefined();
+    });
+
     it('should not process if no temporary edge exists', () => {
       mockActionStateManager.linking = null;
       const newState = {

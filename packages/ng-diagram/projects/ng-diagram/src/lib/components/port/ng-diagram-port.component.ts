@@ -1,5 +1,6 @@
 import {
   AfterContentInit,
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
   computed,
@@ -60,7 +61,7 @@ const originPointClassMap: Record<OriginPoint, string> = {
   host: {
     '[attr.data-port-id]': 'id()',
     '[class]': 'portClass',
-    '[style.display]': 'isRenderedOnCanvas() ? "block" : "none"',
+    '[style.display]': 'isRenderedOnCanvas() && !hidden() ? "block" : "none"',
   },
   hostDirectives: [{ directive: LinkingInputDirective, inputs: ['portId: id'] }],
 })
@@ -97,6 +98,25 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
    * By default, it is set to 'center'.
    */
   originPoint = input<OriginPoint>('center');
+
+  /**
+   * Whether the port is hidden. Defaults to false.
+   *
+   * A hidden port stays mounted as `display: none`, creates no measurement
+   * expectation (it never blocks initialization or `waitForMeasurements`),
+   * and is excluded as a linking target and port-snap candidate. Unhiding
+   * re-measures it automatically.
+   *
+   * Edges attached to a hidden port keep the port's last measured geometry
+   * as their anchor; hide the edge itself via its `hidden` flag if it should
+   * disappear with the port.
+   *
+   * Accepts the static attribute form too: a bare `hidden` attribute means
+   * hidden, matching native HTML semantics.
+   *
+   * @since 1.4.0
+   */
+  hidden = input(false, { transform: booleanAttribute });
 
   get portClass(): string {
     const originClass = originPointClassMap[this.originPoint()] || 'center';
@@ -152,6 +172,17 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
         });
       }
     });
+
+    effect(() => {
+      const hidden = this.hidden();
+      const nodeData = untracked(() => this.nodeData());
+      if (!this.isInitialized() || !nodeData) return;
+      // Runtime toggles; the initial value is written in ngOnInit BEFORE the
+      // port registers for measurement. The registry write only schedules a
+      // coalesced flush (FlowCore defers the prune and the middleware pass to
+      // a microtask), so it is safe inside the reactive context.
+      this.flowCoreProvider.provide().templateVisibilityRegistry?.setPortHidden(nodeData.id, this.id(), hidden);
+    });
   }
 
   /** @internal */
@@ -166,6 +197,12 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.ownerInternalId = (nodeData as any)._internalId;
+
+    // Declare hidden state BEFORE registering for measurement so a hidden
+    // port never creates an init measurement expectation.
+    if (this.hidden()) {
+      this.flowCoreProvider.provide().templateVisibilityRegistry?.setPortHidden(nodeData.id, this.id(), true);
+    }
 
     // Always call addPort - InternalUpdater handles virtualization logic
     this.flowCoreProvider.provide().updater.addPort(nodeData.id, {
@@ -216,10 +253,17 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
       return;
     }
 
-    // In virtualization mode, skip if node is just virtualized (scrolled out of view)
+    // In virtualization mode, skip ALL cleanup if the node is just virtualized
+    // (scrolled out of view): the port still exists in the model, and its
+    // hidden declaration must survive the unmount — clearing it here would
+    // make a hidden port a snap/linking target while its owner is off-screen.
+    // Remounting rewrites the declaration from the input in ngOnInit.
     if (flowCore.isVirtualizationActive && !flowCore.isNodeCurrentlyRendered(nodeData.id)) {
       return;
     }
+
+    // This instance owns the registry entry — clear its hidden declaration.
+    flowCore.templateVisibilityRegistry?.setPortHidden(nodeData.id, portId, false);
 
     flowCore.internalUpdater.deletePort(nodeData.id, portId);
   }

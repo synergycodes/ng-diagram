@@ -19,7 +19,9 @@ export class MovingAction implements KeyboardAction {
     return (
       flowCore.config.nodeDraggingEnabled &&
       shortcut.actionName.startsWith('keyboardMoveSelection') &&
-      flowCore.modelLookup.getSelectedNodes().length > 0
+      // Effectively hidden selected nodes cannot be moved — claiming the key
+      // for them would leave arrows dead (move no-ops, panning yielded).
+      flowCore.modelLookup.getSelectedNodes().some((node) => !node.computedHidden)
     );
   }
 

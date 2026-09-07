@@ -22,7 +22,7 @@ export type StripEdgeRuntimePropertiesFn = (edge: Edge) => Edge;
 
 /**
  * Strips runtime-computed properties from a node
- * (`selected`, `measuredPorts`, `measuredBounds`, `computedZIndex`, `_internalId`).
+ * (`selected`, `measuredPorts`, `measuredBounds`, `computedZIndex`, `computedHidden`, `_internalId`).
  *
  * These properties are recomputed during initialization and stale values
  * from persistence cause the measurement system to skip fresh DOM measurement.
@@ -37,15 +37,16 @@ export type StripEdgeRuntimePropertiesFn = (edge: Edge) => Edge;
  */
 export function stripNodeRuntimeProperties(node: Node): Node {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { selected, measuredPorts, measuredBounds, computedZIndex, _internalId, ...rest } = node as Node & {
-    _internalId?: unknown;
-  };
+  const { selected, measuredPorts, measuredBounds, computedZIndex, computedHidden, _internalId, ...rest } =
+    node as Node & {
+      _internalId?: unknown;
+    };
   return rest;
 }
 
 /**
  * Strips runtime-computed properties from an edge
- * (`sourcePosition`, `targetPosition`, `measuredLabels`, `computedZIndex`, `_internalId`).
+ * (`sourcePosition`, `targetPosition`, `measuredLabels`, `computedZIndex`, `computedHidden`, `_internalId`).
  *
  * These properties are recomputed during initialization and stale values
  * from persistence cause the measurement system to skip fresh DOM measurement.
@@ -64,9 +65,10 @@ export function stripNodeRuntimeProperties(node: Node): Node {
  */
 export function stripEdgeRuntimeProperties(edge: Edge): Edge {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { sourcePosition, targetPosition, measuredLabels, computedZIndex, _internalId, ...rest } = edge as Edge & {
-    _internalId?: unknown;
-  };
+  const { sourcePosition, targetPosition, measuredLabels, computedZIndex, computedHidden, _internalId, ...rest } =
+    edge as Edge & {
+      _internalId?: unknown;
+    };
   return {
     ...rest,
     ...(!edge.source && sourcePosition ? { sourcePosition } : {}),
