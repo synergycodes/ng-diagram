@@ -35,33 +35,82 @@ const recordDragEvents = (diagram: import('./fixtures/diagram').Diagram) =>
 const recordedDragEvents = (diagram: import('./fixtures/diagram').Diagram) =>
   diagram.page.evaluate(() => (window as unknown as { __dragEvents?: string[] }).__dragEvents ?? []);
 
+/** Live dragging state as `grabbed:` (pre-threshold) or `moving:idA+idB`; null once cleared. */
+const dragState = (diagram: import('./fixtures/diagram').Diagram) =>
+  diagram.page.evaluate(() => {
+    const dragging = window.__diagram!.diagram.actionState().dragging;
+    return dragging ? `${dragging.movementStarted ? 'moving' : 'grabbed'}:${dragging.nodeIds.join('+')}` : null;
+  });
+
+type Gate = { release?: () => void; unregister?: () => void };
+type GateStash = { __gate?: Gate };
+
+/**
+ * Parks the first pass whose action types include `actionType` until `release()`
+ * is called; later passes of that type run untouched. `armed()` reports whether
+ * that pass is currently parked — the proof that a gesture attempted meanwhile
+ * genuinely overlaps it, independent of protocol latency.
+ */
+const installGate = async (diagram: import('./fixtures/diagram').Diagram, actionType: string) => {
+  await diagram.page.evaluate((type) => {
+    const gate: Gate = {};
+    (window as unknown as GateStash).__gate = gate;
+    gate.unregister = window.__diagram!.diagram.registerMiddleware({
+      name: `e2e-gate-${type}`,
+      execute: async (context, next) => {
+        if ((context.modelActionTypes as string[]).includes(type) && !gate.release) {
+          await new Promise<void>((resolve) => {
+            gate.release = resolve;
+          });
+        }
+        await next();
+      },
+    });
+  }, actionType);
+
+  return {
+    armed: () => diagram.page.evaluate(() => (window as unknown as GateStash).__gate?.release !== undefined),
+    release: () => diagram.page.evaluate(() => (window as unknown as GateStash).__gate?.release?.()),
+    /** Releases a still-parked pass so the page cannot hang, then removes the middleware. */
+    uninstall: () =>
+      diagram.page.evaluate(() => {
+        const gate = (window as unknown as GateStash).__gate;
+        gate?.release?.();
+        gate?.unregister?.();
+      }),
+  };
+};
+
 test.describe('awaitable hardening', () => {
   test('fast re-drag under a slow middleware applies both drags exactly', async ({ diagram }) => {
     await diagram.load({ model: pair });
+    await recordDragEvents(diagram);
     const before = await positionOf(diagram, 'node-a');
 
-    // Slow ONLY the drag end-phase pass (moveNodesStop) so the first drag's
-    // cleanup is genuinely suspended when the second drag starts — an unguarded
-    // suspended cleanup would clobber the second drag's state. Slowing every pass
-    // would also throttle the dozens of moveNodesBy passes and make timing,
-    // not the guarded race, dominate the test.
-    await diagram.page.evaluate(() => {
-      const stash = window as unknown as { __unregisterSlow?: () => void };
-      stash.__unregisterSlow = window.__diagram!.diagram.registerMiddleware({
-        name: 'e2e-slow-drag-end',
-        execute: async (context, next) => {
-          if (context.modelActionTypes.includes('moveNodesStop')) {
-            await new Promise((resolve) => setTimeout(resolve, 60));
-          }
-          await next();
-        },
-      });
-    });
+    // Park ONLY the first drag's end-phase pass (moveNodesStop) so the second
+    // drag provably starts while that cleanup is suspended — an unguarded
+    // suspended cleanup would clobber the second drag's state. Parking every
+    // pass would also hold the dozens of moveNodesBy passes.
+    const gate = await installGate(diagram, 'moveNodesStop');
 
     try {
       await diagram.dragNode('node-a', { x: 80, y: 40 });
-      // Immediately re-drag — no settling wait in between.
-      await diagram.dragNode('node-a', { x: 60, y: -20 });
+      await expect.poll(gate.armed).toBe(true);
+
+      // Re-grab: the new gesture's pre-threshold state now owns the live
+      // dragging slot while the first cleanup is still parked.
+      const center = await centerOfNode(diagram, 'node-a');
+      await diagram.page.mouse.move(center.x, center.y);
+      await diagram.page.mouse.down();
+      await expect.poll(() => dragState(diagram)).toBe('grabbed:');
+
+      // The parked cleanup resumes and finishes before the second drag moves.
+      await gate.release();
+      await expect.poll(() => recordedDragEvents(diagram)).toContain('ended:node-a');
+
+      await diagram.page.mouse.move(center.x + 30, center.y - 10, { steps: 6 });
+      await diagram.page.mouse.move(center.x + 60, center.y - 20, { steps: 6 });
+      await diagram.page.mouse.up();
 
       // Tolerance covers sub-pixel grab inaccuracy of the second drag; a dead
       // second gesture (the guarded regression) would leave dx at ~80.
@@ -71,8 +120,9 @@ test.describe('awaitable hardening', () => {
           return Math.abs(after.x - before.x - 140) <= 6 && Math.abs(after.y - before.y - 20) <= 6;
         })
         .toBe(true);
+      await expect.poll(() => dragState(diagram)).toBe(null);
     } finally {
-      await diagram.page.evaluate(() => (window as unknown as { __unregisterSlow?: () => void }).__unregisterSlow?.());
+      await gate.uninstall();
     }
   });
 
@@ -81,41 +131,31 @@ test.describe('awaitable hardening', () => {
     await recordDragEvents(diagram);
     const before = await positionOf(diagram, 'node-a');
 
-    // Slow ONLY the moveNodesStart pass: the first threshold-crossing continue
-    // awaits that emit, so the release below lands while it is suspended.
-    await diagram.page.evaluate(() => {
-      const stash = window as unknown as { __unregisterSlowStart?: () => void };
-      stash.__unregisterSlowStart = window.__diagram!.diagram.registerMiddleware({
-        name: 'e2e-slow-drag-start',
-        execute: async (context, next) => {
-          if (context.modelActionTypes.includes('moveNodesStart')) {
-            await new Promise((resolve) => setTimeout(resolve, 120));
-          }
-          await next();
-        },
-      });
-    });
+    // Park ONLY the moveNodesStart pass: the first threshold-crossing continue
+    // awaits that emit, so the release below provably lands while it is suspended.
+    const gate = await installGate(diagram, 'moveNodesStart');
 
     try {
-      // One big move past the threshold, then an immediate release.
+      // One big move past the threshold, then the release while the start pass
+      // is still parked.
       const center = await centerOfNode(diagram, 'node-a');
       await diagram.page.mouse.move(center.x, center.y);
       await diagram.page.mouse.down();
       await diagram.page.mouse.move(center.x + 50, center.y, { steps: 1 });
+      await expect.poll(gate.armed).toBe(true);
       await diagram.page.mouse.up();
 
-      // Let the suspended pass resume — an unguarded stale continue would apply
-      // its 50px move HERE, after the drop.
-      await diagram.page.waitForTimeout(300);
+      // The parked pass resumes after the drop — an unguarded stale continue
+      // would apply its 50px move HERE.
+      await gate.release();
 
       // The gesture genuinely started (guards against a vacuous pass), its
-      // lifecycle events paired, and the node never moved.
-      expect(await recordedDragEvents(diagram)).toEqual(['started:node-a', 'ended:node-a']);
+      // lifecycle events paired, its state cleared, and the node never moved.
+      await expect.poll(async () => (await recordedDragEvents(diagram)).join(' ')).toBe('started:node-a ended:node-a');
+      await expect.poll(() => dragState(diagram)).toBe(null);
       expect(await positionOf(diagram, 'node-a')).toEqual(before);
     } finally {
-      await diagram.page.evaluate(() =>
-        (window as unknown as { __unregisterSlowStart?: () => void }).__unregisterSlowStart?.()
-      );
+      await gate.uninstall();
     }
 
     // The discarded move must not have stranded any gesture state.
@@ -134,46 +174,39 @@ test.describe('awaitable hardening', () => {
     await diagram.load({ model: pair });
     await recordDragEvents(diagram);
 
-    // Slow ONLY the drag end-phase pass so the first gesture's nodeDragEnded is
+    // Park ONLY the drag end-phase pass so the first gesture's nodeDragEnded is
     // emitted while the re-grab already owns the live dragging state — an emitter
     // reading that live (still empty) state would swallow the event.
-    await diagram.page.evaluate(() => {
-      const stash = window as unknown as { __unregisterSlow?: () => void };
-      stash.__unregisterSlow = window.__diagram!.diagram.registerMiddleware({
-        name: 'e2e-slow-drag-end',
-        execute: async (context, next) => {
-          if (context.modelActionTypes.includes('moveNodesStop')) {
-            await new Promise((resolve) => setTimeout(resolve, 150));
-          }
-          await next();
-        },
-      });
-    });
+    const gate = await installGate(diagram, 'moveNodesStop');
 
     try {
       await diagram.dragNode('node-a', { x: 80, y: 40 });
+      await expect.poll(gate.armed).toBe(true);
 
-      // Re-grab immediately but HOLD before moving: the previous drop's
-      // suspended pass resumes while the new gesture is still pre-threshold.
+      // Re-grab but HOLD before moving: the new gesture is still pre-threshold
+      // (empty node list) when the parked pass resumes.
       const center = await centerOfNode(diagram, 'node-a');
       await diagram.page.mouse.move(center.x, center.y);
       await diagram.page.mouse.down();
-      await diagram.page.waitForTimeout(250);
+      await expect.poll(() => dragState(diagram)).toBe('grabbed:');
+
+      await gate.release();
+      await expect.poll(async () => (await recordedDragEvents(diagram)).join(' ')).toBe('started:node-a ended:node-a');
+
       await diagram.page.mouse.move(center.x + 60, center.y - 20, { steps: 6 });
       await diagram.page.mouse.up();
-
       await expect
         .poll(async () => (await recordedDragEvents(diagram)).join(' '))
         .toBe('started:node-a ended:node-a started:node-a ended:node-a');
     } finally {
-      await diagram.page.evaluate(() => (window as unknown as { __unregisterSlow?: () => void }).__unregisterSlow?.());
+      await gate.uninstall();
     }
   });
 
   test('two consecutive links complete and only model edges stay rendered', async ({ diagram }) => {
     // NOTE: this is a SEQUENTIAL pair — the protocol roundtrips between the two
-    // gestures (~10-30ms) let the first finishLinking commit before the second
-    // starts. The genuinely overlapping case is the next test.
+    // gestures (tens of milliseconds) let the first finishLinking commit before
+    // the second starts. The genuinely overlapping case is the next test.
     await diagram.load({ model: trio });
     await expect(diagram.allEdges).toHaveCount(1); // seeded edge-ab
 
@@ -187,44 +220,41 @@ test.describe('awaitable hardening', () => {
   test('a link attempted while the previous finishLinking pass is suspended is refused, and linking recovers', async ({
     diagram,
   }) => {
-    await diagram.load({ model: trio });
+    // Node dragging is off: a pointerdown the linking directive refuses bubbles
+    // to the node and would otherwise drag node-c, moving the ports the final
+    // link is aimed at.
+    await diagram.load({ model: trio, config: { nodeDraggingEnabled: false } });
     await expect(diagram.allEdges).toHaveCount(1);
 
-    // Slow ONLY the finishLinking pass so the first gesture's cleanup is
-    // genuinely still in flight when the second gesture starts.
-    await diagram.page.evaluate(() => {
-      const stash = window as unknown as { __unregisterSlowLink?: () => void };
-      stash.__unregisterSlowLink = window.__diagram!.diagram.registerMiddleware({
-        name: 'e2e-slow-finish-linking',
-        execute: async (context, next) => {
-          if (context.modelActionTypes.includes('finishLinking')) {
-            await new Promise((resolve) => setTimeout(resolve, 150));
-          }
-          await next();
-        },
-      });
-    });
+    // Park ONLY the first finishLinking pass so the overlapping attempt below
+    // provably lands while that cleanup is in flight.
+    const gate = await installGate(diagram, 'finishLinking');
+    const linkingSource = () =>
+      diagram.page.evaluate(() => window.__diagram!.diagram.actionState().linking?.sourceNodeId ?? null);
 
     try {
       await diagram.linkPorts({ node: 'node-a', port: 'port-right' }, { node: 'node-c', port: 'port-left' });
-      // Attempt immediately — while finishLinking is suspended, isLinking() is
-      // still true and the new gesture is refused BY DESIGN (no edge, no crash).
-      await diagram.linkPorts({ node: 'node-c', port: 'port-right' }, { node: 'node-b', port: 'port-left' });
+      await expect.poll(gate.armed).toBe(true);
 
-      // First link committed; the overlapping attempt created nothing.
+      // While finishLinking is parked, isLinking() is still true and the new
+      // gesture is refused BY DESIGN: the live state still belongs to the first
+      // gesture and nothing has been committed.
+      await diagram.linkPorts({ node: 'node-c', port: 'port-right' }, { node: 'node-b', port: 'port-left' });
+      expect(await linkingSource()).toBe('node-a');
+      expect((await diagram.model.edges()).length).toBe(1);
+
+      // Releasing the parked pass commits the first link and clears the state.
+      await gate.release();
       await expect.poll(async () => (await diagram.model.edges()).length).toBe(2);
+      await expect.poll(linkingSource).toBe(null);
 
       // The guarded regression: a clobbered/stranded linking state would refuse
-      // every FUTURE link too. After the suspended cleanup finishes, linking
-      // must work again.
-      await diagram.page.waitForTimeout(250);
+      // every FUTURE link too.
       await diagram.linkPorts({ node: 'node-c', port: 'port-right' }, { node: 'node-b', port: 'port-left' });
       await expect.poll(async () => (await diagram.model.edges()).length).toBe(3);
       await expect(diagram.allEdges).toHaveCount(3);
     } finally {
-      await diagram.page.evaluate(() =>
-        (window as unknown as { __unregisterSlowLink?: () => void }).__unregisterSlowLink?.()
-      );
+      await gate.uninstall();
     }
   });
 
