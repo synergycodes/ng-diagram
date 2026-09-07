@@ -22,7 +22,7 @@ describe('NgDiagramBaseEdgeLabelComponent hidden input', () => {
   let registry: TemplateVisibilityRegistry;
   let addEdgeLabel: ReturnType<typeof vi.fn>;
 
-  const createFixture = (initiallyHidden = false) => {
+  const createFixture = (initiallyHidden = false, template?: string) => {
     registry = new TemplateVisibilityRegistry();
     addEdgeLabel = vi.fn();
     const flowCore = {
@@ -48,7 +48,11 @@ describe('NgDiagramBaseEdgeLabelComponent hidden input', () => {
           useValue: { edge: () => ({ id: 'edge1', points: [], measuredLabels: [] }) },
         },
       ],
-    }).compileComponents();
+    });
+    if (template) {
+      TestBed.overrideComponent(TestComponent, { set: { template } });
+    }
+    TestBed.compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);
     if (initiallyHidden) {
@@ -73,6 +77,14 @@ describe('NgDiagramBaseEdgeLabelComponent hidden input', () => {
 
     const host: HTMLElement = fixture.debugElement.query(By.css('ng-diagram-base-edge-label')).nativeElement;
     expect(host.style.display).toBe('');
+  });
+
+  it('should treat the static attribute form as hidden', () => {
+    createFixture(false, `<ng-diagram-base-edge-label [id]="'label1'" [positionOnEdge]="0.5" hidden />`);
+
+    const host: HTMLElement = fixture.debugElement.query(By.css('ng-diagram-base-edge-label')).nativeElement;
+    expect(host.style.display).toBe('none');
+    expect(registry.isLabelHidden('edge1', 'label1')).toBe(true);
   });
 
   it('should declare hidden state in the registry before registering the label', () => {

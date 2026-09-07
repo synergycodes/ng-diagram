@@ -16,6 +16,7 @@ import {
 } from 'ng-diagram';
 import type { HarnessBridge } from './api';
 import { DEFAULT_E2E_MODEL } from './default-model';
+import { DirectiveHiddenNodeComponent } from './directive-hidden-node.component';
 import { HiddenPortsNodeComponent } from './hidden-ports-node.component';
 import { LabelledEdgeComponent } from './labelled-edge.component';
 import { ResizeSidesNodeComponent } from './resize-sides-node.component';
@@ -69,6 +70,7 @@ export class HarnessComponent {
   readonly nodeTemplateMap = new NgDiagramNodeTemplateMap([
     ['resize-sides', ResizeSidesNodeComponent],
     ['hidden-ports', HiddenPortsNodeComponent],
+    ['directive-hidden', DirectiveHiddenNodeComponent],
   ]);
   readonly edgeTemplateMap = new NgDiagramEdgeTemplateMap([['labelled', LabelledEdgeComponent]]);
 

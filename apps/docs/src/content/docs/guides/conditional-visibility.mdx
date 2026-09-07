@@ -8,7 +8,7 @@ sidebar:
 
 ngDiagram treats hidden content as a first-class concept. Nodes and edges can be hidden through the model, every template can hide its element declaratively, and ports and edge labels have their own `hidden` inputs — all without blocking initialization or corrupting measurements.
 
-## Hiding nodes and edges from the model
+## Hiding nodes and edges with the `hidden` flag
 
 Set `hidden` in the model or toggle it at runtime:
 
@@ -28,7 +28,7 @@ Hiding a **group** hides all of its descendants; hiding a **node** hides every e
 Upgrading from a version before 1.4.0: the library now owns the `hidden` property name on nodes and edges. If your application already stored `hidden: true` on elements for its own purposes, those elements will disappear from the diagram after the upgrade.
 :::
 
-## Hiding from templates
+## Hiding nodes and edges with the `ngDiagramHidden` directive
 
 Use the `NgDiagramHiddenDirective` inside a node or edge template when visibility is view-state rather than model data:
 
@@ -43,7 +43,7 @@ Model flag, template binding, or inheritance — **any source hides the element*
 
 For bulk operations prefer the model `hidden` flag: a single `updateNodes` call updates any number of elements in one pass, while template bindings are per-element (their updates are coalesced per change-detection cycle, but the model path is still the cheaper and virtualization-safe choice).
 
-## Hiding ports and edge labels
+## Hiding ports and edge labels with the `hidden` input
 
 Ports and labels are declared in templates, not in the model, so they are hidden declaratively — independently of their owner:
 

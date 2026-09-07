@@ -339,4 +339,241 @@ test.describe('hidden elements', () => {
     const node = await diagram.model.getNodeById('visible-a');
     expect(node).not.toBeNull();
   });
+
+  test('initializes without the measurement timeout when a node is hidden through ngDiagramHidden', async ({
+    diagram,
+  }) => {
+    const warnings: string[] = [];
+    diagram.page.on('console', (msg) => {
+      if (msg.type() === 'warning') {
+        warnings.push(msg.text());
+      }
+    });
+
+    await diagram.load({
+      model: {
+        nodes: [
+          {
+            id: 'by-directive',
+            type: 'directive-hidden',
+            position: { x: 80, y: 80 },
+            data: { label: 'hidden by directive', directiveHidden: true },
+          },
+          { id: 'plain', position: { x: 360, y: 80 }, data: { label: 'plain' } },
+        ],
+        edges: [{ id: 'edge-to-hidden', source: 'plain', target: 'by-directive', data: {} }],
+      },
+    });
+
+    // The binding sits on an inner element of the template but hides its
+    // OWNER — the node host — and the edge follows its hidden endpoint.
+    await expect(diagram.node('by-directive')).toBeAttached();
+    await expect(diagram.node('by-directive')).toHaveCSS('display', 'none');
+    await expect(diagram.node('plain')).toBeVisible();
+    await expect(diagram.edge('edge-to-hidden')).toHaveCSS('display', 'none');
+
+    await diagram.page.waitForTimeout(2500);
+    expect(warnings.filter((text) => text.includes('Measurement timeout'))).toEqual([]);
+  });
+
+  test('toggles ngDiagramHidden at runtime both ways through the model data', async ({ diagram }) => {
+    await diagram.load({
+      model: {
+        nodes: [
+          {
+            id: 'by-directive',
+            type: 'directive-hidden',
+            position: { x: 80, y: 80 },
+            data: { label: 'toggled', directiveHidden: false },
+          },
+          { id: 'plain', position: { x: 360, y: 80 }, data: { label: 'plain' } },
+        ],
+        edges: [{ id: 'edge-to-toggled', source: 'plain', target: 'by-directive', data: {} }],
+      },
+    });
+
+    await expect(diagram.node('by-directive')).toBeVisible();
+    const measured = await diagram.model.getNodeById('by-directive');
+    expect(measured?.size?.width ?? 0).toBeGreaterThan(0);
+
+    await diagram.model.updateNode('by-directive', { data: { label: 'toggled', directiveHidden: true } });
+    await expect(diagram.node('by-directive')).toHaveCSS('display', 'none');
+    await expect(diagram.edge('edge-to-toggled')).toHaveCSS('display', 'none');
+    // Hiding keeps the geometry — the 0×0 report of the now display: none host is rejected.
+    expect((await diagram.model.getNodeById('by-directive'))?.size).toEqual(measured?.size);
+
+    await diagram.model.updateNode('by-directive', { data: { label: 'toggled', directiveHidden: false } });
+    await expect(diagram.node('by-directive')).toBeVisible();
+    await expect(diagram.edge('edge-to-toggled')).not.toHaveCSS('display', 'none');
+  });
+
+  test('unhiding a port at runtime makes it a linking target and hiding it again keeps its geometry', async ({
+    diagram,
+  }) => {
+    await diagram.load({
+      model: {
+        nodes: [
+          {
+            id: 'target',
+            type: 'hidden-ports',
+            position: { x: 80, y: 120 },
+            data: { label: 'ports hidden', portsHidden: true },
+          },
+          {
+            id: 'source',
+            type: 'hidden-ports',
+            position: { x: 420, y: 120 },
+            data: { label: 'ports visible', portsHidden: false },
+          },
+        ],
+        edges: [],
+      },
+    });
+
+    const portOf = async (nodeId: string, portId: string) =>
+      (await diagram.model.getNodeById(nodeId))?.measuredPorts?.find((port) => port.id === portId);
+
+    // Hidden from the first frame: mounted as display: none, never measured.
+    await expect(diagram.port('target', 'port-left')).toHaveCSS('display', 'none');
+    expect((await portOf('target', 'port-left'))?.size).toBeUndefined();
+
+    await diagram.model.updateNode('target', { data: { label: 'ports hidden', portsHidden: false } });
+    await expect(diagram.port('target', 'port-left')).not.toHaveCSS('display', 'none');
+    await expect.poll(async () => (await portOf('target', 'port-left'))?.size?.width ?? 0).toBeGreaterThan(0);
+
+    // Visible and measured — the drawn edge attaches to the port itself.
+    await diagram.linkPorts({ node: 'source', port: 'port-right' }, { node: 'target', port: 'port-left' });
+    await expect
+      .poll(async () =>
+        (await diagram.model.edges()).map((edge) => [edge.source, edge.sourcePort, edge.target, edge.targetPort])
+      )
+      .toEqual([['source', 'port-right', 'target', 'port-left']]);
+
+    const measuredPort = await portOf('target', 'port-left');
+    await diagram.model.updateNode('target', { data: { label: 'ports hidden', portsHidden: true } });
+    await expect(diagram.port('target', 'port-left')).toHaveCSS('display', 'none');
+
+    // The 0×0 report of the hidden port is rejected — its last geometry stays
+    // as the anchor of the edge attached to it.
+    const hiddenPort = await portOf('target', 'port-left');
+    expect(hiddenPort?.size).toEqual(measuredPort?.size);
+    expect(hiddenPort?.position).toEqual(measuredPort?.position);
+    expect((await diagram.model.edges()).length).toBe(1);
+  });
+
+  test('unhiding a label at runtime measures it and hiding it again keeps its size', async ({ diagram }) => {
+    await diagram.load({
+      model: {
+        nodes: [
+          { id: 'a', position: { x: 80, y: 80 }, data: { label: 'a' } },
+          { id: 'b', position: { x: 420, y: 80 }, data: { label: 'b' } },
+        ],
+        edges: [
+          {
+            id: 'labelled',
+            type: 'labelled',
+            source: 'a',
+            target: 'b',
+            data: { label: 'toggled label', labelHidden: true },
+          },
+        ],
+      },
+    });
+
+    const labelOf = async () =>
+      (await diagram.model.getEdgeById('labelled'))?.measuredLabels?.find((label) => label.id === 'edge-label');
+    const label = diagram.edge('labelled').locator('ng-diagram-base-edge-label');
+
+    await expect(label).toHaveCSS('display', 'none');
+    expect((await labelOf())?.size).toBeUndefined();
+
+    await diagram.model.updateEdge('labelled', { data: { label: 'toggled label', labelHidden: false } });
+    await expect(label).not.toHaveCSS('display', 'none');
+    await expect.poll(async () => (await labelOf())?.size?.width ?? 0).toBeGreaterThan(0);
+    const measuredLabel = await labelOf();
+
+    await diagram.model.updateEdge('labelled', { data: { label: 'toggled label', labelHidden: true } });
+    await expect(label).toHaveCSS('display', 'none');
+    expect((await labelOf())?.size).toEqual(measuredLabel?.size);
+  });
+
+  test('hiding a group hides its descendants and their edges through inheritance', async ({ diagram }) => {
+    await diagram.load({
+      model: {
+        nodes: [
+          {
+            id: 'group',
+            isGroup: true,
+            position: { x: 100, y: 100 },
+            size: { width: 360, height: 220 },
+            autoSize: false,
+            data: {},
+          },
+          { id: 'child-1', groupId: 'group', position: { x: 140, y: 160 }, data: { label: 'child 1' } },
+          { id: 'child-2', groupId: 'group', position: { x: 300, y: 160 }, data: { label: 'child 2' } },
+          { id: 'outside', position: { x: 600, y: 160 }, data: { label: 'outside' } },
+        ],
+        edges: [
+          { id: 'internal', source: 'child-1', target: 'child-2', data: {} },
+          { id: 'crossing', source: 'child-2', target: 'outside', data: {} },
+        ],
+      },
+    });
+
+    await expect(diagram.node('child-1')).toBeVisible();
+    await expect(diagram.edge('crossing')).not.toHaveCSS('display', 'none');
+
+    await diagram.model.updateNode('group', { hidden: true });
+
+    // The children never get a flag of their own — they follow the group, and
+    // so do the edges inside it and the one crossing its boundary.
+    for (const id of ['group', 'child-1', 'child-2']) {
+      await expect(diagram.node(id)).toHaveCSS('display', 'none');
+    }
+    await expect(diagram.edge('internal')).toHaveCSS('display', 'none');
+    await expect(diagram.edge('crossing')).toHaveCSS('display', 'none');
+    await expect(diagram.node('outside')).toBeVisible();
+    const child = await diagram.model.getNodeById('child-1');
+    expect(child?.hidden).toBeUndefined();
+    expect(child?.computedHidden).toBe(true);
+
+    await diagram.model.updateNode('group', { hidden: false });
+
+    for (const id of ['group', 'child-1', 'child-2']) {
+      await expect(diagram.node(id)).toBeVisible();
+    }
+    await expect(diagram.edge('crossing')).not.toHaveCSS('display', 'none');
+    expect((await diagram.model.getNodeById('child-1'))?.computedHidden).toBe(false);
+  });
+
+  test('an edge hidden by its own flag stays mounted, is skipped by select all and comes back on unhide', async ({
+    diagram,
+  }) => {
+    await diagram.load({
+      model: {
+        nodes: [
+          { id: 'a', position: { x: 80, y: 80 }, data: { label: 'a' } },
+          { id: 'b', position: { x: 420, y: 80 }, data: { label: 'b' } },
+        ],
+        edges: [
+          { id: 'own-hidden', source: 'a', target: 'b', hidden: true, data: {} },
+          { id: 'visible', source: 'b', target: 'a', data: {} },
+        ],
+      },
+    });
+
+    await expect(diagram.edge('own-hidden')).toBeAttached();
+    await expect(diagram.edge('own-hidden')).toHaveCSS('display', 'none');
+    await expect(diagram.edge('visible')).not.toHaveCSS('display', 'none');
+
+    await diagram.node('a').click();
+    await diagram.page.keyboard.press('Control+a');
+    await diagram.page.keyboard.press('Meta+a');
+    await expect
+      .poll(async () => (await diagram.selection.selection()).edges.map((edge) => edge.id))
+      .toEqual(['visible']);
+
+    await diagram.model.updateEdge('own-hidden', { hidden: false });
+    await expect(diagram.edge('own-hidden')).not.toHaveCSS('display', 'none');
+  });
 });
