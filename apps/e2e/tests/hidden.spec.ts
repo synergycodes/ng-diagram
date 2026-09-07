@@ -170,6 +170,42 @@ test.describe('hidden elements', () => {
     expect(fittedToVisible.scale).toBeGreaterThan(fittedToAll.scale * 2);
   });
 
+  test('a node whose ports start hidden gets measuredBounds and is not clipped by zoomToFit', async ({ diagram }) => {
+    await diagram.load({
+      model: {
+        nodes: [
+          {
+            id: 'ports-hidden',
+            type: 'hidden-ports',
+            position: { x: 0, y: 0 },
+            data: { label: 'ports hidden from start', portsHidden: true },
+          },
+          { id: 'anchor', position: { x: 300, y: 20 }, data: { label: 'anchor' } },
+          { id: 'far', position: { x: 4000, y: 2500 }, data: { label: 'far' } },
+        ],
+        edges: [],
+      },
+    });
+
+    // Hidden ports never measure, but they must not block measuredBounds —
+    // zoomToFit, computePartsBounds and the minimap frame all rely on it.
+    await expect.poll(async () => (await diagram.model.getNodeById('ports-hidden'))?.measuredBounds).toBeDefined();
+
+    // The demo repro: delete the far node, then Zoom to Fit.
+    await diagram.model.deleteNodes(['far']);
+    await diagram.viewport.zoomToFit();
+
+    // The node participates in the fit — nothing is cut off at the edges.
+    const nodeBox = await diagram.node('ports-hidden').boundingBox();
+    const containerBox = await diagram.container.boundingBox();
+    expect(nodeBox).not.toBeNull();
+    expect(containerBox).not.toBeNull();
+    expect(nodeBox!.x).toBeGreaterThanOrEqual(containerBox!.x);
+    expect(nodeBox!.y).toBeGreaterThanOrEqual(containerBox!.y);
+    expect(nodeBox!.x + nodeBox!.width).toBeLessThanOrEqual(containerBox!.x + containerBox!.width);
+    expect(nodeBox!.y + nodeBox!.height).toBeLessThanOrEqual(containerBox!.y + containerBox!.height);
+  });
+
   test('hidden children move with their dragged group', async ({ diagram }) => {
     const collapsedGroup: Partial<Model> = {
       nodes: [

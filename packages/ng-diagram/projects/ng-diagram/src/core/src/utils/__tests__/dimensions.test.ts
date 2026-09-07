@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Edge, Node } from '../../types';
+import { TemplateVisibilityRegistry } from '../../visibility/template-visibility-registry';
 import { calculatePartsBounds, getEdgeMeasuredBounds, getNodeMeasuredBounds } from '../dimensions';
 
 describe('dimensions', () => {
@@ -569,6 +570,74 @@ describe('dimensions', () => {
         y: 85,
         width: 130,
         height: 130,
+      });
+    });
+
+    it('should exclude registry-hidden ports from the bounds', () => {
+      const registry = new TemplateVisibilityRegistry();
+      registry.setPortHidden('node-1', 'port-1', true);
+
+      const node: Node = {
+        id: 'node-1',
+        position: { x: 100, y: 100 },
+        size: { width: 100, height: 100 },
+        data: {},
+        measuredPorts: [
+          // Measured earlier, hidden afterwards — must not extend the frame.
+          {
+            id: 'port-1',
+            position: { x: -10, y: 50 },
+            size: { width: 20, height: 10 },
+            type: 'both',
+            nodeId: 'node-1',
+            side: 'left',
+          },
+          {
+            id: 'port-2',
+            position: { x: 90, y: 45 },
+            size: { width: 20, height: 10 },
+            type: 'both',
+            nodeId: 'node-1',
+            side: 'right',
+          },
+        ],
+      };
+
+      const result = getNodeMeasuredBounds(node, registry);
+
+      expect(result).toEqual({
+        x: 100,
+        y: 100,
+        width: 110,
+        height: 100,
+      });
+    });
+
+    it('should include all ports when no registry is provided', () => {
+      const node: Node = {
+        id: 'node-1',
+        position: { x: 100, y: 100 },
+        size: { width: 100, height: 100 },
+        data: {},
+        measuredPorts: [
+          {
+            id: 'port-1',
+            position: { x: -10, y: 50 },
+            size: { width: 20, height: 10 },
+            type: 'both',
+            nodeId: 'node-1',
+            side: 'left',
+          },
+        ],
+      };
+
+      const result = getNodeMeasuredBounds(node);
+
+      expect(result).toEqual({
+        x: 90,
+        y: 100,
+        width: 110,
+        height: 100,
       });
     });
   });
