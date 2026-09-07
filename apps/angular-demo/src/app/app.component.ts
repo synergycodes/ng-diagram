@@ -48,6 +48,7 @@ import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.com
 import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
 import { DashedEdgeComponent } from './edge-template/dashed-edge/dashed-edge.component';
 import { DefaultLabelledEdgeComponent } from './edge-template/default-labelled-edge/default-labelled-edge.component';
+import { HiddenLabelEdgeComponent } from './edge-template/hidden-label-edge/hidden-label-edge.component';
 import { LabelledEdgeComponent } from './edge-template/labelled-edge/labelled-edge.component';
 import { MeasurementTestsComponent } from './measurement-tests/measurement-tests.component';
 import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap-node/image-minimap-node.component';
@@ -88,6 +89,7 @@ export class AppComponent {
     ['labelled-edge', LabelledEdgeComponent],
     ['dashed-edge', DashedEdgeComponent],
     ['default-labelled-edge', DefaultLabelledEdgeComponent],
+    ['hidden-label-edge', HiddenLabelEdgeComponent],
   ]);
 
   minimapNodeTemplateMap = new NgDiagramMinimapNodeTemplateMap([['image', ImageMinimapNodeComponent]]);

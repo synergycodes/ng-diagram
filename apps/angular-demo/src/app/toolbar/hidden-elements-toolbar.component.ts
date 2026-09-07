@@ -1,6 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from '@angular/core';
-import { NgDiagramModelService, NgDiagramViewportService } from 'ng-diagram';
+import {
+  GroupNode,
+  NgDiagramModelService,
+  NgDiagramSelectionService,
+  NgDiagramService,
+  NgDiagramViewportService,
+  Node,
+} from 'ng-diagram';
 import { COLLAPSIBLE_GROUP_ID, FAR_NODE_ID } from '../data/hidden-elements-model';
+
+const isGroupNode = (node: Node): node is GroupNode => 'isGroup' in node && node.isGroup === true;
 
 @Component({
   selector: 'app-hidden-elements-toolbar',
@@ -10,7 +19,10 @@ import { COLLAPSIBLE_GROUP_ID, FAR_NODE_ID } from '../data/hidden-elements-model
     <div>
       <button (click)="exit.emit()">Exit</button>
       <span class="separator">|</span>
-      <button (click)="toggleGroup()">{{ isCollapsed() ? 'Expand Group' : 'Collapse Group' }}</button>
+      <button (click)="toggleGroup()">{{ isCollapsed() ? 'Expand demo group' : 'Collapse demo group' }}</button>
+      <button (click)="toggleSelectedGroups()" [disabled]="selectedGroups().length === 0">
+        {{ isSelectedCollapsed() ? 'Expand selected group' : 'Collapse selected group' }}
+      </button>
       <label class="demo-toggle">
         <input type="checkbox" [checked]="wholeGroupHidden()" (change)="toggleWholeGroup()" />
         Hide whole group (inheritance)
@@ -33,6 +45,7 @@ import { COLLAPSIBLE_GROUP_ID, FAR_NODE_ID } from '../data/hidden-elements-model
         <input type="checkbox" [checked]="ghostsRevealed()" (change)="toggleGhosts()" />
         Reveal hidden as ghosts
       </label>
+      <button (click)="toggleDebugMode()">{{ debugModeEnabled() ? 'Disable' : 'Enable' }} debug mode</button>
       <button (click)="logDomProof()">Log DOM proof</button>
       <button (click)="zoomToFit()">Zoom to Fit</button>
       <span class="group-label">
@@ -44,6 +57,8 @@ import { COLLAPSIBLE_GROUP_ID, FAR_NODE_ID } from '../data/hidden-elements-model
 })
 export class HiddenElementsToolbarComponent {
   private readonly modelService = inject(NgDiagramModelService);
+  private readonly ngDiagramService = inject(NgDiagramService);
+  private readonly selectionService = inject(NgDiagramSelectionService);
   private readonly viewportService = inject(NgDiagramViewportService);
 
   exit = output<void>();
@@ -82,6 +97,26 @@ export class HiddenElementsToolbarComponent {
     this.modelService.updateNodes(this.groupChildren().map(({ id }) => ({ id, hidden })));
   }
 
+  /** Groups in the current selection — the target of the selected-group collapse. */
+  protected readonly selectedGroups = computed(() => this.selectionService.selection().nodes.filter(isGroupNode));
+
+  private readonly selectedGroupChildren = computed(() => {
+    const groupIds = new Set(this.selectedGroups().map((group) => group.id));
+    return this.modelService.nodes().filter((node) => node.groupId !== undefined && groupIds.has(node.groupId));
+  });
+
+  protected readonly isSelectedCollapsed = computed(() => this.selectedGroupChildren().some((node) => node.hidden));
+
+  /** Collapses/expands every selected group by toggling the `hidden` flag of its direct children. */
+  toggleSelectedGroups(): void {
+    const children = this.selectedGroupChildren();
+    if (children.length === 0) {
+      return;
+    }
+    const hidden = !this.isSelectedCollapsed();
+    this.modelService.updateNodes(children.map(({ id }) => ({ id, hidden })));
+  }
+
   toggleChild(id: string, hidden: boolean): void {
     this.modelService.updateNode(id, { hidden });
   }
@@ -106,6 +141,13 @@ export class HiddenElementsToolbarComponent {
   toggleGhosts(): void {
     this.ghostsRevealed.update((revealed) => !revealed);
     this.revealGhosts.emit(this.ghostsRevealed());
+  }
+
+  protected readonly debugModeEnabled = computed(() => this.ngDiagramService.config().debugMode || false);
+
+  /** Debug mode registers the logger middleware and exposes window.flowCore for console inspection. */
+  toggleDebugMode(): void {
+    this.ngDiagramService.updateConfig({ debugMode: !this.debugModeEnabled() });
   }
 
   /**

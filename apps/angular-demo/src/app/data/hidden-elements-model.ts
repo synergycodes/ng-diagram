@@ -6,10 +6,12 @@ export const FAR_NODE_ID = 'he-far';
 /**
  * Model for the hidden-elements demo: a group whose children carry
  * `hidden: true` from the start (the group is "collapsed"), edges between
- * the children and to outside nodes, and a node whose ports are hidden
- * declaratively via the `[hidden]` port input.
+ * the children and to outside nodes, and every other kind of initially
+ * hidden content — a fully hidden node, a node whose ports start hidden
+ * via the `[hidden]` port input, an edge with a hidden label, and an edge
+ * hidden by its own flag.
  *
- * The hidden children stay mounted as `display: none` and do not block
+ * Hidden content stays mounted as `display: none` and does not block
  * initialization — no 2s measurement-timeout warning despite never being
  * visible. Edges touching a hidden endpoint hide automatically.
  */
@@ -55,6 +57,22 @@ export function createHiddenElementsModel(): { nodes: Node[]; edges: Edge[] } {
       type: 'hidden-port',
       position: { x: 850, y: 400 },
       data: { text: 'Declarative port [hidden]' },
+    },
+    // Fully hidden from the very first render — a model-hidden node creates
+    // no measurement expectation, so initialization never waits for it.
+    {
+      id: 'he-hidden-node',
+      hidden: true,
+      position: { x: 850, y: 60 },
+      data: { label: 'Hidden from start' },
+    },
+    // Starts with both ports hidden (data.portsHidden seeds the template) —
+    // hidden ports never measure and do not block initialization either.
+    {
+      id: 'he-ports-hidden',
+      type: 'hidden-port',
+      position: { x: 1150, y: 250 },
+      data: { text: 'Ports hidden from start', portsHidden: true },
     },
     // Far away on purpose: hiding it visibly shrinks the zoomToFit frame —
     // hidden geometry must not inflate the bounds.
@@ -108,6 +126,25 @@ export function createHiddenElementsModel(): { nodes: Node[]; edges: Edge[] } {
       target: FAR_NODE_ID,
       sourcePort: 'port-right',
       targetPort: 'port-left',
+      data: {},
+    },
+    // Visible edge whose label is hidden via the `[hidden]` label input — the
+    // label stays mounted but unmeasured and never blocks initialization.
+    // Unhide it: updateEdge('he-edge-hidden-label', { data: { labelHidden: false } }).
+    {
+      id: 'he-edge-hidden-label',
+      type: 'hidden-label-edge',
+      source: 'he-outside',
+      target: 'he-ports-hidden',
+      data: {},
+    },
+    // Hidden by its own flag between two visible nodes — the edge-level
+    // `hidden`, independent of endpoint visibility.
+    {
+      id: 'he-edge-hidden',
+      source: 'he-port-node',
+      target: 'he-ports-hidden',
+      hidden: true,
       data: {},
     },
   ];

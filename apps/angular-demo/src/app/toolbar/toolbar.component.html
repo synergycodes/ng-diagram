@@ -5,6 +5,8 @@
   <button [disabled]="!isNodeSelected()" (click)="onChangeNodeTypeClick()">Change Node Type</button>
   <button [disabled]="!isAnythingSelected()" (click)="onBringToFrontClick()">Bring to Front</button>
   <button [disabled]="!isAnythingSelected()" (click)="onSendToBackClick()">Send to Back</button>
+  <button [disabled]="!isAnythingSelected()" (click)="onHideSelectionClick()">Hide selection</button>
+  <button (click)="onShowAllClick()">Show all</button>
   <button [disabled]="!selectedLabelledEdge()" (click)="onToggleLabelPositionClick()">
     {{ isLabelAbsolute() ? 'Label: Absolute → Relative' : 'Label: Relative → Absolute' }}
   </button>
