@@ -69,7 +69,10 @@ export class MiddlewareManager {
     modelActionTypes: ModelActionTypes
   ): Promise<FlowState | undefined> {
     if (!this.eventEmitterMiddleware && this.flowCore.eventManager) {
-      this.eventEmitterMiddleware = createEventEmitterMiddleware(this.flowCore.eventManager);
+      this.eventEmitterMiddleware = createEventEmitterMiddleware(
+        this.flowCore.eventManager,
+        this.flowCore.templateVisibilityRegistry
+      );
     }
 
     if (!this.measurementTrackingMiddleware && this.flowCore.measurementTracker) {

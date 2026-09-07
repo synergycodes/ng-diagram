@@ -44,7 +44,55 @@ test.describe('hidden elements', () => {
     await expect(diagram.edge('edge-ac')).not.toHaveCSS('display', 'none');
 
     // The 2s init safety timeout never fires — hidden content creates no
-    // measurement expectations.
+    // measurement expectations. Wait past the hatch window so a late timeout
+    // (a delayed diagramInit) cannot slip through unnoticed.
+    await diagram.page.waitForTimeout(2500);
+    expect(warnings.filter((text) => text.includes('Measurement timeout'))).toEqual([]);
+  });
+
+  test('initializes without the measurement timeout when ports and edge labels start hidden', async ({ diagram }) => {
+    const warnings: string[] = [];
+    diagram.page.on('console', (msg) => {
+      if (msg.type() === 'warning') {
+        warnings.push(msg.text());
+      }
+    });
+
+    await diagram.load({
+      model: {
+        nodes: [
+          {
+            id: 'ports-hidden',
+            type: 'hidden-ports',
+            position: { x: 80, y: 80 },
+            data: { label: 'ports hidden', portsHidden: true },
+          },
+          { id: 'plain', position: { x: 360, y: 80 }, data: { label: 'plain' } },
+        ],
+        edges: [
+          {
+            id: 'edge-hidden-label',
+            type: 'labelled',
+            source: 'ports-hidden',
+            target: 'plain',
+            data: { label: 'hidden label', labelHidden: true },
+          },
+        ],
+      },
+    });
+
+    // Template-hidden ports and labels stay mounted as display: none from the
+    // very first frame — they never get measured.
+    await expect(diagram.port('ports-hidden', 'port-left')).toBeAttached();
+    await expect(diagram.port('ports-hidden', 'port-left')).toHaveCSS('display', 'none');
+    await expect(diagram.port('ports-hidden', 'port-right')).toHaveCSS('display', 'none');
+    await expect(diagram.edge('edge-hidden-label').locator('ng-diagram-base-edge-label')).toBeAttached();
+    await expect(diagram.edge('edge-hidden-label').locator('ng-diagram-base-edge-label')).toHaveCSS('display', 'none');
+
+    // diagramInit already arrived (load waits for it) — now wait past the 2s
+    // safety hatch and assert it never fired: hidden ports/labels must not
+    // keep the init event waiting.
+    await diagram.page.waitForTimeout(2500);
     expect(warnings.filter((text) => text.includes('Measurement timeout'))).toEqual([]);
   });
 
