@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, linkedSignal } from '@angular/core';
 import { NgDiagramNodeSelectedDirective, NgDiagramNodeTemplate, NgDiagramPortComponent, Node } from 'ng-diagram';
 
 /**
@@ -17,12 +17,20 @@ import { NgDiagramNodeSelectedDirective, NgDiagramNodeTemplate, NgDiagramPortCom
     '[class.ng-diagram-port-hoverable]': 'true',
   },
 })
-export class HiddenPortNodeComponent implements NgDiagramNodeTemplate<{ text: string }> {
-  node = input.required<Node<{ text: string }>>();
+export class HiddenPortNodeComponent implements NgDiagramNodeTemplate<HiddenPortNodeData> {
+  node = input.required<Node<HiddenPortNodeData>>();
 
-  portsHidden = signal(false);
+  // Seeded from the model so a node can start with hidden ports — they are
+  // declared hidden before registering for measurement, so they never block
+  // initialization. The checkbox toggles the local state afterwards.
+  portsHidden = linkedSignal(() => this.node().data.portsHidden === true);
 
   togglePorts(): void {
     this.portsHidden.update((v) => !v);
   }
+}
+
+interface HiddenPortNodeData {
+  text: string;
+  portsHidden?: boolean;
 }

@@ -4,9 +4,9 @@ import { MiddlewareExecutor } from './middleware-executor';
 import {
   createEventEmitterMiddleware,
   createHiddenComputationMiddleware,
+  createMeasuredBoundsMiddleware,
   createMeasurementTrackingMiddleware,
   loggerMiddleware,
-  measuredBoundsMiddleware,
 } from './middlewares';
 
 export class MiddlewareManager {
@@ -15,6 +15,7 @@ export class MiddlewareManager {
   private measurementTrackingMiddleware: Middleware | null = null;
   private hiddenComputationMiddleware: Middleware | null = null;
   private hiddenComputationFinalizeMiddleware: Middleware | null = null;
+  private measuredBoundsMiddleware: Middleware | null = null;
   readonly flowCore: FlowCore;
 
   constructor(flowCore: FlowCore, middlewares?: MiddlewareChain) {
@@ -69,11 +70,18 @@ export class MiddlewareManager {
     modelActionTypes: ModelActionTypes
   ): Promise<FlowState | undefined> {
     if (!this.eventEmitterMiddleware && this.flowCore.eventManager) {
-      this.eventEmitterMiddleware = createEventEmitterMiddleware(this.flowCore.eventManager);
+      this.eventEmitterMiddleware = createEventEmitterMiddleware(
+        this.flowCore.eventManager,
+        this.flowCore.templateVisibilityRegistry
+      );
     }
 
     if (!this.measurementTrackingMiddleware && this.flowCore.measurementTracker) {
       this.measurementTrackingMiddleware = createMeasurementTrackingMiddleware(this.flowCore.measurementTracker);
+    }
+
+    if (!this.measuredBoundsMiddleware) {
+      this.measuredBoundsMiddleware = createMeasuredBoundsMiddleware(this.flowCore.templateVisibilityRegistry);
     }
 
     if (!this.hiddenComputationMiddleware && this.flowCore.templateVisibilityRegistry) {
@@ -105,7 +113,7 @@ export class MiddlewareManager {
       ...(this.hiddenComputationMiddleware ? [this.hiddenComputationMiddleware] : []),
       ...this.middlewareChain,
       ...(this.hiddenComputationFinalizeMiddleware ? [this.hiddenComputationFinalizeMiddleware] : []),
-      measuredBoundsMiddleware,
+      this.measuredBoundsMiddleware,
       loggerMiddleware,
       ...(this.measurementTrackingMiddleware ? [this.measurementTrackingMiddleware] : []),
       ...(this.eventEmitterMiddleware ? [this.eventEmitterMiddleware] : []),

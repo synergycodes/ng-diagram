@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { MiddlewareContext, Node } from '../../../../types';
-import { measuredBoundsMiddleware } from '../measured-bounds-assignment';
+import { TemplateVisibilityRegistry } from '../../../../visibility/template-visibility-registry';
+import { createMeasuredBoundsMiddleware } from '../measured-bounds-assignment';
+
+const measuredBoundsMiddleware = createMeasuredBoundsMiddleware();
 
 describe('measuredBoundsMiddleware', () => {
   let mockContext: Partial<MiddlewareContext>;
@@ -136,6 +139,37 @@ describe('measuredBoundsMiddleware', () => {
 
       expect(mockNext).toHaveBeenCalledWith({
         nodesToUpdate: [{ id: 'node1', measuredBounds: expect.any(Object) }],
+      });
+    });
+
+    it('should assign bounds despite unmeasured ports when they are registry-hidden, excluding them from the extents', () => {
+      const registry = new TemplateVisibilityRegistry();
+      registry.setPortHidden('node1', 'port1', true);
+      const middleware = createMeasuredBoundsMiddleware(registry);
+
+      const node: Node = {
+        id: 'node1',
+        position: { x: 100, y: 100 },
+        size: { width: 200, height: 100 },
+        data: {},
+        measuredPorts: [
+          {
+            id: 'port1',
+            position: undefined, // Hidden from the first frame — never measured
+            size: undefined,
+            type: 'both',
+            nodeId: 'node1',
+            side: 'left',
+          },
+        ],
+      };
+
+      nodesMap.set('node1', node);
+
+      middleware.execute(mockContext as MiddlewareContext, mockNext, vi.fn());
+
+      expect(mockNext).toHaveBeenCalledWith({
+        nodesToUpdate: [{ id: 'node1', measuredBounds: { x: 100, y: 100, width: 200, height: 100 } }],
       });
     });
 

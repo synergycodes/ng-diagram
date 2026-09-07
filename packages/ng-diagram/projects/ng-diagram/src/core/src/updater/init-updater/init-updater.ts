@@ -339,7 +339,8 @@ export class InitUpdater implements Updater {
 
         console.warn(
           '[InitUpdater] Measurement timeout reached. Some entities may not be measurable (e.g., display: none).' +
-            ' Ensure the model provided to ng-diagram was created with initializeModel() or initializeModelAdapter() (for custom ModelAdapter).',
+            ' Ensure the model provided to ng-diagram was created with initializeModel() or initializeModelAdapter() (for custom ModelAdapter).' +
+            ' To intentionally hide elements, use the `hidden` flag on nodes/edges or the `hidden` input on ports and edge labels — hidden elements create no measurement expectations.',
           {
             nodes: { expected: expectedNodes, measured: measuredNodes },
             ports: { expected: expectedPorts, measured: measuredPorts },
