@@ -1,7 +1,6 @@
 :host {
-  position: absolute;
-  height: 100%;
-  padding: 1rem;
+  flex: 0 0 auto;
+  margin-right: 1rem;
   margin-top: 0;
 
   .palette {
@@ -13,6 +12,7 @@
     gap: 0.5rem;
     height: 100%;
     width: 200px;
+    box-sizing: border-box;
     user-select: none;
   }
 }

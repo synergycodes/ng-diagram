@@ -29,7 +29,7 @@ describe('NgDiagramHiddenDirective', () => {
   let registry: TemplateVisibilityRegistry;
   let flowCore: MutableFlowCore;
 
-  const setup = (providers: { nodeId?: string; edgeId?: string; internalId?: string }) => {
+  const setup = (providers: { nodeId?: string; edgeId?: string; internalId?: string }, template?: string) => {
     registry = new TemplateVisibilityRegistry();
     const node = providers.nodeId ? { id: providers.nodeId, _internalId: providers.internalId } : undefined;
     const edge = providers.edgeId ? { id: providers.edgeId, _internalId: providers.internalId } : undefined;
@@ -51,11 +51,21 @@ describe('NgDiagramHiddenDirective', () => {
         ...(node ? [{ provide: NgDiagramNodeComponent, useValue: { node: () => node } }] : []),
         ...(edge ? [{ provide: NgDiagramEdgeComponent, useValue: { edge: () => edge } }] : []),
       ],
-    }).compileComponents();
+    });
+    if (template) {
+      TestBed.overrideComponent(TestComponent, { set: { template } });
+    }
+    TestBed.compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);
     fixture.detectChanges();
   };
+
+  it('should treat the static attribute form as hidden', () => {
+    setup({ nodeId: 'node1' }, `<div ngDiagramHidden></div>`);
+
+    expect(registry.isNodeHidden('node1')).toBe(true);
+  });
 
   it('should write node hidden state to the registry inside a node template', () => {
     setup({ nodeId: 'node1' });

@@ -65,6 +65,29 @@ export class ToolbarComponent {
     this.ngDiagramNodeService.sendToBack();
   }
 
+  /** Sets `hidden: true` on every selected node and edge — hidden content stays selected, so other features can be exercised against it. */
+  onHideSelectionClick(): void {
+    const { nodes, edges } = this.ngDiagramSelectionService.selection();
+    if (nodes.length > 0) {
+      this.ngDiagramModelService.updateNodes(nodes.map(({ id }) => ({ id, hidden: true })));
+    }
+    if (edges.length > 0) {
+      this.ngDiagramModelService.updateEdges(edges.map(({ id }) => ({ id, hidden: true })));
+    }
+  }
+
+  /** Clears the `hidden` flag on every node and edge that has it set. */
+  onShowAllClick(): void {
+    const hiddenNodes = this.ngDiagramModelService.nodes().filter((node) => node.hidden);
+    const hiddenEdges = this.ngDiagramModelService.edges().filter((edge) => edge.hidden);
+    if (hiddenNodes.length > 0) {
+      this.ngDiagramModelService.updateNodes(hiddenNodes.map(({ id }) => ({ id, hidden: false })));
+    }
+    if (hiddenEdges.length > 0) {
+      this.ngDiagramModelService.updateEdges(hiddenEdges.map(({ id }) => ({ id, hidden: false })));
+    }
+  }
+
   onToggleLabelPositionClick(): void {
     const edge = this.selectedLabelledEdge();
     if (!edge) return;

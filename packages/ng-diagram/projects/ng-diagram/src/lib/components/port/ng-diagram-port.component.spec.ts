@@ -25,7 +25,7 @@ describe('NgDiagramPortComponent hidden input', () => {
   let addPort: ReturnType<typeof vi.fn>;
   let flowCore: Partial<FlowCore>;
 
-  const createFixture = (initiallyHidden = false) => {
+  const createFixture = (initiallyHidden = false, template?: string) => {
     registry = new TemplateVisibilityRegistry();
     addPort = vi.fn();
     flowCore = {
@@ -61,7 +61,11 @@ describe('NgDiagramPortComponent hidden input', () => {
           useValue: { node: () => ({ id: 'node1' }) },
         },
       ],
-    }).compileComponents();
+    });
+    if (template) {
+      TestBed.overrideComponent(TestComponent, { set: { template } });
+    }
+    TestBed.compileComponents();
 
     fixture = TestBed.createComponent(TestComponent);
     if (initiallyHidden) {
@@ -86,6 +90,14 @@ describe('NgDiagramPortComponent hidden input', () => {
 
     const host: HTMLElement = fixture.debugElement.query(By.css('ng-diagram-port')).nativeElement;
     expect(host.style.display).toBe('block');
+  });
+
+  it('should treat the static attribute form as hidden', () => {
+    createFixture(false, `<ng-diagram-port [id]="'port1'" [type]="'source'" [side]="'right'" hidden />`);
+
+    const host: HTMLElement = fixture.debugElement.query(By.css('ng-diagram-port')).nativeElement;
+    expect(host.style.display).toBe('none');
+    expect(registry.isPortHidden('node1', 'port1')).toBe(true);
   });
 
   it('should declare hidden state in the registry before registering the port', () => {

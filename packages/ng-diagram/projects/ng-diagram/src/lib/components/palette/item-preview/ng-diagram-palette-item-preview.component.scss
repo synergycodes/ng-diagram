@@ -1,6 +1,21 @@
+// The parked copy is contained by an internal wrapper, so it neither paints over the palette nor
+// extends the page's scrollable area — and no application rule on the host can unclip it.
+:host {
+  display: block;
+}
+
+.preview-clip {
+  position: relative;
+  overflow: hidden;
+  height: 0;
+}
+
 .dragged-node {
   position: absolute;
   background-color: transparent;
   pointer-events: none;
   left: -1000px;
+  // The same layout the drag-image clone uses (`max-content`, no shrink-to-fit), so the parked
+  // copy measures exactly what the drag image will show.
+  width: max-content;
 }

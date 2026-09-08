@@ -4,6 +4,7 @@ import type { EventManager } from '../../../../../event-manager/event-manager';
 import type { DiagramInitEvent } from '../../../../../event-manager/event-types';
 import { mockEdge, mockNode } from '../../../../../test-utils';
 import type { Edge, EdgeLabel, MiddlewareContext, Node, Port } from '../../../../../types';
+import { TemplateVisibilityRegistry } from '../../../../../visibility/template-visibility-registry';
 import { DiagramInitEmitter } from '../diagram-init.emitter';
 
 describe('DiagramInitEmitter', () => {
@@ -811,6 +812,154 @@ describe('DiagramInitEmitter', () => {
       const event = deferredEmitSpy.mock.calls[0][1] as DiagramInitEvent;
       expect(event.nodes).toHaveLength(3);
       expect(event.edges).toHaveLength(1);
+    });
+  });
+
+  describe('hidden elements at init', () => {
+    const unmeasuredPort = (id: string, nodeId: string): Port => ({
+      id,
+      type: 'both',
+      side: 'left',
+      position: undefined,
+      size: undefined,
+      nodeId,
+    });
+
+    const unmeasuredLabel = (id: string): EdgeLabel => ({
+      id,
+      position: undefined,
+      size: undefined,
+      positionOnEdge: 0.5,
+    });
+
+    it('should not wait for a computedHidden node or its ports', () => {
+      const hiddenNode: Node = {
+        ...mockNode,
+        id: 'node1',
+        computedHidden: true,
+        size: undefined,
+        measuredPorts: [unmeasuredPort('port1', 'node1')],
+      };
+
+      context.modelActionTypes = ['init'];
+      context.nodesMap.set('node1', hiddenNode);
+
+      emitter.emit(context, eventManager);
+
+      // Hidden node creates no measurement expectations — emits immediately.
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should not wait for registry-hidden ports on a visible node', () => {
+      const registry = new TemplateVisibilityRegistry();
+      registry.setPortHidden('node1', 'port1', true);
+      registry.setPortHidden('node1', 'port2', true);
+      emitter = new DiagramInitEmitter(registry);
+
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: { width: 100, height: 50 },
+        measuredPorts: [unmeasuredPort('port1', 'node1'), unmeasuredPort('port2', 'node1')],
+      };
+
+      context.modelActionTypes = ['init'];
+      context.nodesMap.set('node1', node);
+
+      emitter.emit(context, eventManager);
+
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should still wait for visible unmeasured ports when only some ports are hidden', () => {
+      const registry = new TemplateVisibilityRegistry();
+      registry.setPortHidden('node1', 'port1', true);
+      emitter = new DiagramInitEmitter(registry);
+
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: { width: 100, height: 50 },
+        measuredPorts: [unmeasuredPort('port1', 'node1'), unmeasuredPort('port2', 'node1')],
+      };
+
+      context.modelActionTypes = ['init'];
+      context.nodesMap.set('node1', node);
+
+      emitter.emit(context, eventManager);
+
+      // port2 is visible and unmeasured — must keep waiting.
+      expect(deferredEmitSpy).not.toHaveBeenCalled();
+
+      context.modelActionTypes = ['updateNode'];
+      context.initialUpdate = {
+        nodesToUpdate: [
+          {
+            id: 'node1',
+            measuredPorts: [
+              {
+                id: 'port2',
+                type: 'both',
+                side: 'right',
+                nodeId: 'node1',
+                position: { x: 90, y: 25 },
+                size: { width: 10, height: 10 },
+              },
+            ],
+          },
+        ],
+      };
+
+      emitter.emit(context, eventManager);
+
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should not wait for labels of a computedHidden edge', () => {
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: { width: 100, height: 50 },
+      };
+      const hiddenEdge: Edge = {
+        ...mockEdge,
+        id: 'edge1',
+        computedHidden: true,
+        measuredLabels: [unmeasuredLabel('label1')],
+      };
+
+      context.modelActionTypes = ['init'];
+      context.nodesMap.set('node1', node);
+      context.edgesMap.set('edge1', hiddenEdge);
+
+      emitter.emit(context, eventManager);
+
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
+    });
+
+    it('should not wait for registry-hidden edge labels on a visible edge', () => {
+      const registry = new TemplateVisibilityRegistry();
+      registry.setLabelHidden('edge1', 'label1', true);
+      emitter = new DiagramInitEmitter(registry);
+
+      const node: Node = {
+        ...mockNode,
+        id: 'node1',
+        size: { width: 100, height: 50 },
+      };
+      const edge: Edge = {
+        ...mockEdge,
+        id: 'edge1',
+        measuredLabels: [unmeasuredLabel('label1')],
+      };
+
+      context.modelActionTypes = ['init'];
+      context.nodesMap.set('node1', node);
+      context.edgesMap.set('edge1', edge);
+
+      emitter.emit(context, eventManager);
+
+      expect(deferredEmitSpy).toHaveBeenCalledOnce();
     });
   });
 

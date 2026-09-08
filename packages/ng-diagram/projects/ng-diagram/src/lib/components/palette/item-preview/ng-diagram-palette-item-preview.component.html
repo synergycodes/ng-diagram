@@ -1,5 +1,5 @@
-<div #preview [class.dragged-node]="isSafari" [style.zoom]="isSafari ? scale() : null">
-  <div [class.dragged-node]="!isSafari" [style.transform]="!isSafari ? scaleTransform : null">
+<div class="preview-clip">
+  <div #preview class="dragged-node">
     <ng-content></ng-content>
   </div>
 </div>
