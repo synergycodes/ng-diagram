@@ -1,0 +1,28 @@
+<ng-diagram-node-resize-adornment [defaultResizable]="!collapsed()">
+  <div
+    class="collapsible-group-node"
+    [class.collapsed]="collapsed()"
+    ngDiagramNodeSelected
+    [node]="node()"
+    ngDiagramGroupHighlighted
+  >
+    <div class="collapsible-group-node-header">
+      <button
+        class="collapse-toggle"
+        (pointerdown)="$event.stopPropagation()"
+        (click)="toggleCollapse()"
+      >
+        <span class="collapse-toggle-icon" [class.rotated]="!collapsed()"
+          >></span
+        >
+      </button>
+      <div class="collapsible-group-node-header-title">{{ groupTitle() }}</div>
+      @if (collapsed()) {
+        <span class="child-count">{{ childCount() }}</span>
+      }
+    </div>
+    @if (!collapsed()) {
+      <div class="collapsible-group-node-content"></div>
+    }
+  </div>
+</ng-diagram-node-resize-adornment>

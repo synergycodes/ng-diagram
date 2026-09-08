@@ -1,0 +1,16 @@
+.diagram {
+  position: relative;
+  display: flex;
+  height: var(--ng-diagram-height);
+  border: var(--ng-diagram-border);
+  margin-top: 0;
+
+  // All nodes start at (0, 0) and the initial ELK layout only runs once the
+  // diagram has initialized, so keep the canvas invisible until the first
+  // layout and zoom-to-fit have completed.
+  visibility: hidden;
+
+  &.ready {
+    visibility: visible;
+  }
+}

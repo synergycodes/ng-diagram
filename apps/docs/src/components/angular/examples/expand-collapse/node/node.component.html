@@ -1,0 +1,21 @@
+<!-- Base node template provides default selection, dragging, and sizing behaviour. -->
+<ng-diagram-base-node-template [node]="node()">
+  <div class="tree-node-content">
+    <span class="node-label">{{ node().data.label }}</span>
+  </div>
+</ng-diagram-base-node-template>
+
+<!-- Expand / collapse button – only rendered when the node has child edges. -->
+@if (node().data.hasChildren) {
+  <button
+    class="toggle-btn"
+    (pointerdown)="$event.stopPropagation()"
+    (click)="onToggle($event)"
+  >
+    {{ node().data.collapsed ? '+' : '−' }}
+  </button>
+}
+
+<!-- Connection ports: top for incoming edges, bottom for outgoing edges. -->
+<ng-diagram-port id="port-bottom" type="both" side="bottom" />
+<ng-diagram-port id="port-top" type="both" side="top" />

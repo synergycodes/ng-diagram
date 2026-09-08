@@ -98,6 +98,21 @@ export const examples: ContentTile[] = [
     imageAlt: 'Screenshot of Performance Test example',
   },
   {
+    title: 'Expand/Collapse Subtree',
+    description: 'Collapse and expand tree subtrees with the hidden flag, with ELK.js re-layouting the visible nodes.',
+    href: '/docs/examples/expand-collapse',
+    image: '/docs/assets/examples/expand-collapse.png',
+    imageAlt: 'Screenshot of Expand/Collapse Subtree example',
+  },
+  {
+    title: 'Expand/Collapse Groups',
+    description:
+      'Collapse groups to a header bar with the hidden flag, rerouting boundary edges so external connections stay visible.',
+    href: '/docs/examples/expand-collapse-groups',
+    image: '/docs/assets/examples/expand-collapse-groups.png',
+    imageAlt: 'Screenshot of Expand/Collapse Groups example',
+  },
+  {
     title: 'Landing Page Diagram',
     description: `Demonstrates the library's capabilities and integration with external libraries like charts in real-case scenario.`,
     href: '/docs/examples/landing-page-diagram',

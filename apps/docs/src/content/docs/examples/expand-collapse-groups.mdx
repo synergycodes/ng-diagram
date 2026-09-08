@@ -1,0 +1,31 @@
+---
+title: Expand/Collapse Groups Example
+description: Example of collapsible groups using the hidden flag, with boundary edges rerouted to the collapsed group
+version: 'since v1.4.0'
+sidebar:
+  order: 16
+  label: Expand/Collapse Groups
+  badge: New
+---
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
+import ExpandCollapseGroups from '@examples/expand-collapse-groups/expand-collapse-groups.astro';
+
+This example demonstrates collapsible groups, including nested ones. Collapsing a group hides its members using the model-level [`hidden`](/docs/guides/conditional-visibility/) flag and shrinks the group to a header bar, while edges crossing the group boundary are temporarily rerouted to the group so external connections stay visible.
+
+<br />
+
+<ExpandCollapseGroups />
+<CodeViewer dirName="examples/expand-collapse-groups" />
+
+## Additional Explanation
+
+### Key Concepts
+
+- **Hiding with the `hidden` flag:** Collapsing a group sets [`hidden`](/docs/api/types/model/simplenode/#hidden) only on the group's **direct children** in one [`updateNodes`](/docs/api/services/ngdiagrammodelservice/#updatenodes) call. The effective-visibility cascade does the rest: descendants of a hidden child group are hidden automatically, and so is every edge touching a hidden node.
+- **Nested collapse composes:** A nested group that was collapsed keeps its own children's `hidden` flags, so collapsing and expanding an outer group preserves the inner group's collapsed state — no bookkeeping of nested visibility is required.
+- **Native interaction exclusion:** Hidden members are excluded from hit-testing, `selectAll`/box selection, `zoomToFit` bounds and the minimap by the library — no `pointer-events` or CSS visibility workarounds.
+- **Boundary edge rerouting:** Edges with exactly one endpoint inside the collapsed group would disappear together with their hidden endpoint. The example reroutes them to the group node for the duration of the collapse and restores the original endpoints on expand.
+- **Group behavior:** The group template uses the [resize adornment](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/), [`ngDiagramNodeSelected`](/docs/api/directives/ngdiagramnodeselecteddirective/) and [`ngDiagramGroupHighlighted`](/docs/api/directives/ngdiagramgrouphighlighteddirective/) — see the [Groups guide](/docs/guides/nodes/groups/).
+
+**Learn more:** [Conditional Visibility guide →](/docs/guides/conditional-visibility/)

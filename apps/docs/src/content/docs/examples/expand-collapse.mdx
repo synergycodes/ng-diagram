@@ -1,0 +1,31 @@
+---
+title: Expand/Collapse Subtree Example
+description: Example of collapsible tree subtrees using the hidden flag and ELK.js layout in ngDiagram
+version: 'since v1.4.0'
+sidebar:
+  order: 15
+  label: Expand/Collapse Subtree
+  badge: New
+---
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
+import ExpandCollapse from '@examples/expand-collapse/expand-collapse.astro';
+
+This example demonstrates a collapsible tree diagram. Each node with children shows a toggle button — collapsing a node hides its whole subtree using the model-level [`hidden`](/docs/guides/conditional-visibility/) flag, and ELK.js re-layouts the remaining visible nodes.
+
+<br />
+
+<ExpandCollapse />
+<CodeViewer dirName="examples/expand-collapse" />
+
+## Additional Explanation
+
+### Key Concepts
+
+- **Hiding with the `hidden` flag:** Collapsing a subtree sets [`hidden`](/docs/api/types/model/simplenode/#hidden) on its nodes in one [`updateNodes`](/docs/api/services/ngdiagrammodelservice/#updatenodes) call. Edges never need their own flag — an edge is effectively hidden whenever one of its endpoint nodes is hidden. Hidden elements are excluded from hit-testing, selection, `zoomToFit` bounds and measurement waits, so no CSS workarounds are required.
+- **Layout on the visible set:** The ELK layout pass only receives visible nodes and edges, so a collapsed tree stays compact. Hidden nodes keep their geometry and re-measure automatically when expanded again.
+- **Batched updates:** The collapsed flag and the subtree's `hidden` flags are committed in a single [`transaction`](/docs/guides/transactions/), so the re-layout that follows reads a consistent model.
+- **Fresh reads after awaited updates:** Right after an awaited update, the `nodes()`/`edges()` signals may not have refreshed yet — the layout service reads through [`getModel()`](/docs/api/services/ngdiagrammodelservice/#getmodel) for the latest committed state (see [State Management](/docs/guides/state-management/)).
+- **Keeping `hasChildren` in sync:** The [`edgeDrawEnded`](/docs/api/types/events/edgedrawendedevent/) and [`selectionRemoved`](/docs/api/types/events/selectionremovedevent/) events update the `hasChildren` flag as the user draws or deletes edges, so toggle buttons appear and disappear accordingly.
+
+**Learn more:** [Conditional Visibility guide →](/docs/guides/conditional-visibility/)
