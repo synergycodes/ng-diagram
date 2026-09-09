@@ -25,19 +25,18 @@ export const diagramModel: {
       data: { label: 'Components', hasChildren: true, collapsed: true },
       type: NodeTemplateType.TreeNode,
     },
-    // The "Components" subtree starts collapsed, so its children are hidden
-    // from the outset via the model-level `hidden` flag.
+    // The "Components" subtree starts collapsed. Its children stay visible in
+    // the initial model so they are measured at init; LayoutService sets
+    // their `hidden` flag together with the first layout.
     {
       id: 'buttons',
       position: { x: 0, y: 0 },
-      hidden: true,
       data: { label: 'Buttons' },
       type: NodeTemplateType.TreeNode,
     },
     {
       id: 'forms',
       position: { x: 0, y: 0 },
-      hidden: true,
       data: { label: 'Forms' },
       type: NodeTemplateType.TreeNode,
     },

@@ -133,17 +133,11 @@ export class DiagramComponent {
   }
 
   /**
-   * Run the ELK tree layout inside a transaction (so measurements are
-   * up-to-date), then fit the viewport to show all nodes.
+   * Hide the subtrees flagged as collapsed, run the ELK tree layout, then
+   * fit the viewport to show all visible nodes.
    */
   async onDiagramInit(_: DiagramInitEvent): Promise<void> {
-    await this.diagramService.transaction(
-      async () => {
-        await this.layoutService.applyLayout();
-      },
-      { waitForMeasurements: true }
-    );
-
+    await this.layoutService.applyInitialLayout();
     await this.viewportService.zoomToFit();
     this.isLayoutReady.set(true);
   }

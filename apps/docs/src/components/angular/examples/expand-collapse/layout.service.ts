@@ -3,7 +3,6 @@ import {
   NgDiagramModelService,
   NgDiagramService,
   type Point,
-  type Size,
 } from 'ng-diagram';
 import { performLayout } from './perform-layout';
 import { type TreeNodeData } from './types';
@@ -25,6 +24,33 @@ interface PositionUpdate {
 export class LayoutService {
   private readonly diagramService = inject(NgDiagramService);
   private readonly modelService = inject(NgDiagramModelService);
+
+  /**
+   * Apply the initial collapsed state and lay out the tree.
+   *
+   * Every node is visible in the initial model, so all of them are measured
+   * by the time the diagram initializes. The subtrees of nodes flagged
+   * `collapsed` are hidden here, in the same transaction as the first
+   * layout — from now on each node has a real size for every layout pass.
+   * Nodes already hidden in the initial model stay hidden and are left
+   * out of the layout.
+   */
+  async applyInitialLayout(): Promise<void> {
+    const hiddenIds = this.collapsedSubtreeIds();
+    const visibleIds = this.visibleNodeIds();
+    for (const id of hiddenIds) {
+      visibleIds.delete(id);
+    }
+
+    const positionUpdates = await this.computeLayout(visibleIds);
+
+    await this.diagramService.transaction(() => {
+      this.modelService.updateNodes(
+        [...hiddenIds].map((id) => ({ id, hidden: true }))
+      );
+      this.modelService.updateNodes(positionUpdates);
+    });
+  }
 
   /**
    * Run the ELK tree layout on all visible nodes and edges and commit
@@ -62,10 +88,7 @@ export class LayoutService {
       }
     }
 
-    // A node shown for the first time has no measured size yet (hidden
-    // nodes render as display: none). It takes the toggled node's size —
-    // every tree node uses the same template.
-    const positionUpdates = await this.computeLayout(visibleIds, node.size);
+    const positionUpdates = await this.computeLayout(visibleIds);
 
     await this.diagramService.transaction(() => {
       this.modelService.updateNodeData<TreeNodeData>(nodeId, {
@@ -88,17 +111,11 @@ export class LayoutService {
    * The root node is pinned to its current position so the tree doesn't
    * jump after a re-layout.
    */
-  private async computeLayout(
-    nodeIds: Set<string>,
-    fallbackSize?: Size
-  ): Promise<PositionUpdate[]> {
+  private async computeLayout(nodeIds: Set<string>): Promise<PositionUpdate[]> {
     // Read through getModel(): right after an awaited update the
     // nodes()/edges() signals may not have refreshed yet.
     const model = this.modelService.getModel();
-    const nodes = model
-      .getNodes()
-      .filter((node) => nodeIds.has(node.id))
-      .map((node) => ({ ...node, size: node.size ?? fallbackSize }));
+    const nodes = model.getNodes().filter((node) => nodeIds.has(node.id));
     const edges = model
       .getEdges()
       .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
@@ -132,6 +149,19 @@ export class LayoutService {
         .filter((node) => !node.hidden)
         .map((node) => node.id)
     );
+  }
+
+  /** Ids of every node inside a subtree whose root is flagged `collapsed`. */
+  private collapsedSubtreeIds(): Set<string> {
+    const ids = new Set<string>();
+    for (const node of this.modelService.getModel().getNodes()) {
+      if ((node.data as TreeNodeData).collapsed) {
+        for (const id of this.computeAvailableSubtreeIds(node.id)) {
+          ids.add(id);
+        }
+      }
+    }
+    return ids;
   }
 
   /**
