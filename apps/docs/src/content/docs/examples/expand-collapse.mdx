@@ -3,7 +3,7 @@ title: Expand/Collapse Subtree Example
 description: Example of collapsible tree subtrees using the hidden flag and ELK.js layout in ngDiagram
 version: 'since v1.4.0'
 sidebar:
-  order: 15
+  order: 6
   label: Expand/Collapse Subtree
   badge: New
 ---
@@ -27,6 +27,6 @@ This example demonstrates a collapsible tree diagram. Each node with children sh
 - **Measured before hidden:** Every node is visible in the initial model, so all of them are measured by the time the diagram initializes. The subtrees flagged `collapsed` in the data are hidden right after, in the same transaction as the first layout. This way each node has a real size for every layout pass, whatever its content. Nodes that are already `hidden` in the initial model stay hidden, but a hidden node is never measured. If you want to keep hidden nodes in your model, give each of them a `size` (the measured size replaces it once the node is shown) and flag its parent as `collapsed`. Without a size, the layout has no dimensions for the node when it is expanded and you need workarounds in code.
 - **Layout first, then one transaction:** When a subtree is toggled, the layout for the new set of visible nodes is computed first. The collapsed flag, the subtree's `hidden` flags and the new positions are then committed in a single [`transaction`](/docs/guides/transactions/), so nodes that appear are rendered at their final position right away.
 - **Fresh reads after awaited updates:** Right after an awaited update, the `nodes()`/`edges()` signals may not have refreshed yet — the layout service reads through [`getModel()`](/docs/api/services/ngdiagrammodelservice/#getmodel) for the latest committed state (see [State Management](/docs/guides/state-management/)).
-- **Keeping `hasChildren` in sync:** The [`edgeDrawEnded`](/docs/api/types/events/edgedrawendedevent/) and [`selectionRemoved`](/docs/api/types/events/selectionremovedevent/) events update the `hasChildren` flag as the user draws or deletes edges, so toggle buttons appear and disappear accordingly.
+- **Toggle button derived from the edges:** The node template shows the toggle when the node has an outgoing edge. The check is a `computed` that reads the [`edges()`](/docs/api/services/ngdiagrammodelservice/#edges) signal, so the button appears and disappears as the user draws or deletes edges, with no flag to keep in the node data. The [`edgeDrawEnded`](/docs/api/types/events/edgedrawendedevent/) and [`selectionRemoved`](/docs/api/types/events/selectionremovedevent/) events only re-layout the tree.
 
 **Learn more:** [Conditional Visibility guide →](/docs/guides/conditional-visibility/)

@@ -2,14 +2,7 @@ import { type Size } from 'ng-diagram';
 
 /** Template identifiers for node types used in the diagram. */
 export enum NodeTemplateType {
-  SimpleNode = 'simpleNode',
   CollapsibleGroupNode = 'collapsibleGroupNode',
-}
-
-/** Data payload for simple (non-group) nodes. */
-export interface SimpleNodeData {
-  /** Display label rendered inside the node. */
-  label: string;
 }
 
 /**

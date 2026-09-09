@@ -39,6 +39,21 @@ export const examples: ContentTile[] = [
     imageAlt: 'Screenshot of Context Menu example',
   },
   {
+    title: 'Expand/Collapse Subtree',
+    description: 'Collapse and expand tree subtrees with the hidden flag, with ELK.js re-layouting the visible nodes.',
+    href: '/docs/examples/expand-collapse',
+    image: '/docs/assets/examples/expand-collapse.png',
+    imageAlt: 'Screenshot of Expand/Collapse Subtree example',
+  },
+  {
+    title: 'Expand/Collapse Groups',
+    description:
+      'Collapse groups to a header bar with the hidden flag, rerouting boundary edges so external connections stay visible.',
+    href: '/docs/examples/expand-collapse-groups',
+    image: '/docs/assets/examples/expand-collapse-groups.png',
+    imageAlt: 'Screenshot of Expand/Collapse Groups example',
+  },
+  {
     title: 'Properties Sidebar',
     description:
       'Build an interactive properties panel that updates when nodes are selected and allows real-time editing of attributes.',
@@ -96,21 +111,6 @@ export const examples: ContentTile[] = [
     href: '/docs/examples/performance-test',
     image: '/docs/assets/examples/performance-test.png',
     imageAlt: 'Screenshot of Performance Test example',
-  },
-  {
-    title: 'Expand/Collapse Subtree',
-    description: 'Collapse and expand tree subtrees with the hidden flag, with ELK.js re-layouting the visible nodes.',
-    href: '/docs/examples/expand-collapse',
-    image: '/docs/assets/examples/expand-collapse.png',
-    imageAlt: 'Screenshot of Expand/Collapse Subtree example',
-  },
-  {
-    title: 'Expand/Collapse Groups',
-    description:
-      'Collapse groups to a header bar with the hidden flag, rerouting boundary edges so external connections stay visible.',
-    href: '/docs/examples/expand-collapse-groups',
-    image: '/docs/assets/examples/expand-collapse-groups.png',
-    imageAlt: 'Screenshot of Expand/Collapse Groups example',
   },
   {
     title: 'Landing Page Diagram',

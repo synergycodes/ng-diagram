@@ -151,34 +151,42 @@ export class LayoutService {
     );
   }
 
-  /** Ids of every node inside a subtree whose root is flagged `collapsed`. */
+  /**
+   * Ids of every node that has a `collapsed` ancestor. One walk that starts
+   * below each collapsed node and descends through the whole subtree, so
+   * every node is visited once.
+   */
   private collapsedSubtreeIds(): Set<string> {
-    const ids = new Set<string>();
-    for (const node of this.modelService.getModel().getNodes()) {
-      if ((node.data as TreeNodeData).collapsed) {
-        for (const id of this.computeAvailableSubtreeIds(node.id)) {
-          ids.add(id);
-        }
+    const hiddenIds = new Set<string>();
+    const stack = this.modelService
+      .getModel()
+      .getNodes()
+      .filter((node) => (node.data as TreeNodeData).collapsed)
+      .flatMap((node) => this.childIds(node.id));
+
+    while (stack.length > 0) {
+      const id = stack.pop()!;
+      if (hiddenIds.has(id)) {
+        continue;
       }
+      hiddenIds.add(id);
+      stack.push(...this.childIds(id));
     }
-    return ids;
+
+    return hiddenIds;
   }
 
-  /**
-   * Find the tree root — the node that is never a target of any edge.
-   */
+  /** The tree root: the node without an incoming edge. */
   private findRootNode() {
-    const targetIds = new Set(
-      this.modelService
-        .getModel()
-        .getEdges()
-        .map((e) => e.target)
-    );
     return (
       this.modelService
         .getModel()
         .getNodes()
-        .find((n) => !targetIds.has(n.id)) ?? null
+        .find((node) =>
+          this.modelService
+            .getConnectedEdges(node.id)
+            .every((edge) => edge.target !== node.id)
+        ) ?? null
     );
   }
 
@@ -193,20 +201,24 @@ export class LayoutService {
 
     while (stack.length > 0) {
       const parentId = stack.pop()!;
-      for (const edge of this.modelService.getConnectedEdges(parentId)) {
-        if (edge.source === parentId) {
-          childrenIds.add(edge.target);
+      for (const childId of this.childIds(parentId)) {
+        childrenIds.add(childId);
 
-          const child = this.modelService.getNodeById<TreeNodeData>(
-            edge.target
-          );
-          if (!child?.data.collapsed) {
-            stack.push(edge.target);
-          }
+        const child = this.modelService.getNodeById<TreeNodeData>(childId);
+        if (!child?.data.collapsed) {
+          stack.push(childId);
         }
       }
     }
 
     return childrenIds;
+  }
+
+  /** Ids of the direct children of a node: the targets of its outgoing edges. */
+  private childIds(nodeId: string): string[] {
+    return this.modelService
+      .getConnectedEdges(nodeId)
+      .filter((edge) => edge.source === nodeId)
+      .map((edge) => edge.target);
   }
 }

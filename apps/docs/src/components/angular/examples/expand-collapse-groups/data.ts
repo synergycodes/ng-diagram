@@ -1,16 +1,12 @@
 import { type Edge, type GroupNode, type Node } from 'ng-diagram';
-import {
-  NodeTemplateType,
-  type CollapsibleGroupData,
-  type SimpleNodeData,
-} from './types';
+import { NodeTemplateType, type CollapsibleGroupData } from './types';
 
 /**
  * Initial diagram model representing an org-chart-style hierarchy
  * with nested collapsible groups and cross-group edges.
  */
 export const diagramModel: {
-  nodes: (Node<SimpleNodeData> | GroupNode<CollapsibleGroupData>)[];
+  nodes: (Node<{ label: string }> | GroupNode<CollapsibleGroupData>)[];
   edges: Edge[];
 } = {
   nodes: [
@@ -19,7 +15,6 @@ export const diagramModel: {
       id: 'cto',
       position: { x: 700, y: 20 },
       data: { label: 'CTO' },
-      type: NodeTemplateType.SimpleNode,
     },
 
     // ── Engineering (top-level group) ────────────────────────────────
@@ -63,14 +58,12 @@ export const diagramModel: {
       id: 'alice',
       position: { x: 170, y: 365 },
       data: { label: 'Alice' },
-      type: NodeTemplateType.SimpleNode,
       groupId: 'frontend-squad',
     },
     {
       id: 'bob',
       position: { x: 420, y: 365 },
       data: { label: 'Bob' },
-      type: NodeTemplateType.SimpleNode,
       groupId: 'frontend-squad',
     },
 
@@ -79,14 +72,12 @@ export const diagramModel: {
       id: 'charlie',
       position: { x: 170, y: 560 },
       data: { label: 'Charlie' },
-      type: NodeTemplateType.SimpleNode,
       groupId: 'team-alpha',
     },
     {
       id: 'diana',
       position: { x: 420, y: 560 },
       data: { label: 'Diana' },
-      type: NodeTemplateType.SimpleNode,
       groupId: 'team-alpha',
     },
 
@@ -106,21 +97,18 @@ export const diagramModel: {
       id: 'dave',
       position: { x: 900, y: 300 },
       data: { label: 'Dave' },
-      type: NodeTemplateType.SimpleNode,
       groupId: 'team-beta',
     },
     {
       id: 'eve',
       position: { x: 1190, y: 300 },
       data: { label: 'Eve' },
-      type: NodeTemplateType.SimpleNode,
       groupId: 'team-beta',
     },
     {
       id: 'frank',
       position: { x: 1040, y: 470 },
       data: { label: 'Frank' },
-      type: NodeTemplateType.SimpleNode,
       groupId: 'team-beta',
     },
 
@@ -129,7 +117,6 @@ export const diagramModel: {
       id: 'tech-lead',
       position: { x: 700, y: 790 },
       data: { label: 'Tech Lead' },
-      type: NodeTemplateType.SimpleNode,
       groupId: 'engineering',
     },
   ],

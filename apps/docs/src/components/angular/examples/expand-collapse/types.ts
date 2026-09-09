@@ -4,6 +4,5 @@ export enum NodeTemplateType {
 
 export interface TreeNodeData {
   label: string;
-  hasChildren?: boolean;
   collapsed?: boolean;
 }

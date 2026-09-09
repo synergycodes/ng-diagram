@@ -15,7 +15,7 @@ import {
   type GroupNode,
   type NgDiagramGroupNodeTemplate,
 } from 'ng-diagram';
-import { type CollapsibleGroupData, type ReroutedEdgeInfo } from '../../types';
+import { type CollapsibleGroupData, type ReroutedEdgeInfo } from '../types';
 
 /** A partial edge update addressed by edge id. */
 type EdgeUpdate = Pick<Edge, 'id'> & Partial<Edge>;

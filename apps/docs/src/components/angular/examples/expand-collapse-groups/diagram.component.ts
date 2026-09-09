@@ -10,8 +10,7 @@ import {
   type NgDiagramConfig,
 } from 'ng-diagram';
 import { diagramModel } from './data';
-import { CollapsibleGroupNodeComponent } from './node/collapsible-group-node/collapsible-group-node.component';
-import { SimpleNodeComponent } from './node/simple-node/simple-node.component';
+import { CollapsibleGroupNodeComponent } from './node/collapsible-group-node.component';
 import { NodeTemplateType } from './types';
 
 /**
@@ -41,7 +40,6 @@ import { NodeTemplateType } from './types';
 })
 export class DiagramComponent {
   nodeTemplateMap = new NgDiagramNodeTemplateMap([
-    [NodeTemplateType.SimpleNode, SimpleNodeComponent],
     [NodeTemplateType.CollapsibleGroupNode, CollapsibleGroupNodeComponent],
   ]);
 

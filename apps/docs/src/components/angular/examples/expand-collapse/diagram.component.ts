@@ -5,7 +5,6 @@ import {
   initializeModel,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
-  NgDiagramModelService,
   NgDiagramNodeTemplateMap,
   NgDiagramViewportService,
   provideNgDiagram,
@@ -17,7 +16,7 @@ import {
 import { diagramModel } from './data';
 import { LayoutService } from './layout.service';
 import { NodeComponent } from './node/node.component';
-import { NodeTemplateType, type TreeNodeData } from './types';
+import { NodeTemplateType } from './types';
 
 /**
  * Expand/Collapse Subtree Example
@@ -26,8 +25,8 @@ import { NodeTemplateType, type TreeNodeData } from './types';
  * automatic node positioning. Nodes with children display a toggle button to
  * expand/collapse their subtree — collapsing sets the model-level `hidden`
  * flag on the subtree's nodes, and the edges leading into them disappear
- * automatically. The `hasChildren` flag on each node is kept in sync as the
- * user draws or deletes edges.
+ * automatically. Whether a node has children is derived from its edges, so
+ * drawing or deleting edges only calls for a re-layout.
  */
 @Component({
   selector: 'expand-collapse-diagram-example',
@@ -50,7 +49,6 @@ import { NodeTemplateType, type TreeNodeData } from './types';
   providers: [provideNgDiagram(), LayoutService],
 })
 export class DiagramComponent {
-  private readonly modelService = inject(NgDiagramModelService);
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly layoutService = inject(LayoutService);
 
@@ -72,55 +70,22 @@ export class DiagramComponent {
   };
 
   /**
-   * When the user draws a new edge, mark the source node as having children
-   * so the expand/collapse toggle button appears. Re-layout only if the
-   * flag actually changed.
+   * A drawn edge changes the tree structure, so the visible nodes are laid
+   * out again. The event fires after the edge is committed to the model.
    */
   async onEdgeDrawEnded(event: EdgeDrawEndedEvent): Promise<void> {
     if (!event.success) return;
 
-    const sourceData = event.source.data as TreeNodeData;
-    if (!sourceData.hasChildren) {
-      // The awaited update is committed before the re-layout reads the model.
-      await this.modelService.updateNodeData<TreeNodeData>(event.source.id, {
-        ...sourceData,
-        hasChildren: true,
-      });
-
-      await this.layoutService.applyLayout();
-    }
+    await this.layoutService.applyLayout();
   }
 
   /**
-   * When the user deletes edges, check whether each affected source node
-   * still has outgoing edges. If not, clear `hasChildren` so the toggle
-   * button is removed. Re-layout only if at least one node was updated.
+   * Deleted edges change the tree structure, so the visible nodes are laid
+   * out again. The event fires after the removal is committed to the model.
    */
   async onSelectionRemoved(event: SelectionRemovedEvent): Promise<void> {
     if (event.deletedEdges.length === 0) return;
 
-    const affectedSourceIds = new Set(event.deletedEdges.map((e) => e.source));
-    const updates: { id: string; data: TreeNodeData }[] = [];
-
-    for (const sourceId of affectedSourceIds) {
-      const stillHasChildren = this.modelService
-        .getConnectedEdges(sourceId)
-        .some((e) => e.source === sourceId);
-      if (stillHasChildren) continue;
-
-      const node = this.modelService.getNodeById<TreeNodeData>(sourceId);
-      if (node?.data.hasChildren) {
-        updates.push({
-          id: sourceId,
-          data: { ...node.data, hasChildren: false },
-        });
-      }
-    }
-
-    if (updates.length === 0) return;
-
-    // One batched update, committed before the re-layout reads the model.
-    await this.modelService.updateNodes(updates);
     await this.layoutService.applyLayout();
   }
 

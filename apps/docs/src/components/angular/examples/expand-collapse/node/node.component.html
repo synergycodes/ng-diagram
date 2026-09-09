@@ -7,7 +7,7 @@
 </ng-diagram-base-node-template>
 
 <!-- Expand / collapse button – only rendered when the node has child edges. -->
-@if (node().data.hasChildren) {
+@if (hasChildren()) {
   <button
     type="button"
     class="toggle-btn"

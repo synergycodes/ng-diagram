@@ -9,20 +9,20 @@ export const diagramModel: {
     {
       id: 'root',
       position: { x: 0, y: 0 },
-      data: { label: 'Application', hasChildren: true },
+      data: { label: 'Application' },
       type: NodeTemplateType.TreeNode,
     },
 
     {
       id: 'frontend',
       position: { x: 0, y: 0 },
-      data: { label: 'Frontend', hasChildren: true },
+      data: { label: 'Frontend' },
       type: NodeTemplateType.TreeNode,
     },
     {
       id: 'components',
       position: { x: 0, y: 0 },
-      data: { label: 'Components', hasChildren: true, collapsed: true },
+      data: { label: 'Components', collapsed: true },
       type: NodeTemplateType.TreeNode,
     },
     // The "Components" subtree starts collapsed. Its children stay visible in
@@ -56,13 +56,13 @@ export const diagramModel: {
     {
       id: 'backend',
       position: { x: 0, y: 0 },
-      data: { label: 'Backend', hasChildren: true },
+      data: { label: 'Backend' },
       type: NodeTemplateType.TreeNode,
     },
     {
       id: 'api',
       position: { x: 0, y: 0 },
-      data: { label: 'API', hasChildren: true },
+      data: { label: 'API' },
       type: NodeTemplateType.TreeNode,
     },
     {
@@ -93,7 +93,7 @@ export const diagramModel: {
     {
       id: 'devops',
       position: { x: 0, y: 0 },
-      data: { label: 'DevOps', hasChildren: true },
+      data: { label: 'DevOps' },
       type: NodeTemplateType.TreeNode,
     },
     {
