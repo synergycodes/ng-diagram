@@ -7,7 +7,6 @@ import {
   NgDiagramComponent,
   NgDiagramModelService,
   NgDiagramNodeTemplateMap,
-  NgDiagramService,
   NgDiagramViewportService,
   provideNgDiagram,
   type DiagramInitEvent,
@@ -51,7 +50,6 @@ import { NodeTemplateType, type TreeNodeData } from './types';
   providers: [provideNgDiagram(), LayoutService],
 })
 export class DiagramComponent {
-  private readonly diagramService = inject(NgDiagramService);
   private readonly modelService = inject(NgDiagramModelService);
   private readonly viewportService = inject(NgDiagramViewportService);
   private readonly layoutService = inject(LayoutService);
@@ -83,13 +81,10 @@ export class DiagramComponent {
 
     const sourceData = event.source.data as TreeNodeData;
     if (!sourceData.hasChildren) {
-      // Await the transaction to ensure hasChildren is committed
-      // to the model before re-layout reads it.
-      await this.diagramService.transaction(async () => {
-        this.modelService.updateNodeData<TreeNodeData>(event.source.id, {
-          ...sourceData,
-          hasChildren: true,
-        });
+      // The awaited update is committed before the re-layout reads the model.
+      await this.modelService.updateNodeData<TreeNodeData>(event.source.id, {
+        ...sourceData,
+        hasChildren: true,
       });
 
       await this.layoutService.applyLayout();
@@ -105,31 +100,28 @@ export class DiagramComponent {
     if (event.deletedEdges.length === 0) return;
 
     const affectedSourceIds = new Set(event.deletedEdges.map((e) => e.source));
-    let changed = false;
+    const updates: { id: string; data: TreeNodeData }[] = [];
 
-    // Await the transaction to ensure hasChildren updates are committed
-    // to the model before re-layout reads them.
-    await this.diagramService.transaction(async () => {
-      for (const sourceId of affectedSourceIds) {
-        const stillHasChildren = this.modelService
-          .getConnectedEdges(sourceId)
-          .some((e) => e.source === sourceId);
-        if (stillHasChildren) continue;
+    for (const sourceId of affectedSourceIds) {
+      const stillHasChildren = this.modelService
+        .getConnectedEdges(sourceId)
+        .some((e) => e.source === sourceId);
+      if (stillHasChildren) continue;
 
-        const node = this.modelService.getNodeById<TreeNodeData>(sourceId);
-        if (node?.data.hasChildren) {
-          this.modelService.updateNodeData<TreeNodeData>(sourceId, {
-            ...node.data,
-            hasChildren: false,
-          });
-          changed = true;
-        }
+      const node = this.modelService.getNodeById<TreeNodeData>(sourceId);
+      if (node?.data.hasChildren) {
+        updates.push({
+          id: sourceId,
+          data: { ...node.data, hasChildren: false },
+        });
       }
-    });
-
-    if (changed) {
-      await this.layoutService.applyLayout();
     }
+
+    if (updates.length === 0) return;
+
+    // One batched update, committed before the re-layout reads the model.
+    await this.modelService.updateNodes(updates);
+    await this.layoutService.applyLayout();
   }
 
   /**
