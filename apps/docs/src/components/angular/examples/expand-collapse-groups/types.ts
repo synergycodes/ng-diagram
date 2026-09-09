@@ -1,4 +1,4 @@
-import { type Edge, type Size } from 'ng-diagram';
+import { type Size } from 'ng-diagram';
 
 /** Template identifiers for node types used in the diagram. */
 export enum NodeTemplateType {
@@ -13,14 +13,18 @@ export interface SimpleNodeData {
 }
 
 /**
- * Stores the original endpoints of an edge that was rerouted
- * to the group boundary during collapse, so it can be restored on expand.
+ * Records which endpoint of an edge was redirected to the group boundary
+ * during collapse, so exactly that endpoint can be restored on expand.
  */
 export interface ReroutedEdgeInfo {
   /** ID of the rerouted edge. */
   edgeId: string;
-  /** Snapshot of the edge's endpoints before rerouting. */
-  originalProps: Pick<Edge, 'source' | 'target' | 'sourcePort' | 'targetPort'>;
+  /** The endpoint that was redirected to the group. */
+  endpoint: 'source' | 'target';
+  /** Node the endpoint pointed at before the reroute. */
+  originalNodeId: string;
+  /** Port the endpoint used before the reroute, if any. */
+  originalPortId?: string;
 }
 
 /**

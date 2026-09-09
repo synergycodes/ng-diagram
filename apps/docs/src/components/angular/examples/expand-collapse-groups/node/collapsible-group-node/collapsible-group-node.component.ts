@@ -17,6 +17,9 @@ import {
 } from 'ng-diagram';
 import { type CollapsibleGroupData, type ReroutedEdgeInfo } from '../../types';
 
+/** A partial edge update addressed by edge id. */
+type EdgeUpdate = Pick<Edge, 'id'> & Partial<Edge>;
+
 /**
  * Group node that can be collapsed into a compact representation and expanded back.
  *
@@ -91,7 +94,7 @@ export class CollapsibleGroupNodeComponent implements NgDiagramGroupNodeTemplate
 
       if (reroutedEdges.length > 0) {
         this.modelService.updateEdges(
-          this.buildRerouteUpdates(reroutedEdges, nestedChildIds, groupId)
+          this.buildRerouteUpdates(reroutedEdges, groupId)
         );
       }
 
@@ -110,17 +113,15 @@ export class CollapsibleGroupNodeComponent implements NgDiagramGroupNodeTemplate
     const node = this.node();
     const data = node.data;
     const expandedSize = data?.expandedSize ?? { width: 300, height: 200 };
-    const reroutedEdges = data?.reroutedEdges ?? [];
+    const restoreUpdates = this.buildRestoreUpdates(
+      data?.reroutedEdges ?? [],
+      node.id
+    );
     const directChildren = this.modelService.getChildren(node.id);
 
     this.diagramService.transaction(() => {
-      if (reroutedEdges.length > 0) {
-        this.modelService.updateEdges(
-          reroutedEdges.map((info) => ({
-            id: info.edgeId,
-            ...info.originalProps,
-          }))
-        );
+      if (restoreUpdates.length > 0) {
+        this.modelService.updateEdges(restoreUpdates);
       }
 
       // Unhiding the direct children is enough. A nested group that was
@@ -143,9 +144,9 @@ export class CollapsibleGroupNodeComponent implements NgDiagramGroupNodeTemplate
   }
 
   /**
-   * Find edges with exactly one endpoint inside the group — these are
-   * rerouted to the group boundary while it is collapsed. Edges fully
-   * inside the group need no handling: they hide with their endpoints.
+   * Find edges with exactly one endpoint inside the group — that endpoint is
+   * redirected to the group boundary while the group is collapsed. Edges
+   * fully inside the group need no handling: they hide with their endpoints.
    */
   private findBoundaryEdges(
     childIdSet: Set<string>,
@@ -157,49 +158,80 @@ export class CollapsibleGroupNodeComponent implements NgDiagramGroupNodeTemplate
       const sourceIsChild = childIdSet.has(edge.source);
       const targetIsChild = childIdSet.has(edge.target);
       if (sourceIsChild === targetIsChild) continue;
+      // An edge between a child and the group itself would end up with both
+      // endpoints on the group node — leave it alone.
+      if (edge.source === groupId || edge.target === groupId) continue;
 
-      const newSource = sourceIsChild ? groupId : edge.source;
-      const newTarget = targetIsChild ? groupId : edge.target;
-      if (newSource === newTarget) continue;
-
-      reroutedEdges.push({
-        edgeId: edge.id,
-        originalProps: {
-          source: edge.source,
-          target: edge.target,
-          sourcePort: edge.sourcePort,
-          targetPort: edge.targetPort,
-        },
-      });
+      reroutedEdges.push(
+        sourceIsChild
+          ? {
+              edgeId: edge.id,
+              endpoint: 'source',
+              originalNodeId: edge.source,
+              originalPortId: edge.sourcePort,
+            }
+          : {
+              edgeId: edge.id,
+              endpoint: 'target',
+              originalNodeId: edge.target,
+              originalPortId: edge.targetPort,
+            }
+      );
     }
 
     return reroutedEdges;
   }
 
-  /**
-   * Build partial edge updates that reroute boundary-crossing
-   * edges to the group node.
-   */
+  /** Partial edge updates that point each recorded endpoint at the group node. */
   private buildRerouteUpdates(
     reroutedEdges: ReroutedEdgeInfo[],
-    childIdSet: Set<string>,
     groupId: string
-  ): (Pick<Edge, 'id'> & Partial<Edge>)[] {
-    return reroutedEdges.map(({ edgeId, originalProps }) => ({
-      id: edgeId,
-      source: childIdSet.has(originalProps.source)
-        ? groupId
-        : originalProps.source,
-      target: childIdSet.has(originalProps.target)
-        ? groupId
-        : originalProps.target,
-      sourcePort: childIdSet.has(originalProps.source)
-        ? undefined
-        : originalProps.sourcePort,
-      targetPort: childIdSet.has(originalProps.target)
-        ? undefined
-        : originalProps.targetPort,
-    }));
+  ): EdgeUpdate[] {
+    return reroutedEdges.map(({ edgeId, endpoint }) =>
+      endpoint === 'source'
+        ? { id: edgeId, source: groupId, sourcePort: undefined }
+        : { id: edgeId, target: groupId, targetPort: undefined }
+    );
+  }
+
+  /**
+   * Partial edge updates that restore the recorded endpoints. Only an
+   * endpoint that still points at this group is restored: a sibling or outer
+   * group may have redirected the edge's other endpoint to itself in the
+   * meantime, and that reroute must stay until its own group expands. This
+   * keeps collapse/expand correct in any order.
+   */
+  private buildRestoreUpdates(
+    reroutedEdges: ReroutedEdgeInfo[],
+    groupId: string
+  ): EdgeUpdate[] {
+    const updates: EdgeUpdate[] = [];
+
+    for (const {
+      edgeId,
+      endpoint,
+      originalNodeId,
+      originalPortId,
+    } of reroutedEdges) {
+      const edge = this.modelService.getEdgeById(edgeId);
+      if (!edge) continue;
+
+      if (endpoint === 'source' && edge.source === groupId) {
+        updates.push({
+          id: edgeId,
+          source: originalNodeId,
+          sourcePort: originalPortId,
+        });
+      } else if (endpoint === 'target' && edge.target === groupId) {
+        updates.push({
+          id: edgeId,
+          target: originalNodeId,
+          targetPort: originalPortId,
+        });
+      }
+    }
+
+    return updates;
   }
 
   /** Deduplicated list of all edges connected to any of the given nodes. */

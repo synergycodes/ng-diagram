@@ -12,6 +12,7 @@ import {
   provideNgDiagram,
   type DiagramInitEvent,
   type EdgeDrawEndedEvent,
+  type NgDiagramConfig,
   type SelectionRemovedEvent,
 } from 'ng-diagram';
 import { diagramModel } from './data';
@@ -36,6 +37,7 @@ import { NodeTemplateType, type TreeNodeData } from './types';
     <div class="not-content diagram" [class.ready]="isLayoutReady()">
       <ng-diagram
         [model]="model"
+        [config]="config"
         [nodeTemplateMap]="nodeTemplateMap"
         (edgeDrawEnded)="onEdgeDrawEnded($event)"
         (selectionRemoved)="onSelectionRemoved($event)"
@@ -61,6 +63,15 @@ export class DiagramComponent {
   ]);
 
   model = initializeModel(diagramModel);
+
+  config: NgDiagramConfig = {
+    resize: {
+      defaultResizable: false,
+    },
+    nodeRotation: {
+      defaultRotatable: false,
+    },
+  };
 
   /**
    * When the user draws a new edge, mark the source node as having children
@@ -133,7 +144,7 @@ export class DiagramComponent {
       { waitForMeasurements: true }
     );
 
-    this.viewportService.zoomToFit();
+    await this.viewportService.zoomToFit();
     this.isLayoutReady.set(true);
   }
 }

@@ -51,11 +51,14 @@ export class DiagramComponent {
     zoom: {
       zoomToFit: {
         onInit: true,
-        padding: 80,
       },
     },
     resize: {
+      defaultResizable: false,
       allowResizeBelowChildrenBounds: false,
+    },
+    nodeRotation: {
+      defaultRotatable: false,
     },
   };
 }

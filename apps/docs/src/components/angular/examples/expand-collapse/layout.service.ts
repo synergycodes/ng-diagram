@@ -1,7 +1,18 @@
 import { inject, Injectable } from '@angular/core';
-import { NgDiagramModelService, NgDiagramService } from 'ng-diagram';
+import {
+  NgDiagramModelService,
+  NgDiagramService,
+  type Point,
+  type Size,
+} from 'ng-diagram';
 import { performLayout } from './perform-layout';
 import { type TreeNodeData } from './types';
+
+/** A node position update addressed by node id. */
+interface PositionUpdate {
+  id: string;
+  position: Point;
+}
 
 /**
  * Manages tree layout and expand/collapse behaviour.
@@ -16,50 +27,21 @@ export class LayoutService {
   private readonly modelService = inject(NgDiagramModelService);
 
   /**
-   * Run the ELK tree layout on all visible nodes and edges.
-   * The root node is pinned to its current position so the tree
-   * doesn't jump after a re-layout.
+   * Run the ELK tree layout on all visible nodes and edges and commit
+   * the new positions.
    */
   async applyLayout(): Promise<void> {
-    // Use getModel() to read the latest committed state directly.
-    // Signal-based accessors (modelService.nodes/edges) may not yet
-    // reflect updates made within the current transaction.
-    const model = this.modelService.getModel();
-    const visibleNodes = model.getNodes().filter((node) => !node.hidden);
-    const visibleNodeIds = new Set(visibleNodes.map((node) => node.id));
-    const visibleEdges = model
-      .getEdges()
-      .filter(
-        (edge) =>
-          visibleNodeIds.has(edge.source) && visibleNodeIds.has(edge.target)
-      );
-
-    const positionedNodes = await performLayout(visibleNodes, visibleEdges);
-
-    const rootNode = this.findRootNode();
-    if (rootNode) {
-      // Offset every node so the root stays where it was before layout.
-      const newRootPosition = positionedNodes.find(
-        (n) => n.id === rootNode.id
-      )!.position;
-      const dx = rootNode.position.x - newRootPosition.x;
-      const dy = rootNode.position.y - newRootPosition.y;
-
-      this.modelService.updateNodes(
-        positionedNodes.map((n) => ({
-          id: n.id,
-          position: { x: n.position.x + dx, y: n.position.y + dy },
-        }))
-      );
-    } else {
-      this.modelService.updateNodes(positionedNodes);
-    }
+    const positionUpdates = await this.computeLayout(this.visibleNodeIds());
+    await this.modelService.updateNodes(positionUpdates);
   }
 
   /**
-   * Toggle the collapsed state of a node and update the visibility
-   * of its subtree. The collapsed flag and the subtree's `hidden` flags
-   * are batched in a single transaction, followed by a re-layout.
+   * Toggle the collapsed state of a node's subtree.
+   *
+   * The layout of the tree as it will look after the toggle is computed
+   * first. The collapsed flag, the subtree's `hidden` flags and every new
+   * position are then committed in a single transaction, so nodes that
+   * appear are rendered at their final position right away.
    */
   async toggleCollapsed(nodeId: string): Promise<void> {
     const node = this.modelService.getNodeById<TreeNodeData>(nodeId);
@@ -68,25 +50,88 @@ export class LayoutService {
       return;
     }
 
-    const newCollapsed = !node.data.collapsed;
+    const collapsed = !node.data.collapsed;
     const subtreeIds = this.computeAvailableSubtreeIds(nodeId);
 
-    // Await the transaction to ensure all updates (collapsed flag +
-    // hidden flags) are committed to the model before re-layout reads them.
-    await this.diagramService.transaction(async () => {
+    const visibleIds = this.visibleNodeIds();
+    for (const id of subtreeIds) {
+      if (collapsed) {
+        visibleIds.delete(id);
+      } else {
+        visibleIds.add(id);
+      }
+    }
+
+    // A node shown for the first time has no measured size yet (hidden
+    // nodes render as display: none). It takes the toggled node's size —
+    // every tree node uses the same template.
+    const positionUpdates = await this.computeLayout(visibleIds, node.size);
+
+    await this.diagramService.transaction(() => {
       this.modelService.updateNodeData<TreeNodeData>(nodeId, {
         ...node.data,
-        collapsed: newCollapsed,
+        collapsed,
       });
 
-      this.updateSubtreeVisibility(
-        subtreeIds,
-        newCollapsed,
-        !newCollapsed ? node.position : undefined
+      // The edges leading into hidden nodes disappear automatically — an
+      // edge is effectively hidden whenever one of its endpoint nodes is.
+      this.modelService.updateNodes(
+        [...subtreeIds].map((id) => ({ id, hidden: collapsed }))
       );
-    });
 
-    await this.applyLayout();
+      this.modelService.updateNodes(positionUpdates);
+    });
+  }
+
+  /**
+   * Compute tree positions for the given nodes and the edges between them.
+   * The root node is pinned to its current position so the tree doesn't
+   * jump after a re-layout.
+   */
+  private async computeLayout(
+    nodeIds: Set<string>,
+    fallbackSize?: Size
+  ): Promise<PositionUpdate[]> {
+    // Read through getModel(): right after an awaited update the
+    // nodes()/edges() signals may not have refreshed yet.
+    const model = this.modelService.getModel();
+    const nodes = model
+      .getNodes()
+      .filter((node) => nodeIds.has(node.id))
+      .map((node) => ({ ...node, size: node.size ?? fallbackSize }));
+    const edges = model
+      .getEdges()
+      .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
+
+    const positionedNodes = await performLayout(nodes, edges);
+
+    // Offset every node so the root stays where it was before layout.
+    const rootNode = this.findRootNode();
+    const positionedRoot = positionedNodes.find((n) => n.id === rootNode?.id);
+    const dx =
+      rootNode && positionedRoot
+        ? rootNode.position.x - positionedRoot.position.x
+        : 0;
+    const dy =
+      rootNode && positionedRoot
+        ? rootNode.position.y - positionedRoot.position.y
+        : 0;
+
+    return positionedNodes.map((n) => ({
+      id: n.id,
+      position: { x: n.position.x + dx, y: n.position.y + dy },
+    }));
+  }
+
+  /** Ids of the nodes that are currently shown. */
+  private visibleNodeIds(): Set<string> {
+    return new Set(
+      this.modelService
+        .getModel()
+        .getNodes()
+        .filter((node) => !node.hidden)
+        .map((node) => node.id)
+    );
   }
 
   /**
@@ -133,27 +178,5 @@ export class LayoutService {
     }
 
     return childrenIds;
-  }
-
-  /**
-   * Set the `hidden` flag on the affected subtree nodes. The edges leading
-   * into hidden nodes disappear automatically — an edge is effectively
-   * hidden whenever one of its endpoint nodes is hidden.
-   */
-  private updateSubtreeVisibility(
-    subtreeIds: Set<string>,
-    hidden: boolean,
-    parentPosition?: { x: number; y: number }
-  ): void {
-    this.modelService.updateNodes(
-      [...subtreeIds].map((id) => ({
-        id,
-        hidden,
-        // When expanding, place children at the parent's position so they
-        // fan out from it once the layout runs — avoids a visual blink
-        // from a stale previous position.
-        ...(parentPosition ? { position: parentPosition } : {}),
-      }))
-    );
   }
 }
