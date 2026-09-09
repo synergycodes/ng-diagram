@@ -45,9 +45,7 @@ export class NodeComponent implements NgDiagramNodeTemplate<TreeNodeData> {
   });
 
   /** Toggle the collapsed state of this node's subtree and re-layout. */
-  onToggle(event: MouseEvent): void {
-    // Prevent the click from also selecting/dragging the node.
-    event.stopPropagation();
+  onToggle(): void {
     this.layoutService.toggleCollapsed(this.node().id);
   }
 }

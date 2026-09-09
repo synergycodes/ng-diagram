@@ -8,7 +8,6 @@ import {
   NgDiagramNodeTemplateMap,
   NgDiagramViewportService,
   provideNgDiagram,
-  type DiagramInitEvent,
   type EdgeDrawEndedEvent,
   type NgDiagramConfig,
   type SelectionRemovedEvent,
@@ -39,7 +38,7 @@ import { NodeTemplateType } from './types';
         [nodeTemplateMap]="nodeTemplateMap"
         (edgeDrawEnded)="onEdgeDrawEnded($event)"
         (selectionRemoved)="onSelectionRemoved($event)"
-        (diagramInit)="onDiagramInit($event)"
+        (diagramInit)="onDiagramInit()"
       >
         <ng-diagram-background />
       </ng-diagram>
@@ -93,7 +92,7 @@ export class DiagramComponent {
    * Hide the subtrees flagged as collapsed, run the ELK tree layout, then
    * fit the viewport to show all visible nodes.
    */
-  async onDiagramInit(_: DiagramInitEvent): Promise<void> {
+  async onDiagramInit(): Promise<void> {
     await this.layoutService.applyInitialLayout();
     await this.viewportService.zoomToFit();
     this.isLayoutReady.set(true);

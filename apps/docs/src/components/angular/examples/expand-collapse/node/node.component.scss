@@ -3,9 +3,7 @@
     min-width: 10rem;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 0 0.5rem;
-    gap: 0.5rem;
   }
 
   .node-label {
@@ -19,7 +17,6 @@
   .toggle-btn {
     width: 1.5rem;
     height: 1.5rem;
-    min-width: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: center;

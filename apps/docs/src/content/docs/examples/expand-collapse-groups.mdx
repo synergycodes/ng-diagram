@@ -1,6 +1,6 @@
 ---
 title: Expand/Collapse Groups Example
-description: Example of collapsible groups using the hidden flag, with boundary edges rerouted to the collapsed group
+description: Example of collapsible groups with boundary edges rerouted to the collapsed group
 version: 'since v1.4.0'
 sidebar:
   order: 7
@@ -26,6 +26,6 @@ This example demonstrates collapsible groups, including nested ones. Collapsing 
 - **Nested collapse composes:** A nested group that was collapsed keeps its own children's `hidden` flags, so collapsing and expanding an outer group preserves the inner group's collapsed state — no bookkeeping of nested visibility is required.
 - **Native interaction exclusion:** Hidden members are excluded from hit-testing, `selectAll`/box selection, `zoomToFit` bounds and the minimap by the library — no `pointer-events` or CSS visibility workarounds.
 - **Boundary edge rerouting:** Edges with exactly one endpoint inside the collapsed group would disappear together with their hidden endpoint. The example redirects that endpoint to the group node for the duration of the collapse and restores it on expand. Each group touches only the endpoint on its own side, so sibling and nested groups can be collapsed and expanded in any order.
-- **Group behavior:** The group template uses the [resize adornment](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/), [`ngDiagramNodeSelected`](/docs/api/directives/ngdiagramnodeselecteddirective/) and [`ngDiagramGroupHighlighted`](/docs/api/directives/ngdiagramgrouphighlighteddirective/) — see the [Groups guide](/docs/guides/nodes/groups/). An expanded group can be resized, but not below the bounds of its visible children; a collapsed group, the member nodes and rotation are turned off.
+- **Group behavior:** The group template uses the [resize adornment](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/), [`ngDiagramNodeSelected`](/docs/api/directives/ngdiagramnodeselecteddirective/) and [`ngDiagramGroupHighlighted`](/docs/api/directives/ngdiagramgrouphighlighteddirective/) — see the [Groups guide](/docs/guides/nodes/groups/). An expanded group can be resized, but not below the bounds of its visible children.
 
 **Learn more:** [Conditional Visibility guide →](/docs/guides/conditional-visibility/)

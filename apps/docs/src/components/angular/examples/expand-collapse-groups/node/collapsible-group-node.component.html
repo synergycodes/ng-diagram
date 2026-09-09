@@ -36,13 +36,12 @@
           />
         </svg>
       </button>
-      <div class="collapsible-group-node-header-title">{{ groupTitle() }}</div>
+      <div class="collapsible-group-node-header-title">
+        {{ node().data.title }}
+      </div>
       @if (collapsed()) {
         <span class="child-count">{{ childCount() }}</span>
       }
     </div>
-    @if (!collapsed()) {
-      <div class="collapsible-group-node-content"></div>
-    }
   </div>
 </ng-diagram-node-resize-adornment>

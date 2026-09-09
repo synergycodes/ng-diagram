@@ -109,8 +109,6 @@ export const diagramModel: {
       type: NodeTemplateType.TreeNode,
     },
   ],
-  // Edges never need a `hidden` flag of their own: an edge is effectively
-  // hidden whenever one of its endpoint nodes is hidden.
   edges: [
     {
       id: 'e-root-frontend',

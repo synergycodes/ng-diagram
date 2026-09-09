@@ -1,17 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import {
-  NgDiagramModelService,
-  NgDiagramService,
-  type Point,
-} from 'ng-diagram';
-import { performLayout } from './perform-layout';
+import { NgDiagramModelService, NgDiagramService } from 'ng-diagram';
+import { performLayout, type PositionUpdate } from './perform-layout';
 import { type TreeNodeData } from './types';
-
-/** A node position update addressed by node id. */
-interface PositionUpdate {
-  id: string;
-  position: Point;
-}
 
 /**
  * Manages tree layout and expand/collapse behaviour.
@@ -120,23 +110,24 @@ export class LayoutService {
       .getEdges()
       .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
 
-    const positionedNodes = await performLayout(nodes, edges);
+    const positionUpdates = await performLayout(nodes, edges);
 
-    // Offset every node so the root stays where it was before layout.
-    const rootNode = this.findRootNode();
-    const positionedRoot = positionedNodes.find((n) => n.id === rootNode?.id);
-    const dx =
-      rootNode && positionedRoot
-        ? rootNode.position.x - positionedRoot.position.x
-        : 0;
-    const dy =
-      rootNode && positionedRoot
-        ? rootNode.position.y - positionedRoot.position.y
-        : 0;
+    // Offset every node so the root, the node without an incoming edge,
+    // stays where it was before the layout.
+    const targetIds = new Set(edges.map((edge) => edge.target));
+    const root = nodes.find((node) => !targetIds.has(node.id));
+    const laidOutRoot = positionUpdates.find(
+      (update) => update.id === root?.id
+    );
+    if (!root || !laidOutRoot) {
+      return positionUpdates;
+    }
+    const dx = root.position.x - laidOutRoot.position.x;
+    const dy = root.position.y - laidOutRoot.position.y;
 
-    return positionedNodes.map((n) => ({
-      id: n.id,
-      position: { x: n.position.x + dx, y: n.position.y + dy },
+    return positionUpdates.map(({ id, position }) => ({
+      id,
+      position: { x: position.x + dx, y: position.y + dy },
     }));
   }
 
@@ -174,20 +165,6 @@ export class LayoutService {
     }
 
     return hiddenIds;
-  }
-
-  /** The tree root: the node without an incoming edge. */
-  private findRootNode() {
-    return (
-      this.modelService
-        .getModel()
-        .getNodes()
-        .find((node) =>
-          this.modelService
-            .getConnectedEdges(node.id)
-            .every((edge) => edge.target !== node.id)
-        ) ?? null
-    );
   }
 
   /**

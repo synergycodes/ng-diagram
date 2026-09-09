@@ -1,5 +1,11 @@
 import ELK, { type ElkNode } from 'elkjs';
-import { type Edge, type Node } from 'ng-diagram';
+import { type Edge, type Node, type Point } from 'ng-diagram';
+
+/** A node position update addressed by node id. */
+export interface PositionUpdate {
+  id: string;
+  position: Point;
+}
 
 // Single ELK instance reused across all layout calls.
 const elk = new ELK();
@@ -11,45 +17,33 @@ const layoutOptions = {
 };
 
 /**
- * Compute tree positions for the given nodes using ELK.js.
- *
- * Converts ng-diagram nodes/edges into the ELK graph format, runs the
- * layout algorithm, and returns a new array of nodes with updated
- * positions.
+ * Compute tree positions for the given nodes with ELK.js. A node that ELK
+ * did not place keeps its current position.
  */
-export async function performLayout(nodes: Node[], edges: Edge[]) {
-  // Convert ng-diagram nodes to ELK format (only id + size are needed).
-  const nodesToLayout = nodes.map(({ id: nodeId, size }): ElkNode => ({
-    id: nodeId,
-    ...size,
-  }));
-
-  // Build the ELK graph with nodes as children and edges as connections.
+export async function performLayout(
+  nodes: Node[],
+  edges: Edge[]
+): Promise<PositionUpdate[]> {
   const graph: ElkNode = {
     id: 'root-graph',
     layoutOptions,
-    children: nodesToLayout,
-    edges: edges.map(({ id, source, target }) => {
-      return {
-        id,
-        sources: [source],
-        targets: [target],
-      };
-    }),
+    // ELK only needs the id and the measured size of each node.
+    children: nodes.map(({ id, size }) => ({ id, ...size })),
+    edges: edges.map(({ id, source, target }) => ({
+      id,
+      sources: [source],
+      targets: [target],
+    })),
   };
 
-  const { children: laidOutNodes } = await elk.layout(graph);
+  const { children = [] } = await elk.layout(graph);
+  const laidOut = new Map(children.map((node) => [node.id, node]));
 
-  const laidOutNodesMap = new Map(laidOutNodes?.map((node) => [node.id, node]));
-
-  return nodes.map((node) => {
-    const laidOut = laidOutNodesMap.get(node.id);
-    return {
-      ...node,
-      position: {
-        x: laidOut?.x ?? node.position.x,
-        y: laidOut?.y ?? node.position.y,
-      },
-    };
-  });
+  return nodes.map(({ id, position }) => ({
+    id,
+    position: {
+      x: laidOut.get(id)?.x ?? position.x,
+      y: laidOut.get(id)?.y ?? position.y,
+    },
+  }));
 }
