@@ -1,0 +1,46 @@
+<!-- Base node template provides default selection, dragging, and sizing behaviour.
+     The default left/right ports are removed: a tree only links top to bottom. -->
+<ng-diagram-base-node-template [node]="node()" [removeDefaultPorts]="true">
+  <div class="tree-node-content">
+    <span class="node-label">{{ node().data.label }}</span>
+  </div>
+</ng-diagram-base-node-template>
+
+<!-- Expand / collapse button, only rendered when the node has child edges.
+     Stopping pointerdown keeps the click from selecting or dragging the node. -->
+@if (hasChildren()) {
+  <button
+    type="button"
+    class="toggle-btn"
+    [attr.aria-expanded]="!node().data.collapsed"
+    [attr.aria-label]="
+      node().data.collapsed ? 'Expand subtree' : 'Collapse subtree'
+    "
+    (pointerdown)="$event.stopPropagation()"
+    (click)="onToggle()"
+  >
+    <!-- Plus while collapsed, minus while expanded. -->
+    <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
+      <path
+        d="M1.5 6h9"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
+      @if (node().data.collapsed) {
+        <path
+          d="M6 1.5v9"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+        />
+      }
+    </svg>
+  </button>
+}
+
+<!-- Connection ports: the data links a parent's bottom port to a child's top port. -->
+<ng-diagram-port id="port-bottom" type="both" side="bottom" />
+<ng-diagram-port id="port-top" type="both" side="top" />
