@@ -341,6 +341,132 @@ describe('zoomToFit command', () => {
       expect(mockApplyUpdate).not.toHaveBeenCalled();
     });
 
+    it('should scope the fit to the target nodes in a diagram with edges', async () => {
+      const nodes: Node[] = [
+        {
+          id: '1',
+          position: { x: 0, y: 0 },
+          size: { width: 100, height: 100 },
+          data: {},
+          measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+        },
+        {
+          id: '2',
+          position: { x: 200, y: 200 },
+          size: { width: 100, height: 100 },
+          data: {},
+          measuredBounds: { x: 200, y: 200, width: 100, height: 100 },
+        },
+        {
+          id: '3',
+          position: { x: 5000, y: 5000 },
+          size: { width: 100, height: 100 },
+          data: {},
+          measuredBounds: { x: 5000, y: 5000, width: 100, height: 100 },
+        },
+      ];
+
+      const edges: Edge[] = [
+        {
+          id: 'e1',
+          source: '1',
+          target: '2',
+          data: {},
+          points: [
+            { x: 50, y: 50 },
+            { x: 250, y: 250 },
+          ],
+        },
+        {
+          id: 'e2',
+          source: '2',
+          target: '3',
+          data: {},
+          points: [
+            { x: 250, y: 250 },
+            { x: 5050, y: 5050 },
+          ],
+        },
+      ];
+
+      const state: FlowState = {
+        nodes,
+        edges,
+        metadata: {
+          viewport: { x: 0, y: 0, scale: 1, width: 800, height: 600 },
+        },
+      };
+
+      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue(state);
+
+      await zoomToFit(commandHandler, { name: 'zoomToFit', nodeIds: ['1', '2'] });
+
+      expect(mockApplyUpdate).toHaveBeenCalled();
+      const { viewport } = mockApplyUpdate.mock.calls[0][0].metadataUpdate;
+
+      // Only nodes 1 and 2 plus the edge between them count: bounds {0, 0, 300, 300}.
+      // Edge e2 leads outside the target set and must not stretch the fit to node 3.
+      // With padding 20, available space is 760x560 → scale limited by height.
+      expect(viewport.scale).toBeCloseTo(560 / 300, 5);
+      // Viewport centers on the subset center (150, 150).
+      expect(viewport.x).toBeCloseTo(400 - 150 * viewport.scale, 5);
+      expect(viewport.y).toBeCloseTo(300 - 150 * viewport.scale, 5);
+    });
+
+    it('should keep explicit edgeIds meaning even when nodeIds are also given', async () => {
+      const nodes: Node[] = [
+        {
+          id: '1',
+          position: { x: 0, y: 0 },
+          size: { width: 100, height: 100 },
+          data: {},
+          measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+        },
+        {
+          id: '2',
+          position: { x: 400, y: 400 },
+          size: { width: 100, height: 100 },
+          data: {},
+          measuredBounds: { x: 400, y: 400, width: 100, height: 100 },
+        },
+      ];
+
+      const edges: Edge[] = [
+        {
+          id: 'e1',
+          source: '1',
+          target: '2',
+          data: {},
+          points: [
+            { x: 100, y: 100 },
+            { x: 400, y: 400 },
+          ],
+        },
+      ];
+
+      const state: FlowState = {
+        nodes,
+        edges,
+        metadata: {
+          viewport: { x: 0, y: 0, scale: 1, width: 800, height: 600 },
+        },
+      };
+
+      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue(state);
+
+      // Edge e1 connects to node 2 which is outside the node target set — explicit edgeIds still include it.
+      await zoomToFit(commandHandler, { name: 'zoomToFit', nodeIds: ['1'], edgeIds: ['e1'] });
+
+      expect(mockApplyUpdate).toHaveBeenCalled();
+      const { viewport } = mockApplyUpdate.mock.calls[0][0].metadataUpdate;
+
+      // Bounds are node 1 united with e1 points: {0, 0, 400, 400}.
+      // With padding 20, available space is 760x560 → scale limited by height.
+      expect(viewport.scale).toBeCloseTo(560 / 400, 5);
+      expect(viewport.x).toBeCloseTo(400 - 200 * viewport.scale, 5);
+      expect(viewport.y).toBeCloseTo(300 - 200 * viewport.scale, 5);
+    });
+
     it('should frame only the selected nodes away from the origin when no edges are targeted', async () => {
       const nodes: Node[] = [
         {
@@ -419,6 +545,134 @@ describe('zoomToFit command', () => {
       const { viewport } = mockApplyUpdate.mock.calls[0][0].metadataUpdate;
 
       // Bounds must cover only the visible node {680, 220, 240, 300}.
+      // With padding 20, available space is 760x560 → scale limited by height.
+      expect(viewport.scale).toBeCloseTo(560 / 300, 5);
+      // Viewport centers on the visible node center (800, 370).
+      expect(viewport.x).toBeCloseTo(400 - 800 * viewport.scale, 5);
+      expect(viewport.y).toBeCloseTo(300 - 370 * viewport.scale, 5);
+    });
+
+    it('should be a no-op when all target nodes are hidden, even in a diagram with visible edges', async () => {
+      const nodes: Node[] = [
+        {
+          id: '1',
+          position: { x: 0, y: 0 },
+          size: { width: 100, height: 100 },
+          data: {},
+          measuredBounds: { x: 0, y: 0, width: 100, height: 100 },
+        },
+        {
+          id: '2',
+          position: { x: 400, y: 400 },
+          size: { width: 100, height: 100 },
+          data: {},
+          measuredBounds: { x: 400, y: 400, width: 100, height: 100 },
+        },
+        {
+          id: '3',
+          position: { x: 5000, y: 5000 },
+          size: { width: 100, height: 100 },
+          data: {},
+          measuredBounds: { x: 5000, y: 5000, width: 100, height: 100 },
+          computedHidden: true,
+        },
+      ];
+
+      const edges: Edge[] = [
+        {
+          id: 'e1',
+          source: '1',
+          target: '2',
+          data: {},
+          points: [
+            { x: 100, y: 100 },
+            { x: 400, y: 400 },
+          ],
+        },
+      ];
+
+      const state: FlowState = {
+        nodes,
+        edges,
+        metadata: {
+          viewport: { x: 0, y: 0, scale: 1, width: 800, height: 600 },
+        },
+      };
+
+      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue(state);
+
+      await zoomToFit(commandHandler, { name: 'zoomToFit', nodeIds: ['3'] });
+
+      expect(mockApplyUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should frame only the visible targets when nodeIds mix visible and hidden nodes', async () => {
+      const nodes: Node[] = [
+        {
+          id: '1',
+          position: { x: 680, y: 220 },
+          size: { width: 240, height: 300 },
+          data: {},
+          measuredBounds: { x: 680, y: 220, width: 240, height: 300 },
+        },
+        {
+          id: '2',
+          position: { x: 5000, y: 5000 },
+          size: { width: 240, height: 240 },
+          data: {},
+          measuredBounds: { x: 5000, y: 5000, width: 240, height: 240 },
+          computedHidden: true,
+        },
+        {
+          id: '3',
+          position: { x: 10000, y: 10000 },
+          size: { width: 100, height: 100 },
+          data: {},
+          measuredBounds: { x: 10000, y: 10000, width: 100, height: 100 },
+        },
+      ];
+
+      const edges: Edge[] = [
+        {
+          id: 'e1',
+          source: '1',
+          target: '2',
+          data: {},
+          points: [
+            { x: 920, y: 370 },
+            { x: 5000, y: 5120 },
+          ],
+          computedHidden: true,
+        },
+        {
+          id: 'e2',
+          source: '1',
+          target: '3',
+          data: {},
+          points: [
+            { x: 920, y: 370 },
+            { x: 10000, y: 10050 },
+          ],
+        },
+      ];
+
+      const state: FlowState = {
+        nodes,
+        edges,
+        metadata: {
+          viewport: { x: 0, y: 0, scale: 1, width: 800, height: 600 },
+        },
+      };
+
+      (commandHandler.flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue(state);
+
+      await zoomToFit(commandHandler, { name: 'zoomToFit', nodeIds: ['1', '2'] });
+
+      expect(mockApplyUpdate).toHaveBeenCalled();
+      const { viewport } = mockApplyUpdate.mock.calls[0][0].metadataUpdate;
+
+      // Bounds must cover only the visible target node {680, 220, 240, 300}:
+      // node 2 is hidden, edge e1 is hidden, and edge e2 leads outside the target set.
       // With padding 20, available space is 760x560 → scale limited by height.
       expect(viewport.scale).toBeCloseTo(560 / 300, 5);
       // Viewport centers on the visible node center (800, 370).

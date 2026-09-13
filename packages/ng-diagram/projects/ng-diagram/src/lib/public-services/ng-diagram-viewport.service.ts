@@ -181,7 +181,8 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
    *
    * @param options Optional configuration object
    * @param options.nodeIds Array of node IDs to fit. If not provided, all nodes are included.
-   * @param options.edgeIds Array of edge IDs to fit. If not provided, all edges are included.
+   * @param options.edgeIds Array of edge IDs to fit. If not provided, all edges are included when
+   *   `nodeIds` is also omitted; when `nodeIds` is provided, only edges connecting the target nodes are included.
    * @param options.padding Padding around the content (default: 50). Supports CSS-like syntax:
    *   - Single number: uniform padding on all sides
    *   - [top/bottom, left/right]: vertical and horizontal padding
