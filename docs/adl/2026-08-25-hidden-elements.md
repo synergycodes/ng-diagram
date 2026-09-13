@@ -130,10 +130,11 @@ have to be re-derived.
 - [NGD-317](https://app.clickup.com/t/86cbanwwx) — `zoomToFit({ nodeIds })` without `edgeIds` fits
   the entire edge network (pre-existing shape, made a live surprise by hidden filtering).
 - [NGD-320](https://app.clickup.com/t/86cbd99n5) — `deleteNodes` on a group leaves children with a
-  dangling `groupId`; previously hidden children reappear as orphans. Decision: at minimum clear
-  the children's `groupId`. Until fixed, the guide's "deleting a group deletes its hidden children"
-  holds for `deleteSelection` only — the docs cascade distinction is deliberately deferred to this
-  task.
+  dangling `groupId`; previously hidden children reappear as orphans. ~~Decision: at minimum clear
+  the children's `groupId`.~~ Resolved (2026-09-11): `deleteNodes` now cascades to all descendants
+  via `modelLookup.getAllDescendantIds`, matching `deleteSelection` — the more consistent of the
+  two triaged options, so the guide's "deleting a group deletes its hidden children" now holds for
+  both paths and no docs cascade distinction is needed.
 - [NGD-321](https://app.clickup.com/t/86cbd99p1) — `draggable: false` on a group should freeze its
   whole subtree. Decision: nothing moves, visible descendants included (the moving visible half is
   a pre-existing bug surfaced by hidden descendants now correctly staying put).
