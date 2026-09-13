@@ -15,25 +15,50 @@ export interface PasteCommand {
 }
 
 /**
- * Calculate the center point of a collection of nodes
+ * Calculate the center point of a collection of points
  */
-const calculateNodeCenter = (nodes: Node[]): Point => {
-  if (nodes.length === 0) {
+const calculateCenter = (points: Point[]): Point => {
+  if (points.length === 0) {
     return { x: 0, y: 0 };
   }
 
-  const centerX = nodes.reduce((sum, node) => sum + node.position.x, 0) / nodes.length;
-  const centerY = nodes.reduce((sum, node) => sum + node.position.y, 0) / nodes.length;
+  const centerX = points.reduce((sum, point) => sum + point.x, 0) / points.length;
+  const centerY = points.reduce((sum, point) => sum + point.y, 0) / points.length;
 
   return { x: centerX, y: centerY };
 };
 
 /**
+ * Collect the positions anchoring the copied edges' free endpoints — the
+ * endpoints that will be pasted dangling because their node was not copied
+ * (or was dangling already). These anchor the pasted content at the cursor
+ * exactly like node positions do.
+ */
+const collectFreeEdgeEndpointPositions = (copiedEdges: Edge[], copiedNodeIds: Set<string>): Point[] => {
+  const positions: Point[] = [];
+
+  for (const edge of copiedEdges) {
+    if (!edge.source || !copiedNodeIds.has(edge.source)) {
+      const position = edge.sourcePosition ?? edge.points?.at(0);
+      if (position) {
+        positions.push(position);
+      }
+    }
+    if (!edge.target || !copiedNodeIds.has(edge.target)) {
+      const position = edge.targetPosition ?? edge.points?.at(-1);
+      if (position) {
+        positions.push(position);
+      }
+    }
+  }
+
+  return positions;
+};
+
+/**
  * Calculate the paste position and offset based on command parameters
  */
-const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point => {
-  const center = calculateNodeCenter(copiedNodes);
-
+const calculatePasteOffset = (copiedNodes: Node[], freeEndpointPositions: Point[], command: PasteCommand): Point => {
   if (!command.position) {
     // Default behavior: offset from original center
     return {
@@ -42,7 +67,7 @@ const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point
     };
   }
 
-  if (copiedNodes.length === 1) {
+  if (copiedNodes.length === 1 && freeEndpointPositions.length === 0) {
     // Single node: center the node at cursor position, accounting for node size
     const singleNode = copiedNodes[0];
     const nodeWidth = singleNode.size?.width ?? 0;
@@ -57,7 +82,9 @@ const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point
     return NgDiagramMath.subtractPoints(target, singleNode.position);
   }
 
-  // Multiple nodes: maintain relative positioning with center at cursor
+  // Maintain relative positioning with the center of the pasted content —
+  // node positions and free edge endpoints alike — at the cursor
+  const center = calculateCenter([...copiedNodes.map((node) => node.position), ...freeEndpointPositions]);
   return NgDiagramMath.subtractPoints(command.position, center);
 };
 
@@ -120,27 +147,70 @@ const createPastedNodes = (
 };
 
 /**
- * Create new edges with updated IDs and references
+ * Create new edges with updated IDs and references.
+ *
+ * Endpoints whose node was copied are remapped to the pasted node. An endpoint
+ * whose node was NOT copied becomes dangling (empty `source`/`target` with the
+ * last routed attachment point as its authored position) — reattaching it to
+ * the original node would silently duplicate the original connection. Already
+ * dangling endpoints stay dangling. Every free-endpoint position is shifted by
+ * the paste offset like every pasted node. An edge whose freed endpoint has no
+ * known position (never routed, no points) is skipped — there is nothing to
+ * author the free end from.
  */
 const createPastedEdges = (
   config: FlowConfig,
   copiedEdges: Edge[],
   nodeIdMap: Map<string, string>,
-  hiddenCopiedNodeIds: Set<string>
+  hiddenCopiedNodeIds: Set<string>,
+  offset: Point
 ): Edge[] => {
-  return copiedEdges.map((edge) => {
-    const newEdgeId = config.computeEdgeId();
+  const pastedEdges: Edge[] = [];
+
+  for (const edge of copiedEdges) {
     const newEdge: Edge = {
       ...edge,
-      id: newEdgeId,
-      source: nodeIdMap.get(edge.source) || edge.source,
-      target: nodeIdMap.get(edge.target) || edge.target,
+      id: config.computeEdgeId(),
       // See createPastedNodes — hidden pasted edges stay deselected.
       selected: !isEdgeEffectivelyHidden(edge, hiddenCopiedNodeIds),
     };
 
-    return newEdge;
-  });
+    const newSource = edge.source ? nodeIdMap.get(edge.source) : '';
+    if (newSource !== undefined) {
+      newEdge.source = newSource;
+    } else {
+      const position = edge.sourcePosition ?? edge.points?.at(0);
+      if (!position) {
+        continue;
+      }
+      newEdge.source = '';
+      newEdge.sourcePort = undefined;
+      newEdge.sourcePosition = position;
+    }
+    if (!newEdge.source && newEdge.sourcePosition) {
+      newEdge.sourcePosition = { x: newEdge.sourcePosition.x + offset.x, y: newEdge.sourcePosition.y + offset.y };
+    }
+
+    const newTarget = edge.target ? nodeIdMap.get(edge.target) : '';
+    if (newTarget !== undefined) {
+      newEdge.target = newTarget;
+    } else {
+      const position = edge.targetPosition ?? edge.points?.at(-1);
+      if (!position) {
+        continue;
+      }
+      newEdge.target = '';
+      newEdge.targetPort = undefined;
+      newEdge.targetPosition = position;
+    }
+    if (!newEdge.target && newEdge.targetPosition) {
+      newEdge.targetPosition = { x: newEdge.targetPosition.x + offset.x, y: newEdge.targetPosition.y + offset.y };
+    }
+
+    pastedEdges.push(newEdge);
+  }
+
+  return pastedEdges;
 };
 
 /**
@@ -225,10 +295,14 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
   const hiddenCopiedNodeIds = computeHiddenNodeIds(copyPasteState.copiedNodes);
 
   // Calculate paste offset from the visible copied nodes only — invisible
-  // members must not pull the pasted content away from the cursor.
+  // members must not pull the pasted content away from the cursor. Free edge
+  // endpoints (pasted dangling) anchor the content just like node positions.
   const visibleCopiedNodes = copyPasteState.copiedNodes.filter((node) => !hiddenCopiedNodeIds.has(node.id));
+  const copiedNodeIds = new Set(copyPasteState.copiedNodes.map((node) => node.id));
+  const freeEndpointPositions = collectFreeEdgeEndpointPositions(copyPasteState.copiedEdges, copiedNodeIds);
   const offset = calculatePasteOffset(
     visibleCopiedNodes.length > 0 ? visibleCopiedNodes : copyPasteState.copiedNodes,
+    freeEndpointPositions,
     command
   );
 
@@ -245,8 +319,16 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
     commandHandler.flowCore.config,
     copyPasteState.copiedEdges,
     nodeIdMap,
-    hiddenCopiedNodeIds
+    hiddenCopiedNodeIds,
+    offset
   );
+
+  // Nothing pasteable (e.g. the clipboard held only edges whose freed
+  // endpoints have no position to dangle from) — leave the current
+  // selection untouched.
+  if (newNodes.length === 0 && newEdges.length === 0) {
+    return;
+  }
 
   // Create deselect updates
   const { nodesToUpdate, edgesToUpdate } = createDeselectUpdates(nodes, edges);
