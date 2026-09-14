@@ -116,7 +116,11 @@ export const createInMemoryModelAdapter = (): ModelAdapter => {
 };
 
 /** Real FlowCore over an in-memory model — for tests that need the actual update pipeline. */
-export const createTestFlowCore = (model: ModelAdapter, middlewares: Middleware[] = []): FlowCore => {
+export const createTestFlowCore = (
+  model: ModelAdapter,
+  middlewares: Middleware[] = [],
+  environment: EnvironmentInfo = mockEnvironment
+): FlowCore => {
   const renderer: Renderer = { draw: vi.fn() };
   const inputEventsRouter = {
     emit: vi.fn(),
@@ -124,5 +128,5 @@ export const createTestFlowCore = (model: ModelAdapter, middlewares: Middleware[
     registerDefaultCallbacks: vi.fn(),
   } as unknown as InputEventsRouter;
 
-  return new FlowCore(model, renderer, inputEventsRouter, mockEnvironment, middlewares);
+  return new FlowCore(model, renderer, inputEventsRouter, environment, middlewares);
 };

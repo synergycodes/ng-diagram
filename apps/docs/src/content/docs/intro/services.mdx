@@ -306,6 +306,13 @@ Handles copy, cut, and paste operations for diagram elements with support for po
 - Cut elements (copy + delete)
 - Paste elements at specific positions
 
+:::note
+When you paste an edge, each end whose node was copied with it connects to the new node. An end whose
+node was **not** copied is pasted as a free end instead of reconnecting to the original node, so pasting
+an edge on its own never duplicates the original connection. Move or reconnect the free end as needed.
+See [`paste`](/docs/api/services/ngdiagramclipboardservice/#paste) for details.
+:::
+
 **Usage Example:**
 
 ```typescript
