@@ -66,6 +66,7 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [deletedNode],
         deletedEdges: [],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();
@@ -85,6 +86,7 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [deletedNode1, deletedNode2],
         deletedEdges: [],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();
@@ -104,6 +106,7 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [deletedNode],
         deletedEdges: [],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();
@@ -132,6 +135,7 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [],
         deletedEdges: [deletedEdge],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();
@@ -165,6 +169,7 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [],
         deletedEdges: [deletedEdge1, deletedEdge2],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();
@@ -198,6 +203,7 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [],
         deletedEdges: [deletedEdge],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();
@@ -230,6 +236,7 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [deletedNode1, deletedNode2],
         deletedEdges: [deletedEdge],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();
@@ -276,6 +283,7 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [deletedNode1, deletedNode2],
         deletedEdges: [deletedEdge1],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();
@@ -350,12 +358,91 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [deletedNode],
         deletedEdges: [deletedEdge],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();
       expect(emitSpy).toHaveBeenCalledWith('selectionRemoved', expectedEvent);
       expect(emitSpy.mock.calls[0][1].deletedNodes).toHaveLength(1);
       expect(emitSpy.mock.calls[0][1].deletedEdges).toHaveLength(1);
+    });
+  });
+
+  describe('detached edges', () => {
+    it('should report edges detached to dangling instead of deleted', () => {
+      const deletedNode: Node = { ...mockNode, id: 'node1', position: { x: 100, y: 100 } };
+      const initialEdge: Edge = {
+        id: 'edge1',
+        source: 'node1',
+        target: 'node2',
+        data: {},
+      };
+      const detachedEdge: Edge = {
+        ...initialEdge,
+        source: '',
+        sourcePort: undefined,
+        sourcePosition: { x: 100, y: 100 },
+      };
+
+      context.initialNodesMap.set('node1', deletedNode);
+      context.initialEdgesMap.set('edge1', initialEdge);
+      // The edge survived the delete pass with a changed endpoint — demoted to
+      // dangling by detach-on-node-delete rather than deleted.
+      context.edgesMap.set('edge1', detachedEdge);
+
+      emitter.emit(context, eventManager);
+
+      const expectedEvent: SelectionRemovedEvent = {
+        deletedNodes: [deletedNode],
+        deletedEdges: [],
+        detachedEdges: [detachedEdge],
+      };
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy).toHaveBeenCalledWith('selectionRemoved', expectedEvent);
+    });
+
+    it('should emit when only detachments happened', () => {
+      const initialEdge: Edge = {
+        id: 'edge1',
+        source: 'node1',
+        target: 'node2',
+        data: {},
+      };
+      const detachedEdge: Edge = {
+        ...initialEdge,
+        target: '',
+        targetPort: undefined,
+        targetPosition: { x: 200, y: 200 },
+      };
+
+      context.initialEdgesMap.set('edge1', initialEdge);
+      context.edgesMap.set('edge1', detachedEdge);
+
+      emitter.emit(context, eventManager);
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy.mock.calls[0][1].detachedEdges).toEqual([detachedEdge]);
+      expect(emitSpy.mock.calls[0][1].deletedEdges).toEqual([]);
+    });
+
+    it('should not report an unchanged surviving edge as detached', () => {
+      const deletedNode: Node = { ...mockNode, id: 'node1', position: { x: 100, y: 100 } };
+      const survivingEdge: Edge = {
+        id: 'edge1',
+        source: 'node3',
+        target: 'node4',
+        data: {},
+      };
+
+      context.initialNodesMap.set('node1', deletedNode);
+      context.initialEdgesMap.set('edge1', survivingEdge);
+      context.edgesMap.set('edge1', survivingEdge);
+
+      emitter.emit(context, eventManager);
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy.mock.calls[0][1].detachedEdges).toEqual([]);
     });
   });
 
@@ -468,6 +555,7 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [node1, node2],
         deletedEdges: [edge],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();
@@ -487,6 +575,7 @@ describe('SelectionRemovedEmitter', () => {
       const expectedEvent: SelectionRemovedEvent = {
         deletedNodes: [node1, node2],
         deletedEdges: [],
+        detachedEdges: [],
       };
 
       expect(emitSpy).toHaveBeenCalledOnce();

@@ -20,6 +20,8 @@ import type {
   DiagramInitEvent,
   EdgeDrawEndedEvent,
   EdgeDrawnEvent,
+  EdgeRelinkEndedEvent,
+  EdgeRelinkStartedEvent,
   GroupMembershipChangedEvent,
   GroupNode,
   MiddlewareChain,
@@ -214,6 +216,24 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * For cancelled draws, includes the cancellation reason.
    */
   @Output() edgeDrawEnded = new EventEmitter<EdgeDrawEndedEvent>();
+
+  /**
+   * Event emitted when the user starts dragging an endpoint of an existing
+   * edge (the relinking gesture, see `edgeRelinking` config).
+   *
+   * @since 1.4.0
+   */
+  @Output() edgeRelinkStarted = new EventEmitter<EdgeRelinkStartedEvent>();
+
+  /**
+   * Event emitted when an edge relink gesture ends, regardless of outcome.
+   *
+   * Fires when the dragged endpoint is dropped — reconnected to a port, left
+   * dangling on empty canvas, or reverted (invalid drop or cancelled gesture).
+   *
+   * @since 1.4.0
+   */
+  @Output() edgeRelinkEnded = new EventEmitter<EdgeRelinkEndedEvent>();
 
   /**
    * Event emitted when selected nodes are moved within the diagram.
@@ -522,6 +542,8 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 
     eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
     eventManager.on('edgeDrawEnded', (event) => this.edgeDrawEnded.emit(event));
+    eventManager.on('edgeRelinkStarted', (event) => this.edgeRelinkStarted.emit(event));
+    eventManager.on('edgeRelinkEnded', (event) => this.edgeRelinkEnded.emit(event));
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
     eventManager.on('selectionGestureEnded', (event) => this.selectionGestureEnded.emit(event));

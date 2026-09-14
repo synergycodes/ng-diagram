@@ -21,6 +21,29 @@
     [attr.stroke-opacity]="strokeOpacity() || 'var(--edge-stroke-opacity, 1)'"
   />
   <path [attr.d]="path()" fill="none" stroke="none" stroke-width="20" stroke-opacity="0" />
+
+  @if (relinkHandlesVisible()) {
+    <circle
+      class="ng-diagram-edge__relink-handle"
+      data-relink-handle="source"
+      ngDiagramRelinkHandle
+      [edge]="edge()"
+      end="source"
+      [attr.cx]="relinkSourceHandle().x"
+      [attr.cy]="relinkSourceHandle().y"
+      r="5"
+    />
+    <circle
+      class="ng-diagram-edge__relink-handle"
+      data-relink-handle="target"
+      ngDiagramRelinkHandle
+      [edge]="edge()"
+      end="target"
+      [attr.cx]="relinkTargetHandle().x"
+      [attr.cy]="relinkTargetHandle().y"
+      r="5"
+    />
+  }
 </svg>
 
 <ng-content />

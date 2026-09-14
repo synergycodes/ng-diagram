@@ -201,6 +201,28 @@ export const defaultModel: DiagramModel = {
       targetPort: 'port-left',
       routing: 'orthogonal',
     },
+    // Dangling edge: connected at the source, free at the target. Grab the
+    // endpoint handle (select the edge first) to reconnect it to a port.
+    {
+      id: 'dangling-single',
+      source: '9',
+      sourcePort: 'port-right',
+      target: '',
+      targetPosition: { x: 420, y: 620 },
+      data: {},
+      routing: 'orthogonal',
+    },
+    // Dual dangling edge: connected to nothing on both ends. It routes
+    // between its two free endpoints, survives copy/paste and persistence.
+    {
+      id: 'dangling-dual',
+      source: '',
+      sourcePosition: { x: -250, y: 850 },
+      target: '',
+      targetPosition: { x: -50, y: 950 },
+      data: {},
+      routing: 'orthogonal',
+    },
     {
       id: '2',
       source: '2',

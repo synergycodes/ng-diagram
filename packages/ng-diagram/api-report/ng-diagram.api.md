@@ -144,6 +144,21 @@ export class CursorPositionTrackerDirective {
     static ɵfac: i0.ɵɵFactoryDeclaration<CursorPositionTrackerDirective, never>;
 }
 
+// @public
+export interface DanglingEdgesConfig {
+    detachOnNodeDelete: boolean;
+    enabled: boolean;
+    shouldDetachOnNodeDelete?: (edge: Edge, deletedNode: Node_2, end: EdgeEnd) => boolean;
+    shouldKeepOnDrop?: (edge: Edge, dropPosition: Point) => boolean;
+}
+
+// @public
+export interface DanglingEndpoint {
+    edge: Edge;
+    end: EdgeEnd;
+    position: Point;
+}
+
 // @public (undocumented)
 export type DataObject = object;
 
@@ -159,6 +174,8 @@ export interface DiagramEventMap {
     edgeDrawEnded: EdgeDrawEndedEvent;
     // @deprecated
     edgeDrawn: EdgeDrawnEvent;
+    edgeRelinkEnded: EdgeRelinkEndedEvent;
+    edgeRelinkStarted: EdgeRelinkStartedEvent;
     groupMembershipChanged: GroupMembershipChangedEvent;
     nodeDragEnded: NodeDragEndedEvent;
     nodeDragStarted: NodeDragStartedEvent;
@@ -240,7 +257,7 @@ export interface EdgeDrawEndedEvent {
     dropPosition: Point;
     edge?: Edge;
     reason?: EdgeDrawCancelReason;
-    source: Node_2;
+    source?: Node_2;
     sourcePort?: string;
     success: boolean;
     target?: Node_2;
@@ -257,6 +274,9 @@ export interface EdgeDrawnEvent {
 }
 
 // @public
+export type EdgeEnd = 'source' | 'target';
+
+// @public
 export interface EdgeLabel {
     id: string;
     position?: Point;
@@ -266,6 +286,35 @@ export interface EdgeLabel {
 
 // @public
 export type EdgeLabelPosition = number | AbsoluteEdgeLabelPosition;
+
+// @public
+export type EdgeRelinkCancelReason = 'noTarget' | 'invalidConnection' | 'cancelled';
+
+// @public
+export interface EdgeRelinkEndedEvent {
+    dropPosition: Point;
+    edge: Edge;
+    end: EdgeEnd;
+    previousNode?: Node_2;
+    previousPort?: string;
+    previousPosition?: Point;
+    reason?: EdgeRelinkCancelReason;
+    success: boolean;
+    target?: Node_2;
+    targetPort?: string;
+}
+
+// @public
+export interface EdgeRelinkingConfig {
+    enabled: boolean;
+    validateRelink?: (edge: Edge, end: EdgeEnd, targetNode: Node_2 | null, targetPort: Port | null) => boolean;
+}
+
+// @public
+export interface EdgeRelinkStartedEvent {
+    edge: Edge;
+    end: EdgeEnd;
+}
 
 // @public
 export interface EdgeRouting {
@@ -347,8 +396,10 @@ export interface FlowConfig {
     boxSelection: BoxSelectionConfig;
     computeEdgeId: () => string;
     computeNodeId: () => string;
+    danglingEdges: DanglingEdgesConfig;
     debugMode: boolean;
     defaultNode?: DefaultNodeTemplateConfig;
+    edgeRelinking: EdgeRelinkingConfig;
     edgeRouting: EdgeRoutingConfig;
     grouping: GroupingConfig;
     hideWatermark?: boolean;
@@ -398,6 +449,12 @@ export interface FlowStateUpdate {
 export type GestureCancelReason = 'cancelled';
 
 // @public
+export const getDanglingEndpoints: (edges: readonly Edge[]) => DanglingEndpoint[];
+
+// @public
+export const getNearestDanglingEndpointInRange: (edges: readonly Edge[], point: Point, range: number) => DanglingEndpoint | null;
+
+// @public
 export interface GroupingConfig {
     canGroup: (node: Node_2, group: Node_2) => boolean;
 }
@@ -419,6 +476,9 @@ export interface GroupNode<T extends DataObject = DataObject> extends SimpleNode
 
 // @public
 export type GroupNodeData<Data extends object = BasePaletteItemData> = SimpleNodeData<Data> & Pick<GroupNode, 'isGroup'>;
+
+// @public
+export const hasFreeEndpoint: (edge: Edge, end?: EdgeEnd) => boolean;
 
 // @public
 export interface HighlightGroupActionState {
@@ -454,6 +514,9 @@ export interface InvalidateMeasurementsOptions {
         nodeId: string;
     }[];
 }
+
+// @public
+export const isDanglingEdge: (edge: Edge) => boolean;
 
 // @public
 export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | KeyboardZoomAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll' | 'cancelInteraction'>;
@@ -498,6 +561,8 @@ export type KeyboardZoomAction = 'keyboardZoomIn' | 'keyboardZoomOut';
 export interface LinkingActionState {
     cancelReason?: EdgeDrawCancelReason;
     dropPosition?: Point;
+    relink?: LinkingRelinkContext;
+    relinkCancelReason?: EdgeRelinkCancelReason;
     sourceNodeId: string;
     sourcePortId: string;
     temporaryEdge: Edge | null;
@@ -533,6 +598,13 @@ export class LinkingInputDirective implements OnDestroy {
     static ɵdir: i0.ɵɵDirectiveDeclaration<LinkingInputDirective, "[ngDiagramLinkingInput]", never, { "portId": { "alias": "portId"; "required": true; "isSignal": true; }; }, {}, never, never, true, never>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<LinkingInputDirective, never>;
+}
+
+// @public
+export interface LinkingRelinkContext {
+    edgeId: string;
+    end: EdgeEnd;
+    originalEdge: Edge;
 }
 
 // Warning: (ae-internal-missing-underscore) The name "loggerMiddleware" should be prefixed with an underscore because the declaration is marked as @internal
@@ -672,7 +744,7 @@ export interface Model {
 }
 
 // @public
-export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'addEdgeLabelsBulk' | 'updateEdgeLabelsBulk' | 'deleteEdgeLabelsBulk' | 'addPortsBulk' | 'updatePortsBulk' | 'deletePortsBulk' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'cancelResize' | 'startLinking' | 'moveTemporaryEdge' | 'finishLinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'cancelRotate' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'cancelDrag' | 'selectEnd' | 'templateVisibilityChange';
+export type ModelActionType = 'init' | 'changeSelection' | 'moveNodesBy' | 'deleteSelection' | 'addNodes' | 'updateNode' | 'updateNodes' | 'deleteNodes' | 'clearModel' | 'paletteDropNode' | 'addEdges' | 'updateEdge' | 'deleteEdges' | 'deleteElements' | 'addEdgeLabelsBulk' | 'updateEdgeLabelsBulk' | 'deleteEdgeLabelsBulk' | 'addPortsBulk' | 'updatePortsBulk' | 'deletePortsBulk' | 'paste' | 'moveViewport' | 'resizeNode' | 'resizeNodeStart' | 'resizeNodeStop' | 'cancelResize' | 'startLinking' | 'startLinkingFromPosition' | 'moveTemporaryEdge' | 'finishLinking' | 'startRelinking' | 'finishRelinking' | 'zoom' | 'changeZOrder' | 'rotateNodeTo' | 'rotateNodeStart' | 'rotateNodeStop' | 'cancelRotate' | 'highlightGroup' | 'highlightGroupClear' | 'moveNodes' | 'moveNodesStart' | 'moveNodesStop' | 'cancelDrag' | 'selectEnd' | 'templateVisibilityChange';
 
 // @public
 export type ModelActionTypes = LooseAutocomplete<ModelActionType>[];
@@ -732,6 +804,7 @@ export class NgDiagramBaseEdgeComponent {
     constructor();
     // (undocumented)
     readonly class: Signal<string>;
+    readonly dangling: Signal<boolean>;
     edge: InputSignal<Edge<object>>;
     // (undocumented)
     readonly labels: Signal<EdgeLabel[]>;
@@ -743,6 +816,11 @@ export class NgDiagramBaseEdgeComponent {
     readonly path: Signal<string>;
     // (undocumented)
     readonly points: Signal<Point[]>;
+    readonly relinkHandlesVisible: Signal<boolean>;
+    // (undocumented)
+    readonly relinkSourceHandle: Signal<Point>;
+    // (undocumented)
+    readonly relinkTargetHandle: Signal<Point>;
     routing: InputSignal<string | undefined>;
     // (undocumented)
     readonly selected: Signal<boolean | undefined>;
@@ -836,6 +914,8 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     edgeDrawEnded: EventEmitter<EdgeDrawEndedEvent>;
     // @deprecated
     edgeDrawn: EventEmitter<EdgeDrawnEvent>;
+    edgeRelinkEnded: EventEmitter<EdgeRelinkEndedEvent>;
+    edgeRelinkStarted: EventEmitter<EdgeRelinkStartedEvent>;
     // (undocumented)
     readonly edges: WritableSignal<Edge<object>[]>;
     edgeTemplateMap: InputSignal<NgDiagramEdgeTemplateMap>;
@@ -879,7 +959,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     viewportChanged: EventEmitter<ViewportChangedEvent>;
     readonly viewportPannable: WritableSignal<boolean>;
     // (undocumented)
-    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; "tabbable": { "alias": "tabbable"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "edgeDrawEnded": "edgeDrawEnded"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionGestureEnded": "selectionGestureEnded"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "nodeRotateStarted": "nodeRotateStarted"; "nodeRotateEnded": "nodeRotateEnded"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "nodeResizeStarted": "nodeResizeStarted"; "nodeResizeEnded": "nodeResizeEnded"; "paletteItemDropped": "paletteItemDropped"; "nodeDragStarted": "nodeDragStarted"; "nodeDragEnded": "nodeDragEnded"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<NgDiagramComponent, "ng-diagram", never, { "config": { "alias": "config"; "required": false; "isSignal": true; }; "model": { "alias": "model"; "required": true; "isSignal": true; }; "middlewares": { "alias": "middlewares"; "required": false; "isSignal": true; }; "nodeTemplateMap": { "alias": "nodeTemplateMap"; "required": false; "isSignal": true; }; "edgeTemplateMap": { "alias": "edgeTemplateMap"; "required": false; "isSignal": true; }; "tabbable": { "alias": "tabbable"; "required": false; "isSignal": true; }; }, { "diagramInit": "diagramInit"; "edgeDrawn": "edgeDrawn"; "edgeDrawEnded": "edgeDrawEnded"; "edgeRelinkStarted": "edgeRelinkStarted"; "edgeRelinkEnded": "edgeRelinkEnded"; "selectionMoved": "selectionMoved"; "selectionChanged": "selectionChanged"; "selectionGestureEnded": "selectionGestureEnded"; "selectionRemoved": "selectionRemoved"; "groupMembershipChanged": "groupMembershipChanged"; "selectionRotated": "selectionRotated"; "nodeRotateStarted": "nodeRotateStarted"; "nodeRotateEnded": "nodeRotateEnded"; "viewportChanged": "viewportChanged"; "clipboardPasted": "clipboardPasted"; "nodeResized": "nodeResized"; "nodeResizeStarted": "nodeResizeStarted"; "nodeResizeEnded": "nodeResizeEnded"; "paletteItemDropped": "paletteItemDropped"; "nodeDragStarted": "nodeDragStarted"; "nodeDragEnded": "nodeDragEnded"; }, never, ["ng-diagram-background"], true, [{ directive: typeof i1.NgDiagramServicesAvailabilityCheckerDirective; inputs: {}; outputs: {}; }, { directive: typeof i2.BoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i3.MobileBoxSelectionDirective; inputs: {}; outputs: {}; }, { directive: typeof i4.CursorPositionTrackerDirective; inputs: {}; outputs: {}; }, { directive: typeof i5.ZoomingWheelDirective; inputs: {}; outputs: {}; }, { directive: typeof i6.PanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i7.MobilePanningDirective; inputs: {}; outputs: {}; }, { directive: typeof i8.MobileZoomingDirective; inputs: {}; outputs: {}; }, { directive: typeof i9.KeyboardInputsDirective; inputs: {}; outputs: {}; }, { directive: typeof i10.PaletteDropDirective; inputs: {}; outputs: {}; }, { directive: typeof i11.DiagramSelectionDirective; inputs: {}; outputs: {}; }]>;
     // (undocumented)
     static ɵfac: i0.ɵɵFactoryDeclaration<NgDiagramComponent, never>;
 }
@@ -1048,16 +1128,20 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     addNodes(nodes: Node_2[], options?: {
         waitForMeasurements?: boolean;
     }): Promise<void>;
+    attachEdge(edgeId: string, end: EdgeEnd, nodeId: string, portId?: string): Promise<boolean>;
     computePartsBounds(nodes: Node_2[], edges: Edge[]): Rect;
     deleteEdges(ids: string[]): Promise<void>;
     deleteNodes(ids: string[]): Promise<void>;
+    detachEdge(edgeId: string, end: EdgeEnd, position?: Point): Promise<void>;
     readonly edges: Signal<Edge<object>[]>;
     getChildren<T extends DataObject = DataObject>(groupId: string): Node_2<T>[];
     getChildrenNested<T extends DataObject = DataObject>(groupId: string): Node_2<T>[];
     getConnectedEdges<T extends DataObject = DataObject>(nodeId: string): Edge<T>[];
     getConnectedNodes<T extends DataObject = DataObject>(nodeId: string): Node_2<T>[];
+    getDanglingEndpoints(): DanglingEndpoint[];
     getEdgeById<T extends DataObject = DataObject>(edgeId: string): Edge<T> | null;
     getModel(): ModelAdapter;
+    getNearestDanglingEndpointInRange(point: Point, range: number): DanglingEndpoint | null;
     getNearestNodeInRange<T extends DataObject = DataObject>(point: Point, range: number): Node_2<T> | null;
     getNearestPortInRange(point: Point, range: number): Port | null;
     getNodeById<T extends DataObject = DataObject>(nodeId: string): Node_2<T> | null;
@@ -1299,6 +1383,7 @@ export class NgDiagramService extends NgDiagramBaseService {
     setDefaultRouting(name: string): void;
     setEventsEnabled(enabled: boolean): void;
     startLinking(node: Node_2, portId?: string): void;
+    startLinkingFromPosition(position: Point): void;
     transaction(callback: () => Promise<void>): Promise<TransactionResult>;
     transaction(callback: () => Promise<void>, options: TransactionOptions): Promise<TransactionResult>;
     transaction(callback: () => void): Promise<TransactionResult>;
@@ -1541,6 +1626,20 @@ export interface Rect {
 }
 
 // @public
+export class RelinkHandleDirective {
+    // (undocumented)
+    edge: InputSignal<Edge<object>>;
+    // (undocumented)
+    end: InputSignal<EdgeEnd>;
+    // (undocumented)
+    onPointerDown($event: PointerInputEvent): void;
+    // (undocumented)
+    static ɵdir: i0.ɵɵDirectiveDeclaration<RelinkHandleDirective, "[ngDiagramRelinkHandle]", never, { "edge": { "alias": "edge"; "required": true; "isSignal": true; }; "end": { "alias": "end"; "required": true; "isSignal": true; }; }, {}, never, never, true, never>;
+    // (undocumented)
+    static ɵfac: i0.ɵɵFactoryDeclaration<RelinkHandleDirective, never>;
+}
+
+// @public
 export interface ResizeActionState {
     cancelReason?: GestureCancelReason;
     resizingNode: Node_2;
@@ -1605,6 +1704,7 @@ export interface SelectionMovingConfig {
 export interface SelectionRemovedEvent {
     deletedEdges: Edge[];
     deletedNodes: Node_2[];
+    detachedEdges: Edge[];
 }
 
 // @public

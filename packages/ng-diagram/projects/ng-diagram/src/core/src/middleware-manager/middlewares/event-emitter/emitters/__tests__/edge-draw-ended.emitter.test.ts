@@ -209,6 +209,54 @@ describe('EdgeDrawEndedEmitter', () => {
     expect(emitSpy.mock.calls[0][1].dropPosition).toEqual({ x: 0, y: 0 });
   });
 
+  it('should not emit for a relink gesture sharing the linking state', () => {
+    helpers.anyEdgesAdded.mockReturnValue(true);
+    const originalEdge: Edge = { ...mockEdge, id: 'edge-1', source: 'source-node', target: 'target-node' };
+    mockActionStateManager.linking = {
+      ...baseLinking,
+      relink: { edgeId: 'edge-1', end: 'target', originalEdge },
+    };
+    context.edgesMap.set('new-edge', { ...mockEdge, id: 'new-edge', source: 'source-node', target: 'target-node' });
+
+    emitter.emit(context, eventManager);
+
+    // Relink gestures report through edgeRelinkEnded instead.
+    expect(emitSpy).not.toHaveBeenCalled();
+  });
+
+  it('should emit success with undefined source for a draw started from a position', () => {
+    helpers.anyEdgesAdded.mockReturnValue(true);
+    mockActionStateManager.linking = {
+      ...baseLinking,
+      sourceNodeId: '',
+      sourcePortId: '',
+    };
+
+    const danglingEdge: Edge = {
+      ...mockEdge,
+      id: 'dangling-edge',
+      source: '',
+      sourcePort: undefined,
+      sourcePosition: { x: 10, y: 20 },
+      target: 'target-node',
+      targetPort: 'port-2',
+    };
+    context.edgesMap.set('dangling-edge', danglingEdge);
+
+    emitter.emit(context, eventManager);
+
+    expect(emitSpy).toHaveBeenCalledOnce();
+    expect(emitSpy).toHaveBeenCalledWith('edgeDrawEnded', {
+      source: undefined,
+      sourcePort: undefined,
+      dropPosition,
+      success: true,
+      edge: danglingEdge,
+      target: targetNode,
+      targetPort: 'port-2',
+    });
+  });
+
   it('should emit undefined sourcePort when sourcePortId is empty', () => {
     helpers.anyEdgesAdded.mockReturnValue(false);
     mockActionStateManager.linking = {

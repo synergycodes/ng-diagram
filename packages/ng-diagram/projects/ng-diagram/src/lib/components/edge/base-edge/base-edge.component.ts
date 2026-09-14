@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Edge, equalPointsArrays, Point, RoutingMode } from '../../../../core/src';
+import { Edge, equalPointsArrays, isDanglingEdge, Point, RoutingMode } from '../../../../core/src';
 import { isValidPosition } from '../../../../core/src/utils/measurement-validation';
 import { EdgeSelectionDirective, InlineMarkersDirective, ZIndexDirective } from '../../../directives';
+import { RelinkHandleDirective } from '../../../directives/input-events/relinking/relinking.directive';
 import { FlowCoreProviderService } from '../../../services';
 import { MarkerRegistryService } from '../../../services/marker-registry/marker-registry.service';
+import { NgDiagramService } from '../../../public-services/ng-diagram.service';
 
 const INVALID_EDGE_COORDINATES_ERROR = (
   edgeId: string,
@@ -32,7 +34,7 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 @Component({
   selector: 'ng-diagram-base-edge',
   standalone: true,
-  imports: [InlineMarkersDirective],
+  imports: [InlineMarkersDirective, RelinkHandleDirective],
   templateUrl: './base-edge.component.html',
   styleUrl: './base-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,11 +45,13 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
   host: {
     '[class.selected]': 'selected()',
     '[class.temporary]': 'temporary()',
+    '[class.dangling]': 'dangling()',
   },
 })
 export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly markerRegistry = inject(MarkerRegistryService);
+  private readonly diagramService = inject(NgDiagramService);
 
   /**
    * Whether to use inline markers (Safari fallback).
@@ -152,7 +156,32 @@ export class NgDiagramBaseEdgeComponent {
   readonly selected = computed(() => this.edge().selected);
   readonly temporary = computed(() => this.edge().temporary);
 
+  /**
+   * Whether the edge has at least one free (unconnected) endpoint. Temporary
+   * edges are excluded — a draw preview always has a free end and must not
+   * pick up dangling styling.
+   */
+  readonly dangling = computed(() => {
+    const edge = this.edge();
+    return isDanglingEdge(edge) && !edge.temporary;
+  });
+
   readonly labels = computed(() => this.edge().measuredLabels ?? []);
+
+  /**
+   * Endpoint handles for the relinking gesture — rendered on selected,
+   * committed edges when `edgeRelinking.enabled` is true.
+   */
+  readonly relinkHandlesVisible = computed(
+    () =>
+      (this.diagramService.config().edgeRelinking?.enabled ?? false) &&
+      !!this.selected() &&
+      !this.temporary() &&
+      this.points().length > 0
+  );
+
+  readonly relinkSourceHandle = computed(() => this.points()[0]);
+  readonly relinkTargetHandle = computed(() => this.points()[this.points().length - 1]);
 
   readonly class = computed(() => {
     const classArray = ['ng-diagram-edge__path'];
@@ -163,6 +192,10 @@ export class NgDiagramBaseEdgeComponent {
 
     if (this.temporary()) {
       classArray.push('temporary');
+    }
+
+    if (this.dangling()) {
+      classArray.push('dangling');
     }
 
     return classArray.join(' ');

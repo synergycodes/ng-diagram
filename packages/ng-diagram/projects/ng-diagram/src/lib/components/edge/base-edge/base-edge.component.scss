@@ -12,4 +12,18 @@ svg {
     cursor: pointer;
     transition: var(--edge-stroke-transition, none);
   }
+
+  .ng-diagram-edge__relink-handle {
+    pointer-events: all;
+    cursor: grab;
+    touch-action: none;
+    r: var(--edge-relink-handle-radius, 5px);
+    fill: var(--edge-relink-handle-fill, var(--ngd-default-edge-relink-handle-fill, #fff));
+    stroke: var(--edge-relink-handle-stroke, var(--ngd-default-edge-relink-handle-stroke, currentColor));
+    stroke-width: var(--edge-relink-handle-stroke-width, 1.5);
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
 }

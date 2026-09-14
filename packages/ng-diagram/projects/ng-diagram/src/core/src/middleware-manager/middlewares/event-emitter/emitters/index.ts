@@ -2,6 +2,7 @@ export { ClipboardPastedEmitter } from './clipboard-paste.emitter';
 export { DiagramInitEmitter } from './diagram-init.emitter';
 export { EdgeDrawEndedEmitter } from './edge-draw-ended.emitter';
 export { EdgeDrawnEmitter } from './edge-drawn.emitter';
+export { EdgeRelinkEndedEmitter, EdgeRelinkStartedEmitter } from './edge-relink.emitter';
 export { type EventEmitter } from './event-emitter.interface';
 export { NodeDragEndedEmitter, NodeDragStartedEmitter } from './node-drag-lifecycle.emitter';
 export { NodeResizeEndedEmitter, NodeResizeStartedEmitter } from './node-resize-lifecycle.emitter';

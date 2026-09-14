@@ -18,9 +18,16 @@ export abstract class BaseRenderStrategy implements RenderStrategy {
 
   protected render(): void {
     const { nodes, edges, metadata } = this.flowCore.getState();
-    const temporaryEdge = this.flowCore.actionStateManager.linking?.temporaryEdge;
+    const linking = this.flowCore.actionStateManager.linking;
+    const temporaryEdge = linking?.temporaryEdge;
 
-    const { nodes: visibleNodes, edges: visibleEdges } = this.process(nodes, edges, metadata.viewport);
+    const { nodes: visibleNodes, edges: processedEdges } = this.process(nodes, edges, metadata.viewport);
+
+    // An edge whose endpoint is being relinked is represented by the temporary
+    // edge for the duration of the gesture — rendering both would show the
+    // stale original underneath the preview.
+    const relinkedEdgeId = linking?.relink?.edgeId;
+    const visibleEdges = relinkedEdgeId ? processedEdges.filter((edge) => edge.id !== relinkedEdgeId) : processedEdges;
 
     // The temporary edge lives in action state, so hidden-computation never
     // stamps it — check its source here, or hiding the source mid-gesture

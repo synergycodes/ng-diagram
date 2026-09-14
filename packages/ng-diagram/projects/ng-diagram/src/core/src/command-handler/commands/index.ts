@@ -28,9 +28,11 @@ import {
   cancelLinking,
   finishLinking,
   finishLinkingToPosition,
+  finishRelinking,
   moveTemporaryEdge,
   startLinking,
   startLinkingFromPosition,
+  startRelinking,
 } from './linking/';
 import { moveNodesBy } from './move';
 import { moveNodesStart, moveNodesStop } from './move-nodes-lifecycle';
@@ -85,6 +87,8 @@ export const commands: CommandMap = {
   cancelLinking,
   finishLinkingToPosition,
   startLinkingFromPosition,
+  startRelinking,
+  finishRelinking,
   resizeNode,
   resizeNodeStart,
   resizeNodeStop,

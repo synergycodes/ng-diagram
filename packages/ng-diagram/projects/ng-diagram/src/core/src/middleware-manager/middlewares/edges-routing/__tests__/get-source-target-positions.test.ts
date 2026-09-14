@@ -64,6 +64,15 @@ vi.mock('../../../../utils', () => ({
 }));
 
 vi.mock('../../../../utils/compute-floating-edge-side', () => ({
+  computeFloatingStartSide: vi.fn().mockImplementation((from, to) => {
+    // Simple mock mirroring the position-to-position angle logic
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      return dx > 0 ? 'right' : 'left';
+    }
+    return dy > 0 ? 'bottom' : 'top';
+  }),
   computeFloatingEndSide: vi.fn().mockImplementation((node, _portId, cursorPosition) => {
     // Simple mock that returns different sides based on cursor position relative to a fixed point
     if (!node) return 'left';
@@ -404,6 +413,58 @@ describe('getSourceTargetPositions', () => {
       const result = getSourceTargetPositions(edge, nodesMap);
 
       expect(result.source?.side).toBe('bottom'); // Dangling side computed dynamically, not the 'right' default
+      expect(result.target?.side).toBe('left'); // Target side comes from the port
+    });
+
+    it('should compute both sides facing each other for a committed dual dangling edge', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        source: '',
+        target: '',
+        sourcePosition: { x: 0, y: 0 },
+        targetPosition: { x: 10, y: 200 }, // Mostly below the source
+      };
+
+      const result = getSourceTargetPositions(edge, new Map<string, Node>());
+
+      // Each side faces the other endpoint instead of the right/left defaults.
+      expect(result.source).toEqual({ x: 0, y: 0, side: 'bottom' });
+      expect(result.target).toEqual({ x: 10, y: 200, side: 'top' });
+    });
+
+    it('should compute a dynamic source side for a dangling source even without a target position', () => {
+      const edge: Edge = {
+        ...mockEdge,
+        source: '', // Dangling start
+        target: 'node-2', // Connected end without a stored position
+        targetPort: 'port-2',
+        targetPosition: undefined,
+        sourcePosition: { x: 250, y: -50 }, // Dangling position above the target
+      };
+
+      const nodesMap = new Map<string, Node>([
+        [
+          'node-2',
+          {
+            ...mockNode,
+            id: 'node-2',
+            position: { x: 200, y: 0 },
+            measuredPorts: [
+              {
+                ...mockPort,
+                id: 'port-2',
+                side: 'left',
+                position: { x: 0, y: 45 },
+                size: { width: 10, height: 10 },
+              },
+            ],
+          },
+        ],
+      ]);
+
+      const result = getSourceTargetPositions(edge, nodesMap);
+
+      expect(result.source?.side).toBe('bottom'); // Dynamic, not the 'right' default
       expect(result.target?.side).toBe('left'); // Target side comes from the port
     });
   });

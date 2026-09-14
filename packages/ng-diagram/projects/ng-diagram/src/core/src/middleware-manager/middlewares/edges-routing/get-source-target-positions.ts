@@ -1,6 +1,6 @@
 import type { Edge, Node, Point, PortLocation, PortSide } from '../../../types';
 import { getNodeBorderIntersection, getPortFlowPositionSide } from '../../../utils';
-import { computeFloatingEndSide } from '../../../utils/compute-floating-edge-side';
+import { computeFloatingEndSide, computeFloatingStartSide } from '../../../utils/compute-floating-edge-side';
 
 /**
  * Computes dynamic sides for floating edge ends — the live end of a temporary
@@ -13,6 +13,16 @@ const getFloatingEndSides = (
   edge: Edge,
   nodesMap: Map<string, Node>
 ): { sourceSide?: PortSide; targetSide?: PortSide } => {
+  // Both ends free (dual dangling edge, or a draw started from empty canvas):
+  // each side faces the other endpoint so the route runs between them instead
+  // of using the hardcoded right/left defaults.
+  if (!edge.source && !edge.target && edge.sourcePosition && edge.targetPosition) {
+    return {
+      sourceSide: computeFloatingStartSide(edge.sourcePosition, edge.targetPosition),
+      targetSide: computeFloatingStartSide(edge.targetPosition, edge.sourcePosition),
+    };
+  }
+
   // Floating target (dangling end, or drawing from source)
   if (!edge.target && edge.targetPosition) {
     const startNode = nodesMap.get(edge.source);
@@ -21,7 +31,7 @@ const getFloatingEndSides = (
   }
 
   // Floating source (dangling start, or reverse drawing from target)
-  if (!edge.source && edge.sourcePosition && edge.targetPosition) {
+  if (!edge.source && edge.sourcePosition) {
     const endNode = nodesMap.get(edge.target);
     const sourceSide = computeFloatingEndSide(endNode, edge.targetPort, edge.sourcePosition);
     return { sourceSide };

@@ -1,9 +1,9 @@
 import { EdgeRoutingName } from '../edge-routing-manager';
-import type { Edge } from './edge.interface';
+import type { Edge, EdgeEnd } from './edge.interface';
 import type { Node, Port } from './node.interface';
 import type { NgDiagramPanelPosition } from './panel-position.interface';
 import type { ShortcutDefinition } from './shortcut.interface';
-import { Size } from './utils';
+import { Point, Size } from './utils';
 
 /**
  * Configuration for node resizing behavior.
@@ -109,6 +109,82 @@ export interface LinkingConfig {
    * @since 1.2.0
    */
   selectNodeOnPortPress: boolean;
+}
+
+/**
+ * Configuration for dangling edges — edges with one or both endpoints not
+ * connected to any node (an empty `source`/`target` with the free end anchored
+ * at `sourcePosition`/`targetPosition`).
+ *
+ * Everything here is opt-in; with the defaults the diagram behaves exactly as
+ * before: a link drop on empty canvas discards the edge and deleting a node
+ * deletes its edges.
+ *
+ * @public
+ * @since 1.4.0
+ * @category Types/Configuration/Features
+ */
+export interface DanglingEdgesConfig {
+  /**
+   * Master switch for dangling edges. When true, an edge draw that ends on
+   * empty canvas keeps the edge as a dangling edge instead of discarding it,
+   * and an edge relink dropped on empty canvas detaches that endpoint.
+   * @default false
+   */
+  enabled: boolean;
+  /**
+   * Per-edge decision whether a link dropped on empty canvas is kept as a
+   * dangling edge. Called only when `enabled` is true. The edge passed in is
+   * the fully-built final edge (after `linking.finalEdgeDataBuilder`).
+   * Returning false discards the edge (the default behavior when the feature
+   * is off).
+   * @default undefined (keep every edge)
+   */
+  shouldKeepOnDrop?: (edge: Edge, dropPosition: Point) => boolean;
+  /**
+   * When true, edges connected to a deleted node are detached into dangling
+   * edges — anchored where their port was — instead of being deleted.
+   * Requires `enabled` to be true. An edge that is itself part of the deleted
+   * selection is always deleted. An edge losing both endpoints in one delete
+   * becomes a dual dangling edge.
+   * @default false
+   */
+  detachOnNodeDelete: boolean;
+  /**
+   * Per-edge decision whether a given endpoint is detached (kept dangling) or
+   * deleted along with the node. Called only when `enabled` and
+   * `detachOnNodeDelete` are true, once per endpoint losing its node.
+   * Returning false deletes the edge.
+   * @default undefined (detach every edge)
+   */
+  shouldDetachOnNodeDelete?: (edge: Edge, deletedNode: Node, end: EdgeEnd) => boolean;
+}
+
+/**
+ * Configuration for interactive edge relinking — dragging an endpoint of an
+ * existing edge to reconnect it to another port or leave it dangling.
+ *
+ * @public
+ * @since 1.4.0
+ * @category Types/Configuration/Features
+ */
+export interface EdgeRelinkingConfig {
+  /**
+   * Enables the relinking gesture. When true, a selected edge shows grabbable
+   * endpoint handles; dragging one previews the reconnection live and commits
+   * it on drop. Dropping on empty canvas leaves the endpoint dangling when
+   * `danglingEdges.enabled` is true, otherwise the relink is reverted.
+   * @default false
+   */
+  enabled: boolean;
+  /**
+   * Validates a relink drop. Receives the edge being relinked, which endpoint
+   * is dragged, and the candidate node/port under the pointer.
+   * When not provided, `linking.validateConnection` is used with the edge's
+   * endpoints in their proper roles.
+   * @default undefined (falls back to linking.validateConnection)
+   */
+  validateRelink?: (edge: Edge, end: EdgeEnd, targetNode: Node | null, targetPort: Port | null) => boolean;
 }
 
 /**
@@ -533,6 +609,18 @@ export interface FlowConfig {
    * Configuration for linking (edge creation).
    */
   linking: LinkingConfig;
+
+  /**
+   * Configuration for dangling edges (edges with unconnected endpoints).
+   * @since 1.4.0
+   */
+  danglingEdges: DanglingEdgesConfig;
+
+  /**
+   * Configuration for interactive edge relinking.
+   * @since 1.4.0
+   */
+  edgeRelinking: EdgeRelinkingConfig;
 
   /**
    * Configuration for node grouping.

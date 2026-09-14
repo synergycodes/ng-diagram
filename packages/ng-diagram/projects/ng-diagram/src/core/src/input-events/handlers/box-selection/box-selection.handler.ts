@@ -64,10 +64,26 @@ export class BoxSelectionEventHandler extends EventHandler<BoxSelectionEvent> {
       getNodesInRect(this.flow, rect, this.flow.config.boxSelection.partialInclusion).map((node) => node.id)
     );
 
+    // An edge is inside the box when each endpoint is: a node inside the box,
+    // or a free (dangling) endpoint whose anchor position lies inside the box.
+    const isPointInRect = (point: Point | undefined): boolean =>
+      !!point &&
+      point.x >= rect.x &&
+      point.x <= rect.x + rect.width &&
+      point.y >= rect.y &&
+      point.y <= rect.y + rect.height;
+    const isEndpointInBox = (nodeId: string, position: Point | undefined): boolean =>
+      nodeId ? nodeIds.has(nodeId) : isPointInRect(position);
+
     // Endpoint containment comes from the spatial hash (hidden nodes already
     // excluded), but an edge can be hidden on its own — filter it here.
     const edgesBetweenIds = edges
-      .filter((edge) => !edge.computedHidden && nodeIds.has(edge.source) && nodeIds.has(edge.target))
+      .filter(
+        (edge) =>
+          !edge.computedHidden &&
+          isEndpointInBox(edge.source, edge.sourcePosition) &&
+          isEndpointInBox(edge.target, edge.targetPosition)
+      )
       .map((edge) => edge.id);
 
     this.flow.commandHandler.emit('select', {

@@ -1,6 +1,6 @@
 import { NgDiagramMath } from '../../math';
 import type { CommandHandler, Edge, FlowConfig, FlowStateUpdate, Node, Point } from '../../types';
-import { snapNodePosition } from '../../utils';
+import { getDanglingEndpoints, hasFreeEndpoint, snapNodePosition } from '../../utils';
 import { computeHiddenNodeIds, isEdgeEffectivelyHidden } from '../../visibility/effective-visibility';
 
 const OFFSET = 20;
@@ -15,25 +15,17 @@ export interface PasteCommand {
 }
 
 /**
- * Calculate the center point of a collection of nodes
+ * Collect the positions of free (dangling) endpoints among the copied edges.
+ * They anchor pasted content the same way node positions do — without them a
+ * copied selection of just a dangling edge would have no reference point.
  */
-const calculateNodeCenter = (nodes: Node[]): Point => {
-  if (nodes.length === 0) {
-    return { x: 0, y: 0 };
-  }
-
-  const centerX = nodes.reduce((sum, node) => sum + node.position.x, 0) / nodes.length;
-  const centerY = nodes.reduce((sum, node) => sum + node.position.y, 0) / nodes.length;
-
-  return { x: centerX, y: centerY };
-};
+const collectFreeEndpointPositions = (edges: Edge[]): Point[] =>
+  getDanglingEndpoints(edges).map((endpoint) => endpoint.position);
 
 /**
  * Calculate the paste position and offset based on command parameters
  */
-const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point => {
-  const center = calculateNodeCenter(copiedNodes);
-
+const calculatePasteOffset = (copiedNodes: Node[], copiedEdges: Edge[], command: PasteCommand): Point => {
   if (!command.position) {
     // Default behavior: offset from original center
     return {
@@ -42,7 +34,9 @@ const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point
     };
   }
 
-  if (copiedNodes.length === 1) {
+  const freeEndpointPositions = collectFreeEndpointPositions(copiedEdges);
+
+  if (copiedNodes.length === 1 && freeEndpointPositions.length === 0) {
     // Single node: center the node at cursor position, accounting for node size
     const singleNode = copiedNodes[0];
     const nodeWidth = singleNode.size?.width ?? 0;
@@ -57,7 +51,16 @@ const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point
     return NgDiagramMath.subtractPoints(target, singleNode.position);
   }
 
-  // Multiple nodes: maintain relative positioning with center at cursor
+  // Multiple anchors (node positions and free edge endpoints): maintain
+  // relative positioning with their center at cursor
+  const anchors = [...copiedNodes.map((node) => node.position), ...freeEndpointPositions];
+  if (anchors.length === 0) {
+    return { x: OFFSET, y: OFFSET };
+  }
+  const center = {
+    x: anchors.reduce((sum, point) => sum + point.x, 0) / anchors.length,
+    y: anchors.reduce((sum, point) => sum + point.y, 0) / anchors.length,
+  };
   return NgDiagramMath.subtractPoints(command.position, center);
 };
 
@@ -125,16 +128,31 @@ const createPastedNodes = (
 const createPastedEdges = (
   config: FlowConfig,
   copiedEdges: Edge[],
+  offset: Point,
   nodeIdMap: Map<string, string>,
   hiddenCopiedNodeIds: Set<string>
 ): Edge[] => {
   return copiedEdges.map((edge) => {
     const newEdgeId = config.computeEdgeId();
+
+    // Free (dangling) endpoints move with the paste offset like node positions
+    // do — otherwise the pasted copy would pin its free end exactly on the
+    // original. Manual points travel along so the stored path stays aligned;
+    // fully-connected edges get re-routed from their new nodes instead.
     const newEdge: Edge = {
       ...edge,
       id: newEdgeId,
       source: nodeIdMap.get(edge.source) || edge.source,
       target: nodeIdMap.get(edge.target) || edge.target,
+      ...(!edge.source && edge.sourcePosition
+        ? { sourcePosition: { x: edge.sourcePosition.x + offset.x, y: edge.sourcePosition.y + offset.y } }
+        : {}),
+      ...(!edge.target && edge.targetPosition
+        ? { targetPosition: { x: edge.targetPosition.x + offset.x, y: edge.targetPosition.y + offset.y } }
+        : {}),
+      ...(hasFreeEndpoint(edge) && edge.points
+        ? { points: edge.points.map((point) => ({ x: point.x + offset.x, y: point.y + offset.y })) }
+        : {}),
       // See createPastedNodes — hidden pasted edges stay deselected.
       selected: !isEdgeEffectivelyHidden(edge, hiddenCopiedNodeIds),
     };
@@ -192,10 +210,18 @@ export const copy = async (commandHandler: CommandHandler) => {
 
   // Edges: explicitly selected visible edges, plus every edge fully inside the
   // copied node set (the internal wiring of copied groups, hidden or not).
-  const copiedEdges = edges.filter(
-    (edge) =>
-      (edge.selected && !edge.computedHidden) || (copiedNodeIds.has(edge.source) && copiedNodeIds.has(edge.target))
-  );
+  // With dangling edges enabled, "fully inside" counts only the connected
+  // endpoints — a dangling edge travels with its one node (a dual dangling
+  // edge still only copies when selected).
+  const danglingEnabled = commandHandler.flowCore.config.danglingEdges?.enabled;
+  const isInsideCopiedSet = (edge: Edge): boolean => {
+    if (danglingEnabled) {
+      const connectedEndpoints = [edge.source, edge.target].filter(Boolean);
+      return connectedEndpoints.length > 0 && connectedEndpoints.every((nodeId) => copiedNodeIds.has(nodeId));
+    }
+    return copiedNodeIds.has(edge.source) && copiedNodeIds.has(edge.target);
+  };
+  const copiedEdges = edges.filter((edge) => (edge.selected && !edge.computedHidden) || isInsideCopiedSet(edge));
 
   commandHandler.flowCore.actionStateManager.copyPaste = {
     copiedNodes,
@@ -229,6 +255,7 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
   const visibleCopiedNodes = copyPasteState.copiedNodes.filter((node) => !hiddenCopiedNodeIds.has(node.id));
   const offset = calculatePasteOffset(
     visibleCopiedNodes.length > 0 ? visibleCopiedNodes : copyPasteState.copiedNodes,
+    copyPasteState.copiedEdges,
     command
   );
 
@@ -244,6 +271,7 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
   const newEdges = createPastedEdges(
     commandHandler.flowCore.config,
     copyPasteState.copiedEdges,
+    offset,
     nodeIdMap,
     hiddenCopiedNodeIds
   );

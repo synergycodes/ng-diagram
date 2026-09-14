@@ -8,13 +8,15 @@ import { moveTemporaryEdge, MoveTemporaryEdgeCommand } from '../move-temporary-e
 vi.mock('../utils', () => ({
   createTemporaryEdge: vi.fn(),
   isProperTargetPort: vi.fn(),
+  isProperSourcePort: vi.fn(),
   validateConnection: vi.fn(),
+  validateRelinkOrConnection: vi.fn(),
 }));
 
-import { createTemporaryEdge, isProperTargetPort, validateConnection } from '../utils';
+import { createTemporaryEdge, isProperTargetPort, validateRelinkOrConnection } from '../utils';
 const mockCreateTemporaryEdge = vi.mocked(createTemporaryEdge);
 const mockIsProperTargetPort = vi.mocked(isProperTargetPort);
-const mockValidateConnection = vi.mocked(validateConnection);
+const mockValidateRelinkOrConnection = vi.mocked(validateRelinkOrConnection);
 
 describe('moveTemporaryEdge', () => {
   let mockCommandHandler: CommandHandler;
@@ -152,7 +154,7 @@ describe('moveTemporaryEdge', () => {
     mockFlowCore.getNearestPortInRange.mockReturnValue(mockTargetPort);
     mockIsProperTargetPort.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
-    mockValidateConnection.mockReturnValue(true);
+    mockValidateRelinkOrConnection.mockReturnValue(true);
 
     const connectedEdge = {
       ...mockTemporaryEdge,
@@ -193,7 +195,7 @@ describe('moveTemporaryEdge', () => {
     mockFlowCore.getNearestPortInRange.mockReturnValue(mockTargetPort);
     mockIsProperTargetPort.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
-    mockValidateConnection.mockReturnValue(false); // Connection invalid
+    mockValidateRelinkOrConnection.mockReturnValue(false); // Connection invalid
 
     const floatingEdge = { ...mockTemporaryEdge, target: '', targetPort: '' };
     mockCreateTemporaryEdge.mockReturnValue(floatingEdge);
@@ -205,8 +207,9 @@ describe('moveTemporaryEdge', () => {
 
     await moveTemporaryEdge(mockCommandHandler, command);
 
-    expect(mockValidateConnection).toHaveBeenCalledWith(
+    expect(mockValidateRelinkOrConnection).toHaveBeenCalledWith(
       mockFlowCore,
+      undefined,
       mockTemporaryEdge.source,
       mockTemporaryEdge.sourcePort,
       'target-node',

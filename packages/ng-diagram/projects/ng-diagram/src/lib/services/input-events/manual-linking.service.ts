@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Node } from '../../../core/src';
+import { Node, Point } from '../../../core/src';
 import { PointerInputEvent } from '../../types';
 import { CursorPositionTrackerService } from '../cursor-position-tracker/cursor-position-tracker.service';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
@@ -38,6 +38,29 @@ export class ManualLinkingService {
     } as PointerInputEvent;
 
     this.linkingEventService.emitStart(startEvent, node, portId);
+
+    document.addEventListener('pointermove', this.onPointerMove);
+    document.addEventListener('click', this.onDocumentClick, true);
+    document.addEventListener('touchmove', this.onTouchMove, { passive: false });
+    document.addEventListener('touchend', this.onTouchEnd, { passive: false });
+    this.unregisterInteractionCleanup = this.flowCoreProvider
+      .provide()
+      .registerInteractionCleanup(() => this.removeListeners());
+  }
+
+  /**
+   * Call this method to start linking from a position on the canvas (no source
+   * node) from your custom logic. The edge follows the pointer until a click
+   * finishes it.
+   */
+  startLinkingFromPosition(position: Point) {
+    // A previous manual linking still in flight would leave its document
+    // listeners and its interaction-cleanup entry orphaned — latest call wins.
+    this.removeListeners();
+    this.node = undefined;
+    this.portId = undefined;
+
+    this.flowCoreProvider.provide().commandHandler.emit('startLinkingFromPosition', { position });
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('click', this.onDocumentClick, true);

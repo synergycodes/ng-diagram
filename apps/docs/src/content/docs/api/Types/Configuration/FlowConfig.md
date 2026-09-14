@@ -58,6 +58,18 @@ The node's unique ID.
 
 ***
 
+### danglingEdges
+
+> **danglingEdges**: [`DanglingEdgesConfig`](/docs/api/types/configuration/features/danglingedgesconfig/)
+
+Configuration for dangling edges (edges with unconnected endpoints).
+
+#### Since
+
+1.4.0
+
+***
+
 ### debugMode
 
 > **debugMode**: `boolean`
@@ -81,6 +93,18 @@ false
 
 1.3.0
 Configuration options for the default Node Templates
+
+***
+
+### edgeRelinking
+
+> **edgeRelinking**: [`EdgeRelinkingConfig`](/docs/api/types/configuration/features/edgerelinkingconfig/)
+
+Configuration for interactive edge relinking.
+
+#### Since
+
+1.4.0
 
 ***
 

@@ -434,6 +434,110 @@ describe('finishLinking', () => {
     expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
+  describe('dangling edges: keep on drop', () => {
+    const temporaryEdgeNoTarget: Edge = {
+      ...mockTemporaryEdge,
+      target: '',
+      targetPort: '',
+    };
+    const keptEdge: Edge = {
+      id: 'kept-edge',
+      source: 'source-node',
+      sourcePort: 'source-port',
+      target: '',
+      targetPort: '',
+      targetPosition: { x: 50, y: 60 },
+      temporary: false,
+      data: {},
+    };
+
+    beforeEach(() => {
+      mockFlowCore.config = { danglingEdges: { enabled: true, detachOnNodeDelete: false } };
+      mockFlowCore.actionStateManager.linking = {
+        sourceNodeId: 'source-node',
+        sourcePortId: 'source-port',
+        temporaryEdge: temporaryEdgeNoTarget,
+      };
+      mockCreateFinalEdge.mockReturnValue(keptEdge);
+    });
+
+    it('should keep the built dangling edge on a drop over empty canvas', async () => {
+      await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 50, y: 60 } });
+
+      expect(mockCreateFinalEdge).toHaveBeenCalledWith(mockFlowCore.config, temporaryEdgeNoTarget, {
+        target: '',
+        targetPort: '',
+        targetPosition: { x: 50, y: 60 },
+      });
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({ edgesToAdd: [keptEdge] }, 'finishLinking');
+      expect(mockFlowCore.actionStateManager.linking!.cancelReason).toBeUndefined();
+      expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+    });
+
+    it('should build the final edge before shouldKeepOnDrop and pass the built edge and drop position', async () => {
+      const callOrder: string[] = [];
+      mockCreateFinalEdge.mockImplementation(() => {
+        callOrder.push('createFinalEdge');
+        return keptEdge;
+      });
+      const shouldKeepOnDrop = vi.fn(() => {
+        callOrder.push('shouldKeepOnDrop');
+        return true;
+      });
+      mockFlowCore.config = { danglingEdges: { enabled: true, shouldKeepOnDrop } };
+
+      await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 50, y: 60 } });
+
+      // The callback must see what would actually be committed — the edge
+      // after finalEdgeDataBuilder ran.
+      expect(callOrder).toEqual(['createFinalEdge', 'shouldKeepOnDrop']);
+      expect(shouldKeepOnDrop).toHaveBeenCalledWith(keptEdge, { x: 50, y: 60 });
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({ edgesToAdd: [keptEdge] }, 'finishLinking');
+    });
+
+    it('should fall back to the cancelled pass when shouldKeepOnDrop declines', async () => {
+      mockFlowCore.config = { danglingEdges: { enabled: true, shouldKeepOnDrop: () => false } };
+
+      await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 50, y: 60 } });
+
+      expect(mockFlowCore.actionStateManager.linking!.cancelReason).toBe('noTarget');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishLinking');
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalledWith(
+        expect.objectContaining({ edgesToAdd: expect.anything() }),
+        'finishLinking'
+      );
+      expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+    });
+
+    it('should discard the edge when dangling edges are disabled', async () => {
+      mockFlowCore.config = { danglingEdges: { enabled: false } };
+
+      await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 50, y: 60 } });
+
+      expect(mockCreateFinalEdge).not.toHaveBeenCalled();
+      expect(mockFlowCore.actionStateManager.linking!.cancelReason).toBe('noTarget');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishLinking');
+      expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+    });
+
+    it('should not keep a dangling edge from an effectively hidden source', async () => {
+      mockFlowCore.getNodeById.mockImplementation((id: string) =>
+        id === 'source-node' ? { ...mockNode, id: 'source-node', computedHidden: true } : null
+      );
+
+      await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 50, y: 60 } });
+
+      expect(mockCreateFinalEdge).not.toHaveBeenCalled();
+      expect(mockFlowCore.actionStateManager.linking!.cancelReason).toBe('noTarget');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishLinking');
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalledWith(
+        expect.objectContaining({ edgesToAdd: expect.anything() }),
+        'finishLinking'
+      );
+      expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+    });
+  });
+
   it('should not clear a new linking gesture that replaced the state while finishLinking was suspended', async () => {
     const ownGesture: InternalLinkingActionState = {
       sourceNodeId: 'source-node',
