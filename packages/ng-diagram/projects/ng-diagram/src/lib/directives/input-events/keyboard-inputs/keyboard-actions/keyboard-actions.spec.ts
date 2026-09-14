@@ -34,7 +34,7 @@ describe('keyboard actions — arrow-key gates', () => {
 
   // The full config × selection matrix. `moves` is MovingAction's expected
   // claim on the arrow key; PanningAction must claim it in exactly the
-  // opposite cells (NGD-314: no cell may leave the arrows dead).
+  // opposite cells, so no cell leaves the arrows dead.
   const matrix: { nodeDraggingEnabled: boolean; selection: string; moves: boolean }[] = [
     { nodeDraggingEnabled: true, selection: 'no selection', moves: false },
     { nodeDraggingEnabled: true, selection: 'visible selection', moves: true },

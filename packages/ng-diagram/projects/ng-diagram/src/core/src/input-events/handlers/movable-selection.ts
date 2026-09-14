@@ -17,16 +17,6 @@ import type { Node } from '../../types';
  * violations (per pointermove frame during a drag), and would strand hidden
  * children that effective visibility considers covered.
  */
-/**
- * Whether an arrow key would actually move something — the single predicate
- * MovingAction gates on and PanningAction negates, so the two stay exact
- * complements: any selection the move handler would no-op on (dragging
- * disabled, only hidden nodes, only `draggable: false` nodes) must not
- * swallow the arrow keys; they fall through to viewport panning instead.
- */
-export const hasMovableSelection = (flow: FlowCore): boolean =>
-  flow.config.nodeDraggingEnabled && getMovableSelection(flow).length > 0;
-
 export const getMovableSelection = (flow: FlowCore): Node[] => {
   const selectedWithChildren = flow.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
 
@@ -54,3 +44,10 @@ export const getMovableSelection = (flow: FlowCore): Node[] => {
     return coveredByMovingRoots.has(node.id);
   });
 };
+
+/**
+ * Whether an arrow key would move something: node dragging enabled and at least one movable node in the
+ * selection. Keyboard move claims the arrow keys when this holds, keyboard pan when it does not.
+ */
+export const hasMovableSelection = (flow: FlowCore): boolean =>
+  flow.config.nodeDraggingEnabled && getMovableSelection(flow).length > 0;

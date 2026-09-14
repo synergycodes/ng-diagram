@@ -42,12 +42,17 @@ All available shortcut actions with their default key bindings. See [`ShortcutAc
 
 ### Arrow Keys: Move vs Pan
 
-The arrow keys are bound to both `keyboardMoveSelection*` and `keyboardPan*`, and exactly one of the two actions
-claims each key press. The keys move the selection when it would actually move — node dragging is enabled
-([`nodeDraggingEnabled`](/docs/api/types/configuration/flowconfig)) and at least one selected node is visible and
-draggable. In every other case they pan the viewport (as long as `viewportPanningEnabled` is set): with no selection,
-with `nodeDraggingEnabled: false`, or when the selection contains only hidden or `draggable: false` nodes. A selection
-that cannot be moved never swallows the arrow keys.
+Each arrow key is bound to two actions: a `keyboardMoveSelection` action and a `keyboardPan` action (see the table
+above). Exactly one of them handles each key press:
+
+- **The selection moves** when node dragging is enabled
+  ([`nodeDraggingEnabled`](/docs/api/types/configuration/flowconfig#nodedraggingenabled)) and at least one selected
+  node is visible and draggable.
+- **The viewport pans** in every other case: nothing is selected, `nodeDraggingEnabled` is `false`, or the selection
+  contains only hidden or `draggable: false` nodes. Panning requires
+  [`viewportPanningEnabled`](/docs/api/types/configuration/flowconfig#viewportpanningenabled).
+
+A selection that cannot move never blocks the arrow keys.
 
 ## Focus and Tab Order
 
