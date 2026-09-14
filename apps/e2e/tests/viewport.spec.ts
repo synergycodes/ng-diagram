@@ -1,4 +1,5 @@
 import { expect, test } from './fixtures/diagram';
+import { trio } from './fixtures/models';
 
 test.describe('viewport', () => {
   test('panning empty canvas shifts the viewport by the drag delta', async ({ diagram }) => {
@@ -79,5 +80,28 @@ test.describe('viewport', () => {
     expect(nodeBox.x).toBeLessThan(containerBox.x + containerBox.width);
     expect(nodeBox.y + nodeBox.height).toBeGreaterThan(containerBox.y);
     expect(nodeBox.y).toBeLessThan(containerBox.y + containerBox.height);
+  });
+
+  test('arrow keys pan the viewport when node dragging is disabled and a node is selected', async ({ diagram }) => {
+    await diagram.load({ model: trio, config: { nodeDraggingEnabled: false } });
+
+    // Clicking the canvas focuses the diagram and clears the selection, so select afterwards.
+    await diagram.clickCanvas();
+    await diagram.selection.select(['node-a']);
+
+    const before = await diagram.viewport.viewport();
+    await diagram.page.keyboard.press('ArrowRight');
+
+    // A selection that cannot move must not claim the key — panning takes over.
+    await expect
+      .poll(async () => {
+        const viewport = await diagram.viewport.viewport();
+        return viewport.x !== before.x || viewport.y !== before.y;
+      })
+      .toBe(true);
+
+    // And the selected node did not move.
+    const node = await diagram.model.getNodeById('node-a');
+    expect(node?.position).toEqual({ x: 80, y: 80 });
   });
 });
