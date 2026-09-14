@@ -27,7 +27,7 @@ describe('BaseRenderStrategy temporary edge handling', () => {
   let mockFlowCore: {
     getState: ReturnType<typeof vi.fn>;
     getNodeById: ReturnType<typeof vi.fn>;
-    actionStateManager: { linking: { temporaryEdge: Edge } | null };
+    actionStateManager: { linking: { temporaryEdge: Edge; relink?: { edgeId: string } } | null };
     renderer: { draw: ReturnType<typeof vi.fn> };
     config: { debugMode: boolean };
   };
@@ -63,5 +63,38 @@ describe('BaseRenderStrategy temporary edge handling', () => {
     // Hiding the source mid-gesture must not leave a rubber band dangling
     // from nothing.
     expect(drawnEdges()).not.toContainEqual(temporaryEdge);
+  });
+
+  it('should hide the relinked edge and show the temporary edge during a relink', () => {
+    const relinkedEdge: Edge = { ...mockEdge, id: 'relinked-edge', source: 'source-node', target: 'other-node' };
+    const otherEdge: Edge = { ...mockEdge, id: 'other-edge', source: 'a', target: 'b' };
+    mockFlowCore.getState.mockReturnValue({
+      nodes: [sourceNode],
+      edges: [relinkedEdge, otherEdge],
+      metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+    });
+    mockFlowCore.actionStateManager = { linking: { temporaryEdge, relink: { edgeId: 'relinked-edge' } } };
+
+    new TestRenderStrategy(mockFlowCore as unknown as FlowCore).init();
+
+    // The temporary edge represents the relinked edge for the duration of the
+    // gesture — rendering both would show the stale original underneath.
+    expect(drawnEdges()).not.toContainEqual(relinkedEdge);
+    expect(drawnEdges()).toContainEqual(otherEdge);
+    expect(drawnEdges()).toContainEqual(temporaryEdge);
+  });
+
+  it('should render the relinked edge again when no relink is in progress', () => {
+    const edge: Edge = { ...mockEdge, id: 'relinked-edge', source: 'source-node', target: 'other-node' };
+    mockFlowCore.getState.mockReturnValue({
+      nodes: [sourceNode],
+      edges: [edge],
+      metadata: { viewport: { x: 0, y: 0, scale: 1 } },
+    });
+    mockFlowCore.actionStateManager = { linking: null };
+
+    new TestRenderStrategy(mockFlowCore as unknown as FlowCore).init();
+
+    expect(drawnEdges()).toContainEqual(edge);
   });
 });

@@ -1,6 +1,7 @@
 export * from './change-generation';
 export * from './compute-floating-edge-side';
 export * from './constants';
+export * from './dangling-edges';
 export * from './deep-merge';
 export * from './get-node-border-intersection';
 export * from './get-port-flow-position';

@@ -11,6 +11,15 @@ import { DataObject, Point, Size } from './utils';
 export type RoutingMode = 'manual' | 'auto';
 
 /**
+ * Identifies one endpoint of an edge.
+ *
+ * @public
+ * @since 1.4.0
+ * @category Types/Model
+ */
+export type EdgeEnd = 'source' | 'target';
+
+/**
  * Interface representing an edge (connection) between nodes in the flow diagram
  *
  * @public

@@ -109,6 +109,18 @@ export class ToolbarComponent {
     }
   }
 
+  onLinkFromPositionClick() {
+    // Start drawing an edge from the middle of the screen — no source node.
+    // Finishing on empty canvas keeps it as a dual dangling edge (the
+    // danglingEdges feature is enabled in this demo); finishing on a port
+    // connects it.
+    const center = this.ngDiagramViewportService.clientToFlowPosition({
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+    });
+    this.ngDiagramService.startLinkingFromPosition(center);
+  }
+
   onCenterOnClick() {
     const node = this.ngDiagramSelectionService.selection().nodes[0];
 

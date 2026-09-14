@@ -1,5 +1,12 @@
-import type { CommandHandler, Edge, Point } from '../../../types';
-import { createTemporaryEdge, isProperTargetPort, validateConnection } from './utils';
+import type { CommandHandler, Edge, EdgeEnd, Point } from '../../../types';
+import type { LinkingRelinkContext } from '../../../types/action-state.interface';
+import {
+  createTemporaryEdge,
+  isProperSourcePort,
+  isProperTargetPort,
+  relinkPreviewBase,
+  validateRelinkOrConnection,
+} from './utils';
 
 export interface MoveTemporaryEdgeCommand {
   name: 'moveTemporaryEdge';
@@ -12,21 +19,31 @@ interface TargetPortInfo {
   isValid: boolean;
 }
 
+/**
+ * Finds the port the dragged end of the temporary edge would snap to at
+ * `position`. For a normal draw (and a target-end relink) the candidate must
+ * be target-capable; while relinking the source end it must be source-capable.
+ */
 export const getTargetPortInfo = (
   commandHandler: CommandHandler,
   position: Point,
-  temporaryEdge: Edge
+  temporaryEdge: Edge,
+  draggedEnd: EdgeEnd = 'target'
 ): TargetPortInfo => {
-  const targetPort = commandHandler.flowCore.getNearestPortInRange(
+  const candidatePort = commandHandler.flowCore.getNearestPortInRange(
     position,
     commandHandler.flowCore.config.linking.portSnapDistance
   );
-  const isProperTarget = targetPort && isProperTargetPort(targetPort, temporaryEdge.source, temporaryEdge.sourcePort);
+  const isProperCandidate =
+    candidatePort &&
+    (draggedEnd === 'target'
+      ? isProperTargetPort(candidatePort, temporaryEdge.source, temporaryEdge.sourcePort)
+      : isProperSourcePort(candidatePort, temporaryEdge.target, temporaryEdge.targetPort));
 
   return {
-    targetNodeId: isProperTarget ? targetPort.nodeId : '',
-    targetPortId: isProperTarget ? targetPort.id : '',
-    isValid: !!isProperTarget,
+    targetNodeId: isProperCandidate ? candidatePort.nodeId : '',
+    targetPortId: isProperCandidate ? candidatePort.id : '',
+    isValid: !!isProperCandidate,
   };
 };
 
@@ -34,87 +51,122 @@ export const createNewTemporaryEdge = (
   commandHandler: CommandHandler,
   temporaryEdge: Edge,
   targetPortInfo: TargetPortInfo,
-  position: Point
+  position: Point,
+  draggedEnd: EdgeEnd = 'target',
+  relink?: LinkingRelinkContext
 ): Edge => {
-  const { targetNodeId, targetPortId } = targetPortInfo;
+  const { targetNodeId: candidateNodeId, targetPortId: candidatePortId } = targetPortInfo;
+  const { config } = commandHandler.flowCore;
 
-  const source = temporaryEdge.source || '';
-  const sourcePort = temporaryEdge.sourcePort || '';
+  // The end that stays anchored while the other follows the pointer.
+  const fixedEndFields: Partial<Edge> =
+    draggedEnd === 'target'
+      ? {
+          source: temporaryEdge.source || '',
+          sourcePort: temporaryEdge.sourcePort || '',
+          sourcePosition: temporaryEdge.sourcePosition,
+        }
+      : {
+          target: temporaryEdge.target || '',
+          targetPort: temporaryEdge.targetPort || '',
+          targetPosition: temporaryEdge.targetPosition,
+        };
 
-  const createFloatingEdge = () =>
-    createTemporaryEdge(commandHandler.flowCore.config, {
-      source,
-      sourcePort,
-      target: '',
-      targetPort: '',
-      targetPosition: position,
+  const buildPreview = (draggedEndFields: Partial<Edge>): Edge =>
+    createTemporaryEdge(config, {
+      ...(relink ? relinkPreviewBase(relink.originalEdge) : {}),
+      ...fixedEndFields,
+      ...draggedEndFields,
     });
 
-  if (!targetNodeId) {
+  const createFloatingEdge = () =>
+    buildPreview(
+      draggedEnd === 'target'
+        ? { target: '', targetPort: '', targetPosition: position }
+        : { source: '', sourcePort: '', sourcePosition: position }
+    );
+
+  if (!candidateNodeId) {
     return createFloatingEdge();
   }
 
-  const targetNode = commandHandler.flowCore.getNodeById(targetNodeId);
-  if (!targetNode) {
+  const candidateNode = commandHandler.flowCore.getNodeById(candidateNodeId);
+  if (!candidateNode) {
     return createFloatingEdge();
   }
 
-  const isConnectionValid = validateConnection(
+  const isConnectionValid = validateRelinkOrConnection(
     commandHandler.flowCore,
-    temporaryEdge.source,
-    temporaryEdge.sourcePort,
-    targetNodeId,
-    targetPortId
+    relink,
+    draggedEnd === 'target' ? temporaryEdge.source : candidateNodeId,
+    draggedEnd === 'target' ? temporaryEdge.sourcePort : candidatePortId,
+    draggedEnd === 'target' ? candidateNodeId : temporaryEdge.target,
+    draggedEnd === 'target' ? candidatePortId : temporaryEdge.targetPort
   );
 
   if (!isConnectionValid) {
     return createFloatingEdge();
   }
 
-  if (targetPortId && targetNode.measuredPorts?.find((port) => port.id === targetPortId)) {
-    return createTemporaryEdge(commandHandler.flowCore.config, {
-      source,
-      sourcePort,
-      target: targetNodeId,
-      targetPort: targetPortId,
-      targetPosition: position,
-    });
-  }
+  const hasMeasuredCandidatePort =
+    candidatePortId && candidateNode.measuredPorts?.find((port) => port.id === candidatePortId);
 
-  return createTemporaryEdge(commandHandler.flowCore.config, {
-    source,
-    sourcePort,
-    target: targetNodeId,
-    targetPort: '',
-    targetPosition: position,
-  });
+  return buildPreview(
+    draggedEnd === 'target'
+      ? {
+          target: candidateNodeId,
+          targetPort: hasMeasuredCandidatePort ? candidatePortId : '',
+          targetPosition: position,
+        }
+      : {
+          source: candidateNodeId,
+          sourcePort: hasMeasuredCandidatePort ? candidatePortId : '',
+          sourcePosition: position,
+        }
+  );
 };
 
-export const isSameTarget = (temporaryEdge: Edge, targetNodeId: string, targetPortId: string): boolean => {
-  return targetNodeId === temporaryEdge.target && targetPortId === temporaryEdge.targetPort;
+export const isSameTarget = (
+  temporaryEdge: Edge,
+  targetNodeId: string,
+  targetPortId: string,
+  draggedEnd: EdgeEnd = 'target'
+): boolean => {
+  return draggedEnd === 'target'
+    ? targetNodeId === temporaryEdge.target && targetPortId === temporaryEdge.targetPort
+    : targetNodeId === temporaryEdge.source && targetPortId === temporaryEdge.sourcePort;
 };
 
 export const moveTemporaryEdge = async (commandHandler: CommandHandler, command: MoveTemporaryEdgeCommand) => {
   const { position } = command;
-  const temporaryEdge = commandHandler.flowCore.actionStateManager.linking?.temporaryEdge;
+  const linking = commandHandler.flowCore.actionStateManager.linking;
+  const temporaryEdge = linking?.temporaryEdge;
 
-  if (!commandHandler.flowCore.actionStateManager.linking || !temporaryEdge) {
+  if (!linking || !temporaryEdge) {
     return;
   }
 
-  const targetPortInfo = getTargetPortInfo(commandHandler, position, temporaryEdge);
+  const draggedEnd = linking.relink?.end ?? 'target';
+  const targetPortInfo = getTargetPortInfo(commandHandler, position, temporaryEdge, draggedEnd);
 
   if (
     targetPortInfo.targetNodeId &&
-    isSameTarget(temporaryEdge, targetPortInfo.targetNodeId, targetPortInfo.targetPortId)
+    isSameTarget(temporaryEdge, targetPortInfo.targetNodeId, targetPortInfo.targetPortId, draggedEnd)
   ) {
     return;
   }
 
-  const newTemporaryEdge = createNewTemporaryEdge(commandHandler, temporaryEdge, targetPortInfo, position);
+  const newTemporaryEdge = createNewTemporaryEdge(
+    commandHandler,
+    temporaryEdge,
+    targetPortInfo,
+    position,
+    draggedEnd,
+    linking.relink
+  );
 
   commandHandler.flowCore.actionStateManager.linking = {
-    ...commandHandler.flowCore.actionStateManager.linking,
+    ...linking,
     temporaryEdge: newTemporaryEdge,
   };
 

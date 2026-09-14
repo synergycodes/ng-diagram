@@ -21,16 +21,23 @@ export class SelectionRemovedEmitter implements EventEmitter {
     }
 
     const edgesToDelete: Edge[] = [];
+    const detachedEdges: Edge[] = [];
     for (const [id, edge] of initialEdgesMap) {
-      if (!edgesMap.has(id)) {
+      const currentEdge = edgesMap.get(id);
+      if (!currentEdge) {
         edgesToDelete.push(edge);
+      } else if (currentEdge.source !== edge.source || currentEdge.target !== edge.target) {
+        // An endpoint changed within the delete pass — the edge was demoted to
+        // dangling by detach-on-node-delete rather than deleted.
+        detachedEdges.push(currentEdge);
       }
     }
 
-    if (nodesToDelete.length > 0 || edgesToDelete.length > 0) {
+    if (nodesToDelete.length > 0 || edgesToDelete.length > 0 || detachedEdges.length > 0) {
       const event: SelectionRemovedEvent = {
         deletedNodes: nodesToDelete,
         deletedEdges: edgesToDelete,
+        detachedEdges,
       };
       eventManager.deferredEmit('selectionRemoved', event);
     }

@@ -11,11 +11,30 @@ It can be extended or used directly to render edges in the diagram.
 
 ## Properties
 
+### dangling
+
+> `readonly` **dangling**: `Signal`\<`boolean`\>
+
+Whether the edge has at least one free (unconnected) endpoint. Temporary
+edges are excluded — a draw preview always has a free end and must not
+pick up dangling styling.
+
+***
+
 ### edge
 
 > **edge**: `InputSignal`\<[`Edge`](/docs/api/types/model/edge/)\<`object`\>\>
 
 Edge data model
+
+***
+
+### relinkHandlesVisible
+
+> `readonly` **relinkHandlesVisible**: `Signal`\<`boolean`\>
+
+Endpoint handles for the relinking gesture — rendered on selected,
+committed edges when `edgeRelinking.enabled` is true.
 
 ***
 

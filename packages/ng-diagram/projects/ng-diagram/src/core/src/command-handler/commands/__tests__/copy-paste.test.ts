@@ -724,6 +724,122 @@ describe('Copy-Paste Commands', () => {
     });
   });
 
+  describe('dangling edges', () => {
+    it('should offset the free endpoint position and the points of a pasted dangling edge', async () => {
+      commandHandler.flowCore.getState = () => ({
+        nodes: [{ ...mockNode, id: 'node1', position: { x: 10, y: 20 }, selected: true }],
+        edges: [
+          {
+            ...mockEdge,
+            id: 'edge1',
+            source: 'node1',
+            target: '',
+            targetPosition: { x: 300, y: 300 },
+            points: [
+              { x: 110, y: 120 },
+              { x: 300, y: 300 },
+            ],
+            selected: true,
+          },
+        ],
+        metadata: mockMetadata,
+      });
+
+      await copy(commandHandler);
+      await paste(commandHandler, { name: 'paste' });
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      expect(update.edgesToAdd).toHaveLength(1);
+      const pastedEdge = update.edgesToAdd[0];
+      // The free end travels with the default (20, 20) paste offset, and the
+      // stored path travels along so it stays aligned.
+      expect(pastedEdge.target).toBe('');
+      expect(pastedEdge.targetPosition).toEqual({ x: 320, y: 320 });
+      expect(pastedEdge.points).toEqual([
+        { x: 130, y: 140 },
+        { x: 320, y: 320 },
+      ]);
+      // The connected end is remapped to the pasted node.
+      expect(pastedEdge.source).toBe(update.nodesToAdd[0].id);
+    });
+
+    it('should anchor a paste of only a dangling edge at its free endpoint center', async () => {
+      commandHandler.flowCore.getState = () => ({
+        nodes: [],
+        edges: [
+          {
+            ...mockEdge,
+            id: 'edge1',
+            source: '',
+            target: '',
+            sourcePosition: { x: 0, y: 0 },
+            targetPosition: { x: 100, y: 100 },
+            points: [
+              { x: 0, y: 0 },
+              { x: 100, y: 100 },
+            ],
+            selected: true,
+          },
+        ],
+        metadata: mockMetadata,
+      });
+
+      await copy(commandHandler);
+      await paste(commandHandler, { name: 'paste', position: { x: 200, y: 200 } });
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      expect(update.nodesToAdd).toHaveLength(0);
+      expect(update.edgesToAdd).toHaveLength(1);
+      const pastedEdge = update.edgesToAdd[0];
+      // Free endpoint center is (50, 50), cursor at (200, 200) → offset (150, 150).
+      expect(pastedEdge.sourcePosition).toEqual({ x: 150, y: 150 });
+      expect(pastedEdge.targetPosition).toEqual({ x: 250, y: 250 });
+      expect(pastedEdge.points).toEqual([
+        { x: 150, y: 150 },
+        { x: 250, y: 250 },
+      ]);
+    });
+
+    it('should not offset the points of fully-connected pasted edges', async () => {
+      const originalPoints = [
+        { x: 5, y: 5 },
+        { x: 45, y: 45 },
+      ];
+      commandHandler.flowCore.getState = () => ({
+        nodes: [
+          { ...mockNode, id: 'node1', position: { x: 0, y: 0 }, selected: true },
+          { ...mockNode, id: 'node2', position: { x: 50, y: 50 }, selected: true },
+        ],
+        edges: [
+          {
+            ...mockEdge,
+            id: 'edge1',
+            source: 'node1',
+            target: 'node2',
+            points: originalPoints,
+            selected: true,
+          },
+        ],
+        metadata: mockMetadata,
+      });
+
+      await copy(commandHandler);
+      await paste(commandHandler, { name: 'paste' });
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      // Fully-connected edges are re-routed from their new nodes instead.
+      expect(update.edgesToAdd[0].points).toEqual(originalPoints);
+      expect(update.edgesToAdd[0].sourcePosition).toBeUndefined();
+      expect(update.edgesToAdd[0].targetPosition).toBeUndefined();
+    });
+  });
+
   describe('hidden elements', () => {
     const setState = (nodes: Partial<Node>[], edges: object[] = [], descendants: Record<string, string[]> = {}) => {
       const flowCore = commandHandler.flowCore as unknown as {
