@@ -40,6 +40,7 @@ The node/edge host components apply `[style.display]="computedHidden ? 'none' : 
 
 - **Hiding does not auto-deselect.** A hidden element keeps its `selected` flag, but every interaction surface excludes it, so it cannot be moved or manipulated while invisible.
 - **`deleteSelection` skips effectively hidden selected elements** — deleting content the user cannot see would be destructive. Descendants of a deleted visible group and edges of deleted nodes are removed regardless of their own hidden state (no orphans, no dangling edges).
+- **`deleteNodes` cascades like `deleteSelection`** — deleting a node programmatically removes its whole subtree and the edges connected to any removed node, so both delete paths behave the same and no child is left with a `groupId` pointing at a deleted node. Clearing the children's `groupId` instead was considered and rejected: the two delete paths would diverge and the docs would need a cascade distinction. To delete a group but keep its children, call `NgDiagramGroupsService.removeFromGroup` first ([#806](https://github.com/synergycodes/ng-diagram/pull/806)).
 - **Edge attached to a hidden port**: the edge keeps the port's last measured geometry as its anchor (the simplest behavior). Deciding what to do with such an edge is up to the user — e.g. hide it with its own `hidden`.
 - **Automatic detection rejected**: inferring hidden from 0×0 reports was considered and rejected — 0×0 can also be a genuine measurement error, so the declarative flag is the reliable signal; the zero-size guard handles the corruption side independently.
 
@@ -130,11 +131,9 @@ have to be re-derived.
 - [NGD-317](https://app.clickup.com/t/86cbanwwx) — `zoomToFit({ nodeIds })` without `edgeIds` fits
   the entire edge network (pre-existing shape, made a live surprise by hidden filtering).
 - [NGD-320](https://app.clickup.com/t/86cbd99n5) — `deleteNodes` on a group leaves children with a
-  dangling `groupId`; previously hidden children reappear as orphans. ~~Decision: at minimum clear
-  the children's `groupId`.~~ Resolved (2026-09-11): `deleteNodes` now cascades to all descendants
-  via `modelLookup.getAllDescendantIds`, matching `deleteSelection` — the more consistent of the
-  two triaged options, so the guide's "deleting a group deletes its hidden children" now holds for
-  both paths and no docs cascade distinction is needed.
+  dangling `groupId`; previously hidden children reappear as orphans. Resolved in
+  [#806](https://github.com/synergycodes/ng-diagram/pull/806): `deleteNodes` cascades to all
+  descendants, see "Resolved open decisions" above.
 - [NGD-321](https://app.clickup.com/t/86cbd99p1) — `draggable: false` on a group should freeze its
   whole subtree. Decision: nothing moves, visible descendants included (the moving visible half is
   a pre-existing bug surfaced by hidden descendants now correctly staying put).
