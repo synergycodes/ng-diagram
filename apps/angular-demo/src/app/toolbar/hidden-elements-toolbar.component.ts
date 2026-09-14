@@ -7,7 +7,7 @@ import {
   NgDiagramViewportService,
   Node,
 } from 'ng-diagram';
-import { COLLAPSIBLE_GROUP_ID, FAR_NODE_ID } from '../data/hidden-elements-model';
+import { COLLAPSIBLE_GROUP_ID, createHiddenElementsModel, FAR_NODE_ID } from '../data/hidden-elements-model';
 
 const isGroupNode = (node: Node): node is GroupNode => 'isGroup' in node && node.isGroup === true;
 
@@ -27,6 +27,11 @@ const isGroupNode = (node: Node): node is GroupNode => 'isGroup' in node && node
         <input type="checkbox" [checked]="wholeGroupHidden()" (change)="toggleWholeGroup()" />
         Hide whole group (inheritance)
       </label>
+      @if (groupExists()) {
+        <button (click)="deleteGroup()">Delete group (cascades)</button>
+      } @else {
+        <button (click)="restoreGroup()">Restore group</button>
+      }
       <span class="separator">|</span>
       <span class="group-label">Per child:</span>
       @for (child of groupChildren(); track child.id) {
@@ -127,6 +132,31 @@ export class HiddenElementsToolbarComponent {
    */
   toggleWholeGroup(): void {
     this.modelService.updateNode(COLLAPSIBLE_GROUP_ID, { hidden: !this.wholeGroupHidden() });
+  }
+
+  protected readonly groupExists = computed(() =>
+    this.modelService.nodes().some((node) => node.id === COLLAPSIBLE_GROUP_ID)
+  );
+
+  /**
+   * Deletes only the group node — `deleteNodes` cascades to all descendants
+   * (hidden ones included) and their edges, so the collapsed children do not
+   * survive as orphans with a dangling `groupId`.
+   */
+  deleteGroup(): void {
+    this.modelService.deleteNodes([COLLAPSIBLE_GROUP_ID]);
+  }
+
+  /** Re-adds the deleted group subtree from the initial model, so the demo is repeatable. */
+  restoreGroup(): void {
+    const { nodes, edges } = createHiddenElementsModel();
+    const subtreeNodes = nodes.filter(
+      (node) => node.id === COLLAPSIBLE_GROUP_ID || node.groupId === COLLAPSIBLE_GROUP_ID
+    );
+    const subtreeNodeIds = new Set(subtreeNodes.map((node) => node.id));
+    const subtreeEdges = edges.filter((edge) => subtreeNodeIds.has(edge.source) || subtreeNodeIds.has(edge.target));
+    this.modelService.addNodes(subtreeNodes);
+    this.modelService.addEdges(subtreeEdges);
   }
 
   /**

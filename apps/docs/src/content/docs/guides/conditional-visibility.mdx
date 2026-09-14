@@ -85,7 +85,7 @@ Effectively hidden elements:
 - stay mounted in the DOM as `display: none` — they keep their geometry and re-measure automatically when unhidden;
 - never block initialization or `waitForMeasurements`;
 - are excluded from every _interactive_ surface: hit-testing, `selectAll`, keyboard move, drag, box selection, linking, `zoomToFit` bounds, the minimap, virtualization and edge routing. Programmatic APIs (`select`, `centerOnNode`, `bringToFront`/`sendToBack`, group APIs) deliberately do **not** filter hidden elements — acting on them is your call;
-- keep their `selected` flag (hiding does not deselect), but cannot be moved, and `deleteSelection` skips hidden selected elements. Deleting a visible group still deletes its hidden children, and deleting a node still removes its hidden edges.
+- keep their `selected` flag (hiding does not deselect), but cannot be moved, and `deleteSelection` skips hidden selected elements. Deleting a group — whether through `deleteSelection` or the programmatic `deleteNodes` — still deletes its hidden children (both cascade to all descendants), and deleting a node still removes its hidden edges.
 
 The library never sets an inline `display` value on **visible** nodes, edges or labels, so your own CSS stays in charge of them. (Ports are the one exception: the port component has always managed its own inline `display` as part of its rendering lifecycle — use the port's `hidden` input rather than CSS to hide it.)
 

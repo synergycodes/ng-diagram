@@ -186,6 +186,10 @@ A promise that resolves once the change has been applied to the model. Inside a 
 
 Deletes nodes by their IDs.
 
+Deleting a group cascades to all of its descendants (children, grandchildren, …),
+and edges connected to any deleted node are removed as well — the same semantics
+as deleting the selection.
+
 #### Parameters
 
 ##### ids
