@@ -28,26 +28,42 @@ const calculateCenter = (points: Point[]): Point => {
   return { x: centerX, y: centerY };
 };
 
-/**
- * Collect the positions anchoring the copied edges' free endpoints — the
- * endpoints that will be pasted dangling because their node was not copied
- * (or was dangling already). These anchor the pasted content at the cursor
- * exactly like node positions do.
- */
+/** One end of an edge: the node it hangs on, its port, its stored position, and where it lands if pasted free. */
+interface EdgeEnd {
+  nodeId: string;
+  port: string | undefined;
+  position: Point | undefined;
+  // The stored end position, or the matching end of the routed path when no
+  // end position is stored (an edge that was never routed has neither).
+  freePosition: Point | undefined;
+}
+
+const getSourceEnd = (edge: Edge): EdgeEnd => ({
+  nodeId: edge.source,
+  port: edge.sourcePort,
+  position: edge.sourcePosition,
+  freePosition: edge.sourcePosition ?? edge.points?.at(0),
+});
+
+const getTargetEnd = (edge: Edge): EdgeEnd => ({
+  nodeId: edge.target,
+  port: edge.targetPort,
+  position: edge.targetPosition,
+  freePosition: edge.targetPosition ?? edge.points?.at(-1),
+});
+
+/** An end is pasted free when it has no node or its node was not copied. */
+const isPastedFree = (end: EdgeEnd, copiedNodeIds: Set<string>): boolean =>
+  !end.nodeId || !copiedNodeIds.has(end.nodeId);
+
+/** Positions of the edge ends that will be pasted free — they anchor the pasted content at the cursor like node positions do. */
 const collectFreeEdgeEndpointPositions = (copiedEdges: Edge[], copiedNodeIds: Set<string>): Point[] => {
   const positions: Point[] = [];
 
   for (const edge of copiedEdges) {
-    if (!edge.source || !copiedNodeIds.has(edge.source)) {
-      const position = edge.sourcePosition ?? edge.points?.at(0);
-      if (position) {
-        positions.push(position);
-      }
-    }
-    if (!edge.target || !copiedNodeIds.has(edge.target)) {
-      const position = edge.targetPosition ?? edge.points?.at(-1);
-      if (position) {
-        positions.push(position);
+    for (const end of [getSourceEnd(edge), getTargetEnd(edge)]) {
+      if (isPastedFree(end, copiedNodeIds) && end.freePosition) {
+        positions.push(end.freePosition);
       }
     }
   }
@@ -146,18 +162,28 @@ const createPastedNodes = (
   });
 };
 
-/**
- * Create new edges with updated IDs and references.
- *
- * Endpoints whose node was copied are remapped to the pasted node. An endpoint
- * whose node was NOT copied becomes dangling (empty `source`/`target` with the
- * last routed attachment point as its authored position) — reattaching it to
- * the original node would silently duplicate the original connection. Already
- * dangling endpoints stay dangling. Every free-endpoint position is shifted by
- * the paste offset like every pasted node. An edge whose freed endpoint has no
- * known position (never routed, no points) is skipped — there is nothing to
- * author the free end from.
- */
+/** Resolves one end of a pasted edge; undefined when the end must be pasted free but has no position. */
+const resolvePastedEnd = (end: EdgeEnd, nodeIdMap: Map<string, string>, offset: Point): EdgeEnd | undefined => {
+  const pastedNodeId = nodeIdMap.get(end.nodeId);
+  if (pastedNodeId) {
+    // Node copied too: hang the end on the pasted node, routing recomputes its position.
+    return { ...end, nodeId: pastedNodeId };
+  }
+  if (!end.freePosition) {
+    return undefined;
+  }
+  // Node not copied (or the end was free already): paste the end free at its
+  // shifted position. Reattaching it to the original node would silently
+  // duplicate the original connection.
+  return {
+    ...end,
+    nodeId: '',
+    port: undefined,
+    position: { x: end.freePosition.x + offset.x, y: end.freePosition.y + offset.y },
+  };
+};
+
+/** Create new edges with updated IDs and references; an edge whose free end has no position is skipped. */
 const createPastedEdges = (
   config: FlowConfig,
   copiedEdges: Edge[],
@@ -168,46 +194,24 @@ const createPastedEdges = (
   const pastedEdges: Edge[] = [];
 
   for (const edge of copiedEdges) {
-    const newEdge: Edge = {
+    const source = resolvePastedEnd(getSourceEnd(edge), nodeIdMap, offset);
+    const target = resolvePastedEnd(getTargetEnd(edge), nodeIdMap, offset);
+    if (!source || !target) {
+      continue;
+    }
+
+    pastedEdges.push({
       ...edge,
       id: config.computeEdgeId(),
+      source: source.nodeId,
+      sourcePort: source.port,
+      sourcePosition: source.position,
+      target: target.nodeId,
+      targetPort: target.port,
+      targetPosition: target.position,
       // See createPastedNodes — hidden pasted edges stay deselected.
       selected: !isEdgeEffectivelyHidden(edge, hiddenCopiedNodeIds),
-    };
-
-    const newSource = edge.source ? nodeIdMap.get(edge.source) : '';
-    if (newSource !== undefined) {
-      newEdge.source = newSource;
-    } else {
-      const position = edge.sourcePosition ?? edge.points?.at(0);
-      if (!position) {
-        continue;
-      }
-      newEdge.source = '';
-      newEdge.sourcePort = undefined;
-      newEdge.sourcePosition = position;
-    }
-    if (!newEdge.source && newEdge.sourcePosition) {
-      newEdge.sourcePosition = { x: newEdge.sourcePosition.x + offset.x, y: newEdge.sourcePosition.y + offset.y };
-    }
-
-    const newTarget = edge.target ? nodeIdMap.get(edge.target) : '';
-    if (newTarget !== undefined) {
-      newEdge.target = newTarget;
-    } else {
-      const position = edge.targetPosition ?? edge.points?.at(-1);
-      if (!position) {
-        continue;
-      }
-      newEdge.target = '';
-      newEdge.targetPort = undefined;
-      newEdge.targetPosition = position;
-    }
-    if (!newEdge.target && newEdge.targetPosition) {
-      newEdge.targetPosition = { x: newEdge.targetPosition.x + offset.x, y: newEdge.targetPosition.y + offset.y };
-    }
-
-    pastedEdges.push(newEdge);
+    });
   }
 
   return pastedEdges;

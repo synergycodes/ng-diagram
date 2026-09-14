@@ -307,13 +307,10 @@ Handles copy, cut, and paste operations for diagram elements with support for po
 - Paste elements at specific positions
 
 :::note
-When pasting an edge, endpoints whose node was copied together with it are remapped to the newly
-pasted nodes. An endpoint whose node was **not** copied becomes dangling — empty `source`/`target`
-with an authored position at the edge's last attachment point — instead of being attached to the
-original node, so pasting a lone edge never duplicates the connection between the original nodes.
-You can reconnect or reposition the dangling end afterwards. Already-dangling endpoints stay
-dangling, and free endpoints anchor the pasted content at the paste position exactly like node
-positions do — pasting only edges centers them at the cursor.
+When you paste an edge, each end whose node was copied with it connects to the new node. An end whose
+node was **not** copied is pasted as a free end instead of reconnecting to the original node, so pasting
+an edge on its own never duplicates the original connection. Move or reconnect the free end as needed.
+See [`paste`](/docs/api/services/ngdiagramclipboardservice/#paste) for details.
 :::
 
 **Usage Example:**
