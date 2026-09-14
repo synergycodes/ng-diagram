@@ -129,7 +129,9 @@ have to be re-derived.
 ### Follow-up tasks
 
 - [NGD-317](https://app.clickup.com/t/86cbanwwx) — `zoomToFit({ nodeIds })` without `edgeIds` fits
-  the entire edge network (pre-existing shape, made a live surprise by hidden filtering).
+  the entire edge network (pre-existing shape, made a live surprise by hidden filtering). Resolved in
+  [#808](https://github.com/synergycodes/ng-diagram/pull/808): without `edgeIds` only edges with both
+  ends among the requested nodes count, so hidden-only `nodeIds` is a no-op.
 - [NGD-320](https://app.clickup.com/t/86cbd99n5) — `deleteNodes` on a group leaves children with a
   dangling `groupId`; previously hidden children reappear as orphans. Resolved in
   [#806](https://github.com/synergycodes/ng-diagram/pull/806): `deleteNodes` cascades to all

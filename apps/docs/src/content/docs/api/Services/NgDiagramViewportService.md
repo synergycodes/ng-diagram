@@ -351,8 +351,8 @@ Optional configuration object
 
 `string`[]
 
-Array of edge IDs to fit. If not provided, all edges are included when
-  `nodeIds` is also omitted; when `nodeIds` is provided, only edges connecting the target nodes are included.
+Array of edge IDs to fit. If not provided, only edges with both ends among the fitted
+  nodes are included. When `nodeIds` is not provided either, all edges are included.
 
 ###### nodeIds?
 
