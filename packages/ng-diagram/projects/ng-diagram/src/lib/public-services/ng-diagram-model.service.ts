@@ -513,6 +513,10 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
 
   /**
    * Deletes nodes by their IDs.
+   *
+   * Deleting a group cascades to all of its descendants (children, grandchildren, …),
+   * and edges connected to any deleted node are removed as well — the same semantics
+   * as deleting the selection.
    * @param ids Array of node IDs to delete.
    * @returns A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
    */

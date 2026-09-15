@@ -44,7 +44,10 @@ describe('KeyboardInputsDirective', () => {
         hasActiveInteraction: vi.fn().mockReturnValue(false),
         // Disabled so PanningAction/MovingAction short-circuit without model access
         config: { viewportPanningEnabled: false, nodeDraggingEnabled: false },
-        modelLookup: { getSelectedNodes: vi.fn().mockReturnValue([]) },
+        modelLookup: {
+          getSelectedNodesWithChildren: vi.fn().mockReturnValue([]),
+          getAllDescendantIds: vi.fn().mockReturnValue([]),
+        },
       }),
     };
 

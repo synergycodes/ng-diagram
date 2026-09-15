@@ -44,3 +44,10 @@ export const getMovableSelection = (flow: FlowCore): Node[] => {
     return coveredByMovingRoots.has(node.id);
   });
 };
+
+/**
+ * Whether an arrow key would move something: node dragging enabled and at least one movable node in the
+ * selection. Keyboard move claims the arrow keys when this holds, keyboard pan when it does not.
+ */
+export const hasMovableSelection = (flow: FlowCore): boolean =>
+  flow.config.nodeDraggingEnabled && getMovableSelection(flow).length > 0;

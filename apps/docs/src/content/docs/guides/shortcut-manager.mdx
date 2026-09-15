@@ -40,6 +40,20 @@ All available shortcut actions with their default key bindings. See [`ShortcutAc
 | `undo`                       | <kbd>Ctrl/Cmd + Z</kbd>                   | Undo last action (not implemented by default; requires custom model)                                                |
 | `zoom`                       | <kbd>Ctrl/Cmd + Wheel</kbd>               | Increase or decrease diagram viewport scale                                                                         |
 
+### Arrow Keys: Move vs Pan
+
+Each arrow key is bound to two actions: a `keyboardMoveSelection` action and a `keyboardPan` action (see the table
+above). Exactly one of them handles each key press:
+
+- **The selection moves** when node dragging is enabled
+  ([`nodeDraggingEnabled`](/docs/api/types/configuration/flowconfig#nodedraggingenabled)) and at least one selected
+  node is visible and draggable.
+- **The viewport pans** in every other case: nothing is selected, `nodeDraggingEnabled` is `false`, or the selection
+  contains only hidden or `draggable: false` nodes. Panning requires
+  [`viewportPanningEnabled`](/docs/api/types/configuration/flowconfig#viewportpanningenabled).
+
+A selection that cannot move never blocks the arrow keys.
+
 ## Focus and Tab Order
 
 Shortcuts only work when focus is inside the diagram. The diagram takes focus when the user clicks it, and it is

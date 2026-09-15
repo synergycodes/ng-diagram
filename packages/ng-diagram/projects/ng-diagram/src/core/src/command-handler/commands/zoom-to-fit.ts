@@ -60,9 +60,18 @@ const filterTargetElements = (
   nodeIds?: string[],
   edgeIds?: string[]
 ): { targetNodes: Node[]; targetEdges: Edge[] } => {
-  const targetNodes = nodeIds?.length ? nodes.filter((node) => nodeIds.includes(node.id)) : nodes;
+  const targetNodeIds = nodeIds?.length ? new Set(nodeIds) : undefined;
+  const targetNodes = targetNodeIds ? nodes.filter((node) => targetNodeIds.has(node.id)) : nodes;
 
-  const targetEdges = edgeIds?.length ? edges.filter((edge) => edgeIds.includes(edge.id)) : edges;
+  let targetEdges: Edge[];
+  if (edgeIds?.length) {
+    targetEdges = edges.filter((edge) => edgeIds.includes(edge.id));
+  } else if (targetNodeIds) {
+    // Scope the fit to the requested nodes: only edges with both ends among them may contribute bounds
+    targetEdges = edges.filter((edge) => targetNodeIds.has(edge.source) && targetNodeIds.has(edge.target));
+  } else {
+    targetEdges = edges;
+  }
 
   return { targetNodes, targetEdges };
 };

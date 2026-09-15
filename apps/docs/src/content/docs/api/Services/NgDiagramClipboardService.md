@@ -40,6 +40,10 @@ Since 1.4.0 the copy cascades: all descendants of the copied nodes travel with t
 (including hidden children of a collapsed group), together with the edges connecting copied
 nodes. Effectively hidden *selected* elements are skipped — consistent with `deleteSelection`.
 
+A selected edge is copied even when its endpoint nodes are not — [paste](/docs/api/services/ngdiagramclipboardservice/#paste) then recreates
+it with the uncopied endpoints dangling instead of attached to the original nodes; see
+`paste` for details.
+
 ***
 
 ### cut()
@@ -90,3 +94,15 @@ pasted elements have been measured — useful before calling `zoomToFit()` or
 `Promise`\<`void`\>
 
 A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
+
+#### Remarks
+
+Edge endpoints whose node was copied together with the edge are remapped to the
+newly pasted nodes. An endpoint whose node was NOT copied becomes dangling — empty
+`source`/`target` with `sourcePosition`/`targetPosition` at the edge's last attachment
+point — instead of being attached to the original node, so pasting a lone edge never
+duplicates the connection between the original nodes; reconnect or reposition the pasted
+edge as needed. Already-dangling endpoints stay dangling. Free endpoints anchor the pasted
+content at the target `position` exactly like node positions do — pasting only edges centers
+them at the cursor. An edge whose freed endpoint has no known position (it was never routed)
+is skipped.

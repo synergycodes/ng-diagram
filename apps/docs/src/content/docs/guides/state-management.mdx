@@ -284,6 +284,9 @@ this.modelService.deleteNodes(['node-1', 'node-2']);
 this.modelService.deleteEdges(['edge-1', 'edge-2']);
 ```
 
+Deleting a node also removes the edges connected to it, and deleting a group cascades to all of
+its descendants (children, grandchildren, …) — the same semantics as deleting the selection.
+
 ### Querying Elements
 
 Find and retrieve specific elements:

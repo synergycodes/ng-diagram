@@ -37,6 +37,9 @@ describe('Add Update Delete Command', () => {
         isActive: vi.fn().mockReturnValue(false),
         getCurrentTransaction: vi.fn(),
       },
+      modelLookup: {
+        getAllDescendantIds: vi.fn().mockReturnValue([]),
+      },
     } as unknown as FlowCore;
     commandHandler = new CommandHandler(flowCore);
   });
@@ -132,6 +135,51 @@ describe('Add Update Delete Command', () => {
     commandHandler.emit('deleteNodes', { ids: ['1'] });
 
     expect(flowCore.applyUpdate).toHaveBeenCalledWith({ nodesToRemove: ['1'], edgesToRemove: ['1'] }, 'deleteNodes');
+  });
+
+  it('should cascade deleting a group to its descendants and their edges', () => {
+    const group = { ...mockNode, id: 'group', isGroup: true };
+    const child = { ...mockNode, id: 'child', groupId: 'group', hidden: true, computedHidden: true };
+    const grandchild = { ...mockNode, id: 'grandchild', groupId: 'child', computedHidden: true };
+    const standalone = { ...mockNode, id: 'standalone' };
+    const childEdge = { ...mockEdge, id: 'childEdge', source: 'child', target: 'standalone' };
+    const outsideEdge = { ...mockEdge, id: 'outsideEdge', source: 'standalone', target: 'standalone' };
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [group, child, grandchild, standalone],
+      edges: [childEdge, outsideEdge],
+      metadata: {},
+    });
+    (flowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+      id === 'group' ? ['child', 'grandchild'] : []
+    );
+
+    commandHandler.emit('deleteNodes', { ids: ['group'] });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { nodesToRemove: ['group', 'child', 'grandchild'], edgesToRemove: ['childEdge'] },
+      'deleteNodes'
+    );
+  });
+
+  it('should not duplicate ids when a deleted group and its child are both passed explicitly', () => {
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [
+        { ...mockNode, id: 'group', isGroup: true },
+        { ...mockNode, id: 'child', groupId: 'group' },
+      ],
+      edges: [],
+      metadata: {},
+    });
+    (flowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+      id === 'group' ? ['child'] : []
+    );
+
+    commandHandler.emit('deleteNodes', { ids: ['group', 'child'] });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { nodesToRemove: ['group', 'child'], edgesToRemove: [] },
+      'deleteNodes'
+    );
   });
 
   it('should add edges to the flow', () => {
