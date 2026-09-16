@@ -25,9 +25,12 @@
   @if (relinkHandlesVisible()) {
     <!-- Invisible hit circles: a finger-friendly grab area that keeps a
          constant screen size at any zoom. Rendered under the visible circles
-         and carrying the same directive, so grabbing either starts the relink. -->
+         and carrying the same directive, so grabbing either starts the relink;
+         data-relink-handle-hit lets the stylesheet highlight the matching
+         visible circle on hover. -->
     <circle
       class="ng-diagram-edge__relink-handle-hit"
+      data-relink-handle-hit="source"
       ngDiagramRelinkHandle
       [edge]="edge()"
       end="source"
@@ -37,6 +40,7 @@
     />
     <circle
       class="ng-diagram-edge__relink-handle-hit"
+      data-relink-handle-hit="target"
       ngDiagramRelinkHandle
       [edge]="edge()"
       end="target"

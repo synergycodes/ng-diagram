@@ -25,17 +25,13 @@ svg {
     stroke: var(--edge-relink-handle-stroke, var(--ngd-relink-handle-stroke, currentColor));
     stroke-width: var(--edge-relink-handle-stroke-width, var(--ngd-relink-handle-stroke-width, 1.5px));
 
-    &:hover {
-      fill: var(--edge-relink-handle-fill-hover, var(--ngd-relink-handle-fill-hover, currentColor));
-    }
-
     &:active {
       cursor: grabbing;
     }
   }
 
-  // Enlarged invisible grab area for the handles (touch, low zoom). Hovering
-  // it highlights the visible circle drawn on top.
+  // Enlarged invisible grab area for the handles (touch, low zoom). It sits
+  // under the visible circle, so the pointer is over exactly one of the two.
   .ng-diagram-edge__relink-handle-hit {
     pointer-events: all;
     cursor: grab;
@@ -46,5 +42,15 @@ svg {
     &:active {
       cursor: grabbing;
     }
+  }
+
+  // The visible circle highlights while the pointer is over it or over the
+  // hit area of the same end (an earlier sibling in the template).
+  .ng-diagram-edge__relink-handle:hover,
+  .ng-diagram-edge__relink-handle-hit[data-relink-handle-hit='source']:hover
+    ~ .ng-diagram-edge__relink-handle[data-relink-handle='source'],
+  .ng-diagram-edge__relink-handle-hit[data-relink-handle-hit='target']:hover
+    ~ .ng-diagram-edge__relink-handle[data-relink-handle='target'] {
+    fill: var(--edge-relink-handle-fill-hover, var(--ngd-relink-handle-fill-hover, currentColor));
   }
 }

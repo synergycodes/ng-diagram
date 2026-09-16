@@ -450,6 +450,32 @@ test.describe('edge relinking', () => {
     await diagram.linkPorts({ node: 'node-a', port: 'port-right' }, { node: 'node-c', port: 'port-left' });
     await expect.poll(async () => (await diagram.model.edges()).length).toBe(2);
   });
+
+  test('the hit area keeps its screen size at low zoom and highlights the handle', async ({ diagram }) => {
+    await diagram.load({ model: trio, config: relinkOn });
+    await diagram.viewport.zoom(0.5);
+    await diagram.selection.select([], ['edge-ab']);
+
+    const visible = diagram.edge('edge-ab').locator('[data-relink-handle="target"]');
+    const handle = await diagram.centerOf(visible, 'target handle of edge-ab');
+    // At zoom 0.5 the visible circle is 2.5px in radius, so 9px above its
+    // center only the 12px hit circle can be under the pointer.
+    const ring = { x: handle.x, y: handle.y - 9 };
+    const under = await diagram.page.evaluate(
+      ({ x, y }) => document.elementFromPoint(x, y)?.getAttribute('class') ?? null,
+      ring
+    );
+    expect(under).toContain('ng-diagram-edge__relink-handle-hit');
+
+    // Hovering the hit area highlights the visible circle exactly like hovering the circle itself.
+    const fill = () => visible.evaluate((element) => getComputedStyle(element).fill);
+    const restFill = await fill();
+    await diagram.page.mouse.move(handle.x, handle.y);
+    await expect.poll(fill).not.toBe(restFill);
+    const hoverFill = await fill();
+    await diagram.page.mouse.move(ring.x, ring.y);
+    await expect.poll(fill).toBe(hoverFill);
+  });
 });
 
 test.describe('edge relinking on touch', () => {
