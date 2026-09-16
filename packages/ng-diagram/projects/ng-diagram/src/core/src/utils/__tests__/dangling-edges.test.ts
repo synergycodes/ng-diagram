@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { mockEdge } from '../../test-utils';
 import type { Edge } from '../../types';
 import {
+  alignManualPointsPatch,
   getDanglingEndpoints,
   getNearestDanglingEndpointInRange,
   hasFreeEndpoint,
@@ -125,6 +126,64 @@ describe('dangling-edges utils', () => {
 
     it('should return null for connected edges only', () => {
       expect(getNearestDanglingEndpointInRange([connectedEdge], { x: 0, y: 0 }, 1000)).toBeNull();
+    });
+  });
+
+  describe('alignManualPointsPatch', () => {
+    const manualEdge: Edge = {
+      ...mockEdge,
+      id: 'manual',
+      routingMode: 'manual',
+      points: [
+        { x: 10, y: 20 },
+        { x: 50, y: 60 },
+        { x: 110, y: 120 },
+      ],
+    };
+    const anchor = { x: 300, y: 400 };
+
+    it('should return an empty patch for a non-manual edge', () => {
+      expect(alignManualPointsPatch({ ...manualEdge, routingMode: undefined }, 'target', anchor)).toEqual({});
+      expect(alignManualPointsPatch({ ...manualEdge, routingMode: 'auto' }, 'target', anchor)).toEqual({});
+    });
+
+    it('should return an empty patch for a manual edge without points', () => {
+      expect(alignManualPointsPatch({ ...manualEdge, points: undefined }, 'target', anchor)).toEqual({});
+      expect(alignManualPointsPatch({ ...manualEdge, points: [] }, 'target', anchor)).toEqual({});
+    });
+
+    it('should move the last point to the anchor for the target end', () => {
+      const patch = alignManualPointsPatch(manualEdge, 'target', anchor);
+
+      expect(patch).toEqual({
+        points: [
+          { x: 10, y: 20 },
+          { x: 50, y: 60 },
+          { x: 300, y: 400 },
+        ],
+      });
+      // The stored edge is not mutated — the patch owns fresh point objects.
+      expect(manualEdge.points![2]).toEqual({ x: 110, y: 120 });
+    });
+
+    it('should move the first point to the anchor for the source end', () => {
+      const patch = alignManualPointsPatch(manualEdge, 'source', anchor);
+
+      expect(patch).toEqual({
+        points: [
+          { x: 300, y: 400 },
+          { x: 50, y: 60 },
+          { x: 110, y: 120 },
+        ],
+      });
+      expect(manualEdge.points![0]).toEqual({ x: 10, y: 20 });
+    });
+
+    it('should move the only point of a single-point edge for either end', () => {
+      const singlePointEdge: Edge = { ...manualEdge, points: [{ x: 1, y: 2 }] };
+
+      expect(alignManualPointsPatch(singlePointEdge, 'source', anchor)).toEqual({ points: [{ x: 300, y: 400 }] });
+      expect(alignManualPointsPatch(singlePointEdge, 'target', anchor)).toEqual({ points: [{ x: 300, y: 400 }] });
     });
   });
 });

@@ -149,9 +149,17 @@ The Edge object to use for the temporary edge.
 
 ### validateConnection()
 
-> **validateConnection**: (`source`, `sourcePort`, `target`, `targetPort`) => `boolean`
+> **validateConnection**: (`source`, `sourcePort`, `target`, `targetPort`, `context?`) => `boolean`
 
 Validates whether a connection between two nodes and ports is allowed.
+
+Called for every connection-producing operation: drawing a new edge,
+relinking an existing edge's endpoint, and `attachEdge`. The optional
+`context` says which operation is being validated (since 1.4.0).
+
+`source` can be `null` for draws that start from a position instead of a
+node (`startLinkingFromPosition`) and when relinking the free end of a
+dangling edge.
 
 #### Parameters
 
@@ -178,6 +186,12 @@ The target node.
 The target port.
 
 `null` | [`Port`](/docs/api/types/model/port/)
+
+##### context?
+
+[`ConnectionValidationContext`](/docs/api/types/configuration/features/connectionvalidationcontext/)
+
+The operation asking for validation (`draw` when omitted).
 
 #### Returns
 

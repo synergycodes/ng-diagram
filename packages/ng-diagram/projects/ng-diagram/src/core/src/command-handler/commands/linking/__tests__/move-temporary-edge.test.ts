@@ -10,13 +10,15 @@ vi.mock('../utils', () => ({
   isProperTargetPort: vi.fn(),
   isProperSourcePort: vi.fn(),
   validateConnection: vi.fn(),
-  validateRelinkOrConnection: vi.fn(),
+  connectionContextForGesture: vi.fn().mockReturnValue({ reason: 'draw' }),
+  relinkPreviewBase: vi.fn().mockReturnValue({}),
 }));
 
-import { createTemporaryEdge, isProperTargetPort, validateRelinkOrConnection } from '../utils';
+import { createTemporaryEdge, isProperSourcePort, isProperTargetPort, validateConnection } from '../utils';
 const mockCreateTemporaryEdge = vi.mocked(createTemporaryEdge);
 const mockIsProperTargetPort = vi.mocked(isProperTargetPort);
-const mockValidateRelinkOrConnection = vi.mocked(validateRelinkOrConnection);
+const mockIsProperSourcePort = vi.mocked(isProperSourcePort);
+const mockValidateConnection = vi.mocked(validateConnection);
 
 describe('moveTemporaryEdge', () => {
   let mockCommandHandler: CommandHandler;
@@ -154,7 +156,7 @@ describe('moveTemporaryEdge', () => {
     mockFlowCore.getNearestPortInRange.mockReturnValue(mockTargetPort);
     mockIsProperTargetPort.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
-    mockValidateRelinkOrConnection.mockReturnValue(true);
+    mockValidateConnection.mockReturnValue(true);
 
     const connectedEdge = {
       ...mockTemporaryEdge,
@@ -195,7 +197,7 @@ describe('moveTemporaryEdge', () => {
     mockFlowCore.getNearestPortInRange.mockReturnValue(mockTargetPort);
     mockIsProperTargetPort.mockReturnValue(true);
     mockFlowCore.getNodeById.mockReturnValue(mockTargetNode);
-    mockValidateRelinkOrConnection.mockReturnValue(false); // Connection invalid
+    mockValidateConnection.mockReturnValue(false); // Connection invalid
 
     const floatingEdge = { ...mockTemporaryEdge, target: '', targetPort: '' };
     mockCreateTemporaryEdge.mockReturnValue(floatingEdge);
@@ -207,13 +209,14 @@ describe('moveTemporaryEdge', () => {
 
     await moveTemporaryEdge(mockCommandHandler, command);
 
-    expect(mockValidateRelinkOrConnection).toHaveBeenCalledWith(
+    expect(mockValidateConnection).toHaveBeenCalledWith(
       mockFlowCore,
-      undefined,
       mockTemporaryEdge.source,
       mockTemporaryEdge.sourcePort,
       'target-node',
-      'target-port'
+      'target-port',
+      undefined,
+      { reason: 'draw' }
     );
 
     expect(mockCreateTemporaryEdge).toHaveBeenCalledWith(mockFlowCore.config, {
@@ -246,6 +249,135 @@ describe('moveTemporaryEdge', () => {
       position,
       mockFlowCore.config.linking.portSnapDistance
     );
+  });
+
+  describe('relinking the source end', () => {
+    const originalEdge: Edge = {
+      id: 'edge-1',
+      source: 'old-source-node',
+      sourcePort: 'old-source-port',
+      target: 'fixed-target-node',
+      targetPort: 'fixed-target-port',
+      data: {},
+    };
+
+    const sourceRelinkTemporaryEdge: Edge = {
+      id: 'temp-edge',
+      source: '',
+      sourcePort: '',
+      target: 'fixed-target-node',
+      targetPort: 'fixed-target-port',
+      data: {},
+    };
+
+    const candidatePort: Port = {
+      ...mockPort,
+      id: 'candidate-port',
+      type: 'source',
+      nodeId: 'candidate-node',
+    };
+
+    const candidateNode: Node = {
+      ...mockNode,
+      id: 'candidate-node',
+      measuredPorts: [candidatePort],
+    };
+
+    const setSourceRelink = (temporaryEdge: Edge = sourceRelinkTemporaryEdge): InternalLinkingActionState => {
+      const linking: InternalLinkingActionState = {
+        sourceNodeId: 'old-source-node',
+        sourcePortId: 'old-source-port',
+        temporaryEdge,
+        relink: { edgeId: 'edge-1', end: 'source', originalEdge },
+      };
+      mockFlowCore.actionStateManager.linking = linking;
+      return linking;
+    };
+
+    it('should snap the dragged source end using isProperSourcePort', async () => {
+      setSourceRelink();
+      mockFlowCore.getNearestPortInRange.mockReturnValue(candidatePort);
+      mockIsProperSourcePort.mockReturnValue(true);
+      mockFlowCore.getNodeById.mockReturnValue(candidateNode);
+      mockValidateConnection.mockReturnValue(true);
+      const snappedEdge = { ...sourceRelinkTemporaryEdge, source: 'candidate-node', sourcePort: 'candidate-port' };
+      mockCreateTemporaryEdge.mockReturnValue(snappedEdge);
+
+      await moveTemporaryEdge(mockCommandHandler, { name: 'moveTemporaryEdge', position: { x: 100, y: 200 } });
+
+      // The candidate must be source-capable and distinct from the FIXED
+      // (target) end — the target-port check does not apply.
+      expect(mockIsProperSourcePort).toHaveBeenCalledWith(candidatePort, 'fixed-target-node', 'fixed-target-port');
+      expect(mockIsProperTargetPort).not.toHaveBeenCalled();
+      expect(mockCreateTemporaryEdge).toHaveBeenCalledWith(mockFlowCore.config, {
+        target: 'fixed-target-node',
+        targetPort: 'fixed-target-port',
+        targetPosition: undefined,
+        source: 'candidate-node',
+        sourcePort: 'candidate-port',
+        sourcePosition: { x: 100, y: 200 },
+      });
+      expect(mockFlowCore.actionStateManager.linking!.temporaryEdge).toBe(snappedEdge);
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'moveTemporaryEdge');
+    });
+
+    it('should return early when the source end already snaps to the same candidate', async () => {
+      const linking = setSourceRelink({
+        ...sourceRelinkTemporaryEdge,
+        source: 'candidate-node',
+        sourcePort: 'candidate-port',
+      });
+      mockFlowCore.getNearestPortInRange.mockReturnValue(candidatePort);
+      mockIsProperSourcePort.mockReturnValue(true);
+
+      await moveTemporaryEdge(mockCommandHandler, { name: 'moveTemporaryEdge', position: { x: 100, y: 200 } });
+
+      expect(mockCreateTemporaryEdge).not.toHaveBeenCalled();
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+      // No state write — the live linking object is untouched.
+      expect(mockFlowCore.actionStateManager.linking).toBe(linking);
+    });
+
+    it('should validate with the candidate in the source role', async () => {
+      setSourceRelink();
+      mockFlowCore.getNearestPortInRange.mockReturnValue(candidatePort);
+      mockIsProperSourcePort.mockReturnValue(true);
+      mockFlowCore.getNodeById.mockReturnValue(candidateNode);
+      mockValidateConnection.mockReturnValue(true);
+      mockCreateTemporaryEdge.mockReturnValue(sourceRelinkTemporaryEdge);
+
+      await moveTemporaryEdge(mockCommandHandler, { name: 'moveTemporaryEdge', position: { x: 100, y: 200 } });
+
+      expect(mockValidateConnection).toHaveBeenCalledWith(
+        mockFlowCore,
+        'candidate-node',
+        'candidate-port',
+        'fixed-target-node',
+        'fixed-target-port',
+        undefined,
+        { reason: 'draw' }
+      );
+    });
+
+    it('should un-snap to a floating source end when the candidate fails validation', async () => {
+      setSourceRelink();
+      mockFlowCore.getNearestPortInRange.mockReturnValue(candidatePort);
+      mockIsProperSourcePort.mockReturnValue(true);
+      mockFlowCore.getNodeById.mockReturnValue(candidateNode);
+      mockValidateConnection.mockReturnValue(false);
+      mockCreateTemporaryEdge.mockReturnValue(sourceRelinkTemporaryEdge);
+
+      await moveTemporaryEdge(mockCommandHandler, { name: 'moveTemporaryEdge', position: { x: 100, y: 200 } });
+
+      expect(mockCreateTemporaryEdge).toHaveBeenCalledWith(mockFlowCore.config, {
+        target: 'fixed-target-node',
+        targetPort: 'fixed-target-port',
+        targetPosition: undefined,
+        source: '',
+        sourcePort: '',
+        sourcePosition: { x: 100, y: 200 },
+      });
+    });
   });
 
   it('should preserve the gesture stamp when replacing the linking state', async () => {

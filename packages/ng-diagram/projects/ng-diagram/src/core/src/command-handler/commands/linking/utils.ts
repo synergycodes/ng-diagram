@@ -1,5 +1,5 @@
 import { FlowCore } from '../../../flow-core';
-import type { Edge, FlowConfig, Port } from '../../../types';
+import type { ConnectionValidationContext, Edge, EdgeEnd, FlowConfig, Port } from '../../../types';
 import type { LinkingRelinkContext } from '../../../types/action-state.interface';
 
 export const createFinalEdge = (config: FlowConfig, temporaryEdge: Edge, partialEdge: Partial<Edge>): Edge => {
@@ -59,7 +59,8 @@ export const validateConnection = (
   sourcePortId?: string,
   targetNodeId?: string,
   targetPortId?: string,
-  isFinishLinking?: boolean
+  isFinishLinking?: boolean,
+  context?: ConnectionValidationContext
 ) => {
   const sourceNode = sourceNodeId ? core.getNodeById(sourceNodeId) : null;
   const targetNode = targetNodeId ? core.getNodeById(targetNodeId) : null;
@@ -75,7 +76,13 @@ export const validateConnection = (
     return true;
   }
 
-  return core.config.linking.validateConnection(sourceNode, sourcePort, targetNode, targetPort);
+  return core.config.linking.validateConnection(
+    sourceNode,
+    sourcePort,
+    targetNode,
+    targetPort,
+    context ?? { reason: 'draw' }
+  );
 };
 
 /**
@@ -91,6 +98,8 @@ export const relinkPreviewBase = (edge: Edge): Partial<Edge> => ({
   routing: edge.routing,
   sourceArrowhead: edge.sourceArrowhead,
   targetArrowhead: edge.targetArrowhead,
+  // Labels stay visible on the preview while the endpoint is dragged.
+  measuredLabels: edge.measuredLabels,
 });
 
 export const createTemporaryEdge = (config: FlowConfig, partialEdge: Partial<Edge>): Edge => {
@@ -109,30 +118,35 @@ export const createTemporaryEdge = (config: FlowConfig, partialEdge: Partial<Edg
 };
 
 /**
- * Validates a candidate connection during a relink gesture: uses
- * `edgeRelinking.validateRelink` when provided, otherwise falls back to
- * `linking.validateConnection` with the edge's endpoints in their proper
- * roles. Outside a relink, behaves exactly like `validateConnection`.
+ * Structural checks for connecting an edge's `end` to `nodeId`/`portId`:
+ * the node must exist and be visible; the port (when given) must exist in
+ * `measuredPorts`, point the right direction for the end, and not be
+ * template-hidden. Shared by the relink drop commit and `attachEdge` so both
+ * accept exactly the same targets.
  */
-export const validateRelinkOrConnection = (
-  core: FlowCore,
-  relink: LinkingRelinkContext | undefined,
-  sourceNodeId?: string,
-  sourcePortId?: string,
-  targetNodeId?: string,
-  targetPortId?: string,
-  isFinishLinking?: boolean
-) => {
-  const validateRelink = relink ? core.config.edgeRelinking.validateRelink : undefined;
-  if (relink && validateRelink) {
-    const edge = core.getEdgeById(relink.edgeId) ?? relink.originalEdge;
-    const candidateNodeId = relink.end === 'source' ? sourceNodeId : targetNodeId;
-    const candidatePortId = relink.end === 'source' ? sourcePortId : targetPortId;
-    const candidateNode = candidateNodeId ? core.getNodeById(candidateNodeId) : null;
-    const candidatePort = candidatePortId
-      ? (candidateNode?.measuredPorts?.find((port) => port.id === candidatePortId) ?? null)
-      : null;
-    return validateRelink(edge, relink.end, candidateNode, candidatePort);
+export const isValidEndpointTarget = (core: FlowCore, end: EdgeEnd, nodeId: string, portId?: string): boolean => {
+  const node = core.getNodeById(nodeId);
+  if (!node || node.computedHidden) {
+    return false;
   }
-  return validateConnection(core, sourceNodeId, sourcePortId, targetNodeId, targetPortId, isFinishLinking);
+  if (portId) {
+    const port = node.measuredPorts?.find((candidate) => candidate.id === portId);
+    const wrongDirection = end === 'target' ? port?.type === 'source' : port?.type === 'target';
+    if (!port || wrongDirection || core.templateVisibilityRegistry?.isPortHidden(nodeId, portId)) {
+      return false;
+    }
+  }
+  return true;
 };
+
+/**
+ * Builds the validation context for a gesture: `reason: 'relink'` with the
+ * live edge while an endpoint is being relinked, `reason: 'draw'` otherwise.
+ */
+export const connectionContextForGesture = (
+  core: FlowCore,
+  relink: LinkingRelinkContext | undefined
+): ConnectionValidationContext =>
+  relink
+    ? { reason: 'relink', edge: core.getEdgeById(relink.edgeId) ?? relink.originalEdge, end: relink.end }
+    : { reason: 'draw' };

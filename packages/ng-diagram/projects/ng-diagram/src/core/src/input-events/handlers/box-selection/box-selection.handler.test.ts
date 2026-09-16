@@ -413,6 +413,73 @@ describe('BoxSelectionEventHandler', () => {
       });
     });
 
+    describe('dangling edges', () => {
+      it('should select a dual dangling edge whose free anchors are inside the box even with zero nodes in it', () => {
+        const dualDanglingEdge = {
+          ...mockEdge,
+          id: 'dualDangling',
+          source: '',
+          sourcePosition: { x: 100, y: 100 },
+          target: '',
+          targetPosition: { x: 300, y: 200 },
+        };
+        mockModel.getEdges.mockReturnValue([dualDanglingEdge]);
+        mockSpatialHash.queryIds.mockReturnValue(new Set());
+
+        instance.handle(getSampleBoxSelectionEvent({ phase: 'start', lastInputPoint: { x: 50, y: 50 } }));
+        instance.handle(getSampleBoxSelectionEvent({ phase: 'end', lastInputPoint: { x: 450, y: 450 } }));
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
+          nodeIds: [],
+          edgeIds: ['dualDangling'],
+          multiSelection: false,
+        });
+      });
+
+      it('should not select a single-dangling edge whose free anchor is outside the box', () => {
+        const danglingEdge = {
+          ...mockEdge,
+          id: 'dangling',
+          source: 'node1',
+          target: '',
+          targetPosition: { x: 900, y: 900 },
+        };
+        mockModel.getEdges.mockReturnValue([danglingEdge]);
+        // The connected node IS inside the box — the free anchor is not.
+        mockSpatialHash.queryIds.mockReturnValue(new Set(['node1']));
+
+        instance.handle(getSampleBoxSelectionEvent({ phase: 'start', lastInputPoint: { x: 50, y: 50 } }));
+        instance.handle(getSampleBoxSelectionEvent({ phase: 'end', lastInputPoint: { x: 450, y: 450 } }));
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
+          nodeIds: ['node1'],
+          edgeIds: [],
+          multiSelection: false,
+        });
+      });
+
+      it('should select a single-dangling edge when both the node and the free anchor are inside the box', () => {
+        const danglingEdge = {
+          ...mockEdge,
+          id: 'dangling',
+          source: 'node1',
+          target: '',
+          targetPosition: { x: 400, y: 400 },
+        };
+        mockModel.getEdges.mockReturnValue([danglingEdge]);
+        mockSpatialHash.queryIds.mockReturnValue(new Set(['node1']));
+
+        instance.handle(getSampleBoxSelectionEvent({ phase: 'start', lastInputPoint: { x: 50, y: 50 } }));
+        instance.handle(getSampleBoxSelectionEvent({ phase: 'end', lastInputPoint: { x: 450, y: 450 } }));
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('select', {
+          nodeIds: ['node1'],
+          edgeIds: ['dangling'],
+          multiSelection: false,
+        });
+      });
+    });
+
     describe('partialInclusion setting', () => {
       it('should respect partialInclusion: true', () => {
         mockFlowCore.config.boxSelection.partialInclusion = true;

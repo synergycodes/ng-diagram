@@ -37,6 +37,12 @@
   --ngd-resize-handle-border-color: var(--ngd-transform-box);
   --ngd-resize-handle-border-radius: 0;
 
+  --ngd-relink-handle-size: 0.625rem;
+  --ngd-relink-handle-fill: var(--ngd-ui-bg-primary-default);
+  --ngd-relink-handle-fill-hover: var(--ngd-transform-box);
+  --ngd-relink-handle-stroke: var(--ngd-transform-box);
+  --ngd-relink-handle-stroke-width: 0.09375rem;
+
   --ngd-port-size: 0.25rem;
   --ngd-port-background-color: var(--ngd-node-port-fill-default);
   --ngd-port-border-color: var(--ngd-node-port-stroke-default);

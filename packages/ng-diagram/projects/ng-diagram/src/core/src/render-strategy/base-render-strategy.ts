@@ -30,10 +30,12 @@ export abstract class BaseRenderStrategy implements RenderStrategy {
     const visibleEdges = relinkedEdgeId ? processedEdges.filter((edge) => edge.id !== relinkedEdgeId) : processedEdges;
 
     // The temporary edge lives in action state, so hidden-computation never
-    // stamps it — check its source here, or hiding the source mid-gesture
-    // leaves a rubber band dangling from nothing.
+    // stamps it — check its anchored end here, or hiding that node mid-gesture
+    // leaves a rubber band dangling from nothing. During a target-end drag the
+    // anchored end is the source; during a source-end relink it is the target.
+    const anchoredEndNodeId = linking?.relink?.end === 'source' ? temporaryEdge?.target : temporaryEdge?.source;
     const isTemporaryEdgeVisible =
-      temporaryEdge?.temporary && !this.flowCore.getNodeById(temporaryEdge.source)?.computedHidden;
+      temporaryEdge?.temporary && !(anchoredEndNodeId && this.flowCore.getNodeById(anchoredEndNodeId)?.computedHidden);
     const finalEdges = isTemporaryEdgeVisible ? [...visibleEdges, temporaryEdge] : visibleEdges;
 
     this.performanceLogger.withPerformanceLogging(

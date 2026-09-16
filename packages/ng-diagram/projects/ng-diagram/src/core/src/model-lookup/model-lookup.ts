@@ -31,6 +31,7 @@ export class ModelLookup {
   private _directChildrenMap = { map: new Map<Node['id'], Node['id'][]>(), synchronized: false };
   private _descendantsCache = { map: new Map<Node['id'], Node['id'][]>(), synchronized: false }; // Cache for all descendants
   private _connectedEdgesMap = { map: new Map<Node['id'], Edge['id'][]>(), synchronized: false };
+  private _danglingEdges = { edges: [] as Edge[], synchronized: false };
 
   constructor(private readonly flowCore: FlowCore) {}
 
@@ -43,6 +44,7 @@ export class ModelLookup {
     this._directChildrenMap.synchronized = false;
     this._descendantsCache.synchronized = false;
     this._connectedEdgesMap.synchronized = false;
+    this._danglingEdges.synchronized = false;
   }
 
   /**
@@ -99,6 +101,23 @@ export class ModelLookup {
       };
     }
     return this._connectedEdgesMap.map;
+  }
+
+  /**
+   * Committed edges with at least one free (unconnected) endpoint, rebuilt
+   * lazily after model changes like {@link connectedEdgesMap}. Keeps the
+   * per-frame consumers (virtualization, endpoint-snap queries) O(dangling)
+   * instead of O(all edges).
+   * @returns Dangling edges array
+   */
+  get danglingEdges(): Edge[] {
+    if (!this._danglingEdges.synchronized) {
+      this._danglingEdges = {
+        edges: this.flowCore.getState().edges.filter((edge) => !edge.source || !edge.target),
+        synchronized: true,
+      };
+    }
+    return this._danglingEdges.edges;
   }
 
   /**

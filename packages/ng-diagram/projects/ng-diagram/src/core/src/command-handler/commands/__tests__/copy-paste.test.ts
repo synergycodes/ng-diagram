@@ -75,6 +75,96 @@ describe('Copy-Paste Commands', () => {
       expect(update.edgesToAdd[0].selected).toBe(true);
     });
 
+    describe('dangling edges travelling with copied nodes', () => {
+      const setDanglingEnabled = (enabled: boolean) => {
+        (commandHandler.flowCore.config as unknown as { danglingEdges: { enabled: boolean } }).danglingEdges = {
+          enabled,
+        };
+      };
+
+      const copyPasteState = () =>
+        (
+          commandHandler.flowCore.actionStateManager as unknown as {
+            copyPaste: { copiedNodes: Node[]; copiedEdges: Edge[] };
+          }
+        ).copyPaste;
+
+      const singleDanglingEdge: Edge = {
+        ...mockEdge,
+        id: 'dangling-edge',
+        source: 'node1',
+        sourcePort: 'out',
+        target: '',
+        targetPort: undefined,
+        targetPosition: { x: 300, y: 400 },
+        selected: false,
+      };
+
+      const dualDanglingEdge: Edge = {
+        ...mockEdge,
+        id: 'dual-dangling-edge',
+        source: '',
+        sourcePort: undefined,
+        sourcePosition: { x: 10, y: 20 },
+        target: '',
+        targetPort: undefined,
+        targetPosition: { x: 300, y: 400 },
+        selected: false,
+      };
+
+      const stateWith = (edges: Edge[]) => () => ({
+        nodes: [
+          { ...mockNode, id: 'node1', position: { x: 10, y: 20 }, selected: true },
+          { ...mockNode, id: 'node2', position: { x: 30, y: 40 }, selected: false },
+        ],
+        edges,
+        metadata: mockMetadata,
+      });
+
+      it('should copy an unselected single-dangling edge together with its copied node when enabled', async () => {
+        setDanglingEnabled(true);
+        commandHandler.flowCore.getState = stateWith([singleDanglingEdge]);
+
+        await copy(commandHandler);
+
+        expect(copyPasteState().copiedEdges.map((edge) => edge.id)).toEqual(['dangling-edge']);
+      });
+
+      it('should not copy an unselected single-dangling edge when the feature is disabled', async () => {
+        setDanglingEnabled(false);
+        commandHandler.flowCore.getState = stateWith([singleDanglingEdge]);
+
+        await copy(commandHandler);
+
+        expect(copyPasteState().copiedEdges).toEqual([]);
+      });
+
+      it('should not copy a dangling edge whose connected node was not copied', async () => {
+        setDanglingEnabled(true);
+        commandHandler.flowCore.getState = stateWith([{ ...singleDanglingEdge, source: 'node2' }]);
+
+        await copy(commandHandler);
+
+        expect(copyPasteState().copiedEdges).toEqual([]);
+      });
+
+      it('should copy a dual dangling edge only when it is selected', async () => {
+        setDanglingEnabled(true);
+        commandHandler.flowCore.getState = stateWith([dualDanglingEdge]);
+
+        await copy(commandHandler);
+
+        // Unselected: no connected endpoint inside the copied set — not copied.
+        expect(copyPasteState().copiedEdges).toEqual([]);
+
+        commandHandler.flowCore.getState = stateWith([{ ...dualDanglingEdge, selected: true }]);
+
+        await copy(commandHandler);
+
+        expect(copyPasteState().copiedEdges.map((edge) => edge.id)).toEqual(['dual-dangling-edge']);
+      });
+    });
+
     it('should not copy anything if nothing is selected', async () => {
       commandHandler.flowCore.getState = () => ({
         nodes: [

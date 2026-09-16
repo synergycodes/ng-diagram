@@ -57,7 +57,12 @@ export interface LinkingActionState {
    * @since 1.4.0
    */
   relink?: LinkingRelinkContext;
-  /** Reason the relink gesture ended without changing the edge (set by finishRelinking on failure paths). */
+  /**
+   * Reason the relink gesture ended without changing the edge (set by
+   * finishRelinking on failure paths).
+   *
+   * @since 1.4.0
+   */
   relinkCancelReason?: EdgeRelinkCancelReason;
 }
 

@@ -138,16 +138,39 @@ export const getNearestDanglingEndpointInRange = (
   point: Point,
   range: number
 ): DanglingEndpoint | null => {
-  let best: DanglingEndpoint | null = null;
+  // Single allocation-free scan (this runs in pointermove handlers): only the
+  // winning endpoint materializes an object.
+  let bestEdge: Edge | null = null;
+  let bestEnd: EdgeEnd = 'source';
+  let bestPosition: Point | null = null;
   let bestDistSq = range * range;
-  for (const endpoint of getDanglingEndpoints(edges)) {
-    const dx = endpoint.position.x - point.x;
-    const dy = endpoint.position.y - point.y;
+
+  const consider = (edge: Edge, end: EdgeEnd, position: Point | undefined) => {
+    if (!position) {
+      return;
+    }
+    const dx = position.x - point.x;
+    const dy = position.y - point.y;
     const distSq = dx * dx + dy * dy;
     if (distSq <= bestDistSq) {
       bestDistSq = distSq;
-      best = endpoint;
+      bestEdge = edge;
+      bestEnd = end;
+      bestPosition = position;
+    }
+  };
+
+  for (const edge of edges) {
+    if (edge.temporary) {
+      continue;
+    }
+    if (!edge.source) {
+      consider(edge, 'source', edge.sourcePosition);
+    }
+    if (!edge.target) {
+      consider(edge, 'target', edge.targetPosition);
     }
   }
-  return best;
+
+  return bestEdge && bestPosition ? { edge: bestEdge, end: bestEnd, position: bestPosition } : null;
 };

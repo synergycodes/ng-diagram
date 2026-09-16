@@ -23,6 +23,27 @@
   <path [attr.d]="path()" fill="none" stroke="none" stroke-width="20" stroke-opacity="0" />
 
   @if (relinkHandlesVisible()) {
+    <!-- Invisible hit circles: a finger-friendly grab area that keeps a
+         constant screen size at any zoom. Rendered under the visible circles
+         and carrying the same directive, so grabbing either starts the relink. -->
+    <circle
+      class="ng-diagram-edge__relink-handle-hit"
+      ngDiagramRelinkHandle
+      [edge]="edge()"
+      end="source"
+      [attr.cx]="relinkSourceHandle().x"
+      [attr.cy]="relinkSourceHandle().y"
+      [attr.r]="relinkHandleHitRadius()"
+    />
+    <circle
+      class="ng-diagram-edge__relink-handle-hit"
+      ngDiagramRelinkHandle
+      [edge]="edge()"
+      end="target"
+      [attr.cx]="relinkTargetHandle().x"
+      [attr.cy]="relinkTargetHandle().y"
+      [attr.r]="relinkHandleHitRadius()"
+    />
     <circle
       class="ng-diagram-edge__relink-handle"
       data-relink-handle="source"
@@ -31,7 +52,6 @@
       end="source"
       [attr.cx]="relinkSourceHandle().x"
       [attr.cy]="relinkSourceHandle().y"
-      r="5"
     />
     <circle
       class="ng-diagram-edge__relink-handle"
@@ -41,7 +61,6 @@
       end="target"
       [attr.cx]="relinkTargetHandle().x"
       [attr.cy]="relinkTargetHandle().y"
-      r="5"
     />
   }
 </svg>

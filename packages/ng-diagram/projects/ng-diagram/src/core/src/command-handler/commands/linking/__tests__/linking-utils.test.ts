@@ -1,7 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FlowCore } from '../../../../flow-core';
 import { mockEdge, mockNode, mockPort } from '../../../../test-utils';
-import { createTemporaryEdge, isProperSourcePort, isProperTargetPort, validateRelinkOrConnection } from '../utils';
+import type { Edge } from '../../../../types';
+import {
+  connectionContextForGesture,
+  createFinalEdge,
+  createTemporaryEdge,
+  isProperSourcePort,
+  isProperTargetPort,
+  validateConnection,
+} from '../utils';
 
 describe('linking utils', () => {
   describe('isProperTargetPort', () => {
@@ -80,7 +88,48 @@ describe('linking utils', () => {
     });
   });
 
-  describe('validateRelinkOrConnection', () => {
+  describe('createFinalEdge', () => {
+    const config = {
+      linking: {
+        finalEdgeDataBuilder: (edge: Edge) => edge,
+      },
+      computeEdgeId: () => 'fresh-id',
+    } as unknown as Parameters<typeof createFinalEdge>[0];
+
+    it('should build a kept dangling edge with a fresh id, temporary false and an undefined free port', () => {
+      const temporaryEdge: Edge = {
+        ...mockEdge,
+        id: 'TEMPORARY_EDGE',
+        temporary: true,
+        source: 'node-a',
+        sourcePort: 'out',
+        target: '',
+        targetPort: '',
+      };
+
+      const finalEdge = createFinalEdge(config, temporaryEdge, {
+        target: '',
+        targetPort: undefined,
+        targetPosition: { x: 50, y: 60 },
+      });
+
+      // Passthrough builder: this is the exact shape committed to the model.
+      expect(finalEdge).toEqual({
+        ...temporaryEdge,
+        id: 'fresh-id',
+        temporary: false,
+        target: '',
+        targetPort: undefined,
+        targetPosition: { x: 50, y: 60 },
+      });
+      expect(finalEdge.id).toBe('fresh-id');
+      expect(finalEdge.temporary).toBe(false);
+      expect(finalEdge.target).toBe('');
+      expect(finalEdge.targetPort).toBeUndefined();
+    });
+  });
+
+  describe('validateConnection', () => {
     const candidateNode = {
       ...mockNode,
       id: 'node-c',
@@ -90,7 +139,6 @@ describe('linking utils', () => {
       getEdgeById: ReturnType<typeof vi.fn>;
       getNodeById: ReturnType<typeof vi.fn>;
       config: {
-        edgeRelinking: { validateRelink?: ReturnType<typeof vi.fn> };
         linking: { validateConnection: ReturnType<typeof vi.fn> };
       };
     };
@@ -100,64 +148,22 @@ describe('linking utils', () => {
         getEdgeById: vi.fn().mockReturnValue(mockEdge),
         getNodeById: vi.fn().mockReturnValue(candidateNode),
         config: {
-          edgeRelinking: {},
           linking: { validateConnection: vi.fn().mockReturnValue(true) },
         },
       };
     });
 
-    it('should call validateRelink with the edge, end and candidate during a relink', () => {
-      const validateRelink = vi.fn().mockReturnValue(false);
-      core.config.edgeRelinking.validateRelink = validateRelink;
+    it('should pass the given context through to the config validator', () => {
+      const context = { reason: 'relink' as const, edge: mockEdge, end: 'target' as const };
 
-      const result = validateRelinkOrConnection(
+      const result = validateConnection(
         core as unknown as FlowCore,
-        { edgeId: 'edge-1', end: 'target', originalEdge: mockEdge },
-        'node-a',
-        'out',
-        'node-c',
-        'in-c',
-        true
-      );
-
-      expect(result).toBe(false);
-      expect(validateRelink).toHaveBeenCalledWith(mockEdge, 'target', candidateNode, candidateNode.measuredPorts[0]);
-      expect(core.config.linking.validateConnection).not.toHaveBeenCalled();
-    });
-
-    it('should pass the original edge snapshot when the edge is gone from the model', () => {
-      const validateRelink = vi.fn().mockReturnValue(true);
-      core.config.edgeRelinking.validateRelink = validateRelink;
-      core.getEdgeById.mockReturnValue(undefined);
-      const originalEdge = { ...mockEdge, id: 'edge-1' };
-
-      validateRelinkOrConnection(
-        core as unknown as FlowCore,
-        { edgeId: 'edge-1', end: 'source', originalEdge },
-        'node-c',
-        'in-c',
-        'node-b',
-        'in',
-        true
-      );
-
-      expect(validateRelink).toHaveBeenCalledWith(
-        originalEdge,
-        'source',
-        candidateNode,
-        candidateNode.measuredPorts[0]
-      );
-    });
-
-    it('should fall back to validateConnection when validateRelink is not configured', () => {
-      const result = validateRelinkOrConnection(
-        core as unknown as FlowCore,
-        { edgeId: 'edge-1', end: 'target', originalEdge: mockEdge },
         undefined,
         undefined,
         'node-c',
         'in-c',
-        true
+        true,
+        context
       );
 
       expect(result).toBe(true);
@@ -165,17 +171,57 @@ describe('linking utils', () => {
         null,
         null,
         candidateNode,
-        candidateNode.measuredPorts[0]
+        candidateNode.measuredPorts[0],
+        context
       );
     });
 
-    it('should behave like validateConnection outside a relink', () => {
-      core.config.edgeRelinking.validateRelink = vi.fn();
+    it('should default the context to a draw when none is given', () => {
+      validateConnection(core as unknown as FlowCore, undefined, undefined, 'node-c', 'in-c', true);
 
-      validateRelinkOrConnection(core as unknown as FlowCore, undefined, undefined, undefined, 'node-c', 'in-c', true);
+      expect(core.config.linking.validateConnection).toHaveBeenCalledWith(
+        null,
+        null,
+        candidateNode,
+        candidateNode.measuredPorts[0],
+        {
+          reason: 'draw',
+        }
+      );
+    });
+  });
 
-      expect(core.config.edgeRelinking.validateRelink).not.toHaveBeenCalled();
-      expect(core.config.linking.validateConnection).toHaveBeenCalled();
+  describe('connectionContextForGesture', () => {
+    it('should build a relink context with the live edge', () => {
+      const liveEdge = { ...mockEdge, id: 'edge-1' };
+      const core = { getEdgeById: vi.fn().mockReturnValue(liveEdge) };
+
+      const context = connectionContextForGesture(core as unknown as FlowCore, {
+        edgeId: 'edge-1',
+        end: 'source',
+        originalEdge: mockEdge,
+      });
+
+      expect(context).toEqual({ reason: 'relink', edge: liveEdge, end: 'source' });
+    });
+
+    it('should fall back to the original edge snapshot when the edge left the model', () => {
+      const core = { getEdgeById: vi.fn().mockReturnValue(undefined) };
+      const originalEdge = { ...mockEdge, id: 'edge-1' };
+
+      const context = connectionContextForGesture(core as unknown as FlowCore, {
+        edgeId: 'edge-1',
+        end: 'target',
+        originalEdge,
+      });
+
+      expect(context).toEqual({ reason: 'relink', edge: originalEdge, end: 'target' });
+    });
+
+    it('should build a draw context outside a relink', () => {
+      const core = { getEdgeById: vi.fn() };
+
+      expect(connectionContextForGesture(core as unknown as FlowCore, undefined)).toEqual({ reason: 'draw' });
     });
   });
 });

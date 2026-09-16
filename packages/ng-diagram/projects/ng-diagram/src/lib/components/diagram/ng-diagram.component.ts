@@ -11,6 +11,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  signal,
   untracked,
 } from '@angular/core';
 import { Edge, Node } from '../../../core/src';
@@ -44,6 +45,7 @@ import type {
 
 import { MobileBoxSelectionDirective } from '../../../public-api';
 import { DiagramSelectionDirective } from '../../directives';
+import { RelinkingGestureService } from '../../services/input-events/relinking-gesture.service';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { BoxSelectionDirective } from '../../directives/input-events/box-selection/box-selection.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
@@ -112,6 +114,7 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
   ],
   host: {
     '[class.pannable]': 'viewportPannable()',
+    '[class.relinking]': 'relinkingActive()',
     '[attr.tabindex]': `tabbable() ? '0' : '-1'`,
   },
 })
@@ -163,6 +166,10 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 
   /** Whether panning is enabled in the diagram. */
   readonly viewportPannable = this.renderer.viewportPannable;
+
+  /** Whether an edge endpoint is being dragged — holds the grabbing cursor at the host. */
+  protected readonly relinkingActive =
+    inject(RelinkingGestureService, { optional: true })?.active ?? signal(false).asReadonly();
 
   /**
    * Whether the diagram container takes part in the page's sequential Tab order.

@@ -29,12 +29,55 @@ Edge data model
 
 ***
 
+### relinkHandleHitRadius
+
+> `readonly` **relinkHandleHitRadius**: `Signal`\<`number`\>
+
+Radius of the handles' invisible hit circle, in flow units. Kept at
+roughly a finger-friendly constant size on screen by dividing by the
+viewport scale — at zoom 0.5 the visible 5px circle alone would leave a
+2.5px touch target.
+
+#### Since
+
+1.4.0
+
+***
+
 ### relinkHandlesVisible
 
 > `readonly` **relinkHandlesVisible**: `Signal`\<`boolean`\>
 
 Endpoint handles for the relinking gesture — rendered on selected,
 committed edges when `edgeRelinking.enabled` is true.
+
+#### Since
+
+1.4.0
+
+***
+
+### relinkSourceHandle
+
+> `readonly` **relinkSourceHandle**: `Signal`\<[`Point`](/docs/api/types/geometry/point/)\>
+
+Position of the source endpoint handle (the first routed point).
+
+#### Since
+
+1.4.0
+
+***
+
+### relinkTargetHandle
+
+> `readonly` **relinkTargetHandle**: `Signal`\<[`Point`](/docs/api/types/geometry/point/)\>
+
+Position of the target endpoint handle (the last routed point).
+
+#### Since
+
+1.4.0
 
 ***
 

@@ -21,14 +21,19 @@ export class SelectionRemovedEmitter implements EventEmitter {
     }
 
     const edgesToDelete: Edge[] = [];
-    const detachedEdges: Edge[] = [];
     for (const [id, edge] of initialEdgesMap) {
-      const currentEdge = edgesMap.get(id);
-      if (!currentEdge) {
+      if (!edgesMap.has(id)) {
         edgesToDelete.push(edge);
-      } else if (currentEdge.source !== edge.source || currentEdge.target !== edge.target) {
-        // An endpoint changed within the delete pass — the edge was demoted to
-        // dangling by detach-on-node-delete rather than deleted.
+      }
+    }
+
+    // Detached edges are exactly the edgesToUpdate the delete command itself
+    // issued (built by partitionIncidentEdges) — a middleware that happens to
+    // rewrite an endpoint during the pass must not be misreported as a detach.
+    const detachedEdges: Edge[] = [];
+    for (const update of context.initialUpdate.edgesToUpdate ?? []) {
+      const currentEdge = edgesMap.get(update.id);
+      if (currentEdge && ('source' in update || 'target' in update)) {
         detachedEdges.push(currentEdge);
       }
     }

@@ -39,9 +39,11 @@ const buildKeptDanglingEdge = (
     return null;
   }
 
+  // A free end has no port — normalized to undefined (never '') so the model
+  // shape is identical across every path that produces a dangling end.
   const edge = createFinalEdge(config, temporaryEdge, {
     target: '',
-    targetPort: '',
+    targetPort: undefined,
     targetPosition: dropPosition,
   });
 
@@ -91,6 +93,13 @@ export const finishLinking = async (commandHandler: CommandHandler, command: Fin
   const temporaryEdge = linking?.temporaryEdge;
 
   if (!linking) {
+    return;
+  }
+
+  // A relink owns this state — finishing it as a draw would ADD a duplicate
+  // edge instead of updating the relinked one (finishRelinking is the only
+  // legal finish for it). A teardown already in progress must not run twice.
+  if (linking.relink || linking._finishing) {
     return;
   }
 

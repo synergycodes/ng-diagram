@@ -101,6 +101,43 @@ describe('finishLinking', () => {
     expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
+  it('should return immediately when a relink owns the linking state', async () => {
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+      relink: {
+        edgeId: 'edge-1',
+        end: 'target',
+        originalEdge: { id: 'edge-1', source: 'source-node', target: 'other-node', data: {} },
+      },
+    };
+    mockValidateConnection.mockReturnValue(true);
+
+    await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } });
+
+    // Finishing a relink as a draw would ADD a duplicate edge instead of
+    // updating the relinked one — finishRelinking is the only legal finish.
+    expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+    expect(mockCreateFinalEdge).not.toHaveBeenCalled();
+    expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
+  });
+
+  it('should return immediately when a teardown is already in progress', async () => {
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+      _finishing: true,
+    } as InternalLinkingActionState;
+    mockValidateConnection.mockReturnValue(true);
+
+    await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } });
+
+    expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+    expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
+  });
+
   it('should clear the linking state even when connection validation throws', async () => {
     mockFlowCore.actionStateManager.linking = {
       sourceNodeId: 'source-node',
@@ -464,14 +501,48 @@ describe('finishLinking', () => {
     it('should keep the built dangling edge on a drop over empty canvas', async () => {
       await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 50, y: 60 } });
 
+      // A free end carries no port — targetPort is undefined, never ''.
       expect(mockCreateFinalEdge).toHaveBeenCalledWith(mockFlowCore.config, temporaryEdgeNoTarget, {
         target: '',
-        targetPort: '',
+        targetPort: undefined,
         targetPosition: { x: 50, y: 60 },
       });
       expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({ edgesToAdd: [keptEdge] }, 'finishLinking');
       expect(mockFlowCore.actionStateManager.linking!.cancelReason).toBeUndefined();
       expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+    });
+
+    it('should commit the real kept-edge shape (real createFinalEdge, passthrough builders)', async () => {
+      const actualUtils = await vi.importActual<typeof import('../utils')>('../utils');
+      mockCreateFinalEdge.mockImplementation(actualUtils.createFinalEdge);
+      mockFlowCore.config = {
+        danglingEdges: { enabled: true },
+        linking: { finalEdgeDataBuilder: (edge: Edge) => edge },
+        computeEdgeId: () => 'fresh-id',
+      };
+
+      await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 50, y: 60 } });
+
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          edgesToAdd: [
+            {
+              ...temporaryEdgeNoTarget,
+              id: 'fresh-id',
+              temporary: false,
+              target: '',
+              targetPort: undefined,
+              targetPosition: { x: 50, y: 60 },
+            },
+          ],
+        },
+        'finishLinking'
+      );
+      const [added] = mockFlowCore.applyUpdate.mock.calls[0][0].edgesToAdd as Edge[];
+      expect(added.id).toBe('fresh-id');
+      expect(added.temporary).toBe(false);
+      expect(added.target).toBe('');
+      expect(added.targetPort).toBeUndefined();
     });
 
     it('should build the final edge before shouldKeepOnDrop and pass the built edge and drop position', async () => {

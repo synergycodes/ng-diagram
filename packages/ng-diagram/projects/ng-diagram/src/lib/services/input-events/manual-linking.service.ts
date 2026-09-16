@@ -19,7 +19,12 @@ export class ManualLinkingService {
     // Validate BEFORE attaching document listeners or emitting — an
     // effectively hidden source is refused by the startLinking command, and
     // listeners attached here would be orphaned until the next click.
-    const currentNode = this.flowCoreProvider.provide().getNodeById(node.id);
+    const flowCore = this.flowCoreProvider.provide();
+    if (flowCore.actionStateManager.isLinking()) {
+      console.warn('[ngDiagram] startLinking ignored: another linking or relinking gesture is in progress.');
+      return;
+    }
+    const currentNode = flowCore.getNodeById(node.id);
     if (!currentNode || currentNode.computedHidden) {
       console.warn(`[ngDiagram] startLinking ignored: source node "${node.id}" is missing or effectively hidden.`);
       return;
@@ -52,15 +57,35 @@ export class ManualLinkingService {
    * Call this method to start linking from a position on the canvas (no source
    * node) from your custom logic. The edge follows the pointer until a click
    * finishes it.
+   *
+   * Requires `danglingEdges.enabled` — an edge drawn from a position has an
+   * empty source, i.e. it is a dangling edge by construction.
    */
   startLinkingFromPosition(position: Point) {
-    // A previous manual linking still in flight would leave its document
-    // listeners and its interaction-cleanup entry orphaned — latest call wins.
+    const flowCore = this.flowCoreProvider.provide();
+    // Validate BEFORE attaching document listeners — a refused command would
+    // leave the click-capture listener swallowing the next click.
+    if (!flowCore.config.danglingEdges.enabled) {
+      console.warn(
+        '[ngDiagram] startLinkingFromPosition ignored: dangling edges are disabled. ' +
+          'Set config.danglingEdges.enabled = true to draw edges from a position.'
+      );
+      return;
+    }
+    if (flowCore.actionStateManager.isLinking()) {
+      console.warn(
+        '[ngDiagram] startLinkingFromPosition ignored: another linking or relinking gesture is in progress.'
+      );
+      return;
+    }
+
+    // Defensive: a stale set of listeners (previous gesture torn down without
+    // reaching removeListeners) must not double-drive the new draw.
     this.removeListeners();
     this.node = undefined;
     this.portId = undefined;
 
-    this.flowCoreProvider.provide().commandHandler.emit('startLinkingFromPosition', { position });
+    flowCore.commandHandler.emit('startLinkingFromPosition', { position });
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('click', this.onDocumentClick, true);

@@ -27,6 +27,7 @@ title: "ng-diagram"
 - [NgDiagramHiddenDirective](/docs/api/directives/ngdiagramhiddendirective/)
 - [NgDiagramMinimapNavigationDirective](/docs/api/directives/ngdiagramminimapnavigationdirective/)
 - [NgDiagramNodeSelectedDirective](/docs/api/directives/ngdiagramnodeselecteddirective/)
+- [RelinkHandleDirective](/docs/api/directives/relinkhandledirective/)
 
 ## Internals
 
@@ -46,7 +47,6 @@ title: "ng-diagram"
 
 ## Other
 
-- [RelinkHandleDirective](/docs/api/other/relinkhandledirective/)
 - [InvalidateMeasurementsOptions](/docs/api/other/invalidatemeasurementsoptions/)
 - [~~BaseEdgeLabelComponent~~](/docs/api/other/baseedgelabelcomponent/)
 
@@ -73,6 +73,7 @@ title: "ng-diagram"
 
 - [BackgroundConfig](/docs/api/types/configuration/features/backgroundconfig/)
 - [BoxSelectionConfig](/docs/api/types/configuration/features/boxselectionconfig/)
+- [ConnectionValidationContext](/docs/api/types/configuration/features/connectionvalidationcontext/)
 - [DanglingEdgesConfig](/docs/api/types/configuration/features/danglingedgesconfig/)
 - [DefaultNodeTemplateConfig](/docs/api/types/configuration/features/defaultnodetemplateconfig/)
 - [EdgeRelinkingConfig](/docs/api/types/configuration/features/edgerelinkingconfig/)
@@ -209,6 +210,7 @@ title: "ng-diagram"
 
 ## Utilities
 
+- [computeDetachAnchor](/docs/api/utilities/computedetachanchor/)
 - [configureShortcuts](/docs/api/utilities/configureshortcuts/)
 - [createMiddlewares](/docs/api/utilities/createmiddlewares/)
 - [getDanglingEndpoints](/docs/api/utilities/getdanglingendpoints/)

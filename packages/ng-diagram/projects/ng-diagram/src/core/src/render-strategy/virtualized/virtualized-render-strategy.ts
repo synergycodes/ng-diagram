@@ -100,7 +100,7 @@ export class VirtualizedRenderStrategy extends BaseRenderStrategy {
       return this.cache.get(nodes, edges);
     }
 
-    const result = this.visibleElementsResolver.resolve(viewportRect, edges);
+    const result = this.visibleElementsResolver.resolve(viewportRect);
     this.cache.set(result, nodes, edges, viewportRect);
 
     return result;

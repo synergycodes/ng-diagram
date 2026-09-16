@@ -50,10 +50,20 @@ export interface LinkingConfig {
   portSnapDistance: number;
   /**
    * Validates whether a connection between two nodes and ports is allowed.
+   *
+   * Called for every connection-producing operation: drawing a new edge,
+   * relinking an existing edge's endpoint, and `attachEdge`. The optional
+   * `context` says which operation is being validated (since 1.4.0).
+   *
+   * `source` can be `null` for draws that start from a position instead of a
+   * node (`startLinkingFromPosition`) and when relinking the free end of a
+   * dangling edge.
+   *
    * @param source The source node.
    * @param sourcePort The source port.
    * @param target The target node.
    * @param targetPort The target port.
+   * @param context The operation asking for validation (`draw` when omitted).
    * @returns True if the connection is valid, false otherwise.
    * @default () => true
    */
@@ -61,7 +71,8 @@ export interface LinkingConfig {
     source: Node | null,
     sourcePort: Port | null,
     target: Node | null,
-    targetPort: Port | null
+    targetPort: Port | null,
+    context?: ConnectionValidationContext
   ) => boolean;
   /**
    * Allows customization of the temporary edge object shown while the user is dragging to create a new edge.
@@ -144,9 +155,15 @@ export interface DanglingEdgesConfig {
   /**
    * When true, edges connected to a deleted node are detached into dangling
    * edges — anchored where their port was — instead of being deleted.
-   * Requires `enabled` to be true. An edge that is itself part of the deleted
-   * selection is always deleted. An edge losing both endpoints in one delete
-   * becomes a dual dangling edge.
+   * Requires `enabled` to be true.
+   *
+   * An edge is still deleted, never detached, when:
+   * - it is itself part of the deleted selection (an explicit delete wins),
+   * - it or the lost endpoint's node is effectively hidden (detaching would
+   *   materialize invisible wiring as visible dangling edges), or
+   * - it loses BOTH endpoints in the same delete — it becomes a dual dangling
+   *   edge only when {@link shouldDetachOnNodeDelete} is provided and returns
+   *   true for both ends.
    * @default false
    */
   detachOnNodeDelete: boolean;
@@ -154,8 +171,10 @@ export interface DanglingEdgesConfig {
    * Per-edge decision whether a given endpoint is detached (kept dangling) or
    * deleted along with the node. Called only when `enabled` and
    * `detachOnNodeDelete` are true, once per endpoint losing its node.
-   * Returning false deletes the edge.
-   * @default undefined (detach every edge)
+   * Returning false deletes the edge. For an edge losing both endpoints at
+   * once, the edge survives as a dual dangling edge only when this callback
+   * is provided and returns true for both ends.
+   * @default undefined (detach every edge, except edges losing both ends)
    */
   shouldDetachOnNodeDelete?: (edge: Edge, deletedNode: Node, end: EdgeEnd) => boolean;
 }
@@ -174,17 +193,34 @@ export interface EdgeRelinkingConfig {
    * endpoint handles; dragging one previews the reconnection live and commits
    * it on drop. Dropping on empty canvas leaves the endpoint dangling when
    * `danglingEdges.enabled` is true, otherwise the relink is reverted.
+   *
+   * Connections made by relinking are validated through
+   * `linking.validateConnection`, which receives a context with
+   * `reason: 'relink'` and the edge being relinked.
    * @default false
    */
   enabled: boolean;
-  /**
-   * Validates a relink drop. Receives the edge being relinked, which endpoint
-   * is dragged, and the candidate node/port under the pointer.
-   * When not provided, `linking.validateConnection` is used with the edge's
-   * endpoints in their proper roles.
-   * @default undefined (falls back to linking.validateConnection)
-   */
-  validateRelink?: (edge: Edge, end: EdgeEnd, targetNode: Node | null, targetPort: Port | null) => boolean;
+}
+
+/**
+ * Context passed to {@link LinkingConfig.validateConnection} describing the
+ * operation that asks for validation.
+ *
+ * - `draw` — a new edge is being drawn (gesture or `startLinking*`).
+ * - `relink` — an endpoint of `edge` is being dragged to a new target.
+ * - `attach` — `NgDiagramModelService.attachEdge` connects an endpoint of `edge`.
+ *
+ * @public
+ * @since 1.4.0
+ * @category Types/Configuration/Features
+ */
+export interface ConnectionValidationContext {
+  /** The operation being validated. */
+  reason: 'draw' | 'relink' | 'attach';
+  /** The existing edge whose endpoint is being connected (relink and attach only). */
+  edge?: Edge;
+  /** Which endpoint of `edge` is being connected (relink and attach only). */
+  end?: EdgeEnd;
 }
 
 /**

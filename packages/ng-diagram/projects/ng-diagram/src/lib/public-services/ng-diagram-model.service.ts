@@ -16,7 +16,7 @@ import {
   Port,
   Rect,
 } from '../../core/src';
-import { validateConnection } from '../../core/src/command-handler/commands/linking/utils';
+import { isValidEndpointTarget, validateConnection } from '../../core/src/command-handler/commands/linking/utils';
 import { calculatePartsBounds } from '../../core/src/utils/dimensions';
 import { emitWithMeasurementOption } from './emit-with-measurement-option';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
@@ -176,7 +176,8 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * @since 1.4.0
    */
   getDanglingEndpoints(): DanglingEndpoint[] {
-    return getDanglingEndpoints(this.flowCore.getState().edges);
+    // The model lookup caches the dangling-edge list — O(dangling), not O(edges).
+    return getDanglingEndpoints(this.flowCore.modelLookup.danglingEdges);
   }
 
   /**
@@ -188,7 +189,10 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * @since 1.4.0
    */
   getNearestDanglingEndpointInRange(point: Point, range: number): DanglingEndpoint | null {
-    return getNearestDanglingEndpointInRange(this.flowCore.getState().edges, point, range);
+    // The model lookup caches the dangling-edge list, so calling this per
+    // pointermove costs O(dangling) like getNearestPortInRange's spatial hash
+    // profile — not a scan over every edge.
+    return getNearestDanglingEndpointInRange(this.flowCore.modelLookup.danglingEdges, point, range);
   }
 
   /**
@@ -198,12 +202,23 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    * at the port's current position when the edge was connected to a port, at
    * the edge's routed endpoint otherwise.
    *
+   * Requires `danglingEdges.enabled` — with the feature off this method is a
+   * no-op, so dangling edges only ever come into existence behind the flag.
+   *
    * @param edgeId The edge to detach.
    * @param end Which endpoint to detach.
    * @param position Optional anchor position for the freed endpoint.
    * @since 1.4.0
    */
   detachEdge(edgeId: string, end: EdgeEnd, position?: Point): Promise<void> {
+    if (!this.flowCore.config.danglingEdges.enabled) {
+      console.warn(
+        '[ngDiagram] detachEdge ignored: dangling edges are disabled. ' +
+          'Set config.danglingEdges.enabled = true to detach edge endpoints.'
+      );
+      return Promise.resolve();
+    }
+
     const edge = this.getEdgeById(edgeId);
     if (!edge) {
       return Promise.resolve();
@@ -215,7 +230,10 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
       if (!position) {
         return Promise.resolve();
       }
-      return this.updateEdge(edgeId, end === 'source' ? { sourcePosition: position } : { targetPosition: position });
+      return this.updateEdge(edgeId, {
+        ...(end === 'source' ? { sourcePosition: position } : { targetPosition: position }),
+        ...alignManualPointsPatch(edge, end, position),
+      });
     }
 
     const anchor = position ?? computeDetachAnchor(edge, end, this.getNodeById(nodeId));
@@ -245,7 +263,15 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    */
   async attachEdge(edgeId: string, end: EdgeEnd, nodeId: string, portId?: string): Promise<boolean> {
     const edge = this.getEdgeById(edgeId);
-    if (!edge || !this.getNodeById(nodeId)) {
+    if (!edge) {
+      return false;
+    }
+
+    // Same structural rules as a relink drop: the node must exist and be
+    // visible, the port must exist, point the right direction and not be
+    // template-hidden — otherwise the edge would reference a port that
+    // routing cannot resolve.
+    if (!isValidEndpointTarget(this.flowCore, end, nodeId, portId)) {
       return false;
     }
 
@@ -254,7 +280,13 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
     const targetNodeId = end === 'target' ? nodeId : edge.target || undefined;
     const targetPortId = end === 'target' ? portId : edge.targetPort;
 
-    if (!validateConnection(this.flowCore, sourceNodeId, sourcePortId, targetNodeId, targetPortId, true)) {
+    if (
+      !validateConnection(this.flowCore, sourceNodeId, sourcePortId, targetNodeId, targetPortId, true, {
+        reason: 'attach',
+        edge,
+        end,
+      })
+    ) {
       return false;
     }
 

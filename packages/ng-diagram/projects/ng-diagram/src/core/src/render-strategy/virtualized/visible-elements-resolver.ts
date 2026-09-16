@@ -10,10 +10,10 @@ import type { RenderStrategyResult } from '../render-strategy.interface';
 export class VisibleElementsResolver {
   constructor(private readonly flowCore: FlowCore) {}
 
-  resolve(viewportRect: Rect, allEdges: Edge[]): RenderStrategyResult {
+  resolve(viewportRect: Rect): RenderStrategyResult {
     const primaryVisibleIds = this.getPrimaryVisibleIds(viewportRect);
     const { edges, edgeIds, externalNodeIds } = this.collectVisibleEdges(primaryVisibleIds);
-    this.collectVisibleDanglingEdges(viewportRect, allEdges, primaryVisibleIds, edges, edgeIds, externalNodeIds);
+    this.collectVisibleDanglingEdges(viewportRect, primaryVisibleIds, edges, edgeIds, externalNodeIds);
     const { nodes, nodeIds } = this.buildNodeList(primaryVisibleIds, externalNodeIds);
 
     return { nodes, edges, nodeIds, edgeIds };
@@ -28,17 +28,16 @@ export class VisibleElementsResolver {
    */
   private collectVisibleDanglingEdges(
     viewportRect: Rect,
-    allEdges: Edge[],
     primaryVisibleIds: Set<string>,
     edges: Edge[],
     edgeIds: Set<string>,
     externalNodeIds: Set<string>
   ): void {
-    for (const edge of allEdges) {
+    // The model lookup keeps a cached list of dangling edges, so this stays
+    // O(dangling) — the virtualization guarantee (render cost independent of
+    // model size) holds when the feature is unused (the list is empty).
+    for (const edge of this.flowCore.modelLookup.danglingEdges) {
       if (edgeIds.has(edge.id) || edge.computedHidden) {
-        continue;
-      }
-      if (edge.source && edge.target) {
         continue;
       }
       if (!this.intersectsViewport(edge, viewportRect)) {

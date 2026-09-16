@@ -71,14 +71,8 @@ export class RelinkingEventHandler extends EventHandler<RelinkingInputEvent> {
     }
   }
 
-  override async cancel(): Promise<boolean> {
-    const linking = this.flow.actionStateManager.linking as InternalLinkingActionState | undefined;
-    // Not a relink (or already being torn down) — the linking handler owns it.
-    if (!linking?.relink || linking._finishing) {
-      return false;
-    }
-
-    await this.flow.commandHandler.emit('cancelLinking');
-    return true;
-  }
+  // No cancel() override: the interaction coordinator's `linking` entry covers
+  // relinks too — `isLinking()` is true during a relink and `cancelLinking`
+  // branches on `linking.relink`, so Escape reaches the right teardown through
+  // the LinkingEventHandler.
 }

@@ -20,6 +20,12 @@ export const finishLinkingToPosition = async (
     return;
   }
 
+  // A relink owns this state (finishRelinking is its only legal finish), and
+  // a teardown already in progress must not commit a second edge.
+  if (linking.relink || linking._finishing) {
+    return;
+  }
+
   const gestureId = linking._gestureId;
 
   // Same clear-in-finally + gesture-stamp guard as finishLinking —
@@ -37,7 +43,8 @@ export const finishLinkingToPosition = async (
         edgesToAdd: [
           createFinalEdge(commandHandler.flowCore.config, temporaryEdge, {
             target: '',
-            targetPort: '',
+            // Free ends carry no port — undefined, never '' (see finishLinking).
+            targetPort: undefined,
             targetPosition: position,
           }),
         ],

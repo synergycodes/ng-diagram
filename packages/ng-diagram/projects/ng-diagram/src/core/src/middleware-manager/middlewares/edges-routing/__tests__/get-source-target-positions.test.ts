@@ -63,33 +63,10 @@ vi.mock('../../../../utils', () => ({
   }),
 }));
 
-vi.mock('../../../../utils/compute-floating-edge-side', () => ({
-  computeFloatingStartSide: vi.fn().mockImplementation((from, to) => {
-    // Simple mock mirroring the position-to-position angle logic
-    const dx = to.x - from.x;
-    const dy = to.y - from.y;
-    if (Math.abs(dx) >= Math.abs(dy)) {
-      return dx > 0 ? 'right' : 'left';
-    }
-    return dy > 0 ? 'bottom' : 'top';
-  }),
-  computeFloatingEndSide: vi.fn().mockImplementation((node, _portId, cursorPosition) => {
-    // Simple mock that returns different sides based on cursor position relative to a fixed point
-    if (!node) return 'left';
-    const nodeCenter = {
-      x: node.position.x + 50,
-      y: node.position.y + 25,
-    };
-    const dx = cursorPosition.x - nodeCenter.x;
-    const dy = cursorPosition.y - nodeCenter.y;
-
-    if (Math.abs(dx) > Math.abs(dy)) {
-      return dx > 0 ? 'left' : 'right';
-    } else {
-      return dy > 0 ? 'top' : 'bottom';
-    }
-  }),
-}));
+// The floating-side computation runs REAL geometry (angleBetweenPoints →
+// angleToSide) so the side assertions below pin the actual 45°-segment
+// behavior instead of a lookalike fake.
+vi.mock('../../../../utils/compute-floating-edge-side', async (importOriginal) => await importOriginal());
 
 describe('getSourceTargetPositions', () => {
   it('should return source and target positions for edge with nodes', () => {
@@ -339,8 +316,11 @@ describe('getSourceTargetPositions', () => {
 
       const result = getSourceTargetPositions(edge, nodesMap);
 
-      expect(result.source).toEqual({ x: 50, y: 50, side: 'right' });
-      expect(result.target).toEqual({ x: 150, y: 150, side: 'left' });
+      // Real geometry: the 45° diagonal falls into the bottom segment
+      // (angleToSide treats [45, 135) as bottom), and the reverse angle (225°)
+      // into the top segment — each free end faces the other.
+      expect(result.source).toEqual({ x: 50, y: 50, side: 'bottom' });
+      expect(result.target).toEqual({ x: 150, y: 150, side: 'top' });
     });
   });
 

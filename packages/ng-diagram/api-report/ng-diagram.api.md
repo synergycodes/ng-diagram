@@ -121,7 +121,17 @@ export interface ClipboardPastedEvent {
 }
 
 // @public
+export const computeDetachAnchor: (edge: Edge, end: EdgeEnd, node: Node_2 | null | undefined) => Point | null;
+
+// @public
 export function configureShortcuts(userShortcuts: ShortcutDefinition[], baseShortcuts?: ShortcutDefinition[]): ShortcutDefinition[];
+
+// @public
+export interface ConnectionValidationContext {
+    edge?: Edge;
+    end?: EdgeEnd;
+    reason: 'draw' | 'relink' | 'attach';
+}
 
 // @public
 export interface CopyPasteActionState {
@@ -307,7 +317,6 @@ export interface EdgeRelinkEndedEvent {
 // @public
 export interface EdgeRelinkingConfig {
     enabled: boolean;
-    validateRelink?: (edge: Edge, end: EdgeEnd, targetNode: Node_2 | null, targetPort: Port | null) => boolean;
 }
 
 // @public
@@ -577,7 +586,7 @@ export interface LinkingConfig {
     portSnapDistance: number;
     selectNodeOnPortPress: boolean;
     temporaryEdgeDataBuilder: (defaultTemporaryEdgeData: Edge) => Edge;
-    validateConnection: (source: Node_2 | null, sourcePort: Port | null, target: Node_2 | null, targetPort: Port | null) => boolean;
+    validateConnection: (source: Node_2 | null, sourcePort: Port | null, target: Node_2 | null, targetPort: Port | null, context?: ConnectionValidationContext) => boolean;
 }
 
 // @public (undocumented)
@@ -816,10 +825,9 @@ export class NgDiagramBaseEdgeComponent {
     readonly path: Signal<string>;
     // (undocumented)
     readonly points: Signal<Point[]>;
+    readonly relinkHandleHitRadius: Signal<number>;
     readonly relinkHandlesVisible: Signal<boolean>;
-    // (undocumented)
     readonly relinkSourceHandle: Signal<Point>;
-    // (undocumented)
     readonly relinkTargetHandle: Signal<Point>;
     routing: InputSignal<string | undefined>;
     // (undocumented)
@@ -944,6 +952,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     readonly nodes: WritableSignal<Node_2[]>;
     nodeTemplateMap: InputSignal<NgDiagramNodeTemplateMap>;
     paletteItemDropped: EventEmitter<PaletteItemDroppedEvent>;
+    protected readonly relinkingActive: Signal<boolean>;
     selectionChanged: EventEmitter<SelectionChangedEvent>;
     selectionGestureEnded: EventEmitter<SelectionGestureEndedEvent>;
     selectionMoved: EventEmitter<SelectionMovedEvent>;

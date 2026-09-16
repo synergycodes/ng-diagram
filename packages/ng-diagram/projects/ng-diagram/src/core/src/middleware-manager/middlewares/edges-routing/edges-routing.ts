@@ -231,11 +231,15 @@ export const edgesRoutingMiddleware: Middleware = {
       ? processEdgesForRouting(edges, nodesMap, edgeRoutingManager, helpers, modelActionTypes)
       : [];
 
-    // A temporary edge whose source became effectively hidden mid-gesture is
-    // not re-routed — its geometry is stale and the render layer skips it.
-    const isTemporarySourceHidden = temporaryEdge ? nodesMap.get(temporaryEdge.source)?.computedHidden : false;
+    // A temporary edge whose anchored end became effectively hidden mid-gesture
+    // is not re-routed — its geometry is stale and the render layer skips it.
+    // The anchored end is the source for draws and target-end relinks, and the
+    // target while a source endpoint is being relinked.
+    const anchoredEndNodeId =
+      actionStateManager.linking?.relink?.end === 'source' ? temporaryEdge?.target : temporaryEdge?.source;
+    const isAnchoredEndHidden = anchoredEndNodeId ? nodesMap.get(anchoredEndNodeId)?.computedHidden : false;
     const newTemporaryEdge =
-      temporaryEdge && !isTemporarySourceHidden
+      temporaryEdge && !isAnchoredEndHidden
         ? createUpdatedTemporaryEdge(temporaryEdge, nodesMap, edgeRoutingManager, temporaryEdgeZIndex)
         : undefined;
 

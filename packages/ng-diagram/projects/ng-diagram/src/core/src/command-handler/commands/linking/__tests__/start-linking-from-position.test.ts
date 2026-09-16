@@ -25,19 +25,6 @@ describe('startLinkingFromPosition', () => {
     };
   };
 
-  it('should refuse to clobber an in-flight linking gesture', async () => {
-    mockFlowCore.actionStateManager.isLinking.mockReturnValue(true);
-    const previousLinking = mockFlowCore.actionStateManager.linking;
-
-    await startLinkingFromPosition(mockCommandHandler, {
-      name: 'startLinkingFromPosition',
-      position: { x: 10, y: 20 },
-    });
-
-    expect(mockFlowCore.actionStateManager.linking).toBe(previousLinking);
-    expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
-  });
-
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -59,6 +46,19 @@ describe('startLinkingFromPosition', () => {
       emit: vi.fn(),
       register: vi.fn(),
     } as unknown as CommandHandler;
+  });
+
+  it('should refuse to clobber an in-flight linking gesture', async () => {
+    mockFlowCore.actionStateManager.isLinking.mockReturnValue(true);
+    const previousLinking = mockFlowCore.actionStateManager.linking;
+
+    await startLinkingFromPosition(mockCommandHandler, {
+      name: 'startLinkingFromPosition',
+      position: { x: 10, y: 20 },
+    });
+
+    expect(mockFlowCore.actionStateManager.linking).toBe(previousLinking);
+    expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
   });
 
   describe('basic functionality', () => {

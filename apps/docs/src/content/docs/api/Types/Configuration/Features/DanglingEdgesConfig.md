@@ -22,9 +22,15 @@ deletes its edges.
 
 When true, edges connected to a deleted node are detached into dangling
 edges — anchored where their port was — instead of being deleted.
-Requires `enabled` to be true. An edge that is itself part of the deleted
-selection is always deleted. An edge losing both endpoints in one delete
-becomes a dual dangling edge.
+Requires `enabled` to be true.
+
+An edge is still deleted, never detached, when:
+- it is itself part of the deleted selection (an explicit delete wins),
+- it or the lost endpoint's node is effectively hidden (detaching would
+  materialize invisible wiring as visible dangling edges), or
+- it loses BOTH endpoints in the same delete — it becomes a dual dangling
+  edge only when [shouldDetachOnNodeDelete](/docs/api/types/configuration/features/danglingedgesconfig/#shoulddetachonnodedelete) is provided and returns
+  true for both ends.
 
 #### Default
 
@@ -57,7 +63,9 @@ false
 Per-edge decision whether a given endpoint is detached (kept dangling) or
 deleted along with the node. Called only when `enabled` and
 `detachOnNodeDelete` are true, once per endpoint losing its node.
-Returning false deletes the edge.
+Returning false deletes the edge. For an edge losing both endpoints at
+once, the edge survives as a dual dangling edge only when this callback
+is provided and returns true for both ends.
 
 #### Parameters
 
@@ -80,7 +88,7 @@ Returning false deletes the edge.
 #### Default
 
 ```ts
-undefined (detach every edge)
+undefined (detach every edge, except edges losing both ends)
 ```
 
 ***

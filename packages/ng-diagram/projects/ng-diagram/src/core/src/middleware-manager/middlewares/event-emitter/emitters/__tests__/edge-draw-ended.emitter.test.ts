@@ -122,6 +122,37 @@ describe('EdgeDrawEndedEmitter', () => {
     });
   });
 
+  it('should report a kept dangling edge as a successful draw with no target', () => {
+    helpers.anyEdgesAdded.mockReturnValue(true);
+
+    // A drop over empty canvas kept by the dangling-edges feature: the free
+    // end is normalized to target '' and targetPort undefined (never '').
+    const keptEdge: Edge = {
+      ...mockEdge,
+      id: 'kept-edge',
+      source: 'source-node',
+      sourcePort: 'port-1',
+      target: '',
+      targetPort: undefined,
+      targetPosition: dropPosition,
+      temporary: false,
+    };
+    context.edgesMap.set('kept-edge', keptEdge);
+
+    emitter.emit(context, eventManager);
+
+    expect(emitSpy).toHaveBeenCalledOnce();
+    expect(emitSpy).toHaveBeenCalledWith('edgeDrawEnded', {
+      source: sourceNode,
+      sourcePort: 'port-1',
+      dropPosition,
+      success: true,
+      edge: keptEdge,
+      target: undefined,
+      targetPort: undefined,
+    });
+  });
+
   it('should skip existing edges and only emit for newly added edge', () => {
     helpers.anyEdgesAdded.mockReturnValue(true);
 

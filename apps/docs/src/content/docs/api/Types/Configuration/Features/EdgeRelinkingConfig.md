@@ -20,47 +20,12 @@ endpoint handles; dragging one previews the reconnection live and commits
 it on drop. Dropping on empty canvas leaves the endpoint dangling when
 `danglingEdges.enabled` is true, otherwise the relink is reverted.
 
+Connections made by relinking are validated through
+`linking.validateConnection`, which receives a context with
+`reason: 'relink'` and the edge being relinked.
+
 #### Default
 
 ```ts
 false
-```
-
-***
-
-### validateRelink()?
-
-> `optional` **validateRelink**: (`edge`, `end`, `targetNode`, `targetPort`) => `boolean`
-
-Validates a relink drop. Receives the edge being relinked, which endpoint
-is dragged, and the candidate node/port under the pointer.
-When not provided, `linking.validateConnection` is used with the edge's
-endpoints in their proper roles.
-
-#### Parameters
-
-##### edge
-
-[`Edge`](/docs/api/types/model/edge/)
-
-##### end
-
-[`EdgeEnd`](/docs/api/types/model/edgeend/)
-
-##### targetNode
-
-`null` | [`Node`](/docs/api/types/model/node/)
-
-##### targetPort
-
-`null` | [`Port`](/docs/api/types/model/port/)
-
-#### Returns
-
-`boolean`
-
-#### Default
-
-```ts
-undefined (falls back to linking.validateConnection)
 ```

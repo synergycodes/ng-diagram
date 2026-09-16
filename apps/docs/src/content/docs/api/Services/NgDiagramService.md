@@ -528,9 +528,12 @@ The port ID from which the linking starts. Creates a floating edge when undefine
 Call this method to start drawing an edge from a position on the canvas
 (no source node) from your custom logic. The free end of the edge follows
 the pointer until a click finishes the draw — on a port the edge connects
-to it; on empty canvas the edge is kept as a dual dangling edge when
-`danglingEdges.enabled` is true (and `shouldKeepOnDrop` allows it),
-discarded otherwise.
+to it; on empty canvas both ends stay free (a dual dangling edge), kept
+when `shouldKeepOnDrop` allows it.
+
+Requires `danglingEdges.enabled` — an edge drawn from a position has an
+empty source, i.e. it is a dangling edge by construction. With the
+feature off the call is ignored with a console warning.
 
 #### Parameters
 

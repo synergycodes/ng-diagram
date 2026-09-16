@@ -1,0 +1,146 @@
+---
+version: 'since v1.4.0'
+title: Relinking
+description: Understanding how edge relinking works in ngDiagram
+sidebar:
+  order: 7
+  badge: New
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+The **edge relinking** feature lets users reconnect existing edges by dragging their endpoints. A selected edge shows grabbable handles at both ends; dragging one previews the reconnection live and commits it on drop.
+
+## Enabling Relinking
+
+Relinking is controlled by the [`edgeRelinking`](/docs/api/types/configuration/features/edgerelinkingconfig) configuration:
+
+```typescript
+const config: NgDiagramConfig = {
+  edgeRelinking: {
+    enabled: true,
+  },
+};
+```
+
+When enabled, every selected committed edge rendered by [`ng-diagram-base-edge`](/docs/api/components/ngdiagrambaseedgecomponent) shows an endpoint handle at each end (temporary draw previews never show handles).
+
+## How It Works
+
+- Press a handle and drag it — the edge endpoint follows the pointer as a live preview, snapping to nearby ports like edge drawing does.
+- A click on a handle without dragging (past a small ~5px threshold) does nothing — no relink starts and no events fire.
+- Pressing <kbd>Escape</kbd> (or calling [`cancelActiveInteraction()`](/docs/api/services/ngdiagramservice/#cancelactiveinteraction)) cancels the relink and the edge stays unchanged.
+
+### Drop Outcomes
+
+What happens on release depends on where the endpoint is dropped:
+
+- **On a valid port** — the edge is reconnected to that node and port.
+- **On empty canvas** — the endpoint is detached into a free (dangling) endpoint anchored at the drop position, but only when [`danglingEdges.enabled`](/docs/api/types/configuration/features/danglingedgesconfig/#enabled) is true and [`shouldKeepOnDrop`](/docs/api/types/configuration/features/danglingedgesconfig/#shouldkeepondrop) keeps the edge. A canvas drop is not a connection, so `validateConnection` is not consulted for it. With dangling edges disabled, the relink is reverted with reason `noTarget`.
+- **On an invalid target** — a hidden node, a missing or wrong-direction port, or a connection the validator refuses — the relink is reverted with reason `invalidConnection`.
+- **Back on the original port** — a no-op: the model is untouched and the gesture reports `success: false` with reason `cancelled`.
+
+A reverted relink never touches the model — the edge simply stays as it was.
+
+## Validating Reconnections
+
+Connections made by relinking run through the same [`linking.validateConnection`](/docs/api/types/configuration/features/linkingconfig/#validateconnection) callback as edge drawing. The optional fifth argument, a [`ConnectionValidationContext`](/docs/api/types/configuration/features/connectionvalidationcontext), tells you which operation is asking — for relinks it carries `reason: 'relink'`, the `edge` being relinked, and which `end` is being dragged:
+
+```typescript
+const config: NgDiagramConfig = {
+  linking: {
+    validateConnection: (source, sourcePort, target, targetPort, context) => {
+      if (context?.reason === 'relink') {
+        // Locked edges keep their connections
+        if (context.edge?.data?.['locked']) {
+          return false;
+        }
+      }
+      return source?.id !== target?.id; // no self-connections
+    },
+  },
+};
+```
+
+Note that `source` can be `null` — when relinking the target end of an edge whose source is dangling (and for draws started with [`startLinkingFromPosition`](/docs/api/services/ngdiagramservice/#startlinkingfromposition)), so guard your validator accordingly.
+
+## Events
+
+Two events report the gesture:
+
+- [`edgeRelinkStarted`](/docs/api/types/events/edgerelinkstartedevent) — fires when the user starts dragging an endpoint. The payload carries the `edge` (snapshot at gesture start) and which `end` is being dragged.
+- [`edgeRelinkEnded`](/docs/api/types/events/edgerelinkendedevent) — fires when the gesture ends, regardless of outcome. The payload carries the `edge` (after the relink, or the unchanged snapshot on failure), the dragged `end`, where the endpoint was before (`previousNode`/`previousPort` when it was connected, `previousPosition` when it was dangling), the `dropPosition`, and `success`. On a reconnect, `target`/`targetPort` name the new connection; on failure, `reason` is one of [`noTarget` | `invalidConnection` | `cancelled`](/docs/api/types/events/edgerelinkcancelreason).
+
+```html
+<ng-diagram (edgeRelinkStarted)="onRelinkStarted($event)" (edgeRelinkEnded)="onRelinkEnded($event)" />
+```
+
+```typescript
+onRelinkEnded(event: EdgeRelinkEndedEvent) {
+  if (event.success && event.target) {
+    console.log(`Reconnected ${event.end} of ${event.edge.id} from ${event.previousNode?.id} to ${event.target.id}`);
+  } else if (event.success) {
+    console.log(`Detached ${event.end} of ${event.edge.id} at`, event.dropPosition);
+  } else {
+    console.log('Relink reverted:', event.reason);
+  }
+}
+```
+
+## Customization
+
+### Relink Handles
+
+Here are the CSS variables you can use to style the relink handles globally:
+
+```
+  --ngd-relink-handle-size           // Diameter of the visible handle circle
+  --ngd-relink-handle-fill           // Fill color of the handle
+  --ngd-relink-handle-fill-hover     // Fill color on hover
+  --ngd-relink-handle-stroke         // Stroke (outline) color of the handle
+  --ngd-relink-handle-stroke-width   // Stroke width of the handle
+```
+
+You can also override them per edge with the `--edge-relink-handle-*` counterparts, exactly like `--edge-stroke`:
+
+```scss
+ng-diagram-base-edge.my-edge {
+  --edge-relink-handle-size: 0.875rem;
+  --edge-relink-handle-fill: #fff;
+  --edge-relink-handle-fill-hover: #3b82f6;
+  --edge-relink-handle-stroke: #3b82f6;
+  --edge-relink-handle-stroke-width: 2px;
+}
+```
+
+Each visible handle is paired with an enlarged invisible hit circle of roughly 12 screen pixels that is compensated for zoom, so the handles stay touch-friendly at any zoom level without growing visually.
+
+### Custom Edge Templates
+
+Handles are rendered only by `ng-diagram-base-edge`. A fully custom edge template that does not compose the base edge can make any element a grabbable endpoint handle with the [`RelinkHandleDirective`](/docs/api/directives/relinkhandledirective) (`[ngDiagramRelinkHandle]`):
+
+```html
+<svg:circle
+  ngDiagramRelinkHandle
+  [edge]="edge()"
+  end="target"
+  [attr.cx]="targetPoint().x"
+  [attr.cy]="targetPoint().y"
+  r="5"
+/>
+```
+
+A pointerdown on the host element starts the relink gesture for the given `end` of the given `edge`; the gesture itself is driven at document level, so the host element may unmount during the drag.
+
+<Aside type="note">
+  Handles render as part of the edge, so with{' '}
+  <a href="/docs/api/types/configuration/features/zindexconfig/#elevateonselection">
+    <code>zIndex.elevateOnSelection: false</code>
+  </a>{' '}
+  a handle can sit under an overlapping node and be unreachable there. Keep selection elevation on (the default) or
+  raise the edge's <code>zOrder</code> when nodes may overlap edge endpoints.
+</Aside>
+
+## Related Topics
+
+[Dangling Edges →](/docs/guides/edges/dangling-edges) | [Edges Overview →](/docs/guides/edges/edges) | [Edge Selection →](/docs/guides/edges/selection)

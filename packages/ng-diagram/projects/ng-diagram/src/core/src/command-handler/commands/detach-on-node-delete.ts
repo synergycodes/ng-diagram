@@ -21,11 +21,15 @@ export interface IncidentEdgesPartition {
  * its port was) unless:
  * - it is part of `explicitlyDeletedEdgeIds` (e.g. selected in a
  *   deleteSelection) — an explicit delete always wins, or
+ * - the edge itself or the lost endpoint's node is effectively hidden —
+ *   detaching would materialize invisible wiring (e.g. the collapsed children
+ *   of a deleted group) as visible dangling edges, or
  * - `shouldDetachOnNodeDelete` returns false for any endpoint being lost —
- *   then the whole edge is deleted.
- *
- * An edge losing both endpoints becomes a dual dangling edge when both
- * per-endpoint decisions allow it.
+ *   then the whole edge is deleted, or
+ * - the edge loses BOTH endpoints in the same cascade — such an edge is
+ *   deleted by default (detaching would leave dual-dangling debris at the
+ *   deleted nodes' old positions); it becomes a dual dangling edge only when
+ *   `shouldDetachOnNodeDelete` is defined and returns true for both ends.
  */
 export const partitionIncidentEdges = (
   flowCore: FlowCore,
@@ -33,18 +37,23 @@ export const partitionIncidentEdges = (
   nodesToDeleteIds: Set<string>,
   explicitlyDeletedEdgeIds?: Set<string>
 ): IncidentEdgesPartition => {
-  const danglingEdges = flowCore.config?.danglingEdges;
+  const danglingEdges = flowCore.config.danglingEdges;
   const detachEnabled = !!danglingEdges?.enabled && !!danglingEdges.detachOnNodeDelete;
 
   const edgesToRemove: string[] = [];
   const edgesToUpdate: (Partial<Edge> & { id: Edge['id'] })[] = [];
 
   const mayDetach = (edge: Edge, end: EdgeEnd, nodeId: string): boolean => {
+    const node = flowCore.getNodeById(nodeId);
+    // A hidden lost endpoint must not demote its (hidden) edge into a visible
+    // dangling edge.
+    if (!node || node.computedHidden) {
+      return false;
+    }
     if (!danglingEdges?.shouldDetachOnNodeDelete) {
       return true;
     }
-    const node = flowCore.getNodeById(nodeId);
-    return !!node && danglingEdges.shouldDetachOnNodeDelete(edge, node, end);
+    return danglingEdges.shouldDetachOnNodeDelete(edge, node, end);
   };
 
   for (const edge of edges) {
@@ -54,9 +63,15 @@ export const partitionIncidentEdges = (
       continue;
     }
 
+    // An edge losing both ends is deleted unless the app opted into dual
+    // dangling explicitly through the callback.
+    const dualWithoutOptIn = sourceLost && targetLost && !danglingEdges?.shouldDetachOnNodeDelete;
+
     if (
       !detachEnabled ||
       explicitlyDeletedEdgeIds?.has(edge.id) ||
+      edge.computedHidden ||
+      dualWithoutOptIn ||
       (sourceLost && !mayDetach(edge, 'source', edge.source)) ||
       (targetLost && !mayDetach(edge, 'target', edge.target))
     ) {

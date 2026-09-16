@@ -262,6 +262,9 @@ When `position` is omitted, the endpoint stays anchored where it is now:
 at the port's current position when the edge was connected to a port, at
 the edge's routed endpoint otherwise.
 
+Requires `danglingEdges.enabled` — with the feature off this method is a
+no-op, so dangling edges only ever come into existence behind the flag.
+
 #### Parameters
 
 ##### edgeId

@@ -1,11 +1,12 @@
 import type { CommandHandler, Edge, EdgeEnd, Point } from '../../../types';
 import type { LinkingRelinkContext } from '../../../types/action-state.interface';
 import {
+  connectionContextForGesture,
   createTemporaryEdge,
   isProperSourcePort,
   isProperTargetPort,
   relinkPreviewBase,
-  validateRelinkOrConnection,
+  validateConnection,
 } from './utils';
 
 export interface MoveTemporaryEdgeCommand {
@@ -95,13 +96,14 @@ export const createNewTemporaryEdge = (
     return createFloatingEdge();
   }
 
-  const isConnectionValid = validateRelinkOrConnection(
+  const isConnectionValid = validateConnection(
     commandHandler.flowCore,
-    relink,
     draggedEnd === 'target' ? temporaryEdge.source : candidateNodeId,
     draggedEnd === 'target' ? temporaryEdge.sourcePort : candidatePortId,
     draggedEnd === 'target' ? candidateNodeId : temporaryEdge.target,
-    draggedEnd === 'target' ? candidatePortId : temporaryEdge.targetPort
+    draggedEnd === 'target' ? candidatePortId : temporaryEdge.targetPort,
+    undefined,
+    connectionContextForGesture(commandHandler.flowCore, relink)
   );
 
   if (!isConnectionValid) {

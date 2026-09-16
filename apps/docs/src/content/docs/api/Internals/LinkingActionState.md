@@ -45,7 +45,12 @@ pointer (a normal draw always drags the target end).
 
 > `optional` **relinkCancelReason**: [`EdgeRelinkCancelReason`](/docs/api/types/events/edgerelinkcancelreason/)
 
-Reason the relink gesture ended without changing the edge (set by finishRelinking on failure paths).
+Reason the relink gesture ended without changing the edge (set by
+finishRelinking on failure paths).
+
+#### Since
+
+1.4.0
 
 ***
 

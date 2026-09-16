@@ -151,9 +151,23 @@ describe('partitionIncidentEdges', () => {
       expect(result.edgesToUpdate).toEqual([]);
     });
 
-    it('should produce a dual dangling patch when the edge loses both ends', () => {
+    it('should remove an edge losing both ends when no shouldDetachOnNodeDelete callback is set', () => {
+      // Dual dangling is opt-in: detaching both ends by default would leave
+      // dual-dangling debris at the deleted nodes' old positions.
       const result = partitionIncidentEdges(flowCore(), [incidentEdge], new Set(['node-a', 'node-b']));
 
+      expect(result.edgesToRemove).toEqual(['edge-ab']);
+      expect(result.edgesToUpdate).toEqual([]);
+    });
+
+    it('should produce a dual dangling patch when the callback allows both ends', () => {
+      const shouldDetachOnNodeDelete = vi.fn().mockReturnValue(true);
+      mockFlowCore.config.danglingEdges!.shouldDetachOnNodeDelete = shouldDetachOnNodeDelete;
+
+      const result = partitionIncidentEdges(flowCore(), [incidentEdge], new Set(['node-a', 'node-b']));
+
+      expect(shouldDetachOnNodeDelete).toHaveBeenCalledWith(incidentEdge, nodeWithPort, 'source');
+      expect(shouldDetachOnNodeDelete).toHaveBeenCalledWith(incidentEdge, nodeWithoutPorts, 'target');
       expect(result.edgesToRemove).toEqual([]);
       expect(result.edgesToUpdate).toEqual([
         {
@@ -168,18 +182,6 @@ describe('partitionIncidentEdges', () => {
       ]);
     });
 
-    it('should keep the dual dangling patch when the callback allows both ends', () => {
-      const shouldDetachOnNodeDelete = vi.fn().mockReturnValue(true);
-      mockFlowCore.config.danglingEdges!.shouldDetachOnNodeDelete = shouldDetachOnNodeDelete;
-
-      const result = partitionIncidentEdges(flowCore(), [incidentEdge], new Set(['node-a', 'node-b']));
-
-      expect(shouldDetachOnNodeDelete).toHaveBeenCalledWith(incidentEdge, nodeWithPort, 'source');
-      expect(shouldDetachOnNodeDelete).toHaveBeenCalledWith(incidentEdge, nodeWithoutPorts, 'target');
-      expect(result.edgesToRemove).toEqual([]);
-      expect(result.edgesToUpdate).toHaveLength(1);
-    });
-
     it('should remove the edge losing both ends when the callback denies either end', () => {
       mockFlowCore.config.danglingEdges!.shouldDetachOnNodeDelete = (_edge, _node, end) => end !== 'target';
 
@@ -187,6 +189,75 @@ describe('partitionIncidentEdges', () => {
 
       expect(result.edgesToRemove).toEqual(['edge-ab']);
       expect(result.edgesToUpdate).toEqual([]);
+    });
+
+    it('should remove the edge when the lost endpoint node is effectively hidden', () => {
+      mockFlowCore.getNodeById.mockImplementation((id: string) =>
+        id === 'node-a' ? { ...nodeWithPort, computedHidden: true } : id === 'node-b' ? nodeWithoutPorts : undefined
+      );
+
+      const result = partitionIncidentEdges(flowCore(), [incidentEdge], new Set(['node-a']));
+
+      expect(result.edgesToRemove).toEqual(['edge-ab']);
+      expect(result.edgesToUpdate).toEqual([]);
+    });
+
+    it('should remove an effectively hidden edge instead of detaching it', () => {
+      const hiddenEdge: Edge = { ...incidentEdge, computedHidden: true };
+
+      const result = partitionIncidentEdges(flowCore(), [hiddenEdge], new Set(['node-a']));
+
+      expect(result.edgesToRemove).toEqual(['edge-ab']);
+      expect(result.edgesToUpdate).toEqual([]);
+    });
+
+    it('should delete the edges of hidden children when a collapsed group cascade is deleted', () => {
+      // A3: deleting a group cascades to its (collapsed, hidden) children —
+      // their invisible wiring must be deleted, never materialized as visible
+      // dangling edges; a visible sibling's edge still detaches.
+      const hiddenChildA: Node = { ...mockNode, id: 'child-a', computedHidden: true, position: { x: 0, y: 0 } };
+      const hiddenChildB: Node = { ...mockNode, id: 'child-b', computedHidden: true, position: { x: 50, y: 0 } };
+      const nodes: Record<string, Node> = {
+        'child-a': hiddenChildA,
+        'child-b': hiddenChildB,
+        'node-b': nodeWithoutPorts,
+      };
+      mockFlowCore.getNodeById.mockImplementation((id: string) => nodes[id]);
+
+      const childEdge: Edge = {
+        ...mockEdge,
+        id: 'edge-children',
+        source: 'child-a',
+        target: 'child-b',
+        computedHidden: true,
+        points: undefined,
+      };
+      const outgoingHiddenEdge: Edge = {
+        ...mockEdge,
+        id: 'edge-child-out',
+        source: 'child-a',
+        target: 'node-b',
+        computedHidden: true,
+        points: undefined,
+      };
+      const visibleEdgeToDeleted: Edge = {
+        ...mockEdge,
+        id: 'edge-visible',
+        source: 'outside',
+        target: 'node-b',
+        points: undefined,
+      };
+
+      const result = partitionIncidentEdges(
+        flowCore(),
+        [childEdge, outgoingHiddenEdge, visibleEdgeToDeleted],
+        new Set(['child-a', 'child-b', 'node-b'])
+      );
+
+      expect(result.edgesToRemove).toEqual(['edge-children', 'edge-child-out']);
+      expect(result.edgesToUpdate).toEqual([
+        { id: 'edge-visible', target: '', targetPort: undefined, targetPosition: centerAnchor },
+      ]);
     });
 
     it('should leave non-incident edges untouched', () => {

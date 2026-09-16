@@ -62,7 +62,13 @@ export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 export { configureShortcuts } from './core/src';
 
 // Dangling-edge utilities
-export { getDanglingEndpoints, getNearestDanglingEndpointInRange, hasFreeEndpoint, isDanglingEdge } from './core/src';
+export {
+  computeDetachAnchor,
+  getDanglingEndpoints,
+  getNearestDanglingEndpointInRange,
+  hasFreeEndpoint,
+  isDanglingEdge,
+} from './core/src';
 export { NgDiagramMinimapNodeTemplateMap } from './lib/components/minimap/ng-diagram-minimap.types';
 export { initializeModel, initializeModelAdapter, type InitializeModelOptions } from './lib/model/initialize-model';
 export {
@@ -99,6 +105,7 @@ export type {
   BackgroundConfig,
   BoxSelectionConfig,
   ClipboardPastedEvent,
+  ConnectionValidationContext,
   CopyPasteActionState,
   DanglingEdgesConfig,
   DanglingEndpoint,

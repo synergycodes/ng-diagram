@@ -41,7 +41,16 @@ describe('ManualLinkingService', () => {
         },
         {
           provide: FlowCoreProviderService,
-          useValue: { isInitialized: () => true, provide: () => ({ registerInteractionCleanup, getNodeById }) },
+          useValue: {
+            isInitialized: () => true,
+            provide: () => ({
+              registerInteractionCleanup,
+              getNodeById,
+              actionStateManager: { isLinking: () => false },
+              config: { danglingEdges: { enabled: true } },
+              commandHandler: { emit: vi.fn() },
+            }),
+          },
         },
       ],
     });

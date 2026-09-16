@@ -21,6 +21,7 @@ describe('SelectionRemovedEmitter', () => {
     context = {
       modelActionType: 'deleteSelection',
       modelActionTypes: ['deleteSelection'],
+      initialUpdate: {},
       initialNodesMap: new Map<string, Node>(),
       initialEdgesMap: new Map<string, Edge>(),
       nodesMap: new Map<string, Node>(),
@@ -386,8 +387,12 @@ describe('SelectionRemovedEmitter', () => {
 
       context.initialNodesMap.set('node1', deletedNode);
       context.initialEdgesMap.set('edge1', initialEdge);
-      // The edge survived the delete pass with a changed endpoint — demoted to
-      // dangling by detach-on-node-delete rather than deleted.
+      // The delete command itself issued the detach patch (built by
+      // partitionIncidentEdges) and the edge survived the pass — demoted to
+      // dangling rather than deleted.
+      context.initialUpdate.edgesToUpdate = [
+        { id: 'edge1', source: '', sourcePort: undefined, sourcePosition: { x: 100, y: 100 } },
+      ];
       context.edgesMap.set('edge1', detachedEdge);
 
       emitter.emit(context, eventManager);
@@ -417,6 +422,9 @@ describe('SelectionRemovedEmitter', () => {
       };
 
       context.initialEdgesMap.set('edge1', initialEdge);
+      context.initialUpdate.edgesToUpdate = [
+        { id: 'edge1', target: '', targetPort: undefined, targetPosition: { x: 200, y: 200 } },
+      ];
       context.edgesMap.set('edge1', detachedEdge);
 
       emitter.emit(context, eventManager);
@@ -443,6 +451,51 @@ describe('SelectionRemovedEmitter', () => {
 
       expect(emitSpy).toHaveBeenCalledOnce();
       expect(emitSpy.mock.calls[0][1].detachedEdges).toEqual([]);
+    });
+
+    it('should not report an endpoint change the delete command did not issue as a detach', () => {
+      // A middleware rewrote the endpoint during the pass — the change is NOT
+      // part of the command's own initialUpdate, so it is not a detach.
+      const deletedNode: Node = { ...mockNode, id: 'node1', position: { x: 100, y: 100 } };
+      const initialEdge: Edge = {
+        id: 'edge1',
+        source: 'node3',
+        target: 'node4',
+        data: {},
+      };
+      const rewrittenEdge: Edge = { ...initialEdge, target: 'node5' };
+
+      context.initialNodesMap.set('node1', deletedNode);
+      context.initialEdgesMap.set('edge1', initialEdge);
+      context.edgesMap.set('edge1', rewrittenEdge);
+
+      emitter.emit(context, eventManager);
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy.mock.calls[0][1].detachedEdges).toEqual([]);
+    });
+
+    it('should not report an issued detach whose edge was removed during the pass', () => {
+      // The command issued a detach patch, but a middleware deleted the edge
+      // anyway — it must not be reported as a (surviving) detached edge.
+      const initialEdge: Edge = {
+        id: 'edge1',
+        source: 'node1',
+        target: 'node2',
+        data: {},
+      };
+
+      context.initialEdgesMap.set('edge1', initialEdge);
+      context.initialUpdate.edgesToUpdate = [
+        { id: 'edge1', target: '', targetPort: undefined, targetPosition: { x: 200, y: 200 } },
+      ];
+      // Edge absent from edgesMap — deleted rather than detached.
+
+      emitter.emit(context, eventManager);
+
+      expect(emitSpy).toHaveBeenCalledOnce();
+      expect(emitSpy.mock.calls[0][1].detachedEdges).toEqual([]);
+      expect(emitSpy.mock.calls[0][1].deletedEdges).toEqual([initialEdge]);
     });
   });
 

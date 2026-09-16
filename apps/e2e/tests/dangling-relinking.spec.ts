@@ -98,6 +98,20 @@ test.describe('dangling edges', () => {
       config: { danglingEdges: { enabled: true, detachOnNodeDelete: true } },
     });
 
+    // The selectionRemoved payload reports the demoted edges.
+    await diagram.page.evaluate(() => {
+      (window as unknown as Record<string, unknown>).__detached = [];
+      window.__diagram!.diagram.addEventListener('selectionRemoved', (event) => {
+        ((window as unknown as Record<string, unknown>).__detached as unknown[]).push(
+          event.detachedEdges.map((edge) => edge.id)
+        );
+      });
+    });
+
+    // The freed endpoint stays anchored exactly where the edge ended before the delete.
+    const before = await diagram.model.getEdgeById('edge-ab');
+    const expectedAnchor = before!.points!.at(-1);
+
     await diagram.selection.select(['node-b']);
     await diagram.selection.deleteSelection();
 
@@ -106,9 +120,12 @@ test.describe('dangling edges', () => {
     const edges = await diagram.model.edges();
     expect(edges).toHaveLength(1);
     expect(edges[0]).toMatchObject({ id: 'edge-ab', source: 'node-a', target: '' });
-    // Anchored where the deleted node was.
-    expect(edges[0].targetPosition).toBeTruthy();
+    expect(edges[0].targetPosition).toEqual(expectedAnchor);
     await expect(diagram.edge('edge-ab')).toHaveClass(/ng-diagram-edge--dangling/);
+
+    await expect
+      .poll(() => diagram.page.evaluate(() => (window as unknown as Record<string, unknown>).__detached))
+      .toEqual([['edge-ab']]);
   });
 
   test('an explicitly selected edge is deleted, not detached', async ({ diagram }) => {
@@ -210,8 +227,6 @@ test.describe('edge relinking', () => {
     await diagram.beginDrag(handle, { x: handle.x + 150, y: handle.y + 160 });
     await diagram.page.mouse.up();
 
-    const edge = await diagram.model.getEdgeById('edge-ab');
-    expect(edge).toMatchObject({ source: 'node-a', target: 'node-b' });
     await expect
       .poll(() => relinkEnded(diagram))
       .toEqual([
@@ -225,6 +240,8 @@ test.describe('edge relinking', () => {
           targetPort: null,
         },
       ]);
+    const edge = await diagram.model.getEdgeById('edge-ab');
+    expect(edge).toMatchObject({ source: 'node-a', target: 'node-b' });
   });
 
   test('dropping an endpoint on empty canvas detaches it when dangling edges are on', async ({ diagram }) => {
@@ -291,11 +308,216 @@ test.describe('edge relinking', () => {
     await diagram.nextFrame();
     expect((await relinkEnded(diagram)).length).toBe(1);
   });
+  test('a click on a handle without dragging changes nothing and emits nothing', async ({ diagram }) => {
+    await diagram.load({
+      model: trio,
+      config: { ...relinkOn, danglingEdges: { enabled: true } },
+    });
+    await recordRelinkEnded(diagram);
+    await diagram.selection.select([], ['edge-ab']);
+
+    const handle = await diagram.centerOf(
+      diagram.edge('edge-ab').locator('[data-relink-handle="target"]'),
+      'target handle of edge-ab'
+    );
+    await diagram.page.mouse.move(handle.x, handle.y);
+    await diagram.page.mouse.down();
+    await diagram.page.mouse.up();
+    await diagram.nextFrame();
+
+    const edge = await diagram.model.getEdgeById('edge-ab');
+    expect(edge).toMatchObject({ source: 'node-a', target: 'node-b' });
+    expect(await relinkEnded(diagram)).toEqual([]);
+    // The edge stayed rendered the whole time — no gesture, no hidden original.
+    await expect(diagram.edge('edge-ab')).toBeAttached();
+  });
+
+  test('a drop back on the original endpoint reverts without changing the model', async ({ diagram }) => {
+    // The edge must be port-connected: "the original endpoint" means the same
+    // node AND port (a port-less endpoint dropped onto a port is a real change).
+    const trioWithPorts: Partial<Model> = {
+      nodes: trio.nodes,
+      edges: [
+        {
+          id: 'edge-ab',
+          source: 'node-a',
+          sourcePort: 'port-right',
+          target: 'node-b',
+          targetPort: 'port-left',
+          data: {},
+        },
+      ],
+    };
+    await diagram.load({ model: trioWithPorts, config: relinkOn });
+    await recordRelinkEnded(diagram);
+    await diagram.selection.select([], ['edge-ab']);
+
+    const handle = await diagram.centerOf(
+      diagram.edge('edge-ab').locator('[data-relink-handle="target"]'),
+      'target handle of edge-ab'
+    );
+    // Drag away (past the threshold) and come back to the original endpoint.
+    await diagram.beginDrag(handle, { x: handle.x + 120, y: handle.y + 90 });
+    await diagram.page.mouse.move(handle.x, handle.y, { steps: 4 });
+    await diagram.page.mouse.up();
+
+    await expect.poll(async () => (await relinkEnded(diagram)).length).toBe(1);
+    expect((await relinkEnded(diagram))[0]).toMatchObject({ success: false, reason: 'cancelled' });
+    const edge = await diagram.model.getEdgeById('edge-ab');
+    expect(edge).toMatchObject({ source: 'node-a', target: 'node-b', targetPort: 'port-left' });
+  });
+
+  test('shift+drag on a handle box-selects instead of relinking', async ({ diagram }) => {
+    await diagram.load({ model: trio, config: relinkOn });
+    await recordRelinkEnded(diagram);
+    await diagram.selection.select([], ['edge-ab']);
+
+    const handle = await diagram.centerOf(
+      diagram.edge('edge-ab').locator('[data-relink-handle="target"]'),
+      'target handle of edge-ab'
+    );
+    await diagram.page.keyboard.down('Shift');
+    await diagram.beginDrag(handle, { x: handle.x + 120, y: handle.y + 100 });
+    await diagram.page.mouse.up();
+    await diagram.page.keyboard.up('Shift');
+
+    const edge = await diagram.model.getEdgeById('edge-ab');
+    expect(edge).toMatchObject({ source: 'node-a', target: 'node-b' });
+    expect(await relinkEnded(diagram)).toEqual([]);
+  });
+
+  test('the diagram host carries the relinking class only while dragging', async ({ diagram }) => {
+    await diagram.load({ model: trio, config: relinkOn });
+    await diagram.selection.select([], ['edge-ab']);
+    const host = diagram.page.locator('ng-diagram');
+
+    const handle = await diagram.centerOf(
+      diagram.edge('edge-ab').locator('[data-relink-handle="target"]'),
+      'target handle of edge-ab'
+    );
+    await expect(host).not.toHaveClass(/relinking/);
+    await diagram.beginDrag(handle, { x: handle.x + 100, y: handle.y + 80 });
+    await expect(host).toHaveClass(/relinking/);
+    await diagram.page.mouse.up();
+    await expect(host).not.toHaveClass(/relinking/);
+
+    // Escape clears it too.
+    await diagram.selection.select([], ['edge-ab']);
+    const handleAgain = await diagram.centerOf(
+      diagram.edge('edge-ab').locator('[data-relink-handle="target"]'),
+      'target handle of edge-ab'
+    );
+    await diagram.beginDrag(handleAgain, { x: handleAgain.x + 100, y: handleAgain.y + 80 });
+    await expect(host).toHaveClass(/relinking/);
+    await diagram.page.keyboard.press('Escape');
+    await expect(host).not.toHaveClass(/relinking/);
+    await diagram.page.mouse.up();
+  });
+
+  test('validateConnection sees reason "relink" and can reject the drop', async ({ diagram }) => {
+    await diagram.load({ model: trio, config: relinkOn });
+    await recordRelinkEnded(diagram);
+    await diagram.page.evaluate(() => {
+      window.__diagram!.diagram.updateConfig({
+        linking: {
+          validateConnection: (
+            _source: unknown,
+            _sourcePort: unknown,
+            _target: unknown,
+            _targetPort: unknown,
+            context?: { reason?: string }
+          ) => context?.reason !== 'relink',
+        },
+      });
+    });
+    await diagram.selection.select([], ['edge-ab']);
+
+    const handle = await diagram.centerOf(
+      diagram.edge('edge-ab').locator('[data-relink-handle="target"]'),
+      'target handle of edge-ab'
+    );
+    const dst = await diagram.centerOf(diagram.port('node-c', 'port-left'), 'port node-c/port-left');
+    await diagram.beginDrag(handle, dst);
+    await diagram.page.mouse.up();
+
+    await expect.poll(async () => (await relinkEnded(diagram)).length).toBe(1);
+    expect((await relinkEnded(diagram))[0]).toMatchObject({ success: false, reason: 'invalidConnection' });
+    const edge = await diagram.model.getEdgeById('edge-ab');
+    expect(edge).toMatchObject({ source: 'node-a', target: 'node-b' });
+
+    // The same validator still allows drawing new edges from a port.
+    await diagram.selection.deselectAll();
+    await diagram.linkPorts({ node: 'node-a', port: 'port-right' }, { node: 'node-c', port: 'port-left' });
+    await expect.poll(async () => (await diagram.model.edges()).length).toBe(2);
+  });
+});
+
+test.describe('edge relinking on touch', () => {
+  test.use({ hasTouch: true });
+
+  const relinkOn = { edgeRelinking: { enabled: true } };
+
+  /** Dispatch a raw CDP touch sequence (Playwright's touchscreen has no drag). */
+  async function touchSequence(
+    diagram: Diagram,
+    points: { x: number; y: number }[],
+    last: 'touchEnd' | 'touchCancel'
+  ): Promise<void> {
+    const cdp = await diagram.page.context().newCDPSession(diagram.page);
+    const [start, ...moves] = points;
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ ...start, id: 1 }] });
+    for (const move of moves) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ ...move, id: 1 }] });
+      await diagram.nextFrame();
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: last, touchPoints: [] });
+    await cdp.detach();
+  }
+
+  test('a touch drag of the target handle reconnects the edge', async ({ diagram }) => {
+    await diagram.load({ model: trio, config: relinkOn });
+    await diagram.selection.select([], ['edge-ab']);
+
+    const handle = await diagram.centerOf(
+      diagram.edge('edge-ab').locator('[data-relink-handle="target"]'),
+      'target handle of edge-ab'
+    );
+    const dst = await diagram.centerOf(diagram.port('node-c', 'port-left'), 'port node-c/port-left');
+    await touchSequence(
+      diagram,
+      [handle, { x: (handle.x + dst.x) / 2, y: (handle.y + dst.y) / 2 }, dst, dst],
+      'touchEnd'
+    );
+
+    await expect.poll(async () => (await diagram.model.getEdgeById('edge-ab'))?.target).toBe('node-c');
+  });
+
+  test('a cancelled touch reverts the relink', async ({ diagram }) => {
+    await diagram.load({ model: trio, config: relinkOn });
+    await recordRelinkEnded(diagram);
+    await diagram.selection.select([], ['edge-ab']);
+
+    const handle = await diagram.centerOf(
+      diagram.edge('edge-ab').locator('[data-relink-handle="target"]'),
+      'target handle of edge-ab'
+    );
+    await touchSequence(diagram, [handle, { x: handle.x + 90, y: handle.y + 70 }], 'touchCancel');
+
+    await expect.poll(async () => (await relinkEnded(diagram)).length).toBe(1);
+    expect((await relinkEnded(diagram))[0]).toMatchObject({ success: false, reason: 'cancelled' });
+    const edge = await diagram.model.getEdgeById('edge-ab');
+    expect(edge).toMatchObject({ source: 'node-a', target: 'node-b' });
+    // The gesture released its claim: a fresh port draw works right away.
+    await diagram.selection.deselectAll();
+    await expect.poll(async () => (await diagram.diagram.actionState()).linking).toBeFalsy();
+  });
 });
 
 test.describe('startLinkingFromPosition', () => {
   test('a draw started from a position connects to a port on click', async ({ diagram }) => {
-    await diagram.load({ model: pair });
+    // startLinkingFromPosition requires the dangling-edges feature: the drawn
+    // edge has an empty source by construction.
+    await diagram.load({ model: pair, config: { danglingEdges: { enabled: true } } });
 
     const portCenter = await diagram.centerOf(diagram.port('node-b', 'port-left'), 'port node-b/port-left');
     const startFlow = await diagram.viewport.clientToFlowPosition({ x: portCenter.x - 200, y: portCenter.y + 120 });
@@ -332,17 +554,17 @@ test.describe('startLinkingFromPosition', () => {
     expect(edge.targetPosition).toEqual(endFlow);
   });
 
-  test('a draw started from a position dropped on empty canvas is discarded when dangling edges are off', async ({
-    diagram,
-  }) => {
+  test('startLinkingFromPosition is refused when dangling edges are off', async ({ diagram }) => {
     await diagram.load({ model: pair });
 
     const box = await diagram.container.boundingBox();
     const start = { x: box!.x + 500, y: box!.y + 400 };
     const startFlow = await diagram.viewport.clientToFlowPosition(start);
 
+    // The call is ignored with a console warning — no draw starts at all.
     await diagram.diagram.startLinkingFromPosition(startFlow);
     await diagram.page.mouse.move(start.x + 120, start.y + 60, { steps: 4 });
+    await expect(diagram.edge('TEMPORARY_EDGE')).toHaveCount(0);
     await diagram.page.mouse.click(start.x + 120, start.y + 60);
 
     await expect.poll(async () => (await diagram.model.edges()).length).toBe(0);
