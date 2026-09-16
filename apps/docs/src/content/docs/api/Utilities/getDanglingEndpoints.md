@@ -10,7 +10,8 @@ title: "getDanglingEndpoints"
 
 Collects the free endpoints of the given edges. A dual dangling edge yields
 two entries. Endpoints whose anchor position is missing are skipped —
-they cannot be rendered or snapped to.
+they cannot be rendered or snapped to. Temporary and effectively hidden
+edges are skipped.
 
 ## Parameters
 

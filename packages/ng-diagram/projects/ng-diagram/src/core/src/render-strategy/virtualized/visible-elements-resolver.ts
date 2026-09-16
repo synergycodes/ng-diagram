@@ -1,6 +1,6 @@
 import type { FlowCore } from '../../flow-core';
 import type { Edge, Node, Rect } from '../../types';
-import { isGroup } from '../../utils';
+import { boundingRectOfPoints, doesRectsIntersect, isGroup } from '../../utils';
 import type { RenderStrategyResult } from '../render-strategy.interface';
 
 /**
@@ -33,9 +33,9 @@ export class VisibleElementsResolver {
     edgeIds: Set<string>,
     externalNodeIds: Set<string>
   ): void {
-    // The model lookup keeps a cached list of dangling edges, so this stays
-    // O(dangling) — the virtualization guarantee (render cost independent of
-    // model size) holds when the feature is unused (the list is empty).
+    // The model lookup rebuilds its dangling-edge list lazily after a state
+    // change with one pass over all edges (like connectedEdgesMap) and serves
+    // it from cache until the next change; this loop iterates only that subset.
     for (const edge of this.flowCore.modelLookup.danglingEdges) {
       if (edgeIds.has(edge.id) || edge.computedHidden) {
         continue;
@@ -72,18 +72,9 @@ export class VisibleElementsResolver {
       return false;
     }
 
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-    for (const point of anchors) {
-      minX = Math.min(minX, point.x);
-      minY = Math.min(minY, point.y);
-      maxX = Math.max(maxX, point.x);
-      maxY = Math.max(maxY, point.y);
-    }
-
-    return minX <= rect.x + rect.width && maxX >= rect.x && minY <= rect.y + rect.height && maxY >= rect.y;
+    // A bounding box that only touches the viewport edge counts as outside,
+    // like every other rect test in the engine.
+    return doesRectsIntersect(boundingRectOfPoints(anchors), rect);
   }
 
   private getPrimaryVisibleIds(viewportRect: Rect): Set<string> {

@@ -15,8 +15,9 @@ describe('finishLinkingToPosition', () => {
   let mockCommandHandler: CommandHandler;
   let mockFlowCore: {
     getState: ReturnType<typeof vi.fn>;
+    getNodeById: ReturnType<typeof vi.fn>;
     applyUpdate: ReturnType<typeof vi.fn>;
-    config: object;
+    config: { danglingEdges?: { enabled: boolean; shouldKeepOnDrop?: ReturnType<typeof vi.fn> } };
     actionStateManager: {
       linking: LinkingActionState | null;
       clearLinking: ReturnType<typeof vi.fn>;
@@ -37,8 +38,11 @@ describe('finishLinkingToPosition', () => {
 
     mockFlowCore = {
       getState: vi.fn(),
+      // A drop to a position keeps a dangling edge, so the feature is on and
+      // the source node is visible unless a test says otherwise.
+      getNodeById: vi.fn().mockReturnValue({ id: 'source-node', position: { x: 0, y: 0 }, data: {} }),
       applyUpdate: vi.fn().mockResolvedValue(undefined),
-      config: {},
+      config: { danglingEdges: { enabled: true } },
       actionStateManager: {
         linking: null,
         clearLinking: vi.fn(),
@@ -267,6 +271,81 @@ describe('finishLinkingToPosition', () => {
     ).rejects.toThrow('pass failed');
 
     expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
+  it('should claim the teardown so a racing cancel no-ops', async () => {
+    const linking: InternalLinkingActionState = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockFlowCore.actionStateManager.linking = linking;
+    mockCreateFinalEdge.mockReturnValue({ id: 'final-edge', source: 'source-node', target: '', data: {} });
+
+    await finishLinkingToPosition(mockCommandHandler, { name: 'finishLinkingToPosition', position: { x: 1, y: 2 } });
+
+    // clearLinkingForGesture replaces the manager's slot, not this object.
+    expect(linking._finishing).toBe(true);
+  });
+
+  it('should cancel with noTarget when dangling edges are off', async () => {
+    mockFlowCore.config.danglingEdges = { enabled: false };
+    const linking: InternalLinkingActionState = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockFlowCore.actionStateManager.linking = linking;
+
+    await finishLinkingToPosition(mockCommandHandler, { name: 'finishLinkingToPosition', position: { x: 1, y: 2 } });
+
+    expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishLinking');
+    expect(mockFlowCore.applyUpdate).not.toHaveBeenCalledWith(
+      expect.objectContaining({ edgesToAdd: expect.anything() }),
+      'finishLinking'
+    );
+    expect(linking.cancelReason).toBe('noTarget');
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
+  it('should cancel with noTarget when shouldKeepOnDrop declines the edge', async () => {
+    const shouldKeepOnDrop = vi.fn().mockReturnValue(false);
+    mockFlowCore.config.danglingEdges = { enabled: true, shouldKeepOnDrop };
+    const linking: InternalLinkingActionState = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockFlowCore.actionStateManager.linking = linking;
+    mockCreateFinalEdge.mockReturnValue({ id: 'final-edge', source: 'source-node', target: '', data: {} });
+
+    await finishLinkingToPosition(mockCommandHandler, { name: 'finishLinkingToPosition', position: { x: 1, y: 2 } });
+
+    expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishLinking');
+    expect(mockFlowCore.applyUpdate).not.toHaveBeenCalledWith(
+      expect.objectContaining({ edgesToAdd: expect.anything() }),
+      'finishLinking'
+    );
+    expect(linking.cancelReason).toBe('noTarget');
+    expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+  });
+
+  it('should pass the built final edge and the drop position to shouldKeepOnDrop', async () => {
+    const shouldKeepOnDrop = vi.fn().mockReturnValue(true);
+    mockFlowCore.config.danglingEdges = { enabled: true, shouldKeepOnDrop };
+    const finalEdge = { id: 'final-edge', source: 'source-node', target: '', data: {} };
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockCreateFinalEdge.mockReturnValue(finalEdge);
+
+    await finishLinkingToPosition(mockCommandHandler, { name: 'finishLinkingToPosition', position: { x: 7, y: 8 } });
+
+    // The callback decides on the edge that would actually be committed.
+    expect(shouldKeepOnDrop).toHaveBeenCalledWith(finalEdge, { x: 7, y: 8 });
+    expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({ edgesToAdd: [finalEdge] }, 'finishLinking');
   });
 
   it('should not clear a different gesture that replaced the state while the update was in flight', async () => {

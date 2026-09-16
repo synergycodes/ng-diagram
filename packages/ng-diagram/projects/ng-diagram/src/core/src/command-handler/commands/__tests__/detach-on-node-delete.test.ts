@@ -260,6 +260,120 @@ describe('partitionIncidentEdges', () => {
       ]);
     });
 
+    it('should ask the callback once per lost end', () => {
+      const shouldDetachOnNodeDelete = vi.fn((_edge: Edge, _node: Node, end: string) => end !== 'source');
+      mockFlowCore.config.danglingEdges!.shouldDetachOnNodeDelete = shouldDetachOnNodeDelete;
+
+      const result = partitionIncidentEdges(flowCore(), [incidentEdge], new Set(['node-a', 'node-b']));
+
+      // Both ends are reported even though the first answer already decides.
+      expect(shouldDetachOnNodeDelete).toHaveBeenCalledTimes(2);
+      expect(shouldDetachOnNodeDelete).toHaveBeenCalledWith(incidentEdge, nodeWithPort, 'source');
+      expect(shouldDetachOnNodeDelete).toHaveBeenCalledWith(incidentEdge, nodeWithoutPorts, 'target');
+      expect(result.edgesToRemove).toEqual(['edge-ab']);
+      expect(result.edgesToUpdate).toEqual([]);
+    });
+
+    describe('manual routing points', () => {
+      // A second ported node so both detach anchors differ from every stored
+      // point: port-b flow position = (500 + 90 + 10, 600 + 45 + 5).
+      const nodeWithPortB: Node = {
+        ...mockNode,
+        id: 'node-b',
+        position: { x: 500, y: 600 },
+        size: { width: 80, height: 40 },
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-b',
+            type: 'target',
+            side: 'right',
+            position: { x: 90, y: 45 },
+            size: { width: 10, height: 10 },
+            nodeId: 'node-b',
+          },
+        ],
+      };
+      const portBAnchor = { x: 600, y: 650 };
+
+      const manualEdge: Edge = {
+        ...mockEdge,
+        id: 'edge-manual',
+        source: 'node-a',
+        sourcePort: 'port-a',
+        target: 'node-b',
+        targetPort: 'port-b',
+        routingMode: 'manual',
+        points: [
+          { x: 10, y: 20 },
+          { x: 60, y: 70 },
+          { x: 110, y: 120 },
+        ],
+      };
+
+      beforeEach(() => {
+        mockFlowCore.getNodeById.mockImplementation((id: string) =>
+          id === 'node-a' ? nodeWithPort : id === 'node-b' ? nodeWithPortB : undefined
+        );
+      });
+
+      it('should move the last manual point onto the anchor of a lost target end', () => {
+        const result = partitionIncidentEdges(flowCore(), [manualEdge], new Set(['node-b']));
+
+        expect(result.edgesToUpdate).toEqual([
+          {
+            id: 'edge-manual',
+            target: '',
+            targetPort: undefined,
+            targetPosition: portBAnchor,
+            points: [{ x: 10, y: 20 }, { x: 60, y: 70 }, portBAnchor],
+          },
+        ]);
+      });
+
+      it('should move the first manual point onto the anchor of a lost source end', () => {
+        const result = partitionIncidentEdges(flowCore(), [manualEdge], new Set(['node-a']));
+
+        expect(result.edgesToUpdate).toEqual([
+          {
+            id: 'edge-manual',
+            source: '',
+            sourcePort: undefined,
+            sourcePosition: portAnchor,
+            points: [portAnchor, { x: 60, y: 70 }, { x: 110, y: 120 }],
+          },
+        ]);
+      });
+
+      it('should move both manual end points when the edge loses both ends', () => {
+        mockFlowCore.config.danglingEdges!.shouldDetachOnNodeDelete = vi.fn().mockReturnValue(true);
+
+        const result = partitionIncidentEdges(flowCore(), [manualEdge], new Set(['node-a', 'node-b']));
+
+        expect(result.edgesToUpdate).toEqual([
+          {
+            id: 'edge-manual',
+            source: '',
+            sourcePort: undefined,
+            sourcePosition: portAnchor,
+            target: '',
+            targetPort: undefined,
+            targetPosition: portBAnchor,
+            points: [portAnchor, { x: 60, y: 70 }, portBAnchor],
+          },
+        ]);
+      });
+
+      it('should not touch the points of an auto-routed edge', () => {
+        const autoEdge: Edge = { ...manualEdge, routingMode: 'auto' };
+
+        const result = partitionIncidentEdges(flowCore(), [autoEdge], new Set(['node-b']));
+
+        expect(result.edgesToUpdate).toHaveLength(1);
+        expect(result.edgesToUpdate[0]).not.toHaveProperty('points');
+      });
+    });
+
     it('should leave non-incident edges untouched', () => {
       const result = partitionIncidentEdges(flowCore(), [incidentEdge, nonIncidentEdge], new Set(['node-a']));
 

@@ -171,27 +171,31 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
 
   /**
    * Collects the free (unconnected) endpoints of all committed edges — a dual
-   * dangling edge yields two entries.
+   * dangling edge yields two entries. Temporary and effectively hidden edges
+   * are skipped.
    * @returns Dangling endpoints with their edge, end and anchor position.
    * @since 1.4.0
    */
   getDanglingEndpoints(): DanglingEndpoint[] {
-    // The model lookup caches the dangling-edge list — O(dangling), not O(edges).
+    // The model lookup rebuilds its dangling-edge list lazily after a state
+    // change with one pass over all edges, then serves it from cache until the
+    // next change; this walks only the dangling subset.
     return getDanglingEndpoints(this.flowCore.modelLookup.danglingEdges);
   }
 
   /**
    * Gets the free edge endpoint nearest to a point within a range — the
-   * dangling-edges sibling of {@link getNearestPortInRange}.
+   * dangling-edges sibling of {@link getNearestPortInRange}. Temporary and
+   * effectively hidden edges are skipped.
    * @param point Point to check from.
    * @param range Range to check in.
    * @returns Nearest dangling endpoint in range or null.
    * @since 1.4.0
    */
   getNearestDanglingEndpointInRange(point: Point, range: number): DanglingEndpoint | null {
-    // The model lookup caches the dangling-edge list, so calling this per
-    // pointermove costs O(dangling) like getNearestPortInRange's spatial hash
-    // profile — not a scan over every edge.
+    // The model lookup rebuilds its dangling-edge list lazily after a state
+    // change with one pass over all edges, then serves it from cache until the
+    // next change; each call walks only the dangling subset.
     return getNearestDanglingEndpointInRange(this.flowCore.modelLookup.danglingEdges, point, range);
   }
 

@@ -1,6 +1,6 @@
 import type { FlowCore } from '../../flow-core';
 import type { Edge, EdgeEnd } from '../../types';
-import { computeDetachAnchor } from '../../utils';
+import { alignManualPointsPatch, computeDetachAnchor } from '../../utils';
 
 /**
  * How the edges incident to a set of deleted nodes are handled: removed along
@@ -8,7 +8,7 @@ import { computeDetachAnchor } from '../../utils';
  */
 export interface IncidentEdgesPartition {
   edgesToRemove: string[];
-  edgesToUpdate: (Partial<Edge> & { id: Edge['id'] })[];
+  edgesToUpdate: (Partial<Edge> & { id: string })[];
 }
 
 /**
@@ -41,7 +41,7 @@ export const partitionIncidentEdges = (
   const detachEnabled = !!danglingEdges?.enabled && !!danglingEdges.detachOnNodeDelete;
 
   const edgesToRemove: string[] = [];
-  const edgesToUpdate: (Partial<Edge> & { id: Edge['id'] })[] = [];
+  const edgesToUpdate: (Partial<Edge> & { id: string })[] = [];
 
   const mayDetach = (edge: Edge, end: EdgeEnd, nodeId: string): boolean => {
     const node = flowCore.getNodeById(nodeId);
@@ -67,19 +67,22 @@ export const partitionIncidentEdges = (
     // dangling explicitly through the callback.
     const dualWithoutOptIn = sourceLost && targetLost && !danglingEdges?.shouldDetachOnNodeDelete;
 
-    if (
-      !detachEnabled ||
-      explicitlyDeletedEdgeIds?.has(edge.id) ||
-      edge.computedHidden ||
-      dualWithoutOptIn ||
-      (sourceLost && !mayDetach(edge, 'source', edge.source)) ||
-      (targetLost && !mayDetach(edge, 'target', edge.target))
-    ) {
+    if (!detachEnabled || explicitlyDeletedEdgeIds?.has(edge.id) || edge.computedHidden || dualWithoutOptIn) {
       edgesToRemove.push(edge.id);
       continue;
     }
 
-    const update: Partial<Edge> & { id: Edge['id'] } = { id: edge.id };
+    // Both decisions are computed eagerly: the callback sees every end this
+    // edge loses, so an app can count or log them per end without a
+    // short-circuit hiding the second call.
+    const sourceOk = !sourceLost || mayDetach(edge, 'source', edge.source);
+    const targetOk = !targetLost || mayDetach(edge, 'target', edge.target);
+    if (!sourceOk || !targetOk) {
+      edgesToRemove.push(edge.id);
+      continue;
+    }
+
+    const update: Partial<Edge> & { id: string } = { id: edge.id };
     if (sourceLost) {
       const anchor = computeDetachAnchor(edge, 'source', flowCore.getNodeById(edge.source));
       if (!anchor) {
@@ -89,6 +92,7 @@ export const partitionIncidentEdges = (
       update.source = '';
       update.sourcePort = undefined;
       update.sourcePosition = anchor;
+      Object.assign(update, alignManualPointsPatch(edge, 'source', anchor));
     }
     if (targetLost) {
       const anchor = computeDetachAnchor(edge, 'target', flowCore.getNodeById(edge.target));
@@ -99,6 +103,8 @@ export const partitionIncidentEdges = (
       update.target = '';
       update.targetPort = undefined;
       update.targetPosition = anchor;
+      // Built on the patch above so an edge losing both ends keeps points[0].
+      Object.assign(update, alignManualPointsPatch({ ...edge, ...update }, 'target', anchor));
     }
     edgesToUpdate.push(update);
   }

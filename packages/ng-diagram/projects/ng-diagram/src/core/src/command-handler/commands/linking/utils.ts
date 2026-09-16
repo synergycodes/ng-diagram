@@ -71,8 +71,12 @@ export const validateConnection = (
     ? (targetNode?.measuredPorts?.find((port) => port.id === targetPortId) ?? null)
     : null;
 
-  // Dragging temporary edge case without snapping to target port
-  if (!isFinishLinking && sourcePort && !targetPort) {
+  // A preview pass has nothing to validate while the dragged end has not
+  // snapped to a port; a source-end relink drags the source, so the roles of
+  // the fixed and the dragged port are swapped.
+  const draggedEnd: EdgeEnd = context?.reason === 'relink' ? (context.end ?? 'target') : 'target';
+  const draggedEndUnsnapped = draggedEnd === 'target' ? sourcePort && !targetPort : targetPort && !sourcePort;
+  if (!isFinishLinking && draggedEndUnsnapped) {
     return true;
   }
 
@@ -98,7 +102,9 @@ export const relinkPreviewBase = (edge: Edge): Partial<Edge> => ({
   routing: edge.routing,
   sourceArrowhead: edge.sourceArrowhead,
   targetArrowhead: edge.targetArrowhead,
-  // Labels stay visible on the preview while the endpoint is dragged.
+  // Labels are carried over so they stay visible while the endpoint is
+  // dragged; the routing middleware repositions them along the preview path
+  // on every pass.
   measuredLabels: edge.measuredLabels,
 });
 

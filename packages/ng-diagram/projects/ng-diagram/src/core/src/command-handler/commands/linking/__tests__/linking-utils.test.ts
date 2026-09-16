@@ -153,6 +153,50 @@ describe('linking utils', () => {
       };
     });
 
+    it('should skip the validator while drawing before the dragged end snaps to a port', () => {
+      const result = validateConnection(core as unknown as FlowCore, 'node-c', 'in-c', 'node-c', undefined, false);
+
+      expect(result).toBe(true);
+      expect(core.config.linking.validateConnection).not.toHaveBeenCalled();
+    });
+
+    it('should validate a source-end relink preview whose dragged source snapped to a port', () => {
+      // Relinking the source swaps the roles: the dragged end is the source,
+      // so a port-less fixed target must not skip the validator.
+      core.config.linking.validateConnection.mockReturnValue(false);
+      const context = { reason: 'relink' as const, edge: mockEdge, end: 'source' as const };
+
+      const result = validateConnection(
+        core as unknown as FlowCore,
+        'node-c',
+        'in-c',
+        'node-b',
+        undefined,
+        false,
+        context
+      );
+
+      expect(result).toBe(false);
+      expect(core.config.linking.validateConnection).toHaveBeenCalled();
+    });
+
+    it('should skip the validator on a source-end relink preview before the dragged source snaps', () => {
+      const context = { reason: 'relink' as const, edge: mockEdge, end: 'source' as const };
+
+      const result = validateConnection(
+        core as unknown as FlowCore,
+        'node-a',
+        undefined,
+        'node-c',
+        'in-c',
+        false,
+        context
+      );
+
+      expect(result).toBe(true);
+      expect(core.config.linking.validateConnection).not.toHaveBeenCalled();
+    });
+
     it('should pass the given context through to the config validator', () => {
       const context = { reason: 'relink' as const, edge: mockEdge, end: 'target' as const };
 

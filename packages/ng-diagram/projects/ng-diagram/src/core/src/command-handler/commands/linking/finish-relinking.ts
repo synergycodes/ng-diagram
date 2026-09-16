@@ -55,10 +55,12 @@ export const finishRelinking = async (commandHandler: CommandHandler, command: F
     }
 
     // Hit-test the drop position itself rather than trusting the preview:
-    // moveTemporaryEdge un-snaps candidates the validator rejects, so the
-    // preview can't distinguish "no port under the cursor" from "port the
-    // validator refused" — and the latter must report invalidConnection.
+    // moveTemporaryEdge un-snaps candidates it rejects, so the preview can't
+    // distinguish "no port under the cursor" from "port that cannot take this
+    // end". The raw hit classifies the drop: no port at all is an empty-canvas
+    // drop, a port the end cannot take is a refused connection.
     const dropPortInfo = getTargetPortInfo(commandHandler, dropPosition, temporaryEdge, end);
+    const { hitPort } = dropPortInfo;
     const candidateNodeId = dropPortInfo.targetNodeId || undefined;
     const candidatePortId = dropPortInfo.targetPortId || undefined;
 
@@ -67,7 +69,7 @@ export const finishRelinking = async (commandHandler: CommandHandler, command: F
     // edgeRelinkStarted is kept through the cancelled revert pass).
     const originalNodeId = (end === 'source' ? edge.source : edge.target) || undefined;
     const originalPortId = (end === 'source' ? edge.sourcePort : edge.targetPort) || undefined;
-    if (candidateNodeId && candidateNodeId === originalNodeId && candidatePortId === originalPortId) {
+    if (hitPort && hitPort.nodeId === originalNodeId && hitPort.id === originalPortId) {
       await runRevertPass('cancelled');
       return;
     }
@@ -80,13 +82,13 @@ export const finishRelinking = async (commandHandler: CommandHandler, command: F
       return;
     }
 
-    if (!candidateNodeId) {
+    if (!hitPort) {
       // Dropped on empty canvas — detach the endpoint when dangling edges are
       // enabled and the per-edge callback keeps the detached edge. This is not
       // a connection, so the connection validator is not consulted.
       const { danglingEdges } = flowCore.config;
       if (danglingEdges?.enabled) {
-        const detachUpdate: Partial<Edge> & { id: Edge['id'] } =
+        const detachUpdate: Partial<Edge> & { id: string } =
           end === 'target'
             ? { id: edgeId, target: '', targetPort: undefined, targetPosition: dropPosition }
             : { id: edgeId, source: '', sourcePort: undefined, sourcePosition: dropPosition };
@@ -103,9 +105,17 @@ export const finishRelinking = async (commandHandler: CommandHandler, command: F
       return;
     }
 
-    // Structural checks on the candidate end, mirroring finishLinking's
-    // validateTarget: hidden nodes, hidden ports, wrong-direction ports and
-    // ports that no longer exist are not valid drop targets.
+    // A port that cannot take this end — wrong direction, or the fixed end's
+    // own node/port — is a refused connection, not a detach: the edge reverts
+    // and the app validator is never consulted.
+    if (!candidateNodeId) {
+      await runRevertPass('invalidConnection');
+      return;
+    }
+
+    // The shared structural gate with attachEdge: the node must exist, be
+    // visible, and the port must be present, right-directed and not
+    // template-hidden. The gesture hit-test already guarantees most of it.
     if (!isValidEndpointTarget(flowCore, end, candidateNodeId, candidatePortId)) {
       await runRevertPass('invalidConnection');
       return;
@@ -126,7 +136,7 @@ export const finishRelinking = async (commandHandler: CommandHandler, command: F
       return;
     }
 
-    const reconnectUpdate: Partial<Edge> & { id: Edge['id'] } =
+    const reconnectUpdate: Partial<Edge> & { id: string } =
       end === 'target'
         ? { id: edgeId, target: candidateNodeId, targetPort: candidatePortId, targetPosition: undefined }
         : { id: edgeId, source: candidateNodeId, sourcePort: candidatePortId, sourcePosition: undefined };

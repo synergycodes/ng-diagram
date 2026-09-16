@@ -283,6 +283,67 @@ describe('finishRelinking', () => {
   });
 
   describe('validation', () => {
+    it('should revert a target-end drop on a source-typed port instead of detaching it', async () => {
+      // A port that cannot take the dragged end is a refused connection: the
+      // dangling-edges feature must not turn it into a detach.
+      mockFlowCore.config.danglingEdges.enabled = true;
+      mockFlowCore.getNearestPortInRange.mockReturnValue(hitPort('out-c', 'node-c', 'source'));
+      const linking = setLinking('target', { source: 'node-a', sourcePort: 'out' });
+
+      await finishRelinking(mockCommandHandler, { name: 'finishRelinking', position: { x: 0, y: 0 } });
+
+      expect(linking.relinkCancelReason).toBe('invalidConnection');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishRelinking');
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalledWith(
+        expect.objectContaining({ edgesToUpdate: expect.anything() }),
+        'finishRelinking'
+      );
+      expect(mockFlowCore.config.linking.validateConnection).not.toHaveBeenCalled();
+    });
+
+    it('should revert a source-end drop on a target-typed port instead of detaching it', async () => {
+      mockFlowCore.config.danglingEdges.enabled = true;
+      mockFlowCore.getNearestPortInRange.mockReturnValue(hitPort('in-c', 'node-c', 'target'));
+      const linking = setLinking('source', { target: 'node-b', targetPort: 'in' });
+
+      await finishRelinking(mockCommandHandler, { name: 'finishRelinking', position: { x: 0, y: 0 } });
+
+      expect(linking.relinkCancelReason).toBe('invalidConnection');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishRelinking');
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalledWith(
+        expect.objectContaining({ edgesToUpdate: expect.anything() }),
+        'finishRelinking'
+      );
+      expect(mockFlowCore.config.linking.validateConnection).not.toHaveBeenCalled();
+    });
+
+    it('should revert a target-end drop on the fixed source node when the edge has no source port', async () => {
+      // With no source port the fixed end is the whole node, so any port of it
+      // is rejected as the target end — a detach would silently change the edge.
+      const sourceNodeWithInput: Node = {
+        ...sourceNode,
+        measuredPorts: [
+          ...sourceNode.measuredPorts!,
+          { ...mockPort, id: 'in-a', type: 'target', side: 'left', nodeId: 'node-a' },
+        ],
+      };
+      mockFlowCore.config.danglingEdges.enabled = true;
+      mockFlowCore.getEdgeById.mockReturnValue({ ...originalEdge, sourcePort: undefined });
+      mockFlowCore.getNodeById.mockImplementation((id: string) => (id === 'node-a' ? sourceNodeWithInput : nodes[id]));
+      mockFlowCore.getNearestPortInRange.mockReturnValue(hitPort('in-a', 'node-a', 'target'));
+      const linking = setLinking('target', { source: 'node-a', sourcePort: '' });
+
+      await finishRelinking(mockCommandHandler, { name: 'finishRelinking', position: { x: 0, y: 0 } });
+
+      expect(linking.relinkCancelReason).toBe('invalidConnection');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishRelinking');
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalledWith(
+        expect.objectContaining({ edgesToUpdate: expect.anything() }),
+        'finishRelinking'
+      );
+      expect(mockFlowCore.config.linking.validateConnection).not.toHaveBeenCalled();
+    });
+
     it('should pass reason relink and the endpoints in their proper roles (target end)', async () => {
       mockFlowCore.getNearestPortInRange.mockReturnValue(hitPort('in-c', 'node-c', 'target'));
       setLinking('target', { source: 'node-a', sourcePort: 'out' });

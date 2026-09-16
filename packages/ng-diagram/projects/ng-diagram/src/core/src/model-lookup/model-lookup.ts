@@ -104,10 +104,10 @@ export class ModelLookup {
   }
 
   /**
-   * Committed edges with at least one free (unconnected) endpoint, rebuilt
-   * lazily after model changes like {@link connectedEdgesMap}. Keeps the
-   * per-frame consumers (virtualization, endpoint-snap queries) O(dangling)
-   * instead of O(all edges).
+   * Committed edges with at least one free (unconnected) endpoint. Rebuilt
+   * lazily after a state change with one pass over all edges (the same profile
+   * as {@link connectedEdgesMap}), then served from cache until the next
+   * change, so consumers iterate only the dangling subset.
    * @returns Dangling edges array
    */
   get danglingEdges(): Edge[] {

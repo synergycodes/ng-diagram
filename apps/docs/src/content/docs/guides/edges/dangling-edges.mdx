@@ -52,7 +52,7 @@ const config: NgDiagramConfig = {
 
 ## Keeping Edges Dropped on Empty Canvas
 
-With `enabled: true`, every edge draw released on empty canvas is kept as a dangling edge, anchored where the pointer was released. To decide per edge, provide [`shouldKeepOnDrop`](/docs/api/types/configuration/features/danglingedgesconfig/#shouldkeepondrop):
+With `enabled: true`, every edge draw released on empty canvas is kept as a dangling edge, anchored where the pointer was released. A drop over a port the edge cannot connect to (for example a wrong-direction port) is not a drop on empty canvas — the draw is discarded. To decide per edge, provide [`shouldKeepOnDrop`](/docs/api/types/configuration/features/danglingedgesconfig/#shouldkeepondrop):
 
 ```typescript
 const config: NgDiagramConfig = {

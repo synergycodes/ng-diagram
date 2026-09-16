@@ -200,12 +200,11 @@ const createPastedEdges = (
       continue;
     }
 
-    // A manual-routing edge keeps its stored points verbatim, so an edge with
-    // a free pasted end must have its whole path shifted along with the free
-    // endpoint — otherwise the drawn path stays at the original location.
-    const hasFreePastedEnd = !source.nodeId || !target.nodeId;
+    // A manual-routing edge keeps its stored points verbatim, and every end
+    // that survives resolvePastedEnd moves by exactly `offset`, so the whole
+    // stored path moves with it. Auto-routed edges re-route from their new ends.
     const points =
-      edge.routingMode === 'manual' && edge.points && hasFreePastedEnd
+      edge.routingMode === 'manual' && edge.points
         ? edge.points.map((point) => ({ x: point.x + offset.x, y: point.y + offset.y }))
         : edge.points;
 

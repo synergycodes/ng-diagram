@@ -23,7 +23,7 @@ export const runCancelledFinishPass = async (commandHandler: CommandHandler): Pr
  * callback runs so `shouldKeepOnDrop` sees what would actually be committed
  * (after `finalEdgeDataBuilder`).
  */
-const buildKeptDanglingEdge = (
+export const buildKeptDanglingEdge = (
   commandHandler: CommandHandler,
   temporaryEdge: Edge,
   dropPosition: Point
@@ -124,7 +124,17 @@ export const finishLinking = async (commandHandler: CommandHandler, command: Fin
     const targetPortId = targetPort || undefined;
 
     if (!targetNodeId) {
-      const keptEdge = buildKeptDanglingEdge(commandHandler, temporaryEdge, linking.dropPosition);
+      const { config } = commandHandler.flowCore;
+      // A drop over a port the preview refused (wrong direction, or the source's
+      // own port) is not an empty-canvas drop: no dangling edge is kept and the
+      // draw cancels with 'noTarget' exactly as with the feature off.
+      const droppedOnPort =
+        !!config.danglingEdges?.enabled &&
+        !!commandHandler.flowCore.getNearestPortInRange(linking.dropPosition, config.linking.portSnapDistance);
+
+      const keptEdge = droppedOnPort
+        ? null
+        : buildKeptDanglingEdge(commandHandler, temporaryEdge, linking.dropPosition);
       if (keptEdge) {
         await commandHandler.flowCore.applyUpdate({ edgesToAdd: [keptEdge] }, 'finishLinking');
         return;

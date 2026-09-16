@@ -1215,6 +1215,51 @@ describe('Copy-Paste Commands', () => {
       ]);
     });
 
+    it('should offset the points of a manual-routing edge pasted with both of its nodes', async () => {
+      const originalPoints = [
+        { x: 10, y: 10 },
+        { x: 30, y: 40 },
+        { x: 60, y: 60 },
+      ];
+      commandHandler.flowCore.getState = () => ({
+        nodes: [
+          { ...mockNode, id: 'node1', position: { x: 0, y: 0 }, selected: true },
+          { ...mockNode, id: 'node2', position: { x: 50, y: 50 }, selected: true },
+        ],
+        edges: [
+          {
+            ...mockEdge,
+            id: 'edge1',
+            source: 'node1',
+            target: 'node2',
+            routingMode: 'manual' as const,
+            points: originalPoints,
+            selected: true,
+          },
+        ],
+        metadata: mockMetadata,
+      });
+
+      await copy(commandHandler);
+      await paste(commandHandler, { name: 'paste' });
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      const pastedEdge = update.edgesToAdd[0];
+      // Both ends move by the default (20, 20) paste offset, so the stored
+      // path moves with them.
+      expect(pastedEdge.points).toEqual([
+        { x: 30, y: 30 },
+        { x: 50, y: 60 },
+        { x: 80, y: 80 },
+      ]);
+      expect(pastedEdge.source).toBe(update.nodesToAdd[0].id);
+      expect(pastedEdge.target).toBe(update.nodesToAdd[1].id);
+      expect(pastedEdge.sourcePosition).toBeUndefined();
+      expect(pastedEdge.targetPosition).toBeUndefined();
+    });
+
     it('should not offset the points of fully-connected pasted edges', async () => {
       const originalPoints = [
         { x: 5, y: 5 },

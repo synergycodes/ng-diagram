@@ -94,6 +94,12 @@ describe('dangling-edges utils', () => {
       expect(getDanglingEndpoints([temporaryEdge])).toEqual([]);
     });
 
+    it('should skip effectively hidden edges', () => {
+      const hidden: Edge = { ...targetDanglingEdge, id: 'hidden', computedHidden: true };
+
+      expect(getDanglingEndpoints([hidden])).toEqual([]);
+    });
+
     it('should skip free endpoints without a stored position', () => {
       const positionless: Edge = { ...mockEdge, id: 'positionless', source: '', target: 'node-b' };
 
@@ -122,6 +128,14 @@ describe('dangling-edges utils', () => {
       );
 
       expect(nearest).toBeNull();
+    });
+
+    it('should not pick an effectively hidden edge even when it is the nearest', () => {
+      const hidden: Edge = { ...sourceDanglingEdge, id: 'hidden', computedHidden: true };
+
+      const nearest = getNearestDanglingEndpointInRange([hidden, targetDanglingEdge], { x: 10, y: 20 }, 1000);
+
+      expect(nearest).toEqual({ edge: targetDanglingEdge, end: 'target', position: { x: 100, y: 200 } });
     });
 
     it('should return null for connected edges only', () => {

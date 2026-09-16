@@ -10,7 +10,7 @@ title: "getNearestDanglingEndpointInRange"
 
 Finds the free edge endpoint nearest to `point` within `range`, or null when
 none is close enough. Sibling of `getNearestPortInRange` for snapping to
-dangling ends.
+dangling ends. Temporary and effectively hidden edges are skipped.
 
 ## Parameters
 

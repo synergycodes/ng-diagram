@@ -45,6 +45,21 @@ function relinkEnded(diagram: Diagram): Promise<unknown[]> {
   return diagram.page.evaluate(() => (window as unknown as Record<string, unknown>).__relinkEnded as unknown[]);
 }
 
+/** Record every edgeDrawEnded payload on the page for later assertions. */
+async function recordDrawEnded(diagram: Diagram): Promise<void> {
+  await diagram.page.evaluate(() => {
+    const events: unknown[] = [];
+    (window as unknown as Record<string, unknown>).__drawEnded = events;
+    window.__diagram!.diagram.addEventListener('edgeDrawEnded', (event) => {
+      events.push({ success: event.success, reason: event.reason ?? null });
+    });
+  });
+}
+
+function drawEnded(diagram: Diagram): Promise<unknown[]> {
+  return diagram.page.evaluate(() => (window as unknown as Record<string, unknown>).__drawEnded as unknown[]);
+}
+
 /** Drag from a port onto empty canvas and release. */
 async function dragFromPortToCanvas(diagram: Diagram, node: string, port: string): Promise<{ x: number; y: number }> {
   const from = await diagram.centerOf(diagram.port(node, port), `port ${node}/${port}`);
@@ -80,6 +95,23 @@ test.describe('dangling edges', () => {
     expect(edge.points!.at(-1)).toEqual(dropFlow);
     // Styling hook for dangling edges.
     await expect(diagram.edge(edge.id)).toHaveClass(/ng-diagram-edge--dangling/);
+  });
+
+  test('link drop on a port the edge cannot connect to keeps no dangling edge', async ({ diagram }) => {
+    await diagram.load({ model: pair, config: { danglingEdges: { enabled: true } } });
+    await recordDrawEnded(diagram);
+
+    // The draw's own source port can never become its target, so the preview
+    // never snaps back to it — the release over it is a refused connection,
+    // not a drop on empty canvas.
+    const from = await diagram.centerOf(diagram.port('node-a', 'port-right'), 'port node-a/port-right');
+    await diagram.beginDrag(from, { x: from.x + 200, y: from.y + 140 });
+    await diagram.page.mouse.move(from.x, from.y, { steps: 4 });
+    await diagram.page.mouse.up();
+
+    await expect.poll(() => drawEnded(diagram)).toEqual([{ success: false, reason: 'noTarget' }]);
+    expect(await diagram.model.edges()).toEqual([]);
+    await expect(diagram.allEdges).toHaveCount(0);
   });
 
   test('deleting a node deletes its edges by default', async ({ diagram }) => {
@@ -264,6 +296,42 @@ test.describe('edge relinking', () => {
     const dropFlow = await diagram.viewport.clientToFlowPosition(drop);
     expect(edge?.targetPosition).toEqual(dropFlow);
     expect(edge?.source).toBe('node-a');
+  });
+
+  test('dropping an endpoint on a port that cannot take it reverts with invalidConnection', async ({ diagram }) => {
+    await diagram.load({
+      model: trio,
+      config: { ...relinkOn, danglingEdges: { enabled: true } },
+    });
+    await recordRelinkEnded(diagram);
+    await diagram.selection.select([], ['edge-ab']);
+
+    const handle = await diagram.centerOf(
+      diagram.edge('edge-ab').locator('[data-relink-handle="target"]'),
+      'target handle of edge-ab'
+    );
+    // node-a is the edge's own source, so none of its ports can become the
+    // target end — a refused connection, not a drop on empty canvas.
+    const dst = await diagram.centerOf(diagram.port('node-a', 'port-left'), 'port node-a/port-left');
+    await diagram.beginDrag(handle, dst);
+    await diagram.page.mouse.up();
+
+    await expect
+      .poll(() => relinkEnded(diagram))
+      .toEqual([
+        {
+          edge: 'edge-ab',
+          end: 'target',
+          success: false,
+          reason: 'invalidConnection',
+          previousNode: 'node-b',
+          target: null,
+          targetPort: null,
+        },
+      ]);
+    const edge = await diagram.model.getEdgeById('edge-ab');
+    expect(edge).toMatchObject({ source: 'node-a', target: 'node-b' });
+    expect(edge?.target).not.toBe('');
   });
 
   test('relinking the source endpoint works too', async ({ diagram }) => {

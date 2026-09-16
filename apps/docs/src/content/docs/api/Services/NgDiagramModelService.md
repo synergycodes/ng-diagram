@@ -420,7 +420,8 @@ Array of nodes connected to the given node
 > **getDanglingEndpoints**(): [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)[]
 
 Collects the free (unconnected) endpoints of all committed edges — a dual
-dangling edge yields two entries.
+dangling edge yields two entries. Temporary and effectively hidden edges
+are skipped.
 
 #### Returns
 
@@ -482,7 +483,8 @@ Returns null if flowCore is not initialized.
 > **getNearestDanglingEndpointInRange**(`point`, `range`): `null` \| [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)
 
 Gets the free edge endpoint nearest to a point within a range — the
-dangling-edges sibling of [getNearestPortInRange](/docs/api/services/ngdiagrammodelservice/#getnearestportinrange).
+dangling-edges sibling of [getNearestPortInRange](/docs/api/services/ngdiagrammodelservice/#getnearestportinrange). Temporary and
+effectively hidden edges are skipped.
 
 #### Parameters
 

@@ -48,6 +48,10 @@ Master switch for dangling edges. When true, an edge draw that ends on
 empty canvas keeps the edge as a dangling edge instead of discarding it,
 and an edge relink dropped on empty canvas detaches that endpoint.
 
+A drop over a port the edge cannot connect to (for example a
+wrong-direction port) is not an empty-canvas drop and is discarded as
+before.
+
 #### Default
 
 ```ts

@@ -1,4 +1,4 @@
-import type { CommandHandler, Edge, EdgeEnd, Point } from '../../../types';
+import type { CommandHandler, Edge, EdgeEnd, Point, Port } from '../../../types';
 import type { LinkingRelinkContext } from '../../../types/action-state.interface';
 import {
   connectionContextForGesture,
@@ -18,12 +18,16 @@ interface TargetPortInfo {
   targetNodeId: string;
   targetPortId: string;
   isValid: boolean;
+  /** The raw hit-test result, before the properness filter — null when the position is over no port at all. */
+  hitPort: Port | null;
 }
 
 /**
  * Finds the port the dragged end of the temporary edge would snap to at
  * `position`. For a normal draw (and a target-end relink) the candidate must
  * be target-capable; while relinking the source end it must be source-capable.
+ * `hitPort` reports what the position is over regardless of properness, so
+ * callers can tell "no port here" from "port this end cannot take".
  */
 export const getTargetPortInfo = (
   commandHandler: CommandHandler,
@@ -45,6 +49,7 @@ export const getTargetPortInfo = (
     targetNodeId: isProperCandidate ? candidatePort.nodeId : '',
     targetPortId: isProperCandidate ? candidatePort.id : '',
     isValid: !!isProperCandidate,
+    hitPort: candidatePort ?? null,
   };
 };
 

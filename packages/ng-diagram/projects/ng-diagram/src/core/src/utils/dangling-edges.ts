@@ -53,7 +53,8 @@ export const isDanglingEdge = (edge: Edge): boolean => hasFreeEndpoint(edge);
 /**
  * Collects the free endpoints of the given edges. A dual dangling edge yields
  * two entries. Endpoints whose anchor position is missing are skipped —
- * they cannot be rendered or snapped to.
+ * they cannot be rendered or snapped to. Temporary and effectively hidden
+ * edges are skipped.
  *
  * @public
  * @since 1.4.0
@@ -62,7 +63,7 @@ export const isDanglingEdge = (edge: Edge): boolean => hasFreeEndpoint(edge);
 export const getDanglingEndpoints = (edges: readonly Edge[]): DanglingEndpoint[] => {
   const endpoints: DanglingEndpoint[] = [];
   for (const edge of edges) {
-    if (edge.temporary) {
+    if (edge.temporary || edge.computedHidden) {
       continue;
     }
     if (!edge.source && edge.sourcePosition) {
@@ -127,7 +128,7 @@ export const alignManualPointsPatch = (edge: Edge, end: EdgeEnd, anchor: Point):
 /**
  * Finds the free edge endpoint nearest to `point` within `range`, or null when
  * none is close enough. Sibling of `getNearestPortInRange` for snapping to
- * dangling ends.
+ * dangling ends. Temporary and effectively hidden edges are skipped.
  *
  * @public
  * @since 1.4.0
@@ -161,7 +162,7 @@ export const getNearestDanglingEndpointInRange = (
   };
 
   for (const edge of edges) {
-    if (edge.temporary) {
+    if (edge.temporary || edge.computedHidden) {
       continue;
     }
     if (!edge.source) {

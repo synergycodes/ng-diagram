@@ -200,6 +200,9 @@ export const createUpdatedTemporaryEdge = (
     points,
     sourcePosition: sourcePoint,
     targetPosition: targetPoint,
+    // A relink preview carries the original edge's labels; repositioning them
+    // on every pass keeps them on the path that follows the pointer.
+    measuredLabels: updateLabelPositions(temporaryEdge, points ?? [], routingManager),
     computedZIndex: zIndex,
   };
 };
