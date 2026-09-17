@@ -14,6 +14,8 @@ import { FlowResizeBatchProcessorService } from '../services/flow-resize-observe
 import { InputEventsRouterService } from '../services/input-events/input-events-router.service';
 import { LinkingEventService } from '../services/input-events/linking-event.service';
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
+import { RelinkingEventService } from '../services/input-events/relinking-event.service';
+import { RelinkingGestureService } from '../services/input-events/relinking-gesture.service';
 import { MarkerRegistryService } from '../services/marker-registry/marker-registry.service';
 import { PanelRegistryService } from '../services/panel-registry/panel-registry.service';
 import { PaletteService } from '../services/palette/palette.service';
@@ -70,6 +72,8 @@ export function provideNgDiagram(): Provider[] {
     NgDiagramGroupsService,
     LinkingEventService,
     ManualLinkingService,
+    RelinkingEventService,
+    RelinkingGestureService,
     TemplateProviderService,
     MarkerRegistryService,
     PanelRegistryService,

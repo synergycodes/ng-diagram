@@ -110,6 +110,7 @@ The base edge component exposes these classes for styling:
 
 - `.selected` - Applied when the edge is selected
 - `.temporary` - Applied when the edge is being drawn (preview state)
+- `.dangling` - Applied when the edge has at least one free (unconnected) endpoint — see [Dangling Edges](/docs/guides/edges/dangling-edges); the edge wrapper element also gets the `ng-diagram-edge--dangling` class
 
 See [Edge Selection](/docs/guides/edges/selection) for more details on customizing selection styles.
 
@@ -214,6 +215,13 @@ onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
 }
 ```
 
+## Relinking and Dangling Edges
+
+Two opt-in features extend what users can do with existing edges:
+
+- **[Relinking](/docs/guides/edges/relinking)** — with [`linking.defaultRelinkable`](/docs/api/types/configuration/features/linkingconfig/#defaultrelinkable), selected edges show endpoint handles that users can drag to reconnect the edge to another port, unless the edge's own `relinkable` says otherwise.
+- **[Dangling edges](/docs/guides/edges/dangling-edges)** — with [`danglingEdges.enabled`](/docs/api/types/configuration/features/danglingedgesconfig/#enabled), edges may have free (unconnected) endpoints: a draw or relink dropped on empty canvas keeps the edge, and deleting a node can detach its edges instead of deleting them.
+
 ## Selection During Linking
 
 By default, pressing a port to start linking also selects the parent node. To decouple selection from linking gestures, set [`selectNodeOnPortPress`](/docs/api/types/configuration/features/linkingconfig/#selectnodeonportpress) to `false`:
@@ -242,3 +250,5 @@ See [Conditional Visibility](/docs/guides/conditional-visibility) for the full s
 
 [Labels →](/docs/guides/edges/labels)
 [Floating Edges →](/docs/guides/edges/floating-edges)
+[Dangling Edges →](/docs/guides/edges/dangling-edges)
+[Relinking →](/docs/guides/edges/relinking)

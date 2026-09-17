@@ -1,6 +1,7 @@
 export * from './change-generation';
 export * from './compute-floating-edge-side';
 export * from './constants';
+export * from './dangling-edges';
 export * from './deep-merge';
 export * from './get-node-border-intersection';
 export * from './get-port-flow-position';
@@ -9,6 +10,7 @@ export * from './is-group';
 export * from './measurement-validation';
 export * from './object-properties';
 export * from './rects-points-sizes';
+export * from './relinking';
 export * from './semaphore';
 export * from './snap-node-position';
 export * from './sort-nodes-by-z-index';

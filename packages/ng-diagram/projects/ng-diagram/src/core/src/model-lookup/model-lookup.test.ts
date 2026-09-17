@@ -123,6 +123,61 @@ describe('ModelLookup', () => {
     });
   });
 
+  describe('danglingEdges', () => {
+    const danglingEdge: Edge = {
+      id: 'dangling',
+      source: 'node1',
+      target: '',
+      targetPosition: { x: 10, y: 20 },
+      data: {},
+    };
+    const dualDanglingEdge: Edge = {
+      id: 'dual',
+      source: '',
+      sourcePosition: { x: 0, y: 0 },
+      target: '',
+      targetPosition: { x: 5, y: 5 },
+      data: {},
+    };
+
+    it('should reflect only the edges with at least one free endpoint', () => {
+      (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: mockNodes,
+        edges: [...mockEdges, danglingEdge, dualDanglingEdge],
+        metadata: {},
+      });
+
+      expect(modelLookup.danglingEdges.map((edge) => edge.id)).toEqual(['dangling', 'dual']);
+    });
+
+    it('should cache the list and recompute it only after desynchronize()', () => {
+      (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: mockNodes,
+        edges: [...mockEdges, danglingEdge],
+        metadata: {},
+      });
+
+      const first = modelLookup.danglingEdges;
+      // Same reference on a second read — no re-filter of all edges.
+      expect(modelLookup.danglingEdges).toBe(first);
+      expect((mockFlowCore.getState as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);
+
+      // The state changed, but without desynchronize the cache still stands.
+      (mockFlowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+        nodes: mockNodes,
+        edges: [...mockEdges, danglingEdge, dualDanglingEdge],
+        metadata: {},
+      });
+      expect(modelLookup.danglingEdges).toBe(first);
+
+      modelLookup.desynchronize();
+
+      const recomputed = modelLookup.danglingEdges;
+      expect(recomputed).not.toBe(first);
+      expect(recomputed.map((edge) => edge.id)).toEqual(['dangling', 'dual']);
+    });
+  });
+
   describe('getNodeById', () => {
     it('should return node by id', () => {
       const node = modelLookup.getNodeById('node1');

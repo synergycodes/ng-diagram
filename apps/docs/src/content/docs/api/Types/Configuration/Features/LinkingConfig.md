@@ -10,6 +10,35 @@ Configuration for linking (edge creation) behavior.
 
 ## Properties
 
+### defaultRelinkable
+
+> **defaultRelinkable**: `boolean` \| [`EdgeEnd`](/docs/api/types/model/edgeend/)
+
+Default `relinkable` value for edges that do not set their own. `true`
+lets the user drag both ends of an edge to another port, an `EdgeEnd`
+only that end, `false` neither. A selected edge shows a handle at each
+end that can be relinked; dragging a handle previews the reconnection
+live and commits it on drop. Dropping on empty canvas leaves the endpoint
+dangling when `danglingEdges.enabled` is true, otherwise the relink is
+reverted.
+
+The gesture shares this section's snap distance, edge panning and
+temporary edge builder. Its drops are validated through
+`validateConnection`, which receives a context with `reason: 'relink'`
+and the edge being relinked.
+
+#### Default
+
+```ts
+false
+```
+
+#### Since
+
+1.4.0
+
+***
+
 ### edgePanningEnabled
 
 > **edgePanningEnabled**: `boolean`
@@ -149,9 +178,17 @@ The Edge object to use for the temporary edge.
 
 ### validateConnection()
 
-> **validateConnection**: (`source`, `sourcePort`, `target`, `targetPort`) => `boolean`
+> **validateConnection**: (`source`, `sourcePort`, `target`, `targetPort`, `context?`) => `boolean`
 
 Validates whether a connection between two nodes and ports is allowed.
+
+Called for every connection-producing operation: drawing a new edge,
+relinking an existing edge's endpoint, and `attachEdge`. The optional
+`context` says which operation is being validated (since 1.4.0).
+
+`source` can be `null` for draws that start from a position instead of a
+node (`startLinkingFromPosition`) and when relinking the free end of a
+dangling edge.
 
 #### Parameters
 
@@ -178,6 +215,12 @@ The target node.
 The target port.
 
 `null` | [`Port`](/docs/api/types/model/port/)
+
+##### context?
+
+[`ConnectionValidationContext`](/docs/api/types/configuration/features/connectionvalidationcontext/)
+
+The operation asking for validation (`draw` when omitted).
 
 #### Returns
 

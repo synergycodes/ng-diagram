@@ -5,6 +5,8 @@ import {
   DiagramInitEvent,
   EdgeDrawEndedEvent,
   EdgeDrawnEvent,
+  EdgeRelinkEndedEvent,
+  EdgeRelinkStartedEvent,
   GroupMembershipChangedEvent,
   initializeModel,
   MinimapNodeStyle,
@@ -124,6 +126,17 @@ export class AppComponent {
     },
     linking: {
       selectNodeOnPortPress: false,
+      // Every selected edge shows grabbable endpoint handles unless its own
+      // `relinkable` says otherwise — drag one to reconnect it to another
+      // port or drop it on empty canvas to detach it.
+      defaultRelinkable: true,
+    },
+    // Dangling edges: a link drawn onto empty canvas is kept (with a free
+    // endpoint), and deleting a node detaches its edges instead of deleting
+    // them. Delete an edge explicitly by selecting it.
+    danglingEdges: {
+      enabled: true,
+      detachOnNodeDelete: true,
     },
     shortcuts: configureShortcuts([
       {
@@ -274,18 +287,37 @@ export class AppComponent {
     });
   }
 
+  onEdgeRelinkStarted(event: EdgeRelinkStartedEvent): void {
+    console.log('Edge Relink Started:', { edge: event.edge.id, end: event.end });
+  }
+
+  onEdgeRelinkEnded(event: EdgeRelinkEndedEvent): void {
+    console.log('Edge Relink Ended:', {
+      edge: event.edge.id,
+      end: event.end,
+      success: event.success,
+      previousNode: event.previousNode?.id,
+      previousPort: event.previousPort,
+      target: event.target?.id,
+      targetPort: event.targetPort,
+      reason: event.reason,
+      dropPosition: event.dropPosition,
+    });
+  }
+
   onEdgeDrawEnded(event: EdgeDrawEndedEvent): void {
     if (event.success) {
       console.log('Edge Draw Ended (success):', {
         edge: event.edge!.id,
-        source: event.source.id,
+        // source is undefined for draws started from empty canvas
+        source: event.source?.id,
         target: event.target?.id,
         sourcePort: event.sourcePort,
         targetPort: event.targetPort,
       });
     } else {
       console.log('Edge Draw Ended (cancelled):', {
-        source: event.source.id,
+        source: event.source?.id,
         sourcePort: event.sourcePort,
         reason: event.reason,
         dropPosition: event.dropPosition,

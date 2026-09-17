@@ -1,9 +1,20 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Edge, equalPointsArrays, Point, RoutingMode } from '../../../../core/src';
+import {
+  Edge,
+  EdgeEnd,
+  equalPointsArrays,
+  isDanglingEdge,
+  isEdgeEndRelinkable,
+  Point,
+  RoutingMode,
+} from '../../../../core/src';
 import { isValidPosition } from '../../../../core/src/utils/measurement-validation';
 import { EdgeSelectionDirective, InlineMarkersDirective, ZIndexDirective } from '../../../directives';
+import { RelinkHandleDirective } from '../../../directives/input-events/relinking/relinking.directive';
 import { FlowCoreProviderService } from '../../../services';
 import { MarkerRegistryService } from '../../../services/marker-registry/marker-registry.service';
+import { RendererService } from '../../../services/renderer/renderer.service';
+import { NgDiagramService } from '../../../public-services/ng-diagram.service';
 
 const INVALID_EDGE_COORDINATES_ERROR = (
   edgeId: string,
@@ -21,6 +32,9 @@ Edge details:
 Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 `;
 
+/** Screen-pixel radius of the relink handles' invisible hit area. */
+const RELINK_HANDLE_HIT_RADIUS_PX = 12;
+
 /**
  * Base edge component that handles edge rendering.
  * It can be extended or used directly to render edges in the diagram.
@@ -32,7 +46,7 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 @Component({
   selector: 'ng-diagram-base-edge',
   standalone: true,
-  imports: [InlineMarkersDirective],
+  imports: [InlineMarkersDirective, RelinkHandleDirective],
   templateUrl: './base-edge.component.html',
   styleUrl: './base-edge.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,11 +57,16 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
   host: {
     '[class.selected]': 'selected()',
     '[class.temporary]': 'temporary()',
+    '[class.dangling]': 'dangling()',
   },
 })
 export class NgDiagramBaseEdgeComponent {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private readonly markerRegistry = inject(MarkerRegistryService);
+  // Optional so consumer TestBeds that mount the component without
+  // provideNgDiagram() keep working — without it the relink handles stay off.
+  private readonly diagramService = inject(NgDiagramService, { optional: true });
+  private readonly renderer = inject(RendererService, { optional: true });
 
   /**
    * Whether to use inline markers (Safari fallback).
@@ -152,7 +171,59 @@ export class NgDiagramBaseEdgeComponent {
   readonly selected = computed(() => this.edge().selected);
   readonly temporary = computed(() => this.edge().temporary);
 
+  /**
+   * Whether the edge has at least one free (unconnected) endpoint. Temporary
+   * edges are excluded — a draw preview always has a free end and must not
+   * pick up dangling styling.
+   */
+  readonly dangling = computed(() => {
+    const edge = this.edge();
+    return isDanglingEdge(edge) && !edge.temporary;
+  });
+
   readonly labels = computed(() => this.edge().measuredLabels ?? []);
+
+  /**
+   * Whether the source endpoint handle is rendered: the edge is selected,
+   * committed, routed, and its source end can be relinked.
+   *
+   * @since 1.4.0
+   */
+  readonly relinkSourceHandleVisible = computed(() => this.relinkHandleVisible('source'));
+
+  /**
+   * Same as {@link relinkSourceHandleVisible} for the target end.
+   *
+   * @since 1.4.0
+   */
+  readonly relinkTargetHandleVisible = computed(() => this.relinkHandleVisible('target'));
+
+  /**
+   * Position of the source endpoint handle (the first routed point).
+   *
+   * @since 1.4.0
+   */
+  readonly relinkSourceHandle = computed(() => this.points()[0]);
+
+  /**
+   * Position of the target endpoint handle (the last routed point).
+   *
+   * @since 1.4.0
+   */
+  readonly relinkTargetHandle = computed(() => this.points()[this.points().length - 1]);
+
+  /**
+   * Radius of the handles' invisible hit circle, in flow units. Kept at
+   * roughly a finger-friendly constant size on screen by dividing by the
+   * viewport scale — at zoom 0.5 the visible 5px circle alone would leave a
+   * 2.5px touch target.
+   *
+   * @since 1.4.0
+   */
+  readonly relinkHandleHitRadius = computed(() => {
+    const scale = this.renderer?.viewport().scale || 1;
+    return RELINK_HANDLE_HIT_RADIUS_PX / scale;
+  });
 
   readonly class = computed(() => {
     const classArray = ['ng-diagram-edge__path'];
@@ -165,12 +236,24 @@ export class NgDiagramBaseEdgeComponent {
       classArray.push('temporary');
     }
 
+    if (this.dangling()) {
+      classArray.push('dangling');
+    }
+
     return classArray.join(' ');
   });
 
   private prevRouting: string | undefined;
   private prevRoutingMode: RoutingMode | undefined;
   private prevPoints: Point[] | undefined;
+
+  private relinkHandleVisible(end: EdgeEnd): boolean {
+    if (!this.selected() || this.temporary() || this.points().length === 0) {
+      return false;
+    }
+    const defaultRelinkable = this.diagramService?.config().linking?.defaultRelinkable ?? false;
+    return isEdgeEndRelinkable(this.edge(), end, defaultRelinkable);
+  }
 
   constructor() {
     // Sync edge properties from custom components back to the model

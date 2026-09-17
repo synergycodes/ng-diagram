@@ -11,6 +11,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  signal,
   untracked,
 } from '@angular/core';
 import { Edge, Node } from '../../../core/src';
@@ -20,6 +21,8 @@ import type {
   DiagramInitEvent,
   EdgeDrawEndedEvent,
   EdgeDrawnEvent,
+  EdgeRelinkEndedEvent,
+  EdgeRelinkStartedEvent,
   GroupMembershipChangedEvent,
   GroupNode,
   MiddlewareChain,
@@ -42,6 +45,7 @@ import type {
 
 import { MobileBoxSelectionDirective } from '../../../public-api';
 import { DiagramSelectionDirective } from '../../directives';
+import { RelinkingGestureService } from '../../services/input-events/relinking-gesture.service';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { BoxSelectionDirective } from '../../directives/input-events/box-selection/box-selection.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
@@ -110,6 +114,7 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
   ],
   host: {
     '[class.pannable]': 'viewportPannable()',
+    '[class.relinking]': 'relinkingActive()',
     '[attr.tabindex]': `tabbable() ? '0' : '-1'`,
   },
 })
@@ -161,6 +166,10 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 
   /** Whether panning is enabled in the diagram. */
   readonly viewportPannable = this.renderer.viewportPannable;
+
+  /** Whether an edge endpoint is being dragged — holds the grabbing cursor at the host. */
+  protected readonly relinkingActive =
+    inject(RelinkingGestureService, { optional: true })?.active ?? signal(false).asReadonly();
 
   /**
    * Whether the diagram container takes part in the page's sequential Tab order.
@@ -214,6 +223,24 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * For cancelled draws, includes the cancellation reason.
    */
   @Output() edgeDrawEnded = new EventEmitter<EdgeDrawEndedEvent>();
+
+  /**
+   * Event emitted when the user starts dragging an endpoint of an existing
+   * edge (the relinking gesture, see `linking.defaultRelinkable` config).
+   *
+   * @since 1.4.0
+   */
+  @Output() edgeRelinkStarted = new EventEmitter<EdgeRelinkStartedEvent>();
+
+  /**
+   * Event emitted when an edge relink gesture ends, regardless of outcome.
+   *
+   * Fires when the dragged endpoint is dropped — reconnected to a port, left
+   * dangling on empty canvas, or reverted (invalid drop or cancelled gesture).
+   *
+   * @since 1.4.0
+   */
+  @Output() edgeRelinkEnded = new EventEmitter<EdgeRelinkEndedEvent>();
 
   /**
    * Event emitted when selected nodes are moved within the diagram.
@@ -522,6 +549,8 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 
     eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
     eventManager.on('edgeDrawEnded', (event) => this.edgeDrawEnded.emit(event));
+    eventManager.on('edgeRelinkStarted', (event) => this.edgeRelinkStarted.emit(event));
+    eventManager.on('edgeRelinkEnded', (event) => this.edgeRelinkEnded.emit(event));
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
     eventManager.on('selectionGestureEnded', (event) => this.selectionGestureEnded.emit(event));

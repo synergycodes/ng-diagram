@@ -113,6 +113,52 @@ A promise that resolves once the change has been applied to the model. Inside a 
 
 ***
 
+### attachEdge()
+
+> **attachEdge**(`edgeId`, `end`, `nodeId`, `portId?`): `Promise`\<`boolean`\>
+
+Attaches one endpoint of an edge to a node (and optionally a port),
+running `linking.validateConnection` with the edge's endpoints in their
+proper roles — the symmetric counterpart of [detachEdge](/docs/api/services/ngdiagrammodelservice/#detachedge).
+
+#### Parameters
+
+##### edgeId
+
+`string`
+
+The edge to attach.
+
+##### end
+
+[`EdgeEnd`](/docs/api/types/model/edgeend/)
+
+Which endpoint to attach.
+
+##### nodeId
+
+`string`
+
+The node to attach to.
+
+##### portId?
+
+`string`
+
+The port to attach to.
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+Whether the connection was valid and applied.
+
+#### Since
+
+1.4.0
+
+***
+
 ### computePartsBounds()
 
 > **computePartsBounds**(`nodes`, `edges`): [`Rect`](/docs/api/types/geometry/rect/)
@@ -203,6 +249,49 @@ Array of node IDs to delete.
 `Promise`\<`void`\>
 
 A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
+
+***
+
+### detachEdge()
+
+> **detachEdge**(`edgeId`, `end`, `position?`): `Promise`\<`void`\>
+
+Detaches one endpoint of an edge into a free (dangling) endpoint.
+
+When `position` is omitted, the endpoint stays anchored where it is now:
+at the port's current position when the edge was connected to a port, at
+the edge's routed endpoint otherwise.
+
+Requires `danglingEdges.enabled` — with the feature off this method is a
+no-op, so dangling edges only ever come into existence behind the flag.
+
+#### Parameters
+
+##### edgeId
+
+`string`
+
+The edge to detach.
+
+##### end
+
+[`EdgeEnd`](/docs/api/types/model/edgeend/)
+
+Which endpoint to detach.
+
+##### position?
+
+[`Point`](/docs/api/types/geometry/point/)
+
+Optional anchor position for the freed endpoint.
+
+#### Returns
+
+`Promise`\<`void`\>
+
+#### Since
+
+1.4.0
 
 ***
 
@@ -326,6 +415,26 @@ Array of nodes connected to the given node
 
 ***
 
+### getDanglingEndpoints()
+
+> **getDanglingEndpoints**(): [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)[]
+
+Collects the free (unconnected) endpoints of all committed edges — a dual
+dangling edge yields two entries. Temporary and effectively hidden edges
+are skipped.
+
+#### Returns
+
+[`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)[]
+
+Dangling endpoints with their edge, end and anchor position.
+
+#### Since
+
+1.4.0
+
+***
+
 ### getEdgeById()
 
 > **getEdgeById**\<`T`\>(`edgeId`): `null` \| [`Edge`](/docs/api/types/model/edge/)\<`T`\>
@@ -366,6 +475,40 @@ Returns null if flowCore is not initialized.
 #### Returns
 
 [`ModelAdapter`](/docs/api/types/model/modeladapter/)
+
+***
+
+### getNearestDanglingEndpointInRange()
+
+> **getNearestDanglingEndpointInRange**(`point`, `range`): `null` \| [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)
+
+Gets the free edge endpoint nearest to a point within a range — the
+dangling-edges sibling of [getNearestPortInRange](/docs/api/services/ngdiagrammodelservice/#getnearestportinrange). Temporary and
+effectively hidden edges are skipped.
+
+#### Parameters
+
+##### point
+
+[`Point`](/docs/api/types/geometry/point/)
+
+Point to check from.
+
+##### range
+
+`number`
+
+Range to check in.
+
+#### Returns
+
+`null` \| [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)
+
+Nearest dangling endpoint in range or null.
+
+#### Since
+
+1.4.0
 
 ***
 

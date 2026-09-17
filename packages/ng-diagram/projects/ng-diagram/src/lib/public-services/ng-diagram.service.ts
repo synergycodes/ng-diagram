@@ -7,6 +7,7 @@ import {
   EventListener,
   Middleware,
   Node,
+  Point,
   TransactionCallback,
   TransactionOptions,
   TransactionResult,
@@ -213,6 +214,24 @@ export class NgDiagramService extends NgDiagramBaseService {
    */
   startLinking(node: Node, portId?: string) {
     this.manualLinkingService.startLinking(node, portId);
+  }
+
+  /**
+   * Call this method to start drawing an edge from a position on the canvas
+   * (no source node) from your custom logic. The free end of the edge follows
+   * the pointer until a click finishes the draw — on a port the edge connects
+   * to it; on empty canvas both ends stay free (a dual dangling edge), kept
+   * when `shouldKeepOnDrop` allows it.
+   *
+   * Requires `danglingEdges.enabled` — an edge drawn from a position has an
+   * empty source, i.e. it is a dangling edge by construction. With the
+   * feature off the call is ignored with a console warning.
+   *
+   * @param position The position in flow (diagram) coordinates where the edge starts.
+   * @since 1.4.0
+   */
+  startLinkingFromPosition(position: Point) {
+    this.manualLinkingService.startLinkingFromPosition(position);
   }
 
   // ==============================

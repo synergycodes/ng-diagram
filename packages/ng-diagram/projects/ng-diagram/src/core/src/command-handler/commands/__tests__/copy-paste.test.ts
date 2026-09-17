@@ -75,6 +75,96 @@ describe('Copy-Paste Commands', () => {
       expect(update.edgesToAdd[0].selected).toBe(true);
     });
 
+    describe('dangling edges travelling with copied nodes', () => {
+      const setDanglingEnabled = (enabled: boolean) => {
+        (commandHandler.flowCore.config as unknown as { danglingEdges: { enabled: boolean } }).danglingEdges = {
+          enabled,
+        };
+      };
+
+      const copyPasteState = () =>
+        (
+          commandHandler.flowCore.actionStateManager as unknown as {
+            copyPaste: { copiedNodes: Node[]; copiedEdges: Edge[] };
+          }
+        ).copyPaste;
+
+      const singleDanglingEdge: Edge = {
+        ...mockEdge,
+        id: 'dangling-edge',
+        source: 'node1',
+        sourcePort: 'out',
+        target: '',
+        targetPort: undefined,
+        targetPosition: { x: 300, y: 400 },
+        selected: false,
+      };
+
+      const dualDanglingEdge: Edge = {
+        ...mockEdge,
+        id: 'dual-dangling-edge',
+        source: '',
+        sourcePort: undefined,
+        sourcePosition: { x: 10, y: 20 },
+        target: '',
+        targetPort: undefined,
+        targetPosition: { x: 300, y: 400 },
+        selected: false,
+      };
+
+      const stateWith = (edges: Edge[]) => () => ({
+        nodes: [
+          { ...mockNode, id: 'node1', position: { x: 10, y: 20 }, selected: true },
+          { ...mockNode, id: 'node2', position: { x: 30, y: 40 }, selected: false },
+        ],
+        edges,
+        metadata: mockMetadata,
+      });
+
+      it('should copy an unselected single-dangling edge together with its copied node when enabled', async () => {
+        setDanglingEnabled(true);
+        commandHandler.flowCore.getState = stateWith([singleDanglingEdge]);
+
+        await copy(commandHandler);
+
+        expect(copyPasteState().copiedEdges.map((edge) => edge.id)).toEqual(['dangling-edge']);
+      });
+
+      it('should not copy an unselected single-dangling edge when the feature is disabled', async () => {
+        setDanglingEnabled(false);
+        commandHandler.flowCore.getState = stateWith([singleDanglingEdge]);
+
+        await copy(commandHandler);
+
+        expect(copyPasteState().copiedEdges).toEqual([]);
+      });
+
+      it('should not copy a dangling edge whose connected node was not copied', async () => {
+        setDanglingEnabled(true);
+        commandHandler.flowCore.getState = stateWith([{ ...singleDanglingEdge, source: 'node2' }]);
+
+        await copy(commandHandler);
+
+        expect(copyPasteState().copiedEdges).toEqual([]);
+      });
+
+      it('should copy a dual dangling edge only when it is selected', async () => {
+        setDanglingEnabled(true);
+        commandHandler.flowCore.getState = stateWith([dualDanglingEdge]);
+
+        await copy(commandHandler);
+
+        // Unselected: no connected endpoint inside the copied set — not copied.
+        expect(copyPasteState().copiedEdges).toEqual([]);
+
+        commandHandler.flowCore.getState = stateWith([{ ...dualDanglingEdge, selected: true }]);
+
+        await copy(commandHandler);
+
+        expect(copyPasteState().copiedEdges.map((edge) => edge.id)).toEqual(['dual-dangling-edge']);
+      });
+    });
+
     it('should not copy anything if nothing is selected', async () => {
       commandHandler.flowCore.getState = () => ({
         nodes: [
@@ -1038,6 +1128,171 @@ describe('Copy-Paste Commands', () => {
         expect(pastedNode).toBeDefined();
         expect(pastedNode!.groupId).toBe(pastedInnerGroup!.id); // Node should still reference inner group
       });
+    });
+  });
+
+  describe('dangling edges', () => {
+    it('should offset the free endpoint position and the points of a pasted dangling edge', async () => {
+      commandHandler.flowCore.getState = () => ({
+        nodes: [{ ...mockNode, id: 'node1', position: { x: 10, y: 20 }, selected: true }],
+        edges: [
+          {
+            ...mockEdge,
+            id: 'edge1',
+            source: 'node1',
+            target: '',
+            targetPosition: { x: 300, y: 300 },
+            // Manual routing: the stored path is the truth, so paste must
+            // shift it along with the free endpoint (auto edges re-route).
+            routingMode: 'manual' as const,
+            points: [
+              { x: 110, y: 120 },
+              { x: 300, y: 300 },
+            ],
+            selected: true,
+          },
+        ],
+        metadata: mockMetadata,
+      });
+
+      await copy(commandHandler);
+      await paste(commandHandler, { name: 'paste' });
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      expect(update.edgesToAdd).toHaveLength(1);
+      const pastedEdge = update.edgesToAdd[0];
+      // The free end travels with the default (20, 20) paste offset, and the
+      // stored path travels along so it stays aligned.
+      expect(pastedEdge.target).toBe('');
+      expect(pastedEdge.targetPosition).toEqual({ x: 320, y: 320 });
+      expect(pastedEdge.points).toEqual([
+        { x: 130, y: 140 },
+        { x: 320, y: 320 },
+      ]);
+      // The connected end is remapped to the pasted node.
+      expect(pastedEdge.source).toBe(update.nodesToAdd[0].id);
+    });
+
+    it('should anchor a paste of only a dangling edge at its free endpoint center', async () => {
+      commandHandler.flowCore.getState = () => ({
+        nodes: [],
+        edges: [
+          {
+            ...mockEdge,
+            id: 'edge1',
+            source: '',
+            target: '',
+            sourcePosition: { x: 0, y: 0 },
+            targetPosition: { x: 100, y: 100 },
+            routingMode: 'manual' as const,
+            points: [
+              { x: 0, y: 0 },
+              { x: 100, y: 100 },
+            ],
+            selected: true,
+          },
+        ],
+        metadata: mockMetadata,
+      });
+
+      await copy(commandHandler);
+      await paste(commandHandler, { name: 'paste', position: { x: 200, y: 200 } });
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      expect(update.nodesToAdd).toHaveLength(0);
+      expect(update.edgesToAdd).toHaveLength(1);
+      const pastedEdge = update.edgesToAdd[0];
+      // Free endpoint center is (50, 50), cursor at (200, 200) → offset (150, 150).
+      expect(pastedEdge.sourcePosition).toEqual({ x: 150, y: 150 });
+      expect(pastedEdge.targetPosition).toEqual({ x: 250, y: 250 });
+      expect(pastedEdge.points).toEqual([
+        { x: 150, y: 150 },
+        { x: 250, y: 250 },
+      ]);
+    });
+
+    it('should offset the points of a manual-routing edge pasted with both of its nodes', async () => {
+      const originalPoints = [
+        { x: 10, y: 10 },
+        { x: 30, y: 40 },
+        { x: 60, y: 60 },
+      ];
+      commandHandler.flowCore.getState = () => ({
+        nodes: [
+          { ...mockNode, id: 'node1', position: { x: 0, y: 0 }, selected: true },
+          { ...mockNode, id: 'node2', position: { x: 50, y: 50 }, selected: true },
+        ],
+        edges: [
+          {
+            ...mockEdge,
+            id: 'edge1',
+            source: 'node1',
+            target: 'node2',
+            routingMode: 'manual' as const,
+            points: originalPoints,
+            selected: true,
+          },
+        ],
+        metadata: mockMetadata,
+      });
+
+      await copy(commandHandler);
+      await paste(commandHandler, { name: 'paste' });
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      const pastedEdge = update.edgesToAdd[0];
+      // Both ends move by the default (20, 20) paste offset, so the stored
+      // path moves with them.
+      expect(pastedEdge.points).toEqual([
+        { x: 30, y: 30 },
+        { x: 50, y: 60 },
+        { x: 80, y: 80 },
+      ]);
+      expect(pastedEdge.source).toBe(update.nodesToAdd[0].id);
+      expect(pastedEdge.target).toBe(update.nodesToAdd[1].id);
+      expect(pastedEdge.sourcePosition).toBeUndefined();
+      expect(pastedEdge.targetPosition).toBeUndefined();
+    });
+
+    it('should not offset the points of fully-connected pasted edges', async () => {
+      const originalPoints = [
+        { x: 5, y: 5 },
+        { x: 45, y: 45 },
+      ];
+      commandHandler.flowCore.getState = () => ({
+        nodes: [
+          { ...mockNode, id: 'node1', position: { x: 0, y: 0 }, selected: true },
+          { ...mockNode, id: 'node2', position: { x: 50, y: 50 }, selected: true },
+        ],
+        edges: [
+          {
+            ...mockEdge,
+            id: 'edge1',
+            source: 'node1',
+            target: 'node2',
+            points: originalPoints,
+            selected: true,
+          },
+        ],
+        metadata: mockMetadata,
+      });
+
+      await copy(commandHandler);
+      await paste(commandHandler, { name: 'paste' });
+
+      const updateCall = commandHandler.flowCore.applyUpdate as unknown as ReturnType<typeof vi.fn>;
+      const [update] = updateCall.mock.calls[0];
+
+      // Fully-connected edges are re-routed from their new nodes instead.
+      expect(update.edgesToAdd[0].points).toEqual(originalPoints);
+      expect(update.edgesToAdd[0].sourcePosition).toBeUndefined();
+      expect(update.edgesToAdd[0].targetPosition).toBeUndefined();
     });
   });
 

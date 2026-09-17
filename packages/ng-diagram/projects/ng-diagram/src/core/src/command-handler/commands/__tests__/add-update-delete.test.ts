@@ -161,6 +161,80 @@ describe('Add Update Delete Command', () => {
     );
   });
 
+  it('should detach the edges of a deleted subtree when detach-on-delete is enabled', () => {
+    (flowCore.config as unknown as { danglingEdges: object }).danglingEdges = {
+      enabled: true,
+      detachOnNodeDelete: true,
+    };
+    const group = { ...mockNode, id: 'group', isGroup: true };
+    const child = { ...mockNode, id: 'child', groupId: 'group', position: { x: 5, y: 6 } };
+    const standalone = { ...mockNode, id: 'standalone' };
+    const childEdge = {
+      ...mockEdge,
+      id: 'childEdge',
+      source: 'child',
+      target: 'standalone',
+      points: [
+        { x: 5, y: 6 },
+        { x: 100, y: 100 },
+      ],
+    };
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [group, child, standalone],
+      edges: [childEdge],
+      metadata: {},
+    });
+    getNodeByIdMock.mockImplementation((id: string) => [group, child, standalone].find((node) => node.id === id));
+    (flowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+      id === 'group' ? ['child'] : []
+    );
+
+    commandHandler.emit('deleteNodes', { ids: ['group'] });
+
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      {
+        nodesToRemove: ['group', 'child'],
+        edgesToRemove: [],
+        edgesToUpdate: [{ id: 'childEdge', source: '', sourcePort: undefined, sourcePosition: { x: 5, y: 6 } }],
+      },
+      'deleteNodes'
+    );
+  });
+
+  it('should delete, not detach, the edges of hidden children of a deleted group', () => {
+    (flowCore.config as unknown as { danglingEdges: object }).danglingEdges = {
+      enabled: true,
+      detachOnNodeDelete: true,
+    };
+    const group = { ...mockNode, id: 'group', isGroup: true };
+    const hiddenChild = { ...mockNode, id: 'child', groupId: 'group', computedHidden: true };
+    const standalone = { ...mockNode, id: 'standalone' };
+    const hiddenChildEdge = {
+      ...mockEdge,
+      id: 'childEdge',
+      source: 'child',
+      target: 'standalone',
+      computedHidden: true,
+    };
+    (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
+      nodes: [group, hiddenChild, standalone],
+      edges: [hiddenChildEdge],
+      metadata: {},
+    });
+    getNodeByIdMock.mockImplementation((id: string) => [group, hiddenChild, standalone].find((node) => node.id === id));
+    (flowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+      id === 'group' ? ['child'] : []
+    );
+
+    commandHandler.emit('deleteNodes', { ids: ['group'] });
+
+    // Invisible wiring must never be materialized as visible dangling edges.
+    expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+      { nodesToRemove: ['group', 'child'], edgesToRemove: ['childEdge'] },
+      'deleteNodes'
+    );
+  });
+
   it('should not duplicate ids when a deleted group and its child are both passed explicitly', () => {
     (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({
       nodes: [

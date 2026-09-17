@@ -4,6 +4,7 @@ import type { Edge } from '../types/edge.interface';
 import type {
   BackgroundConfig,
   BoxSelectionConfig,
+  DanglingEdgesConfig,
   EdgeRoutingConfig,
   FlowConfig,
   GroupingConfig,
@@ -36,6 +37,7 @@ const defaultLinkingConfig: LinkingConfig = {
   edgePanningForce: 10,
   edgePanningThreshold: 30,
   selectNodeOnPortPress: true,
+  defaultRelinkable: false,
   validateConnection: (): boolean => {
     // Allow connection by default
     return true;
@@ -50,6 +52,11 @@ const defaultLinkingConfig: LinkingConfig = {
       ...defaultFinalEdgeData,
     };
   },
+};
+
+const defaultDanglingEdgesConfig: DanglingEdgesConfig = {
+  enabled: false,
+  detachOnNodeDelete: false,
 };
 
 const defaultGroupingConfig: GroupingConfig = {
@@ -155,6 +162,7 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       computeEdgeId: () => flowCore.environment.generateId(),
       resize: defaultResizeConfig,
       linking: defaultLinkingConfig,
+      danglingEdges: defaultDanglingEdgesConfig,
       grouping: defaultGroupingConfig,
       zoom: defaultZoomConfig,
       background: defaultBackgroundConfig,

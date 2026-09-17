@@ -200,6 +200,14 @@ const createPastedEdges = (
       continue;
     }
 
+    // A manual-routing edge keeps its stored points verbatim, and every end
+    // that survives resolvePastedEnd moves by exactly `offset`, so the whole
+    // stored path moves with it. Auto-routed edges re-route from their new ends.
+    const points =
+      edge.routingMode === 'manual' && edge.points
+        ? edge.points.map((point) => ({ x: point.x + offset.x, y: point.y + offset.y }))
+        : edge.points;
+
     pastedEdges.push({
       ...edge,
       id: config.computeEdgeId(),
@@ -209,6 +217,7 @@ const createPastedEdges = (
       target: target.nodeId,
       targetPort: target.port,
       targetPosition: target.position,
+      points,
       // See createPastedNodes — hidden pasted edges stay deselected.
       selected: !isEdgeEffectivelyHidden(edge, hiddenCopiedNodeIds),
     });
@@ -264,12 +273,22 @@ export const copy = async (commandHandler: CommandHandler) => {
 
   const copiedNodes = nodes.filter((node) => copiedNodeIds.has(node.id));
 
+  // "Fully inside" the copied node set: with dangling edges enabled only the
+  // connected endpoints count, so a dangling edge travels with its one node (a
+  // dual dangling edge still only copies when selected). With the feature off
+  // the old rule applies unchanged, so the same model copies identically.
+  const danglingEnabled = commandHandler.flowCore.config.danglingEdges?.enabled;
+  const isInsideCopiedSet = (edge: Edge): boolean => {
+    if (danglingEnabled) {
+      const connectedEndpoints = [edge.source, edge.target].filter(Boolean);
+      return connectedEndpoints.length > 0 && connectedEndpoints.every((nodeId) => copiedNodeIds.has(nodeId));
+    }
+    return copiedNodeIds.has(edge.source) && copiedNodeIds.has(edge.target);
+  };
+
   // Edges: explicitly selected visible edges, plus every edge fully inside the
   // copied node set (the internal wiring of copied groups, hidden or not).
-  const copiedEdges = edges.filter(
-    (edge) =>
-      (edge.selected && !edge.computedHidden) || (copiedNodeIds.has(edge.source) && copiedNodeIds.has(edge.target))
-  );
+  const copiedEdges = edges.filter((edge) => (edge.selected && !edge.computedHidden) || isInsideCopiedSet(edge));
 
   commandHandler.flowCore.actionStateManager.copyPaste = {
     copiedNodes,

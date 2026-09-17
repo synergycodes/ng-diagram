@@ -521,6 +521,38 @@ The port ID from which the linking starts. Creates a floating edge when undefine
 
 ***
 
+### startLinkingFromPosition()
+
+> **startLinkingFromPosition**(`position`): `void`
+
+Call this method to start drawing an edge from a position on the canvas
+(no source node) from your custom logic. The free end of the edge follows
+the pointer until a click finishes the draw — on a port the edge connects
+to it; on empty canvas both ends stay free (a dual dangling edge), kept
+when `shouldKeepOnDrop` allows it.
+
+Requires `danglingEdges.enabled` — an edge drawn from a position has an
+empty source, i.e. it is a dangling edge by construction. With the
+feature off the call is ignored with a console warning.
+
+#### Parameters
+
+##### position
+
+[`Point`](/docs/api/types/geometry/point/)
+
+The position in flow (diagram) coordinates where the edge starts.
+
+#### Returns
+
+`void`
+
+#### Since
+
+1.4.0
+
+***
+
 ### transaction()
 
 #### Call Signature
