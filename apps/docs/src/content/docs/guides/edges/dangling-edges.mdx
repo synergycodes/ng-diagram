@@ -94,7 +94,7 @@ const config: NgDiagramConfig = {
 The detach rules are:
 
 - **An explicit delete always wins.** An edge that is itself part of the deleted selection is deleted, never detached.
-- **Hidden elements always delete.** An effectively hidden edge, or an endpoint losing an effectively hidden node (for example the collapsed children of a deleted group), is deleted — detaching would materialize invisible wiring as visible dangling edges.
+- **Hidden wiring never materializes.** An edge that is hidden only because of the node it loses (for example the edges of the collapsed children of a deleted group) is deleted — detaching it would make invisible wiring appear as a visible dangling edge. An edge that stays hidden on its own — through its `hidden` flag, a template binding, or a hidden surviving endpoint — is detached like any other edge and remains hidden.
 - **An edge losing both endpoints in one delete is deleted by default.** It becomes a dual dangling edge only when `shouldDetachOnNodeDelete` is defined and returns `true` for both ends.
 - Deleting a node with the keyboard Delete key follows the same rules — the detached edges are reported in the [`selectionRemoved`](/docs/api/types/events/selectionremovedevent) event (see [Events](#events) below).
 

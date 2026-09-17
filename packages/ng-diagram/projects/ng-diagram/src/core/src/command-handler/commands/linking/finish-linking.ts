@@ -39,8 +39,8 @@ export const buildKeptDanglingEdge = (
     return null;
   }
 
-  // A free end has no port — normalized to undefined (never '') so the model
-  // shape is identical across every path that produces a dangling end.
+  // A free end has no port — undefined, never ''. createFinalEdge applies the
+  // same normalization to a free source (a draw started from a position).
   const edge = createFinalEdge(config, temporaryEdge, {
     target: '',
     targetPort: undefined,

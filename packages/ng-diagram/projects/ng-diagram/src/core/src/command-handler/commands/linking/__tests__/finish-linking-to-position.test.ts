@@ -211,6 +211,24 @@ describe('finishLinkingToPosition', () => {
     expect(createFinalEdgeCall.targetPosition).toEqual(position);
   });
 
+  it('should keep a connected source port untouched', async () => {
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: 'source-node',
+      sourcePortId: 'source-port',
+      temporaryEdge: mockTemporaryEdge,
+    };
+    mockCreateFinalEdge.mockReturnValue({ id: 'final-edge', source: 'source-node', target: '', data: {} });
+
+    await finishLinkingToPosition(mockCommandHandler, {
+      name: 'finishLinkingToPosition',
+      position: { x: 300, y: 400 },
+    });
+
+    // The partial must not mention sourcePort, so the temporary edge's real
+    // port survives the spread in createFinalEdge.
+    expect(mockCreateFinalEdge.mock.calls[0][2]).not.toHaveProperty('sourcePort');
+  });
+
   it('should clear temporary edge', async () => {
     const position = { x: 500, y: 600 };
     const finalEdge = { id: 'final-edge', source: 'source-node', target: '', data: {} };

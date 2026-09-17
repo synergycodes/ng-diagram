@@ -96,18 +96,6 @@ Configuration options for the default Node Templates
 
 ***
 
-### edgeRelinking
-
-> **edgeRelinking**: [`EdgeRelinkingConfig`](/docs/api/types/configuration/features/edgerelinkingconfig/)
-
-Configuration for interactive edge relinking.
-
-#### Since
-
-1.4.0
-
-***
-
 ### edgeRouting
 
 > **edgeRouting**: [`EdgeRoutingConfig`](/docs/api/types/configuration/features/edgeroutingconfig/)

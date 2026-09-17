@@ -64,7 +64,7 @@ export class RelinkingGestureService implements OnDestroy {
     if (this.gestureActive || flowCore.actionStateManager.isLinking()) {
       return false;
     }
-    if (!flowCore.config.edgeRelinking.enabled) {
+    if (!flowCore.config.linking.relinkingEnabled) {
       return false;
     }
     // An Escape-triggered cancel can still be rolling back state.

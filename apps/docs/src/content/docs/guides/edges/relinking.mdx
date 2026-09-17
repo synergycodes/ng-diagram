@@ -13,12 +13,12 @@ The **edge relinking** feature lets users reconnect existing edges by dragging t
 
 ## Enabling Relinking
 
-Relinking is controlled by the [`edgeRelinking`](/docs/api/types/configuration/features/edgerelinkingconfig) configuration:
+Relinking is controlled by the [`linking.relinkingEnabled`](/docs/api/types/configuration/features/linkingconfig/#relinkingenabled) flag:
 
 ```typescript
 const config: NgDiagramConfig = {
-  edgeRelinking: {
-    enabled: true,
+  linking: {
+    relinkingEnabled: true,
   },
 };
 ```

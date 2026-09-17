@@ -11,6 +11,11 @@ export const createFinalEdge = (config: FlowConfig, temporaryEdge: Edge, partial
   return config.linking.finalEdgeDataBuilder({
     ...data,
     id: config.computeEdgeId(),
+    // A temporary edge marks a free end with an empty-string port; the model
+    // shape of a free end is an undefined port, whichever end is free and
+    // whichever drop (canvas, port, draw started from a position) commits it.
+    ...(data.source ? {} : { sourcePort: undefined }),
+    ...(data.target ? {} : { targetPort: undefined }),
   });
 };
 

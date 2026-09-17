@@ -127,6 +127,67 @@ describe('linking utils', () => {
       expect(finalEdge.target).toBe('');
       expect(finalEdge.targetPort).toBeUndefined();
     });
+
+    it('should normalize the port of a free source to undefined when the draw lands on a port', () => {
+      // A draw started from a position: after the first moveTemporaryEdge the
+      // preview carries sourcePort: '' for the fixed free end.
+      const temporaryEdge: Edge = {
+        ...mockEdge,
+        id: 'TEMPORARY_EDGE',
+        temporary: true,
+        source: '',
+        sourcePort: '',
+        sourcePosition: { x: 10, y: 20 },
+        target: '',
+        targetPort: '',
+      };
+
+      const finalEdge = createFinalEdge(config, temporaryEdge, {
+        target: 'node-b',
+        targetPort: 'in',
+        targetPosition: { x: 50, y: 60 },
+      });
+
+      expect(finalEdge.source).toBe('');
+      expect(finalEdge.sourcePort).toBeUndefined();
+      expect(finalEdge.sourcePosition).toEqual({ x: 10, y: 20 });
+      expect(finalEdge.target).toBe('node-b');
+      expect(finalEdge.targetPort).toBe('in');
+    });
+
+    it('should normalize the port of a free target the caller left as an empty string', () => {
+      const temporaryEdge: Edge = {
+        ...mockEdge,
+        id: 'TEMPORARY_EDGE',
+        temporary: true,
+        source: 'node-a',
+        sourcePort: 'out',
+        target: '',
+        targetPort: '',
+      };
+
+      const finalEdge = createFinalEdge(config, temporaryEdge, { target: '', targetPosition: { x: 50, y: 60 } });
+
+      expect(finalEdge.target).toBe('');
+      expect(finalEdge.targetPort).toBeUndefined();
+    });
+
+    it('should leave the ports of connected ends untouched', () => {
+      const temporaryEdge: Edge = {
+        ...mockEdge,
+        id: 'TEMPORARY_EDGE',
+        temporary: true,
+        source: 'node-a',
+        sourcePort: 'out',
+        target: '',
+        targetPort: '',
+      };
+
+      const finalEdge = createFinalEdge(config, temporaryEdge, { target: 'node-b', targetPort: 'in' });
+
+      expect(finalEdge.sourcePort).toBe('out');
+      expect(finalEdge.targetPort).toBe('in');
+    });
   });
 
   describe('validateConnection', () => {

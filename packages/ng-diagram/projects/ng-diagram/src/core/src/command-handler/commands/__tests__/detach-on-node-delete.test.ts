@@ -55,7 +55,11 @@ describe('partitionIncidentEdges', () => {
     target: 'node-y',
   };
 
-  let mockFlowCore: { config: { danglingEdges?: Partial<DanglingEdgesConfig> }; getNodeById: ReturnType<typeof vi.fn> };
+  let mockFlowCore: {
+    config: { danglingEdges?: Partial<DanglingEdgesConfig> };
+    getNodeById: ReturnType<typeof vi.fn>;
+    templateVisibilityRegistry?: { isEdgeHidden: (edgeId: string) => boolean };
+  };
 
   const flowCore = () => mockFlowCore as unknown as FlowCore;
 
@@ -191,24 +195,69 @@ describe('partitionIncidentEdges', () => {
       expect(result.edgesToUpdate).toEqual([]);
     });
 
-    it('should remove the edge when the lost endpoint node is effectively hidden', () => {
+    it('should remove an edge hidden only through the lost endpoint node', () => {
       mockFlowCore.getNodeById.mockImplementation((id: string) =>
         id === 'node-a' ? { ...nodeWithPort, computedHidden: true } : id === 'node-b' ? nodeWithoutPorts : undefined
       );
-
-      const result = partitionIncidentEdges(flowCore(), [incidentEdge], new Set(['node-a']));
-
-      expect(result.edgesToRemove).toEqual(['edge-ab']);
-      expect(result.edgesToUpdate).toEqual([]);
-    });
-
-    it('should remove an effectively hidden edge instead of detaching it', () => {
+      // The edge carries the hidden stamp derived from its hidden endpoint;
+      // once that endpoint is gone nothing would keep it hidden.
       const hiddenEdge: Edge = { ...incidentEdge, computedHidden: true };
 
       const result = partitionIncidentEdges(flowCore(), [hiddenEdge], new Set(['node-a']));
 
       expect(result.edgesToRemove).toEqual(['edge-ab']);
       expect(result.edgesToUpdate).toEqual([]);
+    });
+
+    it('should detach an edge hidden by its own flag and leave it hidden', () => {
+      const hiddenEdge: Edge = { ...incidentEdge, hidden: true, computedHidden: true };
+
+      const result = partitionIncidentEdges(flowCore(), [hiddenEdge], new Set(['node-a']));
+
+      expect(result.edgesToRemove).toEqual([]);
+      expect(result.edgesToUpdate).toEqual([
+        { id: 'edge-ab', source: '', sourcePort: undefined, sourcePosition: portAnchor },
+      ]);
+    });
+
+    it('should detach an edge hidden by a template binding', () => {
+      mockFlowCore.templateVisibilityRegistry = { isEdgeHidden: (edgeId) => edgeId === 'edge-ab' };
+      const hiddenEdge: Edge = { ...incidentEdge, computedHidden: true };
+
+      const result = partitionIncidentEdges(flowCore(), [hiddenEdge], new Set(['node-a']));
+
+      expect(result.edgesToRemove).toEqual([]);
+      expect(result.edgesToUpdate).toEqual([
+        { id: 'edge-ab', source: '', sourcePort: undefined, sourcePosition: portAnchor },
+      ]);
+    });
+
+    it('should detach an edge whose surviving endpoint is hidden', () => {
+      mockFlowCore.getNodeById.mockImplementation((id: string) =>
+        id === 'node-a' ? nodeWithPort : id === 'node-b' ? { ...nodeWithoutPorts, computedHidden: true } : undefined
+      );
+      const hiddenEdge: Edge = { ...incidentEdge, computedHidden: true };
+
+      const result = partitionIncidentEdges(flowCore(), [hiddenEdge], new Set(['node-a']));
+
+      expect(result.edgesToRemove).toEqual([]);
+      expect(result.edgesToUpdate).toEqual([
+        { id: 'edge-ab', source: '', sourcePort: undefined, sourcePosition: portAnchor },
+      ]);
+    });
+
+    it('should detach an edge hidden by its own flag even when the lost node is hidden', () => {
+      mockFlowCore.getNodeById.mockImplementation((id: string) =>
+        id === 'node-a' ? { ...nodeWithPort, computedHidden: true } : id === 'node-b' ? nodeWithoutPorts : undefined
+      );
+      const hiddenEdge: Edge = { ...incidentEdge, hidden: true, computedHidden: true };
+
+      const result = partitionIncidentEdges(flowCore(), [hiddenEdge], new Set(['node-a']));
+
+      expect(result.edgesToRemove).toEqual([]);
+      expect(result.edgesToUpdate).toEqual([
+        { id: 'edge-ab', source: '', sourcePort: undefined, sourcePosition: portAnchor },
+      ]);
     });
 
     it('should delete the edges of hidden children when a collapsed group cascade is deleted', () => {

@@ -473,6 +473,49 @@ describe('finishLinking', () => {
     expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
   });
 
+  it('should commit an undefined source port when a draw started from a position lands on a port', async () => {
+    // startLinkingFromPosition draws with a free source; after the first
+    // moveTemporaryEdge the preview carries sourcePort: '' for that end. The
+    // committed edge uses the model shape of a free end: an undefined port.
+    const actualUtils = await vi.importActual<typeof import('../utils')>('../utils');
+    mockCreateFinalEdge.mockImplementation(actualUtils.createFinalEdge);
+    mockFlowCore.config = {
+      danglingEdges: { enabled: true },
+      linking: { portSnapDistance: 10, finalEdgeDataBuilder: (edge: Edge) => edge },
+      computeEdgeId: () => 'fresh-id',
+    };
+    const freeSourceTemporaryEdge: Edge = {
+      ...mockTemporaryEdge,
+      source: '',
+      sourcePort: '',
+      sourcePosition: { x: 10, y: 20 },
+    };
+    const targetPosition = { x: 150, y: 250 };
+
+    mockFlowCore.actionStateManager.linking = {
+      sourceNodeId: '',
+      sourcePortId: '',
+      temporaryEdge: freeSourceTemporaryEdge,
+    };
+    mockValidateConnection.mockReturnValue(true);
+    mockFlowCore.getNodeById.mockImplementation((id: string) => (id === 'target-node' ? mockTargetNode : undefined));
+    mockGetPortFlowPosition.mockReturnValue(targetPosition);
+
+    await finishLinking(mockCommandHandler, { name: 'finishLinking', position: { x: 0, y: 0 } });
+
+    const [added] = mockFlowCore.applyUpdate.mock.calls[0][0].edgesToAdd as Edge[];
+    expect(added).toMatchObject({
+      id: 'fresh-id',
+      source: '',
+      target: 'target-node',
+      targetPort: 'target-port',
+      targetPosition,
+      temporary: false,
+    });
+    expect(added.sourcePosition).toEqual({ x: 10, y: 20 });
+    expect(added.sourcePort).toBeUndefined();
+  });
+
   describe('dangling edges: keep on drop', () => {
     const temporaryEdgeNoTarget: Edge = {
       ...mockTemporaryEdge,

@@ -76,7 +76,6 @@ title: "ng-diagram"
 - [ConnectionValidationContext](/docs/api/types/configuration/features/connectionvalidationcontext/)
 - [DanglingEdgesConfig](/docs/api/types/configuration/features/danglingedgesconfig/)
 - [DefaultNodeTemplateConfig](/docs/api/types/configuration/features/defaultnodetemplateconfig/)
-- [EdgeRelinkingConfig](/docs/api/types/configuration/features/edgerelinkingconfig/)
 - [EdgeRoutingConfig](/docs/api/types/configuration/features/edgeroutingconfig/)
 - [GroupingConfig](/docs/api/types/configuration/features/groupingconfig/)
 - [LinkingConfig](/docs/api/types/configuration/features/linkingconfig/)

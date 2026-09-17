@@ -177,13 +177,13 @@ export class NgDiagramBaseEdgeComponent {
 
   /**
    * Endpoint handles for the relinking gesture — rendered on selected,
-   * committed edges when `edgeRelinking.enabled` is true.
+   * committed edges when `linking.relinkingEnabled` is true.
    *
    * @since 1.4.0
    */
   readonly relinkHandlesVisible = computed(
     () =>
-      (this.diagramService?.config().edgeRelinking?.enabled ?? false) &&
+      (this.diagramService?.config().linking?.relinkingEnabled ?? false) &&
       !!this.selected() &&
       !this.temporary() &&
       this.points().length > 0

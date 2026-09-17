@@ -315,11 +315,6 @@ export interface EdgeRelinkEndedEvent {
 }
 
 // @public
-export interface EdgeRelinkingConfig {
-    enabled: boolean;
-}
-
-// @public
 export interface EdgeRelinkStartedEvent {
     edge: Edge;
     end: EdgeEnd;
@@ -408,7 +403,6 @@ export interface FlowConfig {
     danglingEdges: DanglingEdgesConfig;
     debugMode: boolean;
     defaultNode?: DefaultNodeTemplateConfig;
-    edgeRelinking: EdgeRelinkingConfig;
     edgeRouting: EdgeRoutingConfig;
     grouping: GroupingConfig;
     hideWatermark?: boolean;
@@ -584,6 +578,7 @@ export interface LinkingConfig {
     edgePanningThreshold: number;
     finalEdgeDataBuilder: (defaultFinalEdgeData: Edge) => Edge;
     portSnapDistance: number;
+    relinkingEnabled: boolean;
     selectNodeOnPortPress: boolean;
     temporaryEdgeDataBuilder: (defaultTemporaryEdgeData: Edge) => Edge;
     validateConnection: (source: Node_2 | null, sourcePort: Port | null, target: Node_2 | null, targetPort: Port | null, context?: ConnectionValidationContext) => boolean;

@@ -1,6 +1,7 @@
 import type { FlowCore } from '../../flow-core';
 import type { Edge, EdgeEnd } from '../../types';
 import { alignManualPointsPatch, computeDetachAnchor } from '../../utils';
+import { isEdgeRawHidden } from '../../visibility/effective-visibility';
 
 /**
  * How the edges incident to a set of deleted nodes are handled: removed along
@@ -21,9 +22,11 @@ export interface IncidentEdgesPartition {
  * its port was) unless:
  * - it is part of `explicitlyDeletedEdgeIds` (e.g. selected in a
  *   deleteSelection) — an explicit delete always wins, or
- * - the edge itself or the lost endpoint's node is effectively hidden —
- *   detaching would materialize invisible wiring (e.g. the collapsed children
- *   of a deleted group) as visible dangling edges, or
+ * - it is hidden only through the node(s) it loses (e.g. the collapsed
+ *   children of a deleted group) — detaching would materialize invisible
+ *   wiring as a visible dangling edge; an edge that stays hidden on its own
+ *   (its `hidden` flag, a template binding, a hidden surviving endpoint)
+ *   detaches like any other, or
  * - `shouldDetachOnNodeDelete` returns false for any endpoint being lost —
  *   then the whole edge is deleted, or
  * - the edge loses BOTH endpoints in the same cascade — such an edge is
@@ -45,15 +48,27 @@ export const partitionIncidentEdges = (
 
   const mayDetach = (edge: Edge, end: EdgeEnd, nodeId: string): boolean => {
     const node = flowCore.getNodeById(nodeId);
-    // A hidden lost endpoint must not demote its (hidden) edge into a visible
-    // dangling edge.
-    if (!node || node.computedHidden) {
+    if (!node) {
       return false;
     }
     if (!danglingEdges?.shouldDetachOnNodeDelete) {
       return true;
     }
     return danglingEdges.shouldDetachOnNodeDelete(edge, node, end);
+  };
+
+  // A hidden edge is deleted only when the detach would make it visible: it is
+  // hidden through the node(s) it loses and nothing else keeps it hidden (own
+  // `hidden` flag, template binding, hidden surviving endpoint). That is the
+  // invisible wiring of e.g. a deleted collapsed group, which must not
+  // reappear as a dangling edge. An edge that stays hidden detaches like a
+  // visible one — hiding is not a reason to lose wiring the user kept.
+  const wouldBecomeVisible = (edge: Edge, sourceLost: boolean, targetLost: boolean): boolean => {
+    if (!edge.computedHidden || isEdgeRawHidden(edge, flowCore.templateVisibilityRegistry)) {
+      return false;
+    }
+    const survivingNodeId = sourceLost && targetLost ? '' : sourceLost ? edge.target : edge.source;
+    return !(survivingNodeId && flowCore.getNodeById(survivingNodeId)?.computedHidden);
   };
 
   for (const edge of edges) {
@@ -67,7 +82,12 @@ export const partitionIncidentEdges = (
     // dangling explicitly through the callback.
     const dualWithoutOptIn = sourceLost && targetLost && !danglingEdges?.shouldDetachOnNodeDelete;
 
-    if (!detachEnabled || explicitlyDeletedEdgeIds?.has(edge.id) || edge.computedHidden || dualWithoutOptIn) {
+    if (
+      !detachEnabled ||
+      explicitlyDeletedEdgeIds?.has(edge.id) ||
+      wouldBecomeVisible(edge, sourceLost, targetLost) ||
+      dualWithoutOptIn
+    ) {
       edgesToRemove.push(edge.id);
       continue;
     }
@@ -82,17 +102,20 @@ export const partitionIncidentEdges = (
       continue;
     }
 
-    const update: Partial<Edge> & { id: string } = { id: edge.id };
+    let update: Partial<Edge> & { id: string } = { id: edge.id };
     if (sourceLost) {
       const anchor = computeDetachAnchor(edge, 'source', flowCore.getNodeById(edge.source));
       if (!anchor) {
         edgesToRemove.push(edge.id);
         continue;
       }
-      update.source = '';
-      update.sourcePort = undefined;
-      update.sourcePosition = anchor;
-      Object.assign(update, alignManualPointsPatch(edge, 'source', anchor));
+      update = {
+        ...update,
+        source: '',
+        sourcePort: undefined,
+        sourcePosition: anchor,
+        ...alignManualPointsPatch(edge, 'source', anchor),
+      };
     }
     if (targetLost) {
       const anchor = computeDetachAnchor(edge, 'target', flowCore.getNodeById(edge.target));
@@ -100,11 +123,14 @@ export const partitionIncidentEdges = (
         edgesToRemove.push(edge.id);
         continue;
       }
-      update.target = '';
-      update.targetPort = undefined;
-      update.targetPosition = anchor;
       // Built on the patch above so an edge losing both ends keeps points[0].
-      Object.assign(update, alignManualPointsPatch({ ...edge, ...update }, 'target', anchor));
+      update = {
+        ...update,
+        target: '',
+        targetPort: undefined,
+        targetPosition: anchor,
+        ...alignManualPointsPatch({ ...edge, ...update }, 'target', anchor),
+      };
     }
     edgesToUpdate.push(update);
   }

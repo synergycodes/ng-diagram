@@ -92,7 +92,7 @@ dangling on empty canvas, or reverted (invalid drop or cancelled gesture).
 > **edgeRelinkStarted**: `EventEmitter`\<[`EdgeRelinkStartedEvent`](/docs/api/types/events/edgerelinkstartedevent/)\>
 
 Event emitted when the user starts dragging an endpoint of an existing
-edge (the relinking gesture, see `edgeRelinking` config).
+edge (the relinking gesture, see `linking.relinkingEnabled` config).
 
 #### Since
 

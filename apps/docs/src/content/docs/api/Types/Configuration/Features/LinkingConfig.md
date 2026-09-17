@@ -97,6 +97,33 @@ The maximum distance (in pixels) at temporary edge will snap to target port.
 
 ***
 
+### relinkingEnabled
+
+> **relinkingEnabled**: `boolean`
+
+Enables edge relinking — dragging an endpoint of an existing edge to
+another port. When true, a selected edge shows grabbable endpoint
+handles; dragging one previews the reconnection live and commits it on
+drop. Dropping on empty canvas leaves the endpoint dangling when
+`danglingEdges.enabled` is true, otherwise the relink is reverted.
+
+The gesture shares this section's snap distance, edge panning and
+temporary edge builder. Its drops are validated through
+`validateConnection`, which receives a context with `reason: 'relink'`
+and the edge being relinked.
+
+#### Default
+
+```ts
+false
+```
+
+#### Since
+
+1.4.0
+
+***
+
 ### selectNodeOnPortPress
 
 > **selectNodeOnPortPress**: `boolean`

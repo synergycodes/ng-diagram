@@ -11,8 +11,7 @@ describe('startRelinking', () => {
     getEdgeById: ReturnType<typeof vi.fn>;
     applyUpdate: ReturnType<typeof vi.fn>;
     config: {
-      edgeRelinking: { enabled: boolean };
-      linking: { temporaryEdgeDataBuilder: ReturnType<typeof vi.fn> };
+      linking: { relinkingEnabled: boolean; temporaryEdgeDataBuilder: ReturnType<typeof vi.fn> };
       computeEdgeId: ReturnType<typeof vi.fn>;
     };
     actionStateManager: {
@@ -58,8 +57,8 @@ describe('startRelinking', () => {
       getEdgeById: vi.fn().mockReturnValue(edge),
       applyUpdate: vi.fn().mockResolvedValue(undefined),
       config: {
-        edgeRelinking: { enabled: true },
         linking: {
+          relinkingEnabled: true,
           // Passthrough builder — mirrors the default config's identity builder.
           temporaryEdgeDataBuilder: vi.fn((temporaryEdge: Edge) => temporaryEdge),
         },
@@ -76,8 +75,8 @@ describe('startRelinking', () => {
   });
 
   describe('refusals', () => {
-    it('should do nothing when edgeRelinking is disabled', async () => {
-      mockFlowCore.config.edgeRelinking.enabled = false;
+    it('should do nothing when relinking is disabled', async () => {
+      mockFlowCore.config.linking.relinkingEnabled = false;
 
       await startRelinking(mockCommandHandler, { name: 'startRelinking', edgeId: 'edge-1', end: 'target' });
 

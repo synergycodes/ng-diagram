@@ -120,6 +120,22 @@ export interface LinkingConfig {
    * @since 1.2.0
    */
   selectNodeOnPortPress: boolean;
+  /**
+   * Enables edge relinking — dragging an endpoint of an existing edge to
+   * another port. When true, a selected edge shows grabbable endpoint
+   * handles; dragging one previews the reconnection live and commits it on
+   * drop. Dropping on empty canvas leaves the endpoint dangling when
+   * `danglingEdges.enabled` is true, otherwise the relink is reverted.
+   *
+   * The gesture shares this section's snap distance, edge panning and
+   * temporary edge builder. Its drops are validated through
+   * `validateConnection`, which receives a context with `reason: 'relink'`
+   * and the edge being relinked.
+   *
+   * @default false
+   * @since 1.4.0
+   */
+  relinkingEnabled: boolean;
 }
 
 /**
@@ -163,8 +179,11 @@ export interface DanglingEdgesConfig {
    *
    * An edge is still deleted, never detached, when:
    * - it is itself part of the deleted selection (an explicit delete wins),
-   * - it or the lost endpoint's node is effectively hidden (detaching would
-   *   materialize invisible wiring as visible dangling edges), or
+   * - it is hidden only because of the node it loses — detaching would make
+   *   invisible wiring (e.g. the collapsed children of a deleted group) appear
+   *   as a visible dangling edge; an edge that stays hidden on its own (its
+   *   `hidden` flag, a template binding, or a hidden other endpoint) is
+   *   detached like any other and remains hidden, or
    * - it loses BOTH endpoints in the same delete — it becomes a dual dangling
    *   edge only when {@link shouldDetachOnNodeDelete} is provided and returns
    *   true for both ends.
@@ -181,29 +200,6 @@ export interface DanglingEdgesConfig {
    * @default undefined (detach every edge, except edges losing both ends)
    */
   shouldDetachOnNodeDelete?: (edge: Edge, deletedNode: Node, end: EdgeEnd) => boolean;
-}
-
-/**
- * Configuration for interactive edge relinking — dragging an endpoint of an
- * existing edge to reconnect it to another port or leave it dangling.
- *
- * @public
- * @since 1.4.0
- * @category Types/Configuration/Features
- */
-export interface EdgeRelinkingConfig {
-  /**
-   * Enables the relinking gesture. When true, a selected edge shows grabbable
-   * endpoint handles; dragging one previews the reconnection live and commits
-   * it on drop. Dropping on empty canvas leaves the endpoint dangling when
-   * `danglingEdges.enabled` is true, otherwise the relink is reverted.
-   *
-   * Connections made by relinking are validated through
-   * `linking.validateConnection`, which receives a context with
-   * `reason: 'relink'` and the edge being relinked.
-   * @default false
-   */
-  enabled: boolean;
 }
 
 /**
@@ -655,12 +651,6 @@ export interface FlowConfig {
    * @since 1.4.0
    */
   danglingEdges: DanglingEdgesConfig;
-
-  /**
-   * Configuration for interactive edge relinking.
-   * @since 1.4.0
-   */
-  edgeRelinking: EdgeRelinkingConfig;
 
   /**
    * Configuration for node grouping.

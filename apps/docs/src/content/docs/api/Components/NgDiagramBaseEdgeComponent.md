@@ -49,7 +49,7 @@ viewport scale — at zoom 0.5 the visible 5px circle alone would leave a
 > `readonly` **relinkHandlesVisible**: `Signal`\<`boolean`\>
 
 Endpoint handles for the relinking gesture — rendered on selected,
-committed edges when `edgeRelinking.enabled` is true.
+committed edges when `linking.relinkingEnabled` is true.
 
 #### Since
 

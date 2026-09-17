@@ -23,14 +23,16 @@ const getFloatingEndSides = (
     };
   }
 
-  // Floating target (dangling end, or drawing from source)
+  // Floating target (dangling end, a draw in progress, or a target-end relink
+  // preview — a draw always drags the target end)
   if (!edge.target && edge.targetPosition) {
     const startNode = nodesMap.get(edge.source);
     const targetSide = computeFloatingEndSide(startNode, edge.sourcePort, edge.targetPosition);
     return { targetSide };
   }
 
-  // Floating source (dangling start, or reverse drawing from target)
+  // Floating source (dangling start, or a source-end relink preview — the only
+  // gesture that moves the source end)
   if (!edge.source && edge.sourcePosition) {
     const endNode = nodesMap.get(edge.target);
     const sourceSide = computeFloatingEndSide(endNode, edge.targetPort, edge.sourcePosition);

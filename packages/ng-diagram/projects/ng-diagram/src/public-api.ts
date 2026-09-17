@@ -123,7 +123,6 @@ export type {
   EdgeLabelPosition,
   EdgeRelinkCancelReason,
   EdgeRelinkEndedEvent,
-  EdgeRelinkingConfig,
   EdgeRelinkStartedEvent,
   EdgeRouting,
   EdgeRoutingConfig,

@@ -5,7 +5,6 @@ import type {
   BackgroundConfig,
   BoxSelectionConfig,
   DanglingEdgesConfig,
-  EdgeRelinkingConfig,
   EdgeRoutingConfig,
   FlowConfig,
   GroupingConfig,
@@ -38,6 +37,7 @@ const defaultLinkingConfig: LinkingConfig = {
   edgePanningForce: 10,
   edgePanningThreshold: 30,
   selectNodeOnPortPress: true,
+  relinkingEnabled: false,
   validateConnection: (): boolean => {
     // Allow connection by default
     return true;
@@ -57,10 +57,6 @@ const defaultLinkingConfig: LinkingConfig = {
 const defaultDanglingEdgesConfig: DanglingEdgesConfig = {
   enabled: false,
   detachOnNodeDelete: false,
-};
-
-const defaultEdgeRelinkingConfig: EdgeRelinkingConfig = {
-  enabled: false,
 };
 
 const defaultGroupingConfig: GroupingConfig = {
@@ -167,7 +163,6 @@ export const createFlowConfig = (config: DeepPartial<FlowConfig>, flowCore: Flow
       resize: defaultResizeConfig,
       linking: defaultLinkingConfig,
       danglingEdges: defaultDanglingEdgesConfig,
-      edgeRelinking: defaultEdgeRelinkingConfig,
       grouping: defaultGroupingConfig,
       zoom: defaultZoomConfig,
       background: defaultBackgroundConfig,

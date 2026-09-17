@@ -273,12 +273,10 @@ export const copy = async (commandHandler: CommandHandler) => {
 
   const copiedNodes = nodes.filter((node) => copiedNodeIds.has(node.id));
 
-  // Edges: explicitly selected visible edges, plus every edge fully inside the
-  // copied node set (the internal wiring of copied groups, hidden or not).
-  // With dangling edges enabled, "fully inside" counts only the connected
-  // endpoints — a dangling edge travels with its one node (a dual dangling
-  // edge still only copies when selected). With the feature off the old rule
-  // applies unchanged, so the same model copies identically to before.
+  // "Fully inside" the copied node set: with dangling edges enabled only the
+  // connected endpoints count, so a dangling edge travels with its one node (a
+  // dual dangling edge still only copies when selected). With the feature off
+  // the old rule applies unchanged, so the same model copies identically.
   const danglingEnabled = commandHandler.flowCore.config.danglingEdges?.enabled;
   const isInsideCopiedSet = (edge: Edge): boolean => {
     if (danglingEnabled) {
@@ -287,6 +285,9 @@ export const copy = async (commandHandler: CommandHandler) => {
     }
     return copiedNodeIds.has(edge.source) && copiedNodeIds.has(edge.target);
   };
+
+  // Edges: explicitly selected visible edges, plus every edge fully inside the
+  // copied node set (the internal wiring of copied groups, hidden or not).
   const copiedEdges = edges.filter((edge) => (edge.selected && !edge.computedHidden) || isInsideCopiedSet(edge));
 
   commandHandler.flowCore.actionStateManager.copyPaste = {

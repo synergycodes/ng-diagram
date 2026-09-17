@@ -4,7 +4,7 @@ import { pair, trio } from './fixtures/models';
 
 /**
  * Dangling edges (config `danglingEdges`) and edge relinking
- * (config `edgeRelinking`) — both opt-in, default off.
+ * (config `linking.relinkingEnabled`) — both opt-in, default off.
  */
 
 /** Both free endpoints set — a dual dangling edge plus one anchored node. */
@@ -197,7 +197,7 @@ test.describe('dangling edges', () => {
 });
 
 test.describe('edge relinking', () => {
-  const relinkOn = { edgeRelinking: { enabled: true } };
+  const relinkOn = { linking: { relinkingEnabled: true } };
 
   test('handles render only on selected edges and only when enabled', async ({ diagram }) => {
     await diagram.load({ model: trio });
@@ -549,7 +549,7 @@ test.describe('edge relinking', () => {
 test.describe('edge relinking on touch', () => {
   test.use({ hasTouch: true });
 
-  const relinkOn = { edgeRelinking: { enabled: true } };
+  const relinkOn = { linking: { relinkingEnabled: true } };
 
   /** Dispatch a raw CDP touch sequence (Playwright's touchscreen has no drag). */
   async function touchSequence(
@@ -626,6 +626,8 @@ test.describe('startLinkingFromPosition', () => {
     const [edge] = await diagram.model.edges();
     expect(edge).toMatchObject({ source: '', target: 'node-b', targetPort: 'port-left' });
     expect(edge.sourcePosition).toEqual(startFlow);
+    // A free end has no port: undefined, never the preview's ''.
+    expect(edge.sourcePort).toBeUndefined();
   });
 
   test('a draw started from a position kept on empty canvas becomes a dual dangling edge', async ({ diagram }) => {

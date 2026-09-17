@@ -26,8 +26,11 @@ Requires `enabled` to be true.
 
 An edge is still deleted, never detached, when:
 - it is itself part of the deleted selection (an explicit delete wins),
-- it or the lost endpoint's node is effectively hidden (detaching would
-  materialize invisible wiring as visible dangling edges), or
+- it is hidden only because of the node it loses — detaching would make
+  invisible wiring (e.g. the collapsed children of a deleted group) appear
+  as a visible dangling edge; an edge that stays hidden on its own (its
+  `hidden` flag, a template binding, or a hidden other endpoint) is
+  detached like any other and remains hidden, or
 - it loses BOTH endpoints in the same delete — it becomes a dual dangling
   edge only when [shouldDetachOnNodeDelete](/docs/api/types/configuration/features/danglingedgesconfig/#shoulddetachonnodedelete) is provided and returns
   true for both ends.

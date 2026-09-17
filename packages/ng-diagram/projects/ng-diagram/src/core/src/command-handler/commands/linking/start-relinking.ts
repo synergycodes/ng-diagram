@@ -20,7 +20,7 @@ export const startRelinking = async (commandHandler: CommandHandler, command: St
   const { flowCore } = commandHandler;
   const { actionStateManager } = flowCore;
 
-  if (!flowCore.config.edgeRelinking.enabled) {
+  if (!flowCore.config.linking.relinkingEnabled) {
     return;
   }
 

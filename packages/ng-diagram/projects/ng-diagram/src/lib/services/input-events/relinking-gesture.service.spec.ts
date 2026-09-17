@@ -18,7 +18,7 @@ describe('RelinkingGestureService', () => {
   let isCancellingInteraction: ReturnType<typeof vi.fn>;
   let panningHandled: ReturnType<typeof vi.fn>;
   let zoomingHandled: ReturnType<typeof vi.fn>;
-  let edgeRelinkingConfig: { enabled: boolean };
+  let relinkingEnabled: boolean;
 
   const edge: Edge = { id: 'edge-1', source: 'node-a', target: 'node-b', data: {} };
 
@@ -45,7 +45,7 @@ describe('RelinkingGestureService', () => {
     isCancellingInteraction = vi.fn().mockReturnValue(false);
     panningHandled = vi.fn().mockReturnValue(false);
     zoomingHandled = vi.fn().mockReturnValue(false);
-    edgeRelinkingConfig = { enabled: true };
+    relinkingEnabled = true;
 
     const mockFlowCore = {
       actionStateManager: { isLinking },
@@ -54,8 +54,12 @@ describe('RelinkingGestureService', () => {
       cancelActiveInteraction,
       get config() {
         return {
-          edgeRelinking: edgeRelinkingConfig,
-          linking: { edgePanningEnabled: false, edgePanningThreshold: 0, edgePanningForce: 0 },
+          linking: {
+            relinkingEnabled,
+            edgePanningEnabled: false,
+            edgePanningThreshold: 0,
+            edgePanningForce: 0,
+          },
         };
       },
     };
@@ -90,7 +94,7 @@ describe('RelinkingGestureService', () => {
 
   describe('beginRelink refusals', () => {
     it('should return false when edge relinking is disabled', () => {
-      edgeRelinkingConfig.enabled = false;
+      relinkingEnabled = false;
 
       expect(service.beginRelink(pointerDownEvent(), edge, 'target')).toBe(false);
 

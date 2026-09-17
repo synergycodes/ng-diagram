@@ -18,8 +18,11 @@ describe('finishRelinking', () => {
         enabled: boolean;
         shouldKeepOnDrop?: ReturnType<typeof vi.fn>;
       };
-      edgeRelinking: { enabled: boolean };
-      linking: { portSnapDistance: number; validateConnection: ReturnType<typeof vi.fn> };
+      linking: {
+        relinkingEnabled: boolean;
+        portSnapDistance: number;
+        validateConnection: ReturnType<typeof vi.fn>;
+      };
     };
     actionStateManager: {
       linking: LinkingActionState | null;
@@ -87,8 +90,11 @@ describe('finishRelinking', () => {
       applyUpdate: vi.fn().mockResolvedValue(undefined),
       config: {
         danglingEdges: { enabled: false },
-        edgeRelinking: { enabled: true },
-        linking: { portSnapDistance: 12, validateConnection: vi.fn().mockReturnValue(true) },
+        linking: {
+          relinkingEnabled: true,
+          portSnapDistance: 12,
+          validateConnection: vi.fn().mockReturnValue(true),
+        },
       },
       actionStateManager: {
         linking: null,
