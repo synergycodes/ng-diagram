@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy, inject, signal } from '@angular/core';
-import { Edge, EdgeEnd, FPS_60, NgDiagramMath, Point } from '../../../core/src';
+import { Edge, EdgeEnd, FPS_60, isEdgeEndRelinkable, NgDiagramMath, Point } from '../../../core/src';
 import { MOVE_THRESHOLD } from '../../../core/src/input-events/handlers/pointer-move-selection/pointer-move-selection.handler';
 import { DiagramEventName, PointerInputEvent } from '../../types';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
@@ -64,7 +64,7 @@ export class RelinkingGestureService implements OnDestroy {
     if (this.gestureActive || flowCore.actionStateManager.isLinking()) {
       return false;
     }
-    if (!flowCore.config.linking.relinkingEnabled) {
+    if (!isEdgeEndRelinkable(edge, end, flowCore.config.linking.defaultRelinkable)) {
       return false;
     }
     // An Escape-triggered cancel can still be rolling back state.

@@ -1,5 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Edge, equalPointsArrays, isDanglingEdge, Point, RoutingMode } from '../../../../core/src';
+import {
+  Edge,
+  EdgeEnd,
+  equalPointsArrays,
+  isDanglingEdge,
+  isEdgeEndRelinkable,
+  Point,
+  RoutingMode,
+} from '../../../../core/src';
 import { isValidPosition } from '../../../../core/src/utils/measurement-validation';
 import { EdgeSelectionDirective, InlineMarkersDirective, ZIndexDirective } from '../../../directives';
 import { RelinkHandleDirective } from '../../../directives/input-events/relinking/relinking.directive';
@@ -176,18 +184,19 @@ export class NgDiagramBaseEdgeComponent {
   readonly labels = computed(() => this.edge().measuredLabels ?? []);
 
   /**
-   * Endpoint handles for the relinking gesture — rendered on selected,
-   * committed edges when `linking.relinkingEnabled` is true.
+   * Whether the source endpoint handle is rendered: the edge is selected,
+   * committed, routed, and its source end can be relinked.
    *
    * @since 1.4.0
    */
-  readonly relinkHandlesVisible = computed(
-    () =>
-      (this.diagramService?.config().linking?.relinkingEnabled ?? false) &&
-      !!this.selected() &&
-      !this.temporary() &&
-      this.points().length > 0
-  );
+  readonly relinkSourceHandleVisible = computed(() => this.relinkHandleVisible('source'));
+
+  /**
+   * Same as {@link relinkSourceHandleVisible} for the target end.
+   *
+   * @since 1.4.0
+   */
+  readonly relinkTargetHandleVisible = computed(() => this.relinkHandleVisible('target'));
 
   /**
    * Position of the source endpoint handle (the first routed point).
@@ -237,6 +246,14 @@ export class NgDiagramBaseEdgeComponent {
   private prevRouting: string | undefined;
   private prevRoutingMode: RoutingMode | undefined;
   private prevPoints: Point[] | undefined;
+
+  private relinkHandleVisible(end: EdgeEnd): boolean {
+    if (!this.selected() || this.temporary() || this.points().length === 0) {
+      return false;
+    }
+    const defaultRelinkable = this.diagramService?.config().linking?.defaultRelinkable ?? false;
+    return isEdgeEndRelinkable(this.edge(), end, defaultRelinkable);
+  }
 
   constructor() {
     // Sync edge properties from custom components back to the model

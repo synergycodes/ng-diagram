@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Edge, Point } from '../../../../core/src';
+import { Edge, EdgeEnd, Point } from '../../../../core/src';
 import { FlowCoreProviderService, RendererService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
+import { RelinkingGestureService } from '../../../services/input-events/relinking-gesture.service';
 import { MarkerRegistryService } from '../../../services/marker-registry/marker-registry.service';
 import { NgDiagramService } from '../../../public-services/ng-diagram.service';
 import { NgDiagramBaseEdgeLabelComponent } from '../../edge-label/base-edge-label/base-edge-label.component';
@@ -22,8 +23,10 @@ describe('NgDiagramBaseEdgeComponent', () => {
   let mockEdge: Edge;
   let mockFlowCore: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   let mockFlowCoreProvider: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  let defaultRelinkable: boolean | EdgeEnd;
 
   beforeEach(async () => {
+    defaultRelinkable = false;
     // Create mock for EdgeRoutingManager
     const mockEdgeRoutingManager = {
       hasRouting: vi.fn().mockReturnValue(true),
@@ -54,7 +57,8 @@ describe('NgDiagramBaseEdgeComponent', () => {
     await TestBed.configureTestingModule({
       providers: [
         { provide: FlowCoreProviderService, useValue: mockFlowCoreProvider },
-        { provide: NgDiagramService, useValue: { config: () => ({}) } },
+        { provide: NgDiagramService, useValue: { config: () => ({ linking: { defaultRelinkable } }) } },
+        { provide: RelinkingGestureService, useValue: { beginRelink: vi.fn().mockReturnValue(false) } },
         RendererService,
         InputEventsRouterService,
         MarkerRegistryService,
@@ -280,5 +284,76 @@ describe('NgDiagramBaseEdgeComponent', () => {
 
     const pathElement = fixture.nativeElement.querySelector('path');
     expect(pathElement.getAttribute('stroke-dasharray')).toBe('var(--edge-stroke-dasharray, none)');
+  });
+
+  describe('relink handles', () => {
+    const handles = () => ({
+      source: component.relinkSourceHandleVisible(),
+      target: component.relinkTargetHandleVisible(),
+    });
+
+    const renderedHandles = () => ({
+      source: fixture.nativeElement.querySelectorAll('[data-relink-handle="source"]').length,
+      target: fixture.nativeElement.querySelectorAll('[data-relink-handle="target"]').length,
+    });
+
+    it.each<[boolean | EdgeEnd, boolean, boolean]>([
+      [true, true, true],
+      ['source', true, false],
+      ['target', false, true],
+      [false, false, false],
+    ])('relinkable %j on a selected edge shows source=%s target=%s', (relinkable, source, target) => {
+      fixture.componentRef.setInput('edge', { ...mockEdge, selected: true, relinkable });
+      fixture.detectChanges();
+
+      expect(handles()).toEqual({ source, target });
+      expect(renderedHandles()).toEqual({ source: source ? 1 : 0, target: target ? 1 : 0 });
+    });
+
+    it.each<[boolean | EdgeEnd, boolean, boolean]>([
+      [true, true, true],
+      ['source', true, false],
+      ['target', false, true],
+      [false, false, false],
+    ])('defaultRelinkable %j applies to an edge without relinkable: source=%s target=%s', (value, source, target) => {
+      defaultRelinkable = value;
+      fixture.componentRef.setInput('edge', { ...mockEdge, selected: true });
+      fixture.detectChanges();
+
+      expect(handles()).toEqual({ source, target });
+    });
+
+    it('should let the edge override the default', () => {
+      defaultRelinkable = true;
+      fixture.componentRef.setInput('edge', { ...mockEdge, selected: true, relinkable: false });
+      fixture.detectChanges();
+
+      expect(handles()).toEqual({ source: false, target: false });
+    });
+
+    it('should hide both handles when the edge is not selected', () => {
+      defaultRelinkable = true;
+      fixture.componentRef.setInput('edge', { ...mockEdge, selected: false });
+      fixture.detectChanges();
+
+      expect(handles()).toEqual({ source: false, target: false });
+      expect(renderedHandles()).toEqual({ source: 0, target: 0 });
+    });
+
+    it('should hide both handles on a temporary edge', () => {
+      defaultRelinkable = true;
+      fixture.componentRef.setInput('edge', { ...mockEdge, selected: true, temporary: true });
+      fixture.detectChanges();
+
+      expect(handles()).toEqual({ source: false, target: false });
+    });
+
+    it('should hide both handles on an edge without points', () => {
+      defaultRelinkable = true;
+      fixture.componentRef.setInput('edge', { ...mockEdge, selected: true, points: [] });
+      fixture.detectChanges();
+
+      expect(handles()).toEqual({ source: false, target: false });
+    });
   });
 });

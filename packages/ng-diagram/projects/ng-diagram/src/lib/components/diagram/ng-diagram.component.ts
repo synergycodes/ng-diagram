@@ -226,7 +226,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 
   /**
    * Event emitted when the user starts dragging an endpoint of an existing
-   * edge (the relinking gesture, see `linking.relinkingEnabled` config).
+   * edge (the relinking gesture, see `linking.defaultRelinkable` config).
    *
    * @since 1.4.0
    */

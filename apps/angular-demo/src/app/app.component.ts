@@ -126,9 +126,10 @@ export class AppComponent {
     },
     linking: {
       selectNodeOnPortPress: false,
-      // Every selected edge shows grabbable endpoint handles — drag one to
-      // reconnect it to another port or drop it on empty canvas to detach it.
-      relinkingEnabled: true,
+      // Every selected edge shows grabbable endpoint handles unless its own
+      // `relinkable` says otherwise — drag one to reconnect it to another
+      // port or drop it on empty canvas to detach it.
+      defaultRelinkable: true,
     },
     // Dangling edges: a link drawn onto empty canvas is kept (with a free
     // endpoint), and deleting a node detaches its edges instead of deleting

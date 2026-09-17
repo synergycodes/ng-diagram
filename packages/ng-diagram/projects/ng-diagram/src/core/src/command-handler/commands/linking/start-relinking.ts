@@ -1,5 +1,6 @@
 import { createLinkingState } from './linking-gesture';
 import type { CommandHandler, EdgeEnd } from '../../../types';
+import { isEdgeEndRelinkable } from '../../../utils/relinking';
 import { createTemporaryEdge, relinkPreviewBase } from './utils';
 
 export interface StartRelinkingCommand {
@@ -20,10 +21,6 @@ export const startRelinking = async (commandHandler: CommandHandler, command: St
   const { flowCore } = commandHandler;
   const { actionStateManager } = flowCore;
 
-  if (!flowCore.config.linking.relinkingEnabled) {
-    return;
-  }
-
   // A draw or another relink already owns the linking state.
   if (actionStateManager.isLinking()) {
     return;
@@ -31,6 +28,9 @@ export const startRelinking = async (commandHandler: CommandHandler, command: St
 
   const edge = flowCore.getEdgeById(edgeId);
   if (!edge || edge.temporary || edge.computedHidden) {
+    return;
+  }
+  if (!isEdgeEndRelinkable(edge, end, flowCore.config.linking.defaultRelinkable)) {
     return;
   }
 

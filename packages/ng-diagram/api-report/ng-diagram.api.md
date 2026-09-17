@@ -243,6 +243,7 @@ export interface Edge<T extends DataObject = DataObject> {
     // (undocumented)
     readonly measuredLabels?: EdgeLabel[];
     points?: Point[];
+    relinkable?: boolean | EdgeEnd;
     routing?: EdgeRoutingName;
     routingMode?: RoutingMode;
     selected?: boolean;
@@ -522,6 +523,9 @@ export interface InvalidateMeasurementsOptions {
 export const isDanglingEdge: (edge: Edge) => boolean;
 
 // @public
+export const isEdgeEndRelinkable: (edge: Edge, end: EdgeEnd, defaultRelinkable: boolean | EdgeEnd) => boolean;
+
+// @public
 export type KeyboardActionName = KeyboardMoveSelectionAction | KeyboardPanAction | KeyboardZoomAction | Extract<InputEventName, 'cut' | 'paste' | 'copy' | 'deleteSelection' | 'undo' | 'redo' | 'selectAll' | 'cancelInteraction'>;
 
 // @public (undocumented)
@@ -573,12 +577,12 @@ export interface LinkingActionState {
 
 // @public
 export interface LinkingConfig {
+    defaultRelinkable: boolean | EdgeEnd;
     edgePanningEnabled: boolean;
     edgePanningForce: number;
     edgePanningThreshold: number;
     finalEdgeDataBuilder: (defaultFinalEdgeData: Edge) => Edge;
     portSnapDistance: number;
-    relinkingEnabled: boolean;
     selectNodeOnPortPress: boolean;
     temporaryEdgeDataBuilder: (defaultTemporaryEdgeData: Edge) => Edge;
     validateConnection: (source: Node_2 | null, sourcePort: Port | null, target: Node_2 | null, targetPort: Port | null, context?: ConnectionValidationContext) => boolean;
@@ -821,9 +825,10 @@ export class NgDiagramBaseEdgeComponent {
     // (undocumented)
     readonly points: Signal<Point[]>;
     readonly relinkHandleHitRadius: Signal<number>;
-    readonly relinkHandlesVisible: Signal<boolean>;
     readonly relinkSourceHandle: Signal<Point>;
+    readonly relinkSourceHandleVisible: Signal<boolean>;
     readonly relinkTargetHandle: Signal<Point>;
+    readonly relinkTargetHandleVisible: Signal<boolean>;
     routing: InputSignal<string | undefined>;
     // (undocumented)
     readonly selected: Signal<boolean | undefined>;

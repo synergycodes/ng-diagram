@@ -19,7 +19,7 @@ describe('finishRelinking', () => {
         shouldKeepOnDrop?: ReturnType<typeof vi.fn>;
       };
       linking: {
-        relinkingEnabled: boolean;
+        defaultRelinkable: boolean;
         portSnapDistance: number;
         validateConnection: ReturnType<typeof vi.fn>;
       };
@@ -91,7 +91,7 @@ describe('finishRelinking', () => {
       config: {
         danglingEdges: { enabled: false },
         linking: {
-          relinkingEnabled: true,
+          defaultRelinkable: true,
           portSnapDistance: 12,
           validateConnection: vi.fn().mockReturnValue(true),
         },

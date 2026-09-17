@@ -4,7 +4,8 @@ import { pair, trio } from './fixtures/models';
 
 /**
  * Dangling edges (config `danglingEdges`) and edge relinking
- * (config `linking.relinkingEnabled`) — both opt-in, default off.
+ * (config `linking.defaultRelinkable`, overridable per edge with
+ * `edge.relinkable`) — both opt-in, default off.
  */
 
 /** Both free endpoints set — a dual dangling edge plus one anchored node. */
@@ -197,7 +198,7 @@ test.describe('dangling edges', () => {
 });
 
 test.describe('edge relinking', () => {
-  const relinkOn = { linking: { relinkingEnabled: true } };
+  const relinkOn = { linking: { defaultRelinkable: true } };
 
   test('handles render only on selected edges and only when enabled', async ({ diagram }) => {
     await diagram.load({ model: trio });
@@ -207,6 +208,60 @@ test.describe('edge relinking', () => {
     await diagram.load({ model: trio, config: relinkOn });
     await expect(diagram.page.locator('[data-relink-handle]')).toHaveCount(0);
     await diagram.selection.select([], ['edge-ab']);
+    await expect(diagram.page.locator('[data-relink-handle]')).toHaveCount(2);
+  });
+
+  /** The trio model with `edge-ab` carrying the given `relinkable` value. */
+  const trioWithRelinkable = (relinkable: boolean | 'source' | 'target'): Partial<Model> => ({
+    nodes: trio.nodes,
+    edges: trio.edges!.map((edge) => ({ ...edge, relinkable })),
+  });
+
+  test("an edge with relinkable 'target' shows only the target handle and still reconnects", async ({ diagram }) => {
+    await diagram.load({ model: trioWithRelinkable('target'), config: relinkOn });
+    await diagram.selection.select([], ['edge-ab']);
+
+    await expect(diagram.page.locator('[data-relink-handle]')).toHaveCount(1);
+    await expect(diagram.page.locator('[data-relink-handle="source"]')).toHaveCount(0);
+
+    const handle = await diagram.centerOf(
+      diagram.edge('edge-ab').locator('[data-relink-handle="target"]'),
+      'target handle of edge-ab'
+    );
+    const dst = await diagram.centerOf(diagram.port('node-c', 'port-left'), 'port node-c/port-left');
+    await diagram.beginDrag(handle, dst);
+    await diagram.page.mouse.up();
+
+    await expect.poll(async () => (await diagram.model.getEdgeById('edge-ab'))?.target).toBe('node-c');
+  });
+
+  test('an edge with relinkable false shows no handles and cannot be relinked', async ({ diagram }) => {
+    await diagram.load({ model: trioWithRelinkable(false), config: relinkOn });
+    await diagram.page.evaluate(() => {
+      (window as unknown as Record<string, unknown>).__relinkStarted = 0;
+      window.__diagram!.diagram.addEventListener('edgeRelinkStarted', () => {
+        (window as unknown as Record<string, number>).__relinkStarted += 1;
+      });
+    });
+    // Where the target handle would sit: the edge's last routed point.
+    const edge = await diagram.model.getEdgeById('edge-ab');
+    const handle = await diagram.viewport.flowToClientPosition(edge!.points!.at(-1)!);
+
+    await diagram.selection.select([], ['edge-ab']);
+    await expect(diagram.page.locator('[data-relink-handle]')).toHaveCount(0);
+
+    await diagram.beginDrag(handle, { x: handle.x + 120, y: handle.y + 100 });
+    await diagram.page.mouse.up();
+    await diagram.nextFrame();
+
+    expect(await diagram.page.evaluate(() => (window as unknown as Record<string, number>).__relinkStarted)).toBe(0);
+    expect(await diagram.model.getEdgeById('edge-ab')).toMatchObject({ source: 'node-a', target: 'node-b' });
+  });
+
+  test('an edge with relinkable true shows both handles although the default is false', async ({ diagram }) => {
+    await diagram.load({ model: trioWithRelinkable(true) });
+    await diagram.selection.select([], ['edge-ab']);
+
     await expect(diagram.page.locator('[data-relink-handle]')).toHaveCount(2);
   });
 
@@ -549,7 +604,7 @@ test.describe('edge relinking', () => {
 test.describe('edge relinking on touch', () => {
   test.use({ hasTouch: true });
 
-  const relinkOn = { linking: { relinkingEnabled: true } };
+  const relinkOn = { linking: { defaultRelinkable: true } };
 
   /** Dispatch a raw CDP touch sequence (Playwright's touchscreen has no drag). */
   async function touchSequence(

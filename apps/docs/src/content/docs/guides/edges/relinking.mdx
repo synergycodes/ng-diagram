@@ -8,22 +8,52 @@ sidebar:
 ---
 
 import { Aside } from '@astrojs/starlight/components';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import RelinkingDemo from '@components/angular/edges/relinking/relinking/relinking.astro';
 
-The **edge relinking** feature lets users reconnect existing edges by dragging their endpoints. A selected edge shows grabbable handles at both ends; dragging one previews the reconnection live and commits it on drop.
+The **edge relinking** feature lets users reconnect existing edges by dragging their endpoints. A selected edge shows a grabbable handle at each end that can be relinked; dragging one previews the reconnection live and commits it on drop.
+
+<RelinkingDemo />
+
+Select an edge to see its handles: the first edge can be relinked at both ends, the second only at its target end, the third is locked. Drag a handle to another port to reconnect the edge, or drop it on empty canvas to detach that end.
 
 ## Enabling Relinking
 
-Relinking is controlled by the [`linking.relinkingEnabled`](/docs/api/types/configuration/features/linkingconfig/#relinkingenabled) flag:
+Relinking is off by default. [`linking.defaultRelinkable`](/docs/api/types/configuration/features/linkingconfig/#defaultrelinkable) sets the default for every edge: `true` lets users drag both ends, `'source'` or `'target'` only that end.
+
+<CodeSnippet relativePath="edges/relinking/relinking/diagram.component.ts" sectionId="config" />
+
+With `defaultRelinkable: true`, every selected committed edge rendered by [`ng-diagram-base-edge`](/docs/api/components/ngdiagrambaseedgecomponent) shows an endpoint handle at each end (temporary draw previews never show handles).
+
+## Controlling Which Edges Can Be Relinked
+
+An edge overrides the default with its own [`relinkable`](/docs/api/types/model/edge/#relinkable) property. The resolved value — the edge's `relinkable` when set, otherwise `linking.defaultRelinkable` — decides which ends the user can drag:
+
+| Resolved value | Source end | Target end |
+| -------------- | ---------- | ---------- |
+| `true`         | yes        | yes        |
+| `'source'`     | yes        | no         |
+| `'target'`     | no         | yes        |
+| `false`        | no         | no         |
+
+Edges in the initial model, edges added with [`addEdges`](/docs/api/services/ngdiagrammodelservice/#addedges) and pasted edges set `relinkable` directly in their data:
+
+<CodeSnippet relativePath="edges/relinking/relinking/diagram.component.ts" sectionId="relinkable" />
+
+Edges drawn by the user get it in [`finalEdgeDataBuilder`](/docs/api/types/configuration/features/linkingconfig/#finaledgedatabuilder), the same place where an app assigns their `type`. To make only one edge type relinkable, leave the default at `false` and opt that type in:
 
 ```typescript
 const config: NgDiagramConfig = {
   linking: {
-    relinkingEnabled: true,
+    // defaultRelinkable stays false: only edges that opt in can be relinked
+    finalEdgeDataBuilder: (edge) => ({ ...edge, type: 'draft', relinkable: true }),
   },
 };
 ```
 
-When enabled, every selected committed edge rendered by [`ng-diagram-base-edge`](/docs/api/components/ngdiagrambaseedgecomponent) shows an endpoint handle at each end (temporary draw previews never show handles).
+For the opposite — everything relinkable except a few locked edges — set `defaultRelinkable: true` and `relinkable: false` on the locked ones.
+
+The builder runs only for edges the user draws. Loaded edges rely on the default or on their own `relinkable` property.
 
 ## How It Works
 
@@ -50,17 +80,20 @@ Connections made by relinking run through the same [`linking.validateConnection`
 const config: NgDiagramConfig = {
   linking: {
     validateConnection: (source, sourcePort, target, targetPort, context) => {
-      if (context?.reason === 'relink') {
-        // Locked edges keep their connections
-        if (context.edge?.data?.['locked']) {
-          return false;
-        }
+      if (source?.id === target?.id) {
+        return false; // no self-connections
       }
-      return source?.id !== target?.id; // no self-connections
+      if (context?.reason === 'relink') {
+        // A relinked end stays inside the edge's current group
+        return source?.groupId === target?.groupId;
+      }
+      return true;
     },
   },
 };
 ```
+
+`context.reason === 'relink'` is for rules about the drop target, like the same-group rule above. To lock an edge or one of its ends, use [`relinkable`](#controlling-which-edges-can-be-relinked) instead — the validator runs only on drop, so a locked edge would still show handles and let the user drag them.
 
 Note that `source` can be `null` — when relinking the target end of an edge whose source is dangling (and for draws started with [`startLinkingFromPosition`](/docs/api/services/ngdiagramservice/#startlinkingfromposition)), so guard your validator accordingly.
 
@@ -131,6 +164,16 @@ Handles are rendered only by `ng-diagram-base-edge`. A fully custom edge templat
 ```
 
 A pointerdown on the host element starts the relink gesture for the given `end` of the given `edge`; the gesture itself is driven at document level, so the host element may unmount during the drag.
+
+The directive refuses the pointerdown on an end that cannot be relinked, so a handle on a locked end never starts a gesture. To hide such a handle as well, resolve the edge's `relinkable` against the config default with [`isEdgeEndRelinkable`](/docs/api/utilities/isedgeendrelinkable):
+
+```typescript
+private readonly diagramService = inject(NgDiagramService);
+
+readonly targetHandleVisible = computed(() =>
+  isEdgeEndRelinkable(this.edge(), 'target', this.diagramService.config().linking.defaultRelinkable)
+);
+```
 
 <Aside type="note">
   Handles render as part of the edge, so with{' '}

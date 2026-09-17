@@ -219,7 +219,7 @@ onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
 
 Two opt-in features extend what users can do with existing edges:
 
-- **[Relinking](/docs/guides/edges/relinking)** — with [`linking.relinkingEnabled`](/docs/api/types/configuration/features/linkingconfig/#relinkingenabled), selected edges show endpoint handles that users can drag to reconnect the edge to another port.
+- **[Relinking](/docs/guides/edges/relinking)** — with [`linking.defaultRelinkable`](/docs/api/types/configuration/features/linkingconfig/#defaultrelinkable), selected edges show endpoint handles that users can drag to reconnect the edge to another port, unless the edge's own `relinkable` says otherwise.
 - **[Dangling edges](/docs/guides/edges/dangling-edges)** — with [`danglingEdges.enabled`](/docs/api/types/configuration/features/danglingedgesconfig/#enabled), edges may have free (unconnected) endpoints: a draw or relink dropped on empty canvas keeps the edge, and deleting a node can detach its edges instead of deleting them.
 
 ## Selection During Linking

@@ -70,6 +70,15 @@ export interface Edge<T extends DataObject = DataObject> {
    */
   hidden?: boolean;
   /**
+   * Whether the user can relink the edge's endpoints. `true` allows both
+   * ends, an `EdgeEnd` allows only that end. When absent,
+   * `linking.defaultRelinkable` applies. Any other value locks both ends.
+   *
+   * Set by the user; the library only reads it.
+   * @since 1.4.0
+   */
+  relinkable?: boolean | EdgeEnd;
+  /**
    * @readonly
    * @remarks ComputedHidden is computed by the system and should not be set manually.
    * The effective visibility applied to the edge: true when its own `hidden`

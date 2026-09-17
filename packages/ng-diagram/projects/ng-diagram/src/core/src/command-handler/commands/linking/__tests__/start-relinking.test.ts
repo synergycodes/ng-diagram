@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../../../flow-core';
 import { mockEdge } from '../../../../test-utils';
-import type { CommandHandler, Edge, LinkingActionState } from '../../../../types';
+import type { CommandHandler, Edge, EdgeEnd, LinkingActionState } from '../../../../types';
 import type { InternalLinkingActionState } from '../../../../types/action-state.interface';
 import { startRelinking } from '../start-relinking';
 
@@ -11,7 +11,7 @@ describe('startRelinking', () => {
     getEdgeById: ReturnType<typeof vi.fn>;
     applyUpdate: ReturnType<typeof vi.fn>;
     config: {
-      linking: { relinkingEnabled: boolean; temporaryEdgeDataBuilder: ReturnType<typeof vi.fn> };
+      linking: { defaultRelinkable: boolean | EdgeEnd; temporaryEdgeDataBuilder: ReturnType<typeof vi.fn> };
       computeEdgeId: ReturnType<typeof vi.fn>;
     };
     actionStateManager: {
@@ -58,7 +58,7 @@ describe('startRelinking', () => {
       applyUpdate: vi.fn().mockResolvedValue(undefined),
       config: {
         linking: {
-          relinkingEnabled: true,
+          defaultRelinkable: true,
           // Passthrough builder — mirrors the default config's identity builder.
           temporaryEdgeDataBuilder: vi.fn((temporaryEdge: Edge) => temporaryEdge),
         },
@@ -75,10 +75,29 @@ describe('startRelinking', () => {
   });
 
   describe('refusals', () => {
-    it('should do nothing when relinking is disabled', async () => {
-      mockFlowCore.config.linking.relinkingEnabled = false;
+    it('should do nothing when the default is false and the edge sets no relinkable', async () => {
+      mockFlowCore.config.linking.defaultRelinkable = false;
 
       await startRelinking(mockCommandHandler, { name: 'startRelinking', edgeId: 'edge-1', end: 'target' });
+
+      expect(mockFlowCore.actionStateManager.linking).toBeNull();
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should do nothing when the edge locks itself although the default allows relinking', async () => {
+      mockFlowCore.config.linking.defaultRelinkable = true;
+      mockFlowCore.getEdgeById.mockReturnValue({ ...edge, relinkable: false });
+
+      await startRelinking(mockCommandHandler, { name: 'startRelinking', edgeId: 'edge-1', end: 'target' });
+
+      expect(mockFlowCore.actionStateManager.linking).toBeNull();
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should do nothing for the source end of an edge that only allows its target end', async () => {
+      mockFlowCore.getEdgeById.mockReturnValue({ ...edge, relinkable: 'target' });
+
+      await startRelinking(mockCommandHandler, { name: 'startRelinking', edgeId: 'edge-1', end: 'source' });
 
       expect(mockFlowCore.actionStateManager.linking).toBeNull();
       expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
@@ -132,6 +151,27 @@ describe('startRelinking', () => {
 
       expect(mockFlowCore.actionStateManager.linking).toBeNull();
       expect(mockFlowCore.applyUpdate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('per-edge relinkable', () => {
+    it('should start for the target end of an edge that only allows its target end', async () => {
+      mockFlowCore.getEdgeById.mockReturnValue({ ...edge, relinkable: 'target' });
+
+      await startRelinking(mockCommandHandler, { name: 'startRelinking', edgeId: 'edge-1', end: 'target' });
+
+      expect(linkingState().relink?.end).toBe('target');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startRelinking');
+    });
+
+    it('should start when the edge opts in although the default is false', async () => {
+      mockFlowCore.config.linking.defaultRelinkable = false;
+      mockFlowCore.getEdgeById.mockReturnValue({ ...edge, relinkable: true });
+
+      await startRelinking(mockCommandHandler, { name: 'startRelinking', edgeId: 'edge-1', end: 'source' });
+
+      expect(linkingState().relink?.end).toBe('source');
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'startRelinking');
     });
   });
 

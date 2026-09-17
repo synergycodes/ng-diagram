@@ -190,6 +190,23 @@ export const defaultModel: DiagramModel = {
       position: { x: 1000, y: 870 },
       data: { label: 'the default label chip' },
     },
+    // Relinking demo: the config default allows both ends; the edges leaving
+    // this node override it with their own `relinkable`.
+    {
+      id: '27',
+      position: { x: 1000, y: 1050 },
+      data: { label: 'relinkable overrides' },
+    },
+    {
+      id: '28',
+      position: { x: 1350, y: 1000 },
+      data: { label: 'target end only' },
+    },
+    {
+      id: '29',
+      position: { x: 1350, y: 1160 },
+      data: { label: 'locked' },
+    },
   ],
   edges: [
     {
@@ -379,6 +396,26 @@ export const defaultModel: DiagramModel = {
       target: '26',
       data: { label: 'select me' },
       type: 'default-labelled-edge',
+    },
+    // Only the target handle shows when selected; the source end stays put.
+    {
+      id: 'relink-target-only',
+      source: '27',
+      sourcePort: 'port-right',
+      target: '28',
+      targetPort: 'port-left',
+      relinkable: 'target',
+      data: { label: "relinkable: 'target'" },
+    },
+    // No handles at all when selected, although the config default is true.
+    {
+      id: 'relink-locked',
+      source: '27',
+      sourcePort: 'port-right',
+      target: '29',
+      targetPort: 'port-left',
+      relinkable: false,
+      data: { label: 'relinkable: false' },
     },
   ],
 };

@@ -218,6 +218,7 @@ title: "ng-diagram"
 - [initializeModel](/docs/api/utilities/initializemodel/)
 - [initializeModelAdapter](/docs/api/utilities/initializemodeladapter/)
 - [isDanglingEdge](/docs/api/utilities/isdanglingedge/)
+- [isEdgeEndRelinkable](/docs/api/utilities/isedgeendrelinkable/)
 - [provideNgDiagram](/docs/api/utilities/providengdiagram/)
 - [stripEdgeRuntimeProperties](/docs/api/utilities/stripedgeruntimeproperties/)
 - [stripNodeRuntimeProperties](/docs/api/utilities/stripnoderuntimeproperties/)

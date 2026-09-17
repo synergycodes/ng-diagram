@@ -61,13 +61,14 @@ export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 // Configuration helpers
 export { configureShortcuts } from './core/src';
 
-// Dangling-edge utilities
+// Dangling-edge and relinking utilities
 export {
   computeDetachAnchor,
   getDanglingEndpoints,
   getNearestDanglingEndpointInRange,
   hasFreeEndpoint,
   isDanglingEdge,
+  isEdgeEndRelinkable,
 } from './core/src';
 export { NgDiagramMinimapNodeTemplateMap } from './lib/components/minimap/ng-diagram-minimap.types';
 export { initializeModel, initializeModelAdapter, type InitializeModelOptions } from './lib/model/initialize-model';

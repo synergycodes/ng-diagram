@@ -10,6 +10,35 @@ Configuration for linking (edge creation) behavior.
 
 ## Properties
 
+### defaultRelinkable
+
+> **defaultRelinkable**: `boolean` \| [`EdgeEnd`](/docs/api/types/model/edgeend/)
+
+Default `relinkable` value for edges that do not set their own. `true`
+lets the user drag both ends of an edge to another port, an `EdgeEnd`
+only that end, `false` neither. A selected edge shows a handle at each
+end that can be relinked; dragging a handle previews the reconnection
+live and commits it on drop. Dropping on empty canvas leaves the endpoint
+dangling when `danglingEdges.enabled` is true, otherwise the relink is
+reverted.
+
+The gesture shares this section's snap distance, edge panning and
+temporary edge builder. Its drops are validated through
+`validateConnection`, which receives a context with `reason: 'relink'`
+and the edge being relinked.
+
+#### Default
+
+```ts
+false
+```
+
+#### Since
+
+1.4.0
+
+***
+
 ### edgePanningEnabled
 
 > **edgePanningEnabled**: `boolean`
@@ -94,33 +123,6 @@ The maximum distance (in pixels) at temporary edge will snap to target port.
 ```ts
 10
 ```
-
-***
-
-### relinkingEnabled
-
-> **relinkingEnabled**: `boolean`
-
-Enables edge relinking — dragging an endpoint of an existing edge to
-another port. When true, a selected edge shows grabbable endpoint
-handles; dragging one previews the reconnection live and commits it on
-drop. Dropping on empty canvas leaves the endpoint dangling when
-`danglingEdges.enabled` is true, otherwise the relink is reverted.
-
-The gesture shares this section's snap distance, edge panning and
-temporary edge builder. Its drops are validated through
-`validateConnection`, which receives a context with `reason: 'relink'`
-and the edge being relinked.
-
-#### Default
-
-```ts
-false
-```
-
-#### Since
-
-1.4.0
 
 ***
 

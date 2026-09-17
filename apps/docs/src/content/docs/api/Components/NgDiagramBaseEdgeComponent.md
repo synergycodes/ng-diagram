@@ -44,19 +44,6 @@ viewport scale — at zoom 0.5 the visible 5px circle alone would leave a
 
 ***
 
-### relinkHandlesVisible
-
-> `readonly` **relinkHandlesVisible**: `Signal`\<`boolean`\>
-
-Endpoint handles for the relinking gesture — rendered on selected,
-committed edges when `linking.relinkingEnabled` is true.
-
-#### Since
-
-1.4.0
-
-***
-
 ### relinkSourceHandle
 
 > `readonly` **relinkSourceHandle**: `Signal`\<[`Point`](/docs/api/types/geometry/point/)\>
@@ -69,11 +56,36 @@ Position of the source endpoint handle (the first routed point).
 
 ***
 
+### relinkSourceHandleVisible
+
+> `readonly` **relinkSourceHandleVisible**: `Signal`\<`boolean`\>
+
+Whether the source endpoint handle is rendered: the edge is selected,
+committed, routed, and its source end can be relinked.
+
+#### Since
+
+1.4.0
+
+***
+
 ### relinkTargetHandle
 
 > `readonly` **relinkTargetHandle**: `Signal`\<[`Point`](/docs/api/types/geometry/point/)\>
 
 Position of the target endpoint handle (the last routed point).
+
+#### Since
+
+1.4.0
+
+***
+
+### relinkTargetHandleVisible
+
+> `readonly` **relinkTargetHandleVisible**: `Signal`\<`boolean`\>
+
+Same as [relinkSourceHandleVisible](/docs/api/components/ngdiagrambaseedgecomponent/#relinksourcehandlevisible) for the target end.
 
 #### Since
 

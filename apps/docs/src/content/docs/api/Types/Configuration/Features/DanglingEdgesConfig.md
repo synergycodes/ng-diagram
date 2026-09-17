@@ -10,9 +10,8 @@ Configuration for dangling edges — edges with one or both endpoints not
 connected to any node (an empty `source`/`target` with the free end anchored
 at `sourcePosition`/`targetPosition`).
 
-Everything here is opt-in; with the defaults the diagram behaves exactly as
-before: a link drop on empty canvas discards the edge and deleting a node
-deletes its edges.
+Everything here is opt-in. With the defaults, a link dropped on empty
+canvas is discarded and deleting a node deletes its edges.
 
 ## Properties
 
@@ -52,8 +51,7 @@ empty canvas keeps the edge as a dangling edge instead of discarding it,
 and an edge relink dropped on empty canvas detaches that endpoint.
 
 A drop over a port the edge cannot connect to (for example a
-wrong-direction port) is not an empty-canvas drop and is discarded as
-before.
+wrong-direction port) is not an empty-canvas drop and is discarded.
 
 #### Default
 

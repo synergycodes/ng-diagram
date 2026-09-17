@@ -121,11 +121,13 @@ export interface LinkingConfig {
    */
   selectNodeOnPortPress: boolean;
   /**
-   * Enables edge relinking — dragging an endpoint of an existing edge to
-   * another port. When true, a selected edge shows grabbable endpoint
-   * handles; dragging one previews the reconnection live and commits it on
-   * drop. Dropping on empty canvas leaves the endpoint dangling when
-   * `danglingEdges.enabled` is true, otherwise the relink is reverted.
+   * Default `relinkable` value for edges that do not set their own. `true`
+   * lets the user drag both ends of an edge to another port, an `EdgeEnd`
+   * only that end, `false` neither. A selected edge shows a handle at each
+   * end that can be relinked; dragging a handle previews the reconnection
+   * live and commits it on drop. Dropping on empty canvas leaves the endpoint
+   * dangling when `danglingEdges.enabled` is true, otherwise the relink is
+   * reverted.
    *
    * The gesture shares this section's snap distance, edge panning and
    * temporary edge builder. Its drops are validated through
@@ -135,7 +137,7 @@ export interface LinkingConfig {
    * @default false
    * @since 1.4.0
    */
-  relinkingEnabled: boolean;
+  defaultRelinkable: boolean | EdgeEnd;
 }
 
 /**
@@ -143,9 +145,8 @@ export interface LinkingConfig {
  * connected to any node (an empty `source`/`target` with the free end anchored
  * at `sourcePosition`/`targetPosition`).
  *
- * Everything here is opt-in; with the defaults the diagram behaves exactly as
- * before: a link drop on empty canvas discards the edge and deleting a node
- * deletes its edges.
+ * Everything here is opt-in. With the defaults, a link dropped on empty
+ * canvas is discarded and deleting a node deletes its edges.
  *
  * @public
  * @since 1.4.0
@@ -158,8 +159,7 @@ export interface DanglingEdgesConfig {
    * and an edge relink dropped on empty canvas detaches that endpoint.
    *
    * A drop over a port the edge cannot connect to (for example a
-   * wrong-direction port) is not an empty-canvas drop and is discarded as
-   * before.
+   * wrong-direction port) is not an empty-canvas drop and is discarded.
    * @default false
    */
   enabled: boolean;

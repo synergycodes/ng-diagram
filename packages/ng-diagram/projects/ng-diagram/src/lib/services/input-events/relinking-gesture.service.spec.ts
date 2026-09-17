@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Edge } from '../../../core/src';
+import type { Edge, EdgeEnd } from '../../../core/src';
 import { PointerInputEvent } from '../../types';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { TouchEventsStateService } from '../touch-events-state-service/touch-events-state-service.service';
@@ -18,7 +18,7 @@ describe('RelinkingGestureService', () => {
   let isCancellingInteraction: ReturnType<typeof vi.fn>;
   let panningHandled: ReturnType<typeof vi.fn>;
   let zoomingHandled: ReturnType<typeof vi.fn>;
-  let relinkingEnabled: boolean;
+  let defaultRelinkable: boolean | EdgeEnd;
 
   const edge: Edge = { id: 'edge-1', source: 'node-a', target: 'node-b', data: {} };
 
@@ -45,7 +45,7 @@ describe('RelinkingGestureService', () => {
     isCancellingInteraction = vi.fn().mockReturnValue(false);
     panningHandled = vi.fn().mockReturnValue(false);
     zoomingHandled = vi.fn().mockReturnValue(false);
-    relinkingEnabled = true;
+    defaultRelinkable = true;
 
     const mockFlowCore = {
       actionStateManager: { isLinking },
@@ -55,7 +55,7 @@ describe('RelinkingGestureService', () => {
       get config() {
         return {
           linking: {
-            relinkingEnabled,
+            defaultRelinkable,
             edgePanningEnabled: false,
             edgePanningThreshold: 0,
             edgePanningForce: 0,
@@ -93,13 +93,31 @@ describe('RelinkingGestureService', () => {
   });
 
   describe('beginRelink refusals', () => {
-    it('should return false when edge relinking is disabled', () => {
-      relinkingEnabled = false;
+    it('should return false when neither the edge nor the default allows relinking', () => {
+      defaultRelinkable = false;
 
       expect(service.beginRelink(pointerDownEvent(), edge, 'target')).toBe(false);
 
       dispatch('pointermove', { clientX: 100 });
       expect(emitStart).not.toHaveBeenCalled();
+    });
+
+    it('should return false and register no document listeners for a locked end', () => {
+      const addEventListener = vi.spyOn(document, 'addEventListener');
+
+      expect(service.beginRelink(pointerDownEvent(), { ...edge, relinkable: 'target' }, 'source')).toBe(false);
+
+      expect(addEventListener).not.toHaveBeenCalled();
+      expect(registerInteractionCleanup).not.toHaveBeenCalled();
+      dispatch('pointermove', { clientX: 100 });
+      expect(emitStart).not.toHaveBeenCalled();
+      addEventListener.mockRestore();
+    });
+
+    it('should claim the gesture for an end the edge allows although the default is false', () => {
+      defaultRelinkable = false;
+
+      expect(service.beginRelink(pointerDownEvent(), { ...edge, relinkable: 'target' }, 'target')).toBe(true);
     });
 
     it('should return false when a gesture is already active', () => {

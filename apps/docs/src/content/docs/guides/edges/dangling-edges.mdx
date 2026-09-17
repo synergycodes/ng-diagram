@@ -7,28 +7,22 @@ sidebar:
   badge: New
 ---
 
-import { Aside } from '@astrojs/starlight/components';
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import DanglingEdgesDemo from '@components/angular/edges/dangling-edges/dangling-edges/dangling-edges.astro';
 
 Dangling edges are edges with one or both endpoints not connected to any node. They are useful for diagrams where connections are sketched before both ends exist, where deleting a node should keep its wiring, or where free-floating annotation lines are part of the domain.
 
-Everything about dangling edges is opt-in. With the defaults the diagram behaves exactly as before: a link drop on empty canvas discards the edge and deleting a node deletes its edges.
+Everything about dangling edges is opt-in. With the defaults, a link dropped on empty canvas is discarded and deleting a node deletes its edges.
+
+Draw an edge from a port onto empty canvas to keep it as a dangling edge; select a node and press <kbd>Delete</kbd> to detach its edges instead of deleting them.
+
+<DanglingEdgesDemo />
 
 ## Model Shape
 
 A free (unconnected) endpoint is represented by an empty string in [`source`](/docs/api/types/model/edge/#source)/[`target`](/docs/api/types/model/edge/#target) with the anchor position stored in [`sourcePosition`](/docs/api/types/model/edge/#sourceposition)/[`targetPosition`](/docs/api/types/model/edge/#targetposition):
 
-```typescript
-edges: [
-  {
-    id: '1',
-    source: 'node-1',
-    sourcePort: 'port-right',
-    target: '', // free endpoint — no node
-    targetPosition: { x: 400, y: 150 }, // anchored here, in flow coordinates
-    data: {},
-  },
-],
-```
+<CodeSnippet relativePath="edges/dangling-edges/dangling-edges/diagram.component.ts" sectionId="model-shape" />
 
 A free endpoint never has a port: when an endpoint is detached, its `sourcePort`/`targetPort` is cleared. An edge with both endpoints free is a **dual dangling edge** — it routes between its two anchor positions.
 
@@ -36,13 +30,7 @@ A free endpoint never has a port: when an endpoint is detached, its `sourcePort`
 
 Dangling edges are controlled by the [`danglingEdges`](/docs/api/types/configuration/features/danglingedgesconfig) configuration:
 
-```typescript
-const config: NgDiagramConfig = {
-  danglingEdges: {
-    enabled: true,
-  },
-};
-```
+<CodeSnippet relativePath="edges/dangling-edges/dangling-edges/diagram.component.ts" sectionId="config" />
 
 [`enabled`](/docs/api/types/configuration/features/danglingedgesconfig/#enabled) is the master switch. When true:
 
@@ -169,7 +157,7 @@ ng-diagram-base-edge.dangling {
 
 ## Events
 
-- [`edgeDrawEnded`](/docs/api/types/events/edgedrawendedevent) — a canvas drop kept as a dangling edge reports `success: true` with the created `edge` but **no** `target`/`targetPort`. Distinguish a connected draw from a kept dangling draw by checking `event.target`.
+- [`edgeDrawEnded`](/docs/api/types/events/edgedrawendedevent) — a canvas drop kept as a dangling edge reports `success: true` with the created `edge` but **no** `target`/`targetPort`. Distinguish a connected draw from a kept dangling draw by checking `event.target`. The deprecated `edgeDrawn` event does not fire for dangling edges — it only reports node-to-node connections.
 - [`selectionRemoved`](/docs/api/types/events/selectionremovedevent) — the new `detachedEdges` field lists the edges that were detached instead of deleted (snapshots taken after the detach — the freed endpoints are already empty with their positions set). It is always present, `[]` when nothing was detached.
 
 ```typescript
@@ -179,14 +167,6 @@ onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
   }
 }
 ```
-
-<Aside type="caution" title="Migration note">
-  If your app hand-built dangling edges by listening to `edgeDrawEnded` with `reason === 'noTarget'` and adding an edge
-  yourself, remove that workaround before enabling `danglingEdges.enabled` — with the flag on, a kept canvas drop
-  reports `success: true` (no `noTarget` cancellation fires), and creating your own edge on top of it would duplicate
-  the kept one. Also note that the deprecated `edgeDrawn` event never fires for kept dangling edges — it only reports
-  node-to-node connections. Use `edgeDrawEnded` instead.
-</Aside>
 
 ## Related Topics
 

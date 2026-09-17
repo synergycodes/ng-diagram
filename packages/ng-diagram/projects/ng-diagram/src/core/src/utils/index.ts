@@ -10,6 +10,7 @@ export * from './is-group';
 export * from './measurement-validation';
 export * from './object-properties';
 export * from './rects-points-sizes';
+export * from './relinking';
 export * from './semaphore';
 export * from './snap-node-position';
 export * from './sort-nodes-by-z-index';

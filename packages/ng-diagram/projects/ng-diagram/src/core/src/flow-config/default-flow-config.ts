@@ -37,7 +37,7 @@ const defaultLinkingConfig: LinkingConfig = {
   edgePanningForce: 10,
   edgePanningThreshold: 30,
   selectNodeOnPortPress: true,
-  relinkingEnabled: false,
+  defaultRelinkable: false,
   validateConnection: (): boolean => {
     // Allow connection by default
     return true;
