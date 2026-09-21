@@ -106,6 +106,24 @@ describe('SignalModelAdapter', () => {
       expect(edges[0].targetPosition).toEqual({ x: 300, y: 150 });
     });
 
+    it('should keep both free-endpoint positions of a dual dangling edge', () => {
+      service.updateEdges([
+        {
+          id: 'dual-dangling',
+          source: '',
+          target: '',
+          data: {},
+          sourcePosition: { x: 100, y: 100 },
+          targetPosition: { x: 300, y: 150 },
+        },
+      ]);
+
+      const { edges } = JSON.parse(service.toJSON());
+
+      expect(edges[0].sourcePosition).toEqual({ x: 100, y: 100 });
+      expect(edges[0].targetPosition).toEqual({ x: 300, y: 150 });
+    });
+
     it('should use overridden strip functions', () => {
       service.stripNodeRuntimeProperties = (node) => node;
       service.stripEdgeRuntimeProperties = (edge) => edge;

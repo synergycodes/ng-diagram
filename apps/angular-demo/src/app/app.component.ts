@@ -5,6 +5,8 @@ import {
   DiagramInitEvent,
   EdgeDrawEndedEvent,
   EdgeDrawnEvent,
+  EdgeRelinkEndedEvent,
+  EdgeRelinkStartedEvent,
   GroupMembershipChangedEvent,
   initializeModel,
   MinimapNodeStyle,
@@ -17,6 +19,7 @@ import {
   NgDiagramModelService,
   NgDiagramNodeTemplateMap,
   NgDiagramPaletteItem,
+  NgDiagramService,
   NodeDragEndedEvent,
   NodeDragStartedEvent,
   NodeResizedEvent,
@@ -43,6 +46,7 @@ import { generateModel } from './data/generate-model';
 import { createHiddenElementsModel } from './data/hidden-elements-model';
 import { nodeTemplateMap } from './data/node-template';
 import { paletteModel } from './data/palette-model';
+import { createRelinkingModel } from './data/relinking-model';
 import { virtualizationConfigOverrides, virtualizationTestConfig } from './data/virtualization-test.config';
 import { ButtonEdgeComponent } from './edge-template/button-edge/button-edge.component';
 import { CustomPolylineEdgeComponent } from './edge-template/custom-polyline-edge/custom-polyline-edge.component';
@@ -55,6 +59,7 @@ import { ImageMinimapNodeComponent } from './minimap-node-template/image-minimap
 import { PaletteComponent } from './palette/palette.component';
 import { BatchTestToolbarComponent } from './toolbar/batch-test-toolbar.component';
 import { HiddenElementsToolbarComponent } from './toolbar/hidden-elements-toolbar.component';
+import { RelinkingToolbarComponent } from './toolbar/relinking-toolbar.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
 
 const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
@@ -67,6 +72,7 @@ const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
     ToolbarComponent,
     BatchTestToolbarComponent,
     HiddenElementsToolbarComponent,
+    RelinkingToolbarComponent,
     MeasurementTestsComponent,
     AwaitableTestsComponent,
     PaletteComponent,
@@ -80,6 +86,7 @@ const LOCAL_STORAGE_KEY = 'ng-diagram-demo';
 export class AppComponent {
   private readonly injector = inject(Injector);
   private readonly modelService = inject(NgDiagramModelService);
+  private readonly ngDiagramService = inject(NgDiagramService);
 
   paletteModel: NgDiagramPaletteItem[] = paletteModel;
   nodeTemplateMap: NgDiagramNodeTemplateMap = nodeTemplateMap;
@@ -124,6 +131,17 @@ export class AppComponent {
     },
     linking: {
       selectNodeOnPortPress: false,
+      // Every selected edge shows grabbable endpoint handles unless its own
+      // `relinkable` says otherwise — drag one to reconnect it to another
+      // port or drop it on empty canvas to detach it.
+      defaultRelinkable: true,
+    },
+    // Dangling edges: a link drawn onto empty canvas is kept (with a free
+    // endpoint), and deleting a node detaches its edges instead of deleting
+    // them. Delete an edge explicitly by selecting it.
+    danglingEdges: {
+      enabled: true,
+      detachOnNodeDelete: true,
     },
     shortcuts: configureShortcuts([
       {
@@ -192,6 +210,40 @@ export class AppComponent {
       this.modelData.set(this.savedModelData);
       this.savedModelData = null;
     }
+  }
+
+  relinkingTestMode = signal(false);
+
+  enterRelinkingTest(): void {
+    this.savedModelData = this.modelData();
+    this.relinkingTestMode.set(true);
+    this.modelData.set(createRelinkingModel());
+  }
+
+  exitRelinkingTest(): void {
+    this.relinkingTestMode.set(false);
+    // The panel writes its own linking/dangling rules into the live config.
+    // A model swap rebuilds the diagram core from the `[config]` input, which
+    // already carries these values; this call restores them even when there is
+    // no saved model to swap back to.
+    this.ngDiagramService.updateConfig({
+      linking: { defaultRelinkable: true, validateConnection: () => true },
+      danglingEdges: {
+        enabled: true,
+        detachOnNodeDelete: true,
+        shouldKeepOnDrop: () => true,
+        shouldDetachOnNodeDelete: () => true,
+      },
+    });
+    if (this.savedModelData) {
+      this.modelData.set(this.savedModelData);
+      this.savedModelData = null;
+    }
+  }
+
+  /** Rebuilds the relinking scene from scratch, keeping the mode open. */
+  resetRelinkingScene(): void {
+    this.modelData.set(createRelinkingModel());
   }
 
   enterBatchTest(): void {
@@ -274,18 +326,37 @@ export class AppComponent {
     });
   }
 
+  onEdgeRelinkStarted(event: EdgeRelinkStartedEvent): void {
+    console.log('Edge Relink Started:', { edge: event.edge.id, end: event.end });
+  }
+
+  onEdgeRelinkEnded(event: EdgeRelinkEndedEvent): void {
+    console.log('Edge Relink Ended:', {
+      edge: event.edge.id,
+      end: event.end,
+      success: event.success,
+      previousNode: event.previousNode?.id,
+      previousPort: event.previousPort,
+      target: event.target?.id,
+      targetPort: event.targetPort,
+      reason: event.reason,
+      dropPosition: event.dropPosition,
+    });
+  }
+
   onEdgeDrawEnded(event: EdgeDrawEndedEvent): void {
     if (event.success) {
       console.log('Edge Draw Ended (success):', {
         edge: event.edge!.id,
-        source: event.source.id,
+        // source is undefined for draws started from empty canvas
+        source: event.source?.id,
         target: event.target?.id,
         sourcePort: event.sourcePort,
         targetPort: event.targetPort,
       });
     } else {
       console.log('Edge Draw Ended (cancelled):', {
-        source: event.source.id,
+        source: event.source?.id,
         sourcePort: event.sourcePort,
         reason: event.reason,
         dropPosition: event.dropPosition,

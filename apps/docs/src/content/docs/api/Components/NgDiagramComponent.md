@@ -72,6 +72,35 @@ Use `edgeDrawEnded` instead, which fires for both successful and cancelled draws
 
 ***
 
+### edgeRelinkEnded
+
+> **edgeRelinkEnded**: `EventEmitter`\<[`EdgeRelinkEndedEvent`](/docs/api/types/events/edgerelinkendedevent/)\>
+
+Event emitted when an edge relink gesture ends, regardless of outcome.
+
+Fires when the dragged endpoint is dropped, whether it was reconnected to
+a port, left dangling on empty canvas, or reverted (invalid drop or
+cancelled gesture).
+
+#### Since
+
+1.4.0
+
+***
+
+### edgeRelinkStarted
+
+> **edgeRelinkStarted**: `EventEmitter`\<[`EdgeRelinkStartedEvent`](/docs/api/types/events/edgerelinkstartedevent/)\>
+
+Event emitted when the user starts dragging an endpoint of an existing
+edge (the relinking gesture; see the `linking.defaultRelinkable` config).
+
+#### Since
+
+1.4.0
+
+***
+
 ### edgeTemplateMap
 
 > **edgeTemplateMap**: `InputSignal`\<[`NgDiagramEdgeTemplateMap`](/docs/api/types/templates/ngdiagramedgetemplatemap/)\>

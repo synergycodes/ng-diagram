@@ -38,6 +38,7 @@ describe('VirtualizedRenderStrategy', () => {
       spatialHash,
       modelLookup: {
         nodesMap,
+        danglingEdges: [],
         getNodeById: vi.fn((id: string) => nodesMap.get(id)),
         getConnectedEdges: vi.fn().mockReturnValue([]),
         getAllDescendantIds: vi.fn().mockReturnValue([]),
@@ -180,6 +181,99 @@ describe('VirtualizedRenderStrategy', () => {
       const result = strategy.process(nodes, edges, defaultViewport);
 
       expect(result.edges.map((e) => e.id)).not.toContain('e2');
+    });
+  });
+
+  describe('dangling edges', () => {
+    const setDanglingEdges = (danglingEdges: Edge[]) => {
+      (mockFlowCore.modelLookup as unknown as { danglingEdges: Edge[] }).danglingEdges = danglingEdges;
+    };
+
+    it('should render a dual dangling edge with anchors inside the viewport even with no visible nodes', () => {
+      const dualDangling: Edge = {
+        ...mockEdge,
+        id: 'dual',
+        source: '',
+        sourcePosition: { x: 100, y: 100 },
+        target: '',
+        targetPosition: { x: 300, y: 200 },
+        points: undefined,
+      };
+      setDanglingEdges([dualDangling]);
+      spatialHash.process([]);
+      updateNodesMap([]);
+
+      const result = strategy.process([], [dualDangling], defaultViewport);
+
+      expect(result.nodes).toEqual([]);
+      expect(result.edges.map((e) => e.id)).toContain('dual');
+    });
+
+    it('should render a single-dangling edge and add its off-screen connected node as external', () => {
+      const externalNode: Node = {
+        ...mockNode,
+        id: 'far-node',
+        position: { x: 2000, y: 2000 },
+        size: { width: 50, height: 50 },
+      };
+      const singleDangling: Edge = {
+        ...mockEdge,
+        id: 'single',
+        source: 'far-node',
+        target: '',
+        targetPosition: { x: 150, y: 150 },
+        points: undefined,
+      };
+      setDanglingEdges([singleDangling]);
+      spatialHash.process([externalNode]);
+      updateNodesMap([externalNode]);
+
+      const result = strategy.process([externalNode], [singleDangling], defaultViewport);
+
+      expect(result.edges.map((e) => e.id)).toContain('single');
+      // The connected endpoint renders like the external endpoint of a
+      // node-discovered edge, so the edge is not drawn into nothing.
+      expect(result.nodes.map((n) => n.id)).toContain('far-node');
+    });
+
+    it('should skip a computedHidden dangling edge', () => {
+      const hiddenDangling: Edge = {
+        ...mockEdge,
+        id: 'hidden-dangling',
+        source: '',
+        sourcePosition: { x: 100, y: 100 },
+        target: '',
+        targetPosition: { x: 300, y: 200 },
+        points: undefined,
+        computedHidden: true,
+      };
+      setDanglingEdges([hiddenDangling]);
+      spatialHash.process([]);
+      updateNodesMap([]);
+
+      const result = strategy.process([], [hiddenDangling], defaultViewport);
+
+      expect(result.edges).toEqual([]);
+    });
+
+    it('should not render a dangling edge whose anchors are far outside the viewport', () => {
+      const farDangling: Edge = {
+        ...mockEdge,
+        id: 'far-dangling',
+        source: '',
+        sourcePosition: { x: 5000, y: 5000 },
+        target: '',
+        targetPosition: { x: 5300, y: 5200 },
+        points: undefined,
+      };
+      setDanglingEdges([farDangling]);
+      spatialHash.process([]);
+      updateNodesMap([]);
+
+      const result = strategy.process([], [farDangling], defaultViewport);
+
+      expect(result.edges).toEqual([]);
+      expect(result.nodes).toEqual([]);
     });
   });
 

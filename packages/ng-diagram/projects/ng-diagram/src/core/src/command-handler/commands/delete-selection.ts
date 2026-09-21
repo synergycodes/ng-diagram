@@ -1,25 +1,9 @@
-import type { CommandHandler, Edge } from '../../types';
+import type { CommandHandler } from '../../types';
+import { partitionIncidentEdges } from './detach-on-node-delete';
 
 export interface DeleteSelectionCommand {
   name: 'deleteSelection';
 }
-
-interface GetEdgesToRemoveParams {
-  edges: Edge[];
-  nodesToDeleteIds: string[];
-}
-
-const getEdgesToRemove = ({ edges, nodesToDeleteIds }: GetEdgesToRemoveParams): string[] => {
-  const nodeIdsSet = new Set<string>(nodesToDeleteIds);
-  // A hidden selected edge is not deleted through its own selection, but an
-  // edge whose endpoint is being deleted always dies — hidden or not —
-  // otherwise it would dangle.
-  return edges
-    .filter(
-      (edge) => (edge.selected && !edge.computedHidden) || nodeIdsSet.has(edge.source) || nodeIdsSet.has(edge.target)
-    )
-    .map((edge) => edge.id);
-};
 
 export const deleteSelection = async (commandHandler: CommandHandler) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
@@ -35,15 +19,33 @@ export const deleteSelection = async (commandHandler: CommandHandler) => {
   const nodesToDeleteIds = [
     ...new Set(selectedVisibleNodeIds.flatMap((id) => [id, ...modelLookup.getAllDescendantIds(id)])),
   ];
+  const nodesToDeleteIdsSet = new Set(nodesToDeleteIds);
 
-  const edgesToDeleteIds = getEdgesToRemove({ edges, nodesToDeleteIds });
+  // Explicitly selected visible edges are always deleted — detach-on-delete
+  // never demotes them. A hidden selected edge is not deleted through its own
+  // selection, but an edge whose endpoint is being deleted dies (or detaches,
+  // when the dangling-edges feature allows) — hidden or not.
+  const selectedEdgeIds = new Set(edges.filter((edge) => edge.selected && !edge.computedHidden).map((edge) => edge.id));
+
+  const { edgesToRemove, edgesToUpdate } = partitionIncidentEdges(
+    commandHandler.flowCore,
+    edges,
+    nodesToDeleteIdsSet,
+    selectedEdgeIds
+  );
+
+  const edgesToDeleteIds = [...new Set([...selectedEdgeIds, ...edgesToRemove])];
 
   if (nodesToDeleteIds.length === 0 && edgesToDeleteIds.length === 0) {
     return;
   }
 
   await commandHandler.flowCore.applyUpdate(
-    { nodesToRemove: nodesToDeleteIds, edgesToRemove: edgesToDeleteIds },
+    {
+      nodesToRemove: nodesToDeleteIds,
+      edgesToRemove: edgesToDeleteIds,
+      ...(edgesToUpdate.length > 0 ? { edgesToUpdate } : {}),
+    },
     'deleteSelection'
   );
 };

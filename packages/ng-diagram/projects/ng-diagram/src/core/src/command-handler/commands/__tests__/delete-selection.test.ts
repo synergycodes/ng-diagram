@@ -15,6 +15,8 @@ describe('Delete Selection Command', () => {
       getState: vi.fn(),
       applyUpdate: vi.fn(),
       modelLookup: mockModelLookup,
+      config: {},
+      getNodeById: vi.fn(),
       transactionManager: {
         isActive: vi.fn().mockReturnValue(false),
         getCurrentTransaction: vi.fn(),
@@ -109,6 +111,85 @@ describe('Delete Selection Command', () => {
       },
       'deleteSelection'
     );
+  });
+
+  describe('dangling edges (detach on delete)', () => {
+    beforeEach(() => {
+      (flowCore.config as { danglingEdges?: { enabled: boolean; detachOnNodeDelete: boolean } }).danglingEdges = {
+        enabled: true,
+        detachOnNodeDelete: true,
+      };
+    });
+
+    it('should detach incident edges into dangling and still remove selected edges', () => {
+      const node1 = { id: 'node1', selected: true, position: { x: 100, y: 100 }, size: { width: 50, height: 50 } };
+      const other = { id: 'other', selected: false, position: { x: 500, y: 500 } };
+      const nodes = [node1, other];
+      const edges = [
+        // Explicitly selected — an explicit delete always wins over detach.
+        { id: 'selectedEdge', selected: true, source: 'node1', target: 'other' },
+        // Incident, unselected — detached into a dangling edge anchored at the
+        // deleted node's center (no port, no routed points).
+        { id: 'incidentEdge', selected: false, source: 'node1', target: 'other' },
+      ];
+
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+        nodes.find((node) => node.id === id)
+      );
+
+      commandHandler.emit('deleteSelection');
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToRemove: ['node1'],
+          edgesToRemove: ['selectedEdge'],
+          edgesToUpdate: [
+            { id: 'incidentEdge', source: '', sourcePort: undefined, sourcePosition: { x: 125, y: 125 } },
+          ],
+        },
+        'deleteSelection'
+      );
+    });
+
+    it('should delete the hidden edges of a deleted collapsed group instead of detaching them', () => {
+      // A3: the group is visible and selected; its children (and their wiring)
+      // are hidden. The hidden wiring must be deleted, never materialized as
+      // visible dangling edges — while the group's own visible edge detaches.
+      const group = { id: 'group', selected: true, position: { x: 0, y: 0 }, size: { width: 100, height: 100 } };
+      const child = {
+        id: 'child',
+        selected: false,
+        computedHidden: true,
+        groupId: 'group',
+        position: { x: 10, y: 10 },
+      };
+      const outside = { id: 'outside', selected: false, position: { x: 500, y: 500 } };
+      const nodes = [group, child, outside];
+      const edges = [
+        { id: 'hiddenChildEdge', selected: false, computedHidden: true, source: 'child', target: 'outside' },
+        { id: 'groupEdge', selected: false, source: 'group', target: 'outside' },
+      ];
+
+      (flowCore.getState as ReturnType<typeof vi.fn>).mockReturnValue({ nodes, edges, metadata: {} });
+      (flowCore.getNodeById as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+        nodes.find((node) => node.id === id)
+      );
+      (flowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+        id === 'group' ? ['child'] : []
+      );
+
+      commandHandler.emit('deleteSelection');
+
+      expect(flowCore.applyUpdate).toHaveBeenCalledWith(
+        {
+          nodesToRemove: ['group', 'child'],
+          edgesToRemove: ['hiddenChildEdge'],
+          edgesToUpdate: [{ id: 'groupEdge', source: '', sourcePort: undefined, sourcePosition: { x: 50, y: 50 } }],
+        },
+        'deleteSelection'
+      );
+    });
   });
 
   describe('hidden elements', () => {

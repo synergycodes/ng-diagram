@@ -1,6 +1,7 @@
 import { resolveLabelPosition } from '../../edge-routing-manager';
 import type { CommandHandler, Edge, EdgeLabel, EdgeLabelPosition, Node, Point, Port } from '../../types';
 import { snapNodePosition } from '../../utils';
+import { partitionIncidentEdges } from './detach-on-node-delete';
 
 const computeAddedPorts = (node: Node, ports: Port[]): Port[] => {
   const newPortIds = new Set(ports.map((port) => port.id));
@@ -79,21 +80,17 @@ export const deleteNodes = async (commandHandler: CommandHandler, command: Delet
   const { edges } = commandHandler.flowCore.getState();
   const { modelLookup } = commandHandler.flowCore;
   const { ids } = command;
-  const edgesToDeleteIds = new Set<string>();
   // Deleting a group cascades to its whole subtree (matching deleteSelection) —
   // children left behind would keep a dangling groupId, and since a missing
   // parent counts as visible, effectively hidden children would reappear as
   // orphans on the computedHidden re-stamp.
   const nodesToDeleteIds = new Set<string>(ids.flatMap((id) => [id, ...modelLookup.getAllDescendantIds(id)]));
-  edges.forEach((edge) => {
-    if (nodesToDeleteIds.has(edge.source) || nodesToDeleteIds.has(edge.target)) {
-      edgesToDeleteIds.add(edge.id);
-    }
-  });
+  const { edgesToRemove, edgesToUpdate } = partitionIncidentEdges(commandHandler.flowCore, edges, nodesToDeleteIds);
   await commandHandler.flowCore.applyUpdate(
     {
       nodesToRemove: Array.from(nodesToDeleteIds),
-      edgesToRemove: edgesToDeleteIds.size > 0 ? Array.from(edgesToDeleteIds) : [],
+      edgesToRemove,
+      ...(edgesToUpdate.length > 0 ? { edgesToUpdate } : {}),
     },
     'deleteNodes'
   );

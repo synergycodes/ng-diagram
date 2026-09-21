@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Node } from '../../../core/src';
+import { Node, Point } from '../../../core/src';
 import { PointerInputEvent } from '../../types';
 import { CursorPositionTrackerService } from '../cursor-position-tracker/cursor-position-tracker.service';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
@@ -19,7 +19,12 @@ export class ManualLinkingService {
     // Validate BEFORE attaching document listeners or emitting — an
     // effectively hidden source is refused by the startLinking command, and
     // listeners attached here would be orphaned until the next click.
-    const currentNode = this.flowCoreProvider.provide().getNodeById(node.id);
+    const flowCore = this.flowCoreProvider.provide();
+    if (flowCore.actionStateManager.isLinking()) {
+      console.warn('[ngDiagram] startLinking ignored: another linking or relinking gesture is in progress.');
+      return;
+    }
+    const currentNode = flowCore.getNodeById(node.id);
     if (!currentNode || currentNode.computedHidden) {
       console.warn(`[ngDiagram] startLinking ignored: source node "${node.id}" is missing or effectively hidden.`);
       return;
@@ -38,6 +43,49 @@ export class ManualLinkingService {
     } as PointerInputEvent;
 
     this.linkingEventService.emitStart(startEvent, node, portId);
+
+    document.addEventListener('pointermove', this.onPointerMove);
+    document.addEventListener('click', this.onDocumentClick, true);
+    document.addEventListener('touchmove', this.onTouchMove, { passive: false });
+    document.addEventListener('touchend', this.onTouchEnd, { passive: false });
+    this.unregisterInteractionCleanup = this.flowCoreProvider
+      .provide()
+      .registerInteractionCleanup(() => this.removeListeners());
+  }
+
+  /**
+   * Call this method to start linking from a position on the canvas (no source
+   * node) from your custom logic. The edge follows the pointer until a click
+   * finishes it.
+   *
+   * Requires `danglingEdges.enabled` — an edge drawn from a position has an
+   * empty source, i.e. it is a dangling edge by construction.
+   */
+  startLinkingFromPosition(position: Point) {
+    const flowCore = this.flowCoreProvider.provide();
+    // Validate BEFORE attaching document listeners — a refused command would
+    // leave the click-capture listener swallowing the next click.
+    if (!flowCore.config.danglingEdges.enabled) {
+      console.warn(
+        '[ngDiagram] startLinkingFromPosition ignored: dangling edges are disabled. ' +
+          'Set config.danglingEdges.enabled = true to draw edges from a position.'
+      );
+      return;
+    }
+    if (flowCore.actionStateManager.isLinking()) {
+      console.warn(
+        '[ngDiagram] startLinkingFromPosition ignored: another linking or relinking gesture is in progress.'
+      );
+      return;
+    }
+
+    // Defensive: a stale set of listeners (previous gesture torn down without
+    // reaching removeListeners) must not double-drive the new draw.
+    this.removeListeners();
+    this.node = undefined;
+    this.portId = undefined;
+
+    flowCore.commandHandler.emit('startLinkingFromPosition', { position });
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('click', this.onDocumentClick, true);

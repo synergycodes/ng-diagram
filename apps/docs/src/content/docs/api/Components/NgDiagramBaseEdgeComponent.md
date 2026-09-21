@@ -11,11 +11,86 @@ It can be extended or used directly to render edges in the diagram.
 
 ## Properties
 
+### dangling
+
+> `readonly` **dangling**: `Signal`\<`boolean`\>
+
+Whether the edge has at least one free (unconnected) endpoint. Temporary
+edges are excluded: a draw preview always has a free end, but it must not
+get the dangling styling.
+
+***
+
 ### edge
 
 > **edge**: `InputSignal`\<[`Edge`](/docs/api/types/model/edge/)\<`object`\>\>
 
 Edge data model
+
+***
+
+### relinkHandleHitRadius
+
+> `readonly` **relinkHandleHitRadius**: `Signal`\<`number`\>
+
+Radius of the invisible hit circle around each handle, in flow units. The
+radius is divided by the viewport scale, so the hit area keeps a constant,
+finger-friendly size on screen at any zoom level. Without this, at zoom
+0.5 the visible 5px circle would give only a 2.5px touch target.
+
+#### Since
+
+1.4.0
+
+***
+
+### relinkSourceHandle
+
+> `readonly` **relinkSourceHandle**: `Signal`\<[`Point`](/docs/api/types/geometry/point/)\>
+
+Position of the source endpoint handle (the first routed point).
+
+#### Since
+
+1.4.0
+
+***
+
+### relinkSourceHandleVisible
+
+> `readonly` **relinkSourceHandleVisible**: `Signal`\<`boolean`\>
+
+Whether the source endpoint handle is rendered. It is rendered when the
+edge is selected, is not a temporary edge, has routed points, and its
+source end can be relinked.
+
+#### Since
+
+1.4.0
+
+***
+
+### relinkTargetHandle
+
+> `readonly` **relinkTargetHandle**: `Signal`\<[`Point`](/docs/api/types/geometry/point/)\>
+
+Position of the target endpoint handle (the last routed point).
+
+#### Since
+
+1.4.0
+
+***
+
+### relinkTargetHandleVisible
+
+> `readonly` **relinkTargetHandleVisible**: `Signal`\<`boolean`\>
+
+Same as [relinkSourceHandleVisible](/docs/api/components/ngdiagrambaseedgecomponent/#relinksourcehandlevisible) for the target end.
+
+#### Since
+
+1.4.0
 
 ***
 

@@ -37,6 +37,7 @@ export class ToolbarComponent {
   measurementTestEnter = output<void>();
   awaitableTestEnter = output<void>();
   hiddenElementsDemoEnter = output<void>();
+  relinkingTestEnter = output<void>();
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
   isAnythingSelected = computed(() => {
     const selection = this.ngDiagramSelectionService.selection();

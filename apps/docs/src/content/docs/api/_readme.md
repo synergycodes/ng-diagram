@@ -27,6 +27,7 @@ title: "ng-diagram"
 - [NgDiagramHiddenDirective](/docs/api/directives/ngdiagramhiddendirective/)
 - [NgDiagramMinimapNavigationDirective](/docs/api/directives/ngdiagramminimapnavigationdirective/)
 - [NgDiagramNodeSelectedDirective](/docs/api/directives/ngdiagramnodeselecteddirective/)
+- [RelinkHandleDirective](/docs/api/directives/relinkhandledirective/)
 
 ## Internals
 
@@ -38,6 +39,7 @@ title: "ng-diagram"
 - [EnvironmentInfo](/docs/api/internals/environmentinfo/)
 - [HighlightGroupActionState](/docs/api/internals/highlightgroupactionstate/)
 - [LinkingActionState](/docs/api/internals/linkingactionstate/)
+- [LinkingRelinkContext](/docs/api/internals/linkingrelinkcontext/)
 - [PanningActionState](/docs/api/internals/panningactionstate/)
 - [ResizeActionState](/docs/api/internals/resizeactionstate/)
 - [RotationActionState](/docs/api/internals/rotationactionstate/)
@@ -71,6 +73,8 @@ title: "ng-diagram"
 
 - [BackgroundConfig](/docs/api/types/configuration/features/backgroundconfig/)
 - [BoxSelectionConfig](/docs/api/types/configuration/features/boxselectionconfig/)
+- [ConnectionValidationContext](/docs/api/types/configuration/features/connectionvalidationcontext/)
+- [DanglingEdgesConfig](/docs/api/types/configuration/features/danglingedgesconfig/)
 - [DefaultNodeTemplateConfig](/docs/api/types/configuration/features/defaultnodetemplateconfig/)
 - [EdgeRoutingConfig](/docs/api/types/configuration/features/edgeroutingconfig/)
 - [GroupingConfig](/docs/api/types/configuration/features/groupingconfig/)
@@ -107,6 +111,8 @@ title: "ng-diagram"
 - [DiagramInitEvent](/docs/api/types/events/diagraminitevent/)
 - [EdgeDrawEndedEvent](/docs/api/types/events/edgedrawendedevent/)
 - [~~EdgeDrawnEvent~~](/docs/api/types/events/edgedrawnevent/)
+- [EdgeRelinkEndedEvent](/docs/api/types/events/edgerelinkendedevent/)
+- [EdgeRelinkStartedEvent](/docs/api/types/events/edgerelinkstartedevent/)
 - [GroupMembershipChangedEvent](/docs/api/types/events/groupmembershipchangedevent/)
 - [NodeDragEndedEvent](/docs/api/types/events/nodedragendedevent/)
 - [NodeDragStartedEvent](/docs/api/types/events/nodedragstartedevent/)
@@ -123,6 +129,7 @@ title: "ng-diagram"
 - [SelectionRotatedEvent](/docs/api/types/events/selectionrotatedevent/)
 - [ViewportChangedEvent](/docs/api/types/events/viewportchangedevent/)
 - [EdgeDrawCancelReason](/docs/api/types/events/edgedrawcancelreason/)
+- [EdgeRelinkCancelReason](/docs/api/types/events/edgerelinkcancelreason/)
 - [GestureCancelReason](/docs/api/types/events/gesturecancelreason/)
 
 ## Types/Geometry
@@ -154,6 +161,7 @@ title: "ng-diagram"
 
 ## Types/Model
 
+- [DanglingEndpoint](/docs/api/types/model/danglingendpoint/)
 - [Edge](/docs/api/types/model/edge/)
 - [EdgeLabel](/docs/api/types/model/edgelabel/)
 - [FlowState](/docs/api/types/model/flowstate/)
@@ -167,6 +175,7 @@ title: "ng-diagram"
 - [SimpleNode](/docs/api/types/model/simplenode/)
 - [Viewport](/docs/api/types/model/viewport/)
 - [AbsoluteEdgeLabelPosition](/docs/api/types/model/absoluteedgelabelposition/)
+- [EdgeEnd](/docs/api/types/model/edgeend/)
 - [EdgeLabelPosition](/docs/api/types/model/edgelabelposition/)
 - [Node](/docs/api/types/model/node/)
 - [OriginPoint](/docs/api/types/model/originpoint/)
@@ -200,10 +209,16 @@ title: "ng-diagram"
 
 ## Utilities
 
+- [computeDetachAnchor](/docs/api/utilities/computedetachanchor/)
 - [configureShortcuts](/docs/api/utilities/configureshortcuts/)
 - [createMiddlewares](/docs/api/utilities/createmiddlewares/)
+- [getDanglingEndpoints](/docs/api/utilities/getdanglingendpoints/)
+- [getNearestDanglingEndpointInRange](/docs/api/utilities/getnearestdanglingendpointinrange/)
+- [hasFreeEndpoint](/docs/api/utilities/hasfreeendpoint/)
 - [initializeModel](/docs/api/utilities/initializemodel/)
 - [initializeModelAdapter](/docs/api/utilities/initializemodeladapter/)
+- [isDanglingEdge](/docs/api/utilities/isdanglingedge/)
+- [isEdgeEndRelinkable](/docs/api/utilities/isedgeendrelinkable/)
 - [provideNgDiagram](/docs/api/utilities/providengdiagram/)
 - [stripEdgeRuntimeProperties](/docs/api/utilities/stripedgeruntimeproperties/)
 - [stripNodeRuntimeProperties](/docs/api/utilities/stripnoderuntimeproperties/)

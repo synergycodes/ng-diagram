@@ -63,6 +63,35 @@ Use `edgeDrawEnded` instead, which fires for both successful and cancelled draws
 
 ***
 
+### edgeRelinkEnded
+
+> **edgeRelinkEnded**: [`EdgeRelinkEndedEvent`](/docs/api/types/events/edgerelinkendedevent/)
+
+Event emitted when an edge relink gesture ends, regardless of outcome.
+
+Fires when the dragged endpoint is dropped, whether it was reconnected to
+a port, left dangling on empty canvas, or reverted (invalid drop or
+cancelled gesture).
+
+#### Since
+
+1.4.0
+
+***
+
+### edgeRelinkStarted
+
+> **edgeRelinkStarted**: [`EdgeRelinkStartedEvent`](/docs/api/types/events/edgerelinkstartedevent/)
+
+Event emitted when the user starts dragging an endpoint of an existing
+edge (the relinking gesture).
+
+#### Since
+
+1.4.0
+
+***
+
 ### groupMembershipChanged
 
 > **groupMembershipChanged**: [`GroupMembershipChangedEvent`](/docs/api/types/events/groupmembershipchangedevent/)

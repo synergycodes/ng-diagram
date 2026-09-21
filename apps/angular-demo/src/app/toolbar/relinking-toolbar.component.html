@@ -1,0 +1,101 @@
+<div class="relinking-toolbar">
+  <div class="toolbar-row">
+    <span class="hint">
+      Select an edge to see its endpoint handles. Drag a handle onto a port, or onto empty canvas to detach it. Select a
+      node and press Delete to see what happens to its edges.
+    </span>
+  </div>
+
+  <div class="toolbar-row">
+    <span class="group-label">Config:</span>
+    <label class="demo-toggle">
+      defaultRelinkable
+      <select [value]="defaultRelinkableValue()" (change)="onDefaultRelinkableChange($event)">
+        <option value="false">false</option>
+        <option value="true">true</option>
+        <option value="source">'source'</option>
+        <option value="target">'target'</option>
+      </select>
+    </label>
+    <label class="demo-toggle">
+      <input type="checkbox" [checked]="danglingEnabled()" (change)="onDanglingEnabledChange()" />
+      danglingEdges.enabled
+    </label>
+    <label class="demo-toggle">
+      <input type="checkbox" [checked]="detachOnNodeDelete()" (change)="onDetachOnNodeDeleteChange()" />
+      detachOnNodeDelete
+    </label>
+    <span class="separator">|</span>
+    <label class="demo-toggle">
+      shouldKeepOnDrop
+      <select [value]="keepOnDropRule()" (change)="onKeepOnDropRuleChange($event)">
+        <option value="always">always keep</option>
+        <option value="never">never keep</option>
+        <option value="byData">by edge data</option>
+      </select>
+    </label>
+    <label class="demo-toggle">
+      shouldDetachOnNodeDelete
+      <select [value]="detachOnDeleteRule()" (change)="onDetachOnDeleteRuleChange($event)">
+        <option value="always">always detach</option>
+        <option value="never">never detach (edges are deleted)</option>
+        <option value="byData">by edge data</option>
+      </select>
+    </label>
+    <label class="demo-toggle">
+      validateConnection
+      <select [value]="validateRule()" (change)="onValidateRuleChange($event)">
+        <option value="all">allow all</option>
+        <option value="noSelf">no self-connections</option>
+        <option value="sameGroup">relink only inside the same group</option>
+        <option value="noRelink">reject every relink</option>
+        <option value="noAttach">reject attachEdge</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="toolbar-row">
+    <span class="group-label">Selected edge:</span>
+    @if (selectedEdge(); as edge) {
+      <span class="edge-state">
+        {{ edge.id }} · {{ endpointsLabel() }} · relinkable: {{ rawRelinkableLabel() }} ·
+        {{ resolvedRelinkableLabel() }}
+      </span>
+      <span class="separator">|</span>
+      <span class="group-label">Set relinkable:</span>
+      <button (click)="setRelinkable(undefined)">default</button>
+      <button (click)="setRelinkable(true)">true</button>
+      <button (click)="setRelinkable('source')">'source'</button>
+      <button (click)="setRelinkable('target')">'target'</button>
+      <button (click)="setRelinkable(false)">false</button>
+      <span class="separator">|</span>
+      <button [disabled]="!canDetachSource()" (click)="detach('source')">Detach source</button>
+      <button [disabled]="!canDetachTarget()" (click)="detach('target')">Detach target</button>
+      <button [disabled]="!canAttachFreeEnd()" (click)="attachFreeEnd()">Attach free end to selected node</button>
+    } @else {
+      <span class="hint">No edge selected.</span>
+    }
+  </div>
+
+  <div class="toolbar-row">
+    <span class="group-label">Actions:</span>
+    <button (click)="drawFromCenter()">Draw from center</button>
+    <button (click)="resetScene.emit()">Reset scene</button>
+    <button (click)="zoomToFit()">Zoom to fit</button>
+    <button (click)="exit.emit()">Exit</button>
+  </div>
+
+  <div class="toolbar-row">
+    <span class="group-label">Events:</span>
+    <button (click)="clearLog()">Clear</button>
+    <span class="hint">Newest first, last {{ maxLogEntries }} entries.</span>
+  </div>
+
+  <div class="event-log">
+    @for (entry of logEntries(); track $index) {
+      <div class="event-log-entry">{{ entry }}</div>
+    } @empty {
+      <div class="event-log-entry empty">No events yet.</div>
+    }
+  </div>
+</div>

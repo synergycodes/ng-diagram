@@ -11,6 +11,15 @@ import { DataObject, Point, Size } from './utils';
 export type RoutingMode = 'manual' | 'auto';
 
 /**
+ * Identifies one endpoint of an edge.
+ *
+ * @public
+ * @since 1.4.0
+ * @category Types/Model
+ */
+export type EdgeEnd = 'source' | 'target';
+
+/**
  * Interface representing an edge (connection) between nodes in the flow diagram
  *
  * @public
@@ -60,6 +69,15 @@ export interface Edge<T extends DataObject = DataObject> {
    * @since 1.4.0
    */
   hidden?: boolean;
+  /**
+   * Whether the user can relink the ends of this edge. `true` allows both
+   * ends, `'source'` or `'target'` allows only that end, and `false` allows
+   * neither. When not set, `linking.defaultRelinkable` applies.
+   *
+   * Set by the user; the library only reads it.
+   * @since 1.4.0
+   */
+  relinkable?: boolean | EdgeEnd;
   /**
    * @readonly
    * @remarks ComputedHidden is computed by the system and should not be set manually.

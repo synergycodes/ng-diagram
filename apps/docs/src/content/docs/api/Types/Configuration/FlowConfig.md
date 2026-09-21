@@ -58,6 +58,18 @@ The node's unique ID.
 
 ***
 
+### danglingEdges
+
+> **danglingEdges**: [`DanglingEdgesConfig`](/docs/api/types/configuration/features/danglingedgesconfig/)
+
+Configuration for dangling edges (edges with unconnected endpoints).
+
+#### Since
+
+1.4.0
+
+***
+
 ### debugMode
 
 > **debugMode**: `boolean`

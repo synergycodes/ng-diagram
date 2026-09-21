@@ -109,6 +109,22 @@ The points of the edge defining the path.
 
 ***
 
+### relinkable?
+
+> `optional` **relinkable**: `boolean` \| [`EdgeEnd`](/docs/api/types/model/edgeend/)
+
+Whether the user can relink the ends of this edge. `true` allows both
+ends, `'source'` or `'target'` allows only that end, and `false` allows
+neither. When not set, `linking.defaultRelinkable` applies.
+
+Set by the user; the library only reads it.
+
+#### Since
+
+1.4.0
+
+***
+
 ### routing?
 
 > `optional` **routing**: [`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/)

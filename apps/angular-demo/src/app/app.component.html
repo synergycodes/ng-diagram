@@ -14,6 +14,8 @@
     (nodeRotateEnded)="onNodeRotateEnded($event)"
     (edgeDrawn)="onEdgeDrawn($event)"
     (edgeDrawEnded)="onEdgeDrawEnded($event)"
+    (edgeRelinkStarted)="onEdgeRelinkStarted($event)"
+    (edgeRelinkEnded)="onEdgeRelinkEnded($event)"
     (clipboardPasted)="onClipboardPasted($event)"
     (nodeResized)="onNodeResized($event)"
     (nodeResizeStarted)="onNodeResizeStarted($event)"
@@ -34,12 +36,15 @@
     <app-awaitable-tests (exit)="exitAwaitableTest()" />
   } @else if (hiddenElementsDemoMode()) {
     <app-hidden-elements-toolbar (exit)="exitHiddenElementsDemo()" (revealGhosts)="revealHiddenGhosts.set($event)" />
+  } @else if (relinkingTestMode()) {
+    <app-relinking-toolbar (exit)="exitRelinkingTest()" (resetScene)="resetRelinkingScene()" />
   } @else {
     <app-toolbar
       (enterBatchTest)="enterBatchTest()"
       (measurementTestEnter)="enterMeasurementTest()"
       (awaitableTestEnter)="enterAwaitableTest()"
       (hiddenElementsDemoEnter)="enterHiddenElementsDemo()"
+      (relinkingTestEnter)="enterRelinkingTest()"
       (testVirtualizationClick)="enableVirtualizationTest()"
       (reinitializeModelClick)="onReinitializeModel()"
       (saveModelClick)="onSaveModel()"

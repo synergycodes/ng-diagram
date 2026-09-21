@@ -1,6 +1,6 @@
 import type { FlowCore } from '../../flow-core';
 import type { Edge, Node, Rect } from '../../types';
-import { isGroup } from '../../utils';
+import { boundingRectOfPoints, doesRectsIntersect, isGroup } from '../../utils';
 import type { RenderStrategyResult } from '../render-strategy.interface';
 
 /**
@@ -13,9 +13,68 @@ export class VisibleElementsResolver {
   resolve(viewportRect: Rect): RenderStrategyResult {
     const primaryVisibleIds = this.getPrimaryVisibleIds(viewportRect);
     const { edges, edgeIds, externalNodeIds } = this.collectVisibleEdges(primaryVisibleIds);
+    this.collectVisibleDanglingEdges(viewportRect, primaryVisibleIds, edges, edgeIds, externalNodeIds);
     const { nodes, nodeIds } = this.buildNodeList(primaryVisibleIds, externalNodeIds);
 
     return { nodes, edges, nodeIds, edgeIds };
+  }
+
+  /**
+   * Adds dangling edges whose visible geometry intersects the viewport.
+   * Edge discovery walks connected edges of visible nodes, which can never
+   * reach an edge through a free ('' ) endpoint — a dual dangling edge is
+   * unreachable that way, and a single-dangling edge disappears the moment its
+   * only node scrolls out even when its free endpoint is still on screen.
+   */
+  private collectVisibleDanglingEdges(
+    viewportRect: Rect,
+    primaryVisibleIds: Set<string>,
+    edges: Edge[],
+    edgeIds: Set<string>,
+    externalNodeIds: Set<string>
+  ): void {
+    // The model lookup rebuilds its dangling-edge list lazily after a state
+    // change with one pass over all edges (like connectedEdgesMap) and serves
+    // it from cache until the next change; this loop iterates only that subset.
+    for (const edge of this.flowCore.modelLookup.danglingEdges) {
+      if (edgeIds.has(edge.id) || edge.computedHidden) {
+        continue;
+      }
+      if (!this.intersectsViewport(edge, viewportRect)) {
+        continue;
+      }
+
+      edges.push(edge);
+      edgeIds.add(edge.id);
+
+      // The connected endpoint (if any) may be off-screen — render it like the
+      // external endpoints of node-discovered edges.
+      const connectedNodeId = edge.source || edge.target;
+      if (connectedNodeId && !primaryVisibleIds.has(connectedNodeId)) {
+        externalNodeIds.add(connectedNodeId);
+      }
+    }
+  }
+
+  /**
+   * Whether the bounding box of the edge's routed points and free-endpoint
+   * anchors intersects the rect. Bounding-box overlap can render an edge whose
+   * path merely skirts the viewport (a benign false positive) but never drops
+   * one that crosses it.
+   */
+  private intersectsViewport(edge: Edge, rect: Rect): boolean {
+    const anchors = [
+      ...(edge.points ?? []),
+      ...(!edge.source && edge.sourcePosition ? [edge.sourcePosition] : []),
+      ...(!edge.target && edge.targetPosition ? [edge.targetPosition] : []),
+    ];
+    if (anchors.length === 0) {
+      return false;
+    }
+
+    // A bounding box that only touches the viewport edge counts as outside,
+    // like every other rect test in the engine.
+    return doesRectsIntersect(boundingRectOfPoints(anchors), rect);
   }
 
   private getPrimaryVisibleIds(viewportRect: Rect): Set<string> {

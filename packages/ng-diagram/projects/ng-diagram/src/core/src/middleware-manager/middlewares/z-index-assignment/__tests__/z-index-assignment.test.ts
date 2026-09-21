@@ -121,6 +121,37 @@ describe('zIndexMiddleware', () => {
     });
   });
 
+  describe('edge endpoint change (relink / detach)', () => {
+    it('should recompute the edge z-index from its new endpoints when source/target change', () => {
+      const lowNode = { ...mockNode, id: 'low-node', computedZIndex: 5 };
+      const highNode = { ...mockNode, id: 'high-node', computedZIndex: 9 };
+      // The edge was relinked onto high-node; its stored z still derives from
+      // the old endpoint pair.
+      const relinkedEdge = { ...mockEdge, id: 'edge1', source: 'low-node', target: 'high-node', computedZIndex: 5 };
+      nodesMap.set('low-node', lowNode);
+      nodesMap.set('high-node', highNode);
+      edgesMap.set('edge1', relinkedEdge);
+      context.state.nodes = [lowNode, highNode];
+      context.state.edges = [relinkedEdge];
+
+      (helpers.anyNodesAdded as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.checkIfAnyNodePropsChanged as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (helpers.checkIfAnyEdgePropsChanged as ReturnType<typeof vi.fn>).mockImplementation((props: string[]) =>
+        props.includes('source')
+      );
+      (helpers.getAffectedEdgeIds as ReturnType<typeof vi.fn>).mockImplementation((props: string[]) =>
+        props.includes('source') ? ['edge1'] : []
+      );
+
+      executeMiddleware();
+
+      expect(helpers.checkIfAnyEdgePropsChanged).toHaveBeenCalledWith(['source', 'target']);
+      expect(nextMock).toHaveBeenCalledWith({
+        edgesToUpdate: [{ id: 'edge1', computedZIndex: 9 }],
+      });
+    });
+  });
+
   describe('node selection z-index assignment', () => {
     it('should assign selectedZIndex to newly selected nodes', () => {
       const node1 = { ...mockNode, id: 'node1', selected: true, computedZIndex: 0 };

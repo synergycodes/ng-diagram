@@ -1,5 +1,5 @@
 import { clearLinkingForGesture } from './linking-gesture';
-import type { CommandHandler, Node, Point } from '../../../types';
+import type { CommandHandler, Edge, Node, Point } from '../../../types';
 import type { InternalLinkingActionState } from '../../../types/action-state.interface';
 import { getPortFlowPosition } from '../../../utils';
 import { createFinalEdge, validateConnection } from './utils';
@@ -14,6 +14,44 @@ export interface FinishLinkingCommand {
 // Callers clear the state themselves (stamped, in their finally).
 export const runCancelledFinishPass = async (commandHandler: CommandHandler): Promise<void> => {
   await commandHandler.flowCore.applyUpdate({}, 'finishLinking');
+};
+
+/**
+ * Builds the dangling edge kept on a drop over empty canvas, or returns null
+ * when the drop should fall back to the cancelled pass (feature off, hidden
+ * source, or the user callback declined). The final edge is built BEFORE the
+ * callback runs so `shouldKeepOnDrop` sees what would actually be committed
+ * (after `finalEdgeDataBuilder`).
+ */
+export const buildKeptDanglingEdge = (
+  commandHandler: CommandHandler,
+  temporaryEdge: Edge,
+  dropPosition: Point
+): Edge | null => {
+  const { config } = commandHandler.flowCore;
+  if (!config.danglingEdges?.enabled) {
+    return null;
+  }
+
+  // Mirror the connected path's guard — a hidden source must not silently
+  // produce an invisible dangling edge.
+  if (temporaryEdge.source && commandHandler.flowCore.getNodeById(temporaryEdge.source)?.computedHidden) {
+    return null;
+  }
+
+  // A free end has no port — undefined, never ''. createFinalEdge applies the
+  // same normalization to a free source (a draw started from a position).
+  const edge = createFinalEdge(config, temporaryEdge, {
+    target: '',
+    targetPort: undefined,
+    targetPosition: dropPosition,
+  });
+
+  if (config.danglingEdges.shouldKeepOnDrop && !config.danglingEdges.shouldKeepOnDrop(edge, dropPosition)) {
+    return null;
+  }
+
+  return edge;
 };
 
 const validateTarget = (
@@ -58,6 +96,13 @@ export const finishLinking = async (commandHandler: CommandHandler, command: Fin
     return;
   }
 
+  // A relink owns this state — finishing it as a draw would ADD a duplicate
+  // edge instead of updating the relinked one (finishRelinking is the only
+  // legal finish for it). A teardown already in progress must not run twice.
+  if (linking.relink || linking._finishing) {
+    return;
+  }
+
   // Claims the teardown — a cancelLinking racing this finish must no-op instead
   // of overwriting the reason and emitting a second edgeDrawEnded.
   linking._finishing = true;
@@ -79,6 +124,21 @@ export const finishLinking = async (commandHandler: CommandHandler, command: Fin
     const targetPortId = targetPort || undefined;
 
     if (!targetNodeId) {
+      const { config } = commandHandler.flowCore;
+      // A drop over a port the preview refused (wrong direction, or the source's
+      // own port) is not an empty-canvas drop: no dangling edge is kept and the
+      // draw cancels with 'noTarget' exactly as with the feature off.
+      const droppedOnPort =
+        !!config.danglingEdges?.enabled &&
+        !!commandHandler.flowCore.getNearestPortInRange(linking.dropPosition, config.linking.portSnapDistance);
+
+      const keptEdge = droppedOnPort
+        ? null
+        : buildKeptDanglingEdge(commandHandler, temporaryEdge, linking.dropPosition);
+      if (keptEdge) {
+        await commandHandler.flowCore.applyUpdate({ edgesToAdd: [keptEdge] }, 'finishLinking');
+        return;
+      }
       linking.cancelReason = 'noTarget';
       await runCancelledFinishPass(commandHandler);
       return;

@@ -21,6 +21,60 @@
     [attr.stroke-opacity]="strokeOpacity() || 'var(--edge-stroke-opacity, 1)'"
   />
   <path [attr.d]="path()" fill="none" stroke="none" stroke-width="20" stroke-opacity="0" />
+
+  <!-- Invisible hit circles: a finger-friendly grab area that keeps a
+       constant screen size at any zoom. Both hit circles render before both
+       visible circles, so a visible handle is never covered by the other
+       end's hit area on a short edge. Each circle carries the same directive,
+       so grabbing either starts the relink; data-relink-handle-hit lets the
+       stylesheet highlight the matching visible circle on hover. Each end
+       renders only when it can be relinked. -->
+  @if (relinkSourceHandleVisible()) {
+    <circle
+      class="ng-diagram-edge__relink-handle-hit"
+      data-relink-handle-hit="source"
+      ngDiagramRelinkHandle
+      [edge]="edge()"
+      end="source"
+      [attr.cx]="relinkSourceHandle().x"
+      [attr.cy]="relinkSourceHandle().y"
+      [attr.r]="relinkHandleHitRadius()"
+    />
+  }
+  @if (relinkTargetHandleVisible()) {
+    <circle
+      class="ng-diagram-edge__relink-handle-hit"
+      data-relink-handle-hit="target"
+      ngDiagramRelinkHandle
+      [edge]="edge()"
+      end="target"
+      [attr.cx]="relinkTargetHandle().x"
+      [attr.cy]="relinkTargetHandle().y"
+      [attr.r]="relinkHandleHitRadius()"
+    />
+  }
+  @if (relinkSourceHandleVisible()) {
+    <circle
+      class="ng-diagram-edge__relink-handle"
+      data-relink-handle="source"
+      ngDiagramRelinkHandle
+      [edge]="edge()"
+      end="source"
+      [attr.cx]="relinkSourceHandle().x"
+      [attr.cy]="relinkSourceHandle().y"
+    />
+  }
+  @if (relinkTargetHandleVisible()) {
+    <circle
+      class="ng-diagram-edge__relink-handle"
+      data-relink-handle="target"
+      ngDiagramRelinkHandle
+      [edge]="edge()"
+      end="target"
+      [attr.cx]="relinkTargetHandle().x"
+      [attr.cy]="relinkTargetHandle().y"
+    />
+  }
 </svg>
 
 <ng-content />

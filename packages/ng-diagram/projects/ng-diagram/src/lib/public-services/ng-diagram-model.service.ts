@@ -1,5 +1,22 @@
 import { effect, inject, Injectable, OnDestroy, signal, untracked } from '@angular/core';
-import { DataObject, Edge, GroupNode, Metadata, Node, Point, Port, Rect } from '../../core/src';
+import {
+  alignManualPointsPatch,
+  computeDetachAnchor,
+  DanglingEndpoint,
+  DataObject,
+  Edge,
+  EdgeEnd,
+  getDanglingEndpoints,
+  getNearestDanglingEndpointInRange,
+  getPortFlowPosition,
+  GroupNode,
+  Metadata,
+  Node,
+  Point,
+  Port,
+  Rect,
+} from '../../core/src';
+import { isValidEndpointTarget, validateConnection } from '../../core/src/command-handler/commands/linking/utils';
 import { calculatePartsBounds } from '../../core/src/utils/dimensions';
 import { emitWithMeasurementOption } from './emit-with-measurement-option';
 import { NgDiagramBaseService } from './ng-diagram-base.service';
@@ -150,6 +167,149 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
    */
   getNearestPortInRange(point: Point, range: number): Port | null {
     return this.flowCore.getNearestPortInRange(point, range) || null;
+  }
+
+  /**
+   * Returns the free (unconnected) endpoints of all edges in the model. A dual
+   * dangling edge gives two entries. Temporary and effectively hidden edges
+   * are skipped.
+   * @returns The free endpoints with their edge, end and anchor position.
+   * @since 1.4.0
+   */
+  getDanglingEndpoints(): DanglingEndpoint[] {
+    // The model lookup rebuilds its dangling-edge list lazily after a state
+    // change with one pass over all edges, then serves it from cache until the
+    // next change; this walks only the dangling subset.
+    return getDanglingEndpoints(this.flowCore.modelLookup.danglingEdges);
+  }
+
+  /**
+   * Finds the free edge endpoint nearest to a point within a range. It works
+   * like {@link getNearestPortInRange}, but for the free endpoints of dangling
+   * edges. Temporary and effectively hidden edges are skipped.
+   * @param point Point to check from.
+   * @param range Range to check in.
+   * @returns Nearest free endpoint in range, or null.
+   * @since 1.4.0
+   */
+  getNearestDanglingEndpointInRange(point: Point, range: number): DanglingEndpoint | null {
+    // The model lookup rebuilds its dangling-edge list lazily after a state
+    // change with one pass over all edges, then serves it from cache until the
+    // next change; each call walks only the dangling subset.
+    return getNearestDanglingEndpointInRange(this.flowCore.modelLookup.danglingEdges, point, range);
+  }
+
+  /**
+   * Detaches one endpoint of an edge, so that it becomes a free (dangling)
+   * endpoint.
+   *
+   * When `position` is omitted, the endpoint stays anchored where it is now:
+   * at the current position of the port when the edge was connected to a
+   * port, otherwise at the routed endpoint of the edge.
+   *
+   * Requires `danglingEdges.enabled`. With the feature off, this method does
+   * nothing and logs a console warning.
+   *
+   * @param edgeId ID of the edge to detach.
+   * @param end Which endpoint to detach.
+   * @param position Optional anchor position for the freed endpoint, in flow coordinates.
+   * @since 1.4.0
+   */
+  detachEdge(edgeId: string, end: EdgeEnd, position?: Point): Promise<void> {
+    if (!this.flowCore.config.danglingEdges.enabled) {
+      console.warn(
+        '[ngDiagram] detachEdge ignored: dangling edges are disabled. ' +
+          'Set config.danglingEdges.enabled = true to detach edge endpoints.'
+      );
+      return Promise.resolve();
+    }
+
+    const edge = this.getEdgeById(edgeId);
+    if (!edge) {
+      return Promise.resolve();
+    }
+
+    const nodeId = end === 'source' ? edge.source : edge.target;
+    if (!nodeId) {
+      // Already dangling on this end — only move the anchor if asked to.
+      if (!position) {
+        return Promise.resolve();
+      }
+      return this.updateEdge(edgeId, {
+        ...(end === 'source' ? { sourcePosition: position } : { targetPosition: position }),
+        ...alignManualPointsPatch(edge, end, position),
+      });
+    }
+
+    const anchor = position ?? computeDetachAnchor(edge, end, this.getNodeById(nodeId));
+    if (!anchor) {
+      return Promise.resolve();
+    }
+
+    return this.updateEdge(edgeId, {
+      ...(end === 'source'
+        ? { source: '', sourcePort: undefined, sourcePosition: anchor }
+        : { target: '', targetPort: undefined, targetPosition: anchor }),
+      ...alignManualPointsPatch(edge, end, anchor),
+    });
+  }
+
+  /**
+   * Attaches one endpoint of an edge to a node and, optionally, to a port.
+   * This is the opposite of {@link detachEdge}.
+   *
+   * The same checks as for a relink drop apply: the node must exist and be
+   * visible, and the port must exist, be visible and have the right direction.
+   * The connection is then validated with `linking.validateConnection`, which
+   * receives the attached node as `source` or `target` according to `end`,
+   * and a context with `reason: 'attach'`.
+   *
+   * @param edgeId ID of the edge to attach.
+   * @param end Which endpoint to attach.
+   * @param nodeId ID of the node to attach to.
+   * @param portId ID of the port to attach to. When omitted, the endpoint is attached to the node without a port.
+   * @returns Whether the connection was valid and applied.
+   * @since 1.4.0
+   */
+  async attachEdge(edgeId: string, end: EdgeEnd, nodeId: string, portId?: string): Promise<boolean> {
+    const edge = this.getEdgeById(edgeId);
+    if (!edge) {
+      return false;
+    }
+
+    // Same structural rules as a relink drop: the node must exist and be
+    // visible, the port must exist, point the right direction and not be
+    // template-hidden — otherwise the edge would reference a port that
+    // routing cannot resolve.
+    if (!isValidEndpointTarget(this.flowCore, end, nodeId, portId)) {
+      return false;
+    }
+
+    const sourceNodeId = end === 'source' ? nodeId : edge.source || undefined;
+    const sourcePortId = end === 'source' ? portId : edge.sourcePort;
+    const targetNodeId = end === 'target' ? nodeId : edge.target || undefined;
+    const targetPortId = end === 'target' ? portId : edge.targetPort;
+
+    if (
+      !validateConnection(this.flowCore, sourceNodeId, sourcePortId, targetNodeId, targetPortId, true, {
+        reason: 'attach',
+        edge,
+        end,
+      })
+    ) {
+      return false;
+    }
+
+    const node = this.getNodeById(nodeId);
+    const newAnchor = node && portId ? getPortFlowPosition(node, portId) : null;
+
+    await this.updateEdge(edgeId, {
+      ...(end === 'source'
+        ? { source: nodeId, sourcePort: portId, sourcePosition: undefined }
+        : { target: nodeId, targetPort: portId, targetPosition: undefined }),
+      ...(newAnchor ? alignManualPointsPatch(edge, end, newAnchor) : {}),
+    });
+    return true;
   }
 
   /**
