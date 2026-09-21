@@ -37,6 +37,7 @@ export class ToolbarComponent {
   measurementTestEnter = output<void>();
   awaitableTestEnter = output<void>();
   hiddenElementsDemoEnter = output<void>();
+  relinkingTestEnter = output<void>();
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
   isAnythingSelected = computed(() => {
     const selection = this.ngDiagramSelectionService.selection();
@@ -107,18 +108,6 @@ export class ToolbarComponent {
     if (node) {
       this.ngDiagramService.startLinking(node);
     }
-  }
-
-  onLinkFromPositionClick() {
-    // Start drawing an edge from the middle of the screen — no source node.
-    // Finishing on empty canvas keeps it as a dual dangling edge (the
-    // danglingEdges feature is enabled in this demo); finishing on a port
-    // connects it.
-    const center = this.ngDiagramViewportService.clientToFlowPosition({
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
-    });
-    this.ngDiagramService.startLinkingFromPosition(center);
   }
 
   onCenterOnClick() {
