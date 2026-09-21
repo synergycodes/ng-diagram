@@ -5,6 +5,7 @@ sidebar:
   order: 1
 ---
 
+import { Badge } from '@astrojs/starlight/components';
 import CodeSnippet from '@components/code-snippet/code-snippet.astro';
 import { Image } from 'astro:assets';
 
@@ -215,7 +216,7 @@ onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
 }
 ```
 
-## Relinking and Dangling Edges
+## Relinking and Dangling Edges <Badge text="since v1.4.0" variant="tip" />
 
 Two opt-in features extend what users can do with existing edges:
 

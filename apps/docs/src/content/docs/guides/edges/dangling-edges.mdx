@@ -14,7 +14,7 @@ Dangling edges are edges with one or both endpoints not connected to any node. T
 
 The feature is fully opt-in. With the default settings, an edge dropped on empty canvas is discarded, and deleting a node deletes its edges.
 
-Try it below: draw an edge from a port onto empty canvas to keep it as a dangling edge, or select a node and press <kbd>Delete</kbd> to detach its edges instead of deleting them.
+Try it below: draw an edge from a port onto empty canvas to keep it as a dangling edge, select a node and press <kbd>Delete</kbd> to detach its edges instead of deleting them, or select the connected edge and drag one of its handles onto empty canvas to detach that end.
 
 <DanglingEdgesDemo />
 
@@ -74,7 +74,7 @@ const config: NgDiagramConfig = {
   danglingEdges: {
     enabled: true,
     detachOnNodeDelete: true,
-    shouldDetachOnNodeDelete: (edge, deletedNode, end) => edge.data?.['keepOnDelete'] === true,
+    shouldDetachOnNodeDelete: (edge, deletedNode, end) => edge.data?.keepOnDelete === true,
   },
 };
 ```
@@ -92,7 +92,6 @@ An edge with both endpoints free is fully supported:
 
 - **Routing** — the edge routes between its two anchor positions with any routing algorithm, like a connected edge.
 - **Persistence** — `toJSON()` saves the `sourcePosition`/`targetPosition` of free endpoints, and [`initializeModel`](/docs/api/utilities/initializemodel) restores them, so dangling edges survive a save and load cycle.
-- **Copy and paste** — with `danglingEdges.enabled`, copying a node also copies a dangling edge connected to it, even when that edge is not selected. Pasting moves the free endpoints together with the rest of the pasted content, and for manual-routing edges the stored `points` move as well.
 - **Box selection** — a free endpoint counts by its anchor position, so a box drawn around a dangling end selects the edge.
 
 ## Drawing Edges from a Position
@@ -113,7 +112,19 @@ The free end of the edge follows the pointer until a click finishes the draw. A 
 
 ## Utilities and Service Methods
 
-The package exports these helper functions:
+The package exports these helper functions. Import them from `ng-diagram` like any other symbol:
+
+```typescript
+import { hasFreeEndpoint, isDanglingEdge } from 'ng-diagram';
+
+private modelService = inject(NgDiagramModelService);
+
+readonly danglingEdges = computed(() => this.modelService.edges().filter(isDanglingEdge));
+
+isSourceFree(edge: Edge): boolean {
+  return hasFreeEndpoint(edge, 'source');
+}
+```
 
 - [`isDanglingEdge(edge)`](/docs/api/utilities/isdanglingedge) — whether the edge has at least one free endpoint.
 - [`hasFreeEndpoint(edge, end?)`](/docs/api/utilities/hasfreeendpoint) — whether the given endpoint (or either, when `end` is omitted) is free.

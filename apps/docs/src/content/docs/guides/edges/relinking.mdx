@@ -153,40 +153,11 @@ ng-diagram-base-edge.my-edge {
 
 Each visible handle has a larger invisible hit circle of about 12 screen pixels. Its size is adjusted for zoom, so the handles stay easy to touch at any zoom level without growing visually. Hovering over the hit circle highlights the visible handle, the same as hovering over the handle itself.
 
-### Custom Edge Templates
-
-Handles are rendered only by `ng-diagram-base-edge`. A fully custom edge template that does not use the base edge can turn any element into an endpoint handle with the [`RelinkHandleDirective`](/docs/api/directives/relinkhandledirective) (`[ngDiagramRelinkHandle]`):
-
-```html
-<svg:circle
-  ngDiagramRelinkHandle
-  [edge]="edge()"
-  end="target"
-  [attr.cx]="targetPoint().x"
-  [attr.cy]="targetPoint().y"
-  r="5"
-/>
-```
-
-A pointerdown on the host element starts the relink gesture for the given `end` of the given `edge`. The gesture itself is handled at document level, so it keeps running even when the host element is removed from the DOM during the drag (the original edge is not rendered while its endpoint is being relinked).
-
-The directive ignores a pointerdown on an end that cannot be relinked, so a handle on a locked end never starts a gesture. To also hide such a handle, check the effective value with [`isEdgeEndRelinkable`](/docs/api/utilities/isedgeendrelinkable):
-
-```typescript
-private readonly diagramService = inject(NgDiagramService);
-
-readonly targetHandleVisible = computed(() =>
-  isEdgeEndRelinkable(this.edge(), 'target', this.diagramService.config().linking.defaultRelinkable)
-);
-```
-
 <Aside type="note">
-  Handles are rendered as part of the edge. With{' '}
-  <a href="/docs/api/types/configuration/features/zindexconfig/#elevateonselection">
-    <code>zIndex.elevateOnSelection: false</code>
-  </a>{' '}
+  Handles are rendered as part of the edge. With
+  [`zIndex.elevateOnSelection`](/docs/api/types/configuration/features/zindexconfig/#elevateonselection) set to `false`,
   a handle can end up under an overlapping node, where the user cannot reach it. Keep selection elevation on (the
-  default), or raise the edge's <code>zOrder</code> when nodes may overlap edge endpoints.
+  default), or raise the edge's `zOrder` when nodes may overlap edge endpoints.
 </Aside>
 
 ## Related Topics

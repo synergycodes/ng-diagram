@@ -46,6 +46,10 @@ export class DiagramComponent {
       // Deleting a node detaches its edges instead of deleting them
       detachOnNodeDelete: true,
     },
+    // Optional: selected edges get handles, so users can also detach an end by dragging it onto empty canvas
+    linking: {
+      defaultRelinkable: true,
+    },
   } satisfies NgDiagramConfig;
   // @section-end:config
 
@@ -71,8 +75,10 @@ export class DiagramComponent {
       // @collapse-end:model-shape
       {
         id: 'dangling',
+        // @mark-start:model-shape
         source: '', // free endpoint: no node, no port
         sourcePosition: { x: 200, y: 340 }, // anchored here, in flow coordinates
+        // @mark-end:model-shape
         target: 'node-3',
         targetPort: 'port-left',
         data: {},
