@@ -37,7 +37,7 @@ export class RelinkHandleDirective {
     }
 
     // Mark the event only when the gesture is actually claimed — a refused
-    // relink (another gesture owns the pointer, feature disabled) must not
+    // relink (another gesture owns the pointer, the end is not relinkable) must not
     // turn the pointerdown into a dead click that neither selects nor pans.
     if (this.relinkingGesture.beginRelink($event, this.edge(), this.end())) {
       $event.relinkHandled = true;
