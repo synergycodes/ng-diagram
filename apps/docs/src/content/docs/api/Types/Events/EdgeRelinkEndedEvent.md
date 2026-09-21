@@ -8,9 +8,9 @@ title: "EdgeRelinkEndedEvent"
 
 Event payload emitted when an edge relink gesture ends, regardless of outcome.
 
-On success the edge was either reconnected (`target`/`targetPort` populated)
-or left dangling (`edge` has an empty endpoint anchored at `dropPosition`).
-On failure the edge is unchanged and `reason` explains why.
+On success the edge was either reconnected (`target` and `targetPort` are
+set) or left dangling (`edge` has a free endpoint anchored at
+`dropPosition`). On failure the edge is unchanged and `reason` explains why.
 
 ## Properties
 
@@ -58,7 +58,7 @@ The port the endpoint was connected to before the relink, if any.
 
 > `optional` **previousPosition**: [`Point`](/docs/api/types/geometry/point/)
 
-The dangling position the endpoint had before the relink, if it was dangling.
+The anchor position of the endpoint before the relink, present only when the endpoint was free (dangling).
 
 ***
 

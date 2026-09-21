@@ -6,10 +6,11 @@ prev: false
 title: "ConnectionValidationContext"
 ---
 
-Context passed to [LinkingConfig.validateConnection](/docs/api/types/configuration/features/linkingconfig/#validateconnection) describing the
-operation that asks for validation.
+Context passed to [LinkingConfig.validateConnection](/docs/api/types/configuration/features/linkingconfig/#validateconnection). It describes the
+operation that is being validated.
 
-- `draw` — a new edge is being drawn (gesture or `startLinking*`).
+- `draw` — a new edge is being drawn, by a pointer gesture or by
+  `startLinking` / `startLinkingFromPosition`.
 - `relink` — an endpoint of `edge` is being dragged to a new target.
 - `attach` — `NgDiagramModelService.attachEdge` connects an endpoint of `edge`.
 

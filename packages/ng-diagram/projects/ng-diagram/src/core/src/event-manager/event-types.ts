@@ -86,8 +86,9 @@ export interface DiagramEventMap {
   /**
    * Event emitted when an edge relink gesture ends, regardless of outcome.
    *
-   * Fires when the dragged endpoint is dropped — reconnected to a port, left
-   * dangling on empty canvas, or reverted (invalid drop or cancelled gesture).
+   * Fires when the dragged endpoint is dropped, whether it was reconnected to
+   * a port, left dangling on empty canvas, or reverted (invalid drop or
+   * cancelled gesture).
    *
    * @since 1.4.0
    */
@@ -342,15 +343,17 @@ export interface EdgeDrawEndedEvent {
 /**
  * Reason an edge relink gesture ended without changing the edge.
  *
- * - `noTarget` — dropped on empty canvas while dangling edges are disabled,
- *   or `danglingEdges.shouldKeepOnDrop` declined the detached edge
- * - `invalidConnection` — the drop target failed validation: rejected by
- *   `linking.validateConnection` (context reason `relink`), or structurally
- *   invalid (hidden node, hidden/missing port, wrong-direction port)
+ * - `noTarget` — the endpoint was dropped on empty canvas while dangling
+ *   edges are disabled, or `danglingEdges.shouldKeepOnDrop` returned false
+ *   for the detached edge
+ * - `invalidConnection` — the drop target failed validation: it was rejected
+ *   by `linking.validateConnection` (context reason `relink`), or it is not a
+ *   valid target at all (hidden node, hidden or missing port, port with the
+ *   wrong direction)
  * - `cancelled` — the gesture was aborted (Esc key,
- *   {@link NgDiagramService.cancelActiveInteraction}, another gesture claimed
- *   the pointer) or the endpoint was dropped back on its original node and
- *   port, which changes nothing
+ *   {@link NgDiagramService.cancelActiveInteraction}, or another gesture took
+ *   over the pointer), or the endpoint was dropped back on its original node
+ *   and port, which changes nothing
  *
  * @public
  * @since 1.4.0
@@ -376,9 +379,9 @@ export interface EdgeRelinkStartedEvent {
 /**
  * Event payload emitted when an edge relink gesture ends, regardless of outcome.
  *
- * On success the edge was either reconnected (`target`/`targetPort` populated)
- * or left dangling (`edge` has an empty endpoint anchored at `dropPosition`).
- * On failure the edge is unchanged and `reason` explains why.
+ * On success the edge was either reconnected (`target` and `targetPort` are
+ * set) or left dangling (`edge` has a free endpoint anchored at
+ * `dropPosition`). On failure the edge is unchanged and `reason` explains why.
  *
  * @public
  * @since 1.4.0
@@ -393,7 +396,7 @@ export interface EdgeRelinkEndedEvent {
   previousNode?: Node;
   /** The port the endpoint was connected to before the relink, if any. */
   previousPort?: string;
-  /** The dangling position the endpoint had before the relink, if it was dangling. */
+  /** The anchor position of the endpoint before the relink, present only when the endpoint was free (dangling). */
   previousPosition?: Point;
   /** The position where the pointer was released. */
   dropPosition: Point;
@@ -475,8 +478,9 @@ export interface SelectionRemovedEvent {
   deletedEdges: Edge[];
   /**
    * Edges that were detached into dangling edges instead of being deleted
-   * (see `danglingEdges.detachOnNodeDelete`). Snapshots taken after the
-   * detach — the freed endpoints are already empty with their positions set.
+   * (see `danglingEdges.detachOnNodeDelete`). The snapshots are taken after
+   * the detach: the freed endpoints already have an empty `source`/`target`
+   * and their anchor positions set. Empty when nothing was detached.
    *
    * @since 1.4.0
    */

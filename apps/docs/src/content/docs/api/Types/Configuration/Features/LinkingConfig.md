@@ -15,17 +15,17 @@ Configuration for linking (edge creation) behavior.
 > **defaultRelinkable**: `boolean` \| [`EdgeEnd`](/docs/api/types/model/edgeend/)
 
 Default `relinkable` value for edges that do not set their own. `true`
-lets the user drag both ends of an edge to another port, an `EdgeEnd`
-only that end, `false` neither. A selected edge shows a handle at each
-end that can be relinked; dragging a handle previews the reconnection
-live and commits it on drop. Dropping on empty canvas leaves the endpoint
-dangling when `danglingEdges.enabled` is true, otherwise the relink is
-reverted.
+lets the user drag both ends of an edge to another port, `'source'` or
+`'target'` allows only that end, and `false` allows neither. A selected
+edge shows a handle at each end that can be relinked. Dragging a handle
+previews the new connection and commits it on drop. A drop on empty
+canvas detaches the endpoint when `danglingEdges.enabled` is true;
+otherwise the relink is reverted.
 
-The gesture shares this section's snap distance, edge panning and
-temporary edge builder. Its drops are validated through
-`validateConnection`, which receives a context with `reason: 'relink'`
-and the edge being relinked.
+Relinking uses the same `portSnapDistance`, edge panning and
+`temporaryEdgeDataBuilder` settings as edge drawing. Each drop is
+validated with `validateConnection`, which receives a context with
+`reason: 'relink'` and the edge being relinked.
 
 #### Default
 
@@ -182,19 +182,19 @@ The Edge object to use for the temporary edge.
 
 Validates whether a connection between two nodes and ports is allowed.
 
-Called for every connection-producing operation: drawing a new edge,
-relinking an existing edge's endpoint, and `attachEdge`. The optional
-`context` says which operation is being validated (since 1.4.0).
+Called for every operation that creates a connection: drawing a new edge,
+relinking an endpoint of an existing edge, and `attachEdge`. The optional
+`context` tells which operation is being validated (since 1.4.0).
 
-`source` can be `null` for draws that start from a position instead of a
-node (`startLinkingFromPosition`) and when relinking the free end of a
-dangling edge.
+`source` is `null` for draws started with `startLinkingFromPosition`.
+When an edge is relinked or attached, the other end of that edge can be
+free (dangling); the `source` or `target` for that end is then `null`.
 
 #### Parameters
 
 ##### source
 
-The source node.
+The source node, or `null` when the source end is free.
 
 `null` | [`Node`](/docs/api/types/model/node/)
 
@@ -206,7 +206,7 @@ The source port.
 
 ##### target
 
-The target node.
+The target node, or `null` when the target end is free.
 
 `null` | [`Node`](/docs/api/types/model/node/)
 
@@ -220,7 +220,7 @@ The target port.
 
 [`ConnectionValidationContext`](/docs/api/types/configuration/features/connectionvalidationcontext/)
 
-The operation asking for validation (`draw` when omitted).
+The operation being validated (`draw` when omitted).
 
 #### Returns
 

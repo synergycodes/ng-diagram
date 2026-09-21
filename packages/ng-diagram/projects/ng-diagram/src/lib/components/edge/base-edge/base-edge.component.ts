@@ -173,8 +173,8 @@ export class NgDiagramBaseEdgeComponent {
 
   /**
    * Whether the edge has at least one free (unconnected) endpoint. Temporary
-   * edges are excluded — a draw preview always has a free end and must not
-   * pick up dangling styling.
+   * edges are excluded: a draw preview always has a free end, but it must not
+   * get the dangling styling.
    */
   readonly dangling = computed(() => {
     const edge = this.edge();
@@ -184,8 +184,9 @@ export class NgDiagramBaseEdgeComponent {
   readonly labels = computed(() => this.edge().measuredLabels ?? []);
 
   /**
-   * Whether the source endpoint handle is rendered: the edge is selected,
-   * committed, routed, and its source end can be relinked.
+   * Whether the source endpoint handle is rendered. It is rendered when the
+   * edge is selected, is not a temporary edge, has routed points, and its
+   * source end can be relinked.
    *
    * @since 1.4.0
    */
@@ -213,10 +214,10 @@ export class NgDiagramBaseEdgeComponent {
   readonly relinkTargetHandle = computed(() => this.points()[this.points().length - 1]);
 
   /**
-   * Radius of the handles' invisible hit circle, in flow units. Kept at
-   * roughly a finger-friendly constant size on screen by dividing by the
-   * viewport scale — at zoom 0.5 the visible 5px circle alone would leave a
-   * 2.5px touch target.
+   * Radius of the invisible hit circle around each handle, in flow units. The
+   * radius is divided by the viewport scale, so the hit area keeps a constant,
+   * finger-friendly size on screen at any zoom level. Without this, at zoom
+   * 0.5 the visible 5px circle would give only a 2.5px touch target.
    *
    * @since 1.4.0
    */

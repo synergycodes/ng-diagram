@@ -71,7 +71,7 @@ export class DiagramComponent {
       // @collapse-end:model-shape
       {
         id: 'dangling',
-        source: '', // free endpoint — no node, no port
+        source: '', // free endpoint: no node, no port
         sourcePosition: { x: 200, y: 340 }, // anchored here, in flow coordinates
         target: 'node-3',
         targetPort: 'port-left',

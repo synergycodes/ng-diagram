@@ -110,7 +110,7 @@ The base edge component exposes these classes for styling:
 
 - `.selected` - Applied when the edge is selected
 - `.temporary` - Applied when the edge is being drawn (preview state)
-- `.dangling` - Applied when the edge has at least one free (unconnected) endpoint — see [Dangling Edges](/docs/guides/edges/dangling-edges); the edge wrapper element also gets the `ng-diagram-edge--dangling` class
+- `.dangling` - Applied when the edge has at least one free (unconnected) endpoint (see [Dangling Edges](/docs/guides/edges/dangling-edges)). The edge wrapper element also gets the `ng-diagram-edge--dangling` class
 
 See [Edge Selection](/docs/guides/edges/selection) for more details on customizing selection styles.
 
@@ -219,7 +219,7 @@ onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
 
 Two opt-in features extend what users can do with existing edges:
 
-- **[Relinking](/docs/guides/edges/relinking)** — with [`linking.defaultRelinkable`](/docs/api/types/configuration/features/linkingconfig/#defaultrelinkable), selected edges show endpoint handles that users can drag to reconnect the edge to another port, unless the edge's own `relinkable` says otherwise.
+- **[Relinking](/docs/guides/edges/relinking)** — with [`linking.defaultRelinkable`](/docs/api/types/configuration/features/linkingconfig/#defaultrelinkable), selected edges show endpoint handles that users can drag to reconnect the edge to another port. An edge can override the default with its own `relinkable` property.
 - **[Dangling edges](/docs/guides/edges/dangling-edges)** — with [`danglingEdges.enabled`](/docs/api/types/configuration/features/danglingedgesconfig/#enabled), edges may have free (unconnected) endpoints: a draw or relink dropped on empty canvas keeps the edge, and deleting a node can detach its edges instead of deleting them.
 
 ## Selection During Linking

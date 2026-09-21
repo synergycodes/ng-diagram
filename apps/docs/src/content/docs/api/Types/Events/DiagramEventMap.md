@@ -69,8 +69,9 @@ Use `edgeDrawEnded` instead, which fires for both successful and cancelled draws
 
 Event emitted when an edge relink gesture ends, regardless of outcome.
 
-Fires when the dragged endpoint is dropped — reconnected to a port, left
-dangling on empty canvas, or reverted (invalid drop or cancelled gesture).
+Fires when the dragged endpoint is dropped, whether it was reconnected to
+a port, left dangling on empty canvas, or reverted (invalid drop or
+cancelled gesture).
 
 #### Since
 

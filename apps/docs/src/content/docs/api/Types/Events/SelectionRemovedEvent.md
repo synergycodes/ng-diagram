@@ -34,8 +34,9 @@ Nodes that were deleted from the diagram
 > **detachedEdges**: [`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
 
 Edges that were detached into dangling edges instead of being deleted
-(see `danglingEdges.detachOnNodeDelete`). Snapshots taken after the
-detach — the freed endpoints are already empty with their positions set.
+(see `danglingEdges.detachOnNodeDelete`). The snapshots are taken after
+the detach: the freed endpoints already have an empty `source`/`target`
+and their anchor positions set. Empty when nothing was detached.
 
 #### Since
 

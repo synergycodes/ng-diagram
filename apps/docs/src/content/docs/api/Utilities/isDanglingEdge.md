@@ -8,8 +8,9 @@ title: "isDanglingEdge"
 
 > **isDanglingEdge**(`edge`): `boolean`
 
-Checks whether an edge is dangling — has at least one endpoint not connected
-to a node. An edge with both endpoints free is a dual dangling edge.
+Checks whether an edge is dangling, that is, whether at least one of its
+endpoints is not connected to a node. An edge with both endpoints free is a
+dual dangling edge.
 
 ## Parameters
 
@@ -17,6 +18,10 @@ to a node. An edge with both endpoints free is a dual dangling edge.
 
 [`Edge`](/docs/api/types/model/edge/)
 
+The edge to check.
+
 ## Returns
 
 `boolean`
+
+`true` when at least one endpoint is free.

@@ -39,12 +39,12 @@ export class DiagramComponent {
     },
     // @collapse-end:config
     linking: {
-      // Both ends of every edge, unless the edge sets its own `relinkable`
+      // Both ends of every edge can be relinked, unless the edge sets its own `relinkable`
       // @mark-start:config
       defaultRelinkable: true,
       // @mark-end:config
     },
-    // A handle dropped on empty canvas detaches that end instead of reverting
+    // A handle dropped on empty canvas detaches that end instead of reverting the relink
     danglingEdges: {
       enabled: true,
     },

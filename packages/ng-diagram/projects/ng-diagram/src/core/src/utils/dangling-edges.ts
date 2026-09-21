@@ -21,11 +21,14 @@ export interface DanglingEndpoint {
 
 /**
  * Checks whether the given endpoint of an edge is free (not connected to a
- * node). A free endpoint is represented by an empty `source`/`target` with the
- * position stored in `sourcePosition`/`targetPosition`.
+ * node). A free endpoint has an empty `source` or `target`, and its position
+ * is stored in `sourcePosition` or `targetPosition`.
  *
  * When `end` is omitted, checks whether either endpoint is free.
  *
+ * @param edge The edge to check.
+ * @param end The endpoint to check, or none to check both.
+ * @returns `true` when the endpoint is free.
  * @public
  * @since 1.4.0
  * @category Utilities
@@ -41,9 +44,12 @@ export const hasFreeEndpoint = (edge: Edge, end?: EdgeEnd): boolean => {
 };
 
 /**
- * Checks whether an edge is dangling — has at least one endpoint not connected
- * to a node. An edge with both endpoints free is a dual dangling edge.
+ * Checks whether an edge is dangling, that is, whether at least one of its
+ * endpoints is not connected to a node. An edge with both endpoints free is a
+ * dual dangling edge.
  *
+ * @param edge The edge to check.
+ * @returns `true` when at least one endpoint is free.
  * @public
  * @since 1.4.0
  * @category Utilities
@@ -51,11 +57,13 @@ export const hasFreeEndpoint = (edge: Edge, end?: EdgeEnd): boolean => {
 export const isDanglingEdge = (edge: Edge): boolean => hasFreeEndpoint(edge);
 
 /**
- * Collects the free endpoints of the given edges. A dual dangling edge yields
- * two entries. Endpoints whose anchor position is missing are skipped —
- * they cannot be rendered or snapped to. Temporary and effectively hidden
- * edges are skipped.
+ * Collects the free endpoints of the given edges. A dual dangling edge gives
+ * two entries. Endpoints without an anchor position are skipped, because they
+ * cannot be rendered or snapped to. Temporary and effectively hidden edges are
+ * skipped as well.
  *
+ * @param edges The edges to scan.
+ * @returns The free endpoints with their edge, end and anchor position.
  * @public
  * @since 1.4.0
  * @category Utilities
@@ -77,11 +85,15 @@ export const getDanglingEndpoints = (edges: readonly Edge[]): DanglingEndpoint[]
 };
 
 /**
- * Computes the anchor a detached endpoint stays at: the port's current flow
- * position when the edge was connected to a port, the edge's routed endpoint
- * otherwise, the node's center as a last resort. Must run while the node is
- * still in the state.
+ * Computes the position where a detached endpoint stays: the current position
+ * of the port when the edge was connected to a port, otherwise the routed
+ * endpoint of the edge, or the center of the node as a last resort. Call it
+ * while the node still exists in the model.
  *
+ * @param edge The edge whose endpoint is being detached.
+ * @param end The endpoint to detach.
+ * @param node The node the endpoint is connected to, if it still exists.
+ * @returns The anchor position, or `null` when none can be computed.
  * @public
  * @since 1.4.0
  * @category Utilities
@@ -126,10 +138,15 @@ export const alignManualPointsPatch = (edge: Edge, end: EdgeEnd, anchor: Point):
 };
 
 /**
- * Finds the free edge endpoint nearest to `point` within `range`, or null when
- * none is close enough. Sibling of `getNearestPortInRange` for snapping to
- * dangling ends. Temporary and effectively hidden edges are skipped.
+ * Finds the free edge endpoint nearest to `point` within `range`, or `null`
+ * when none is close enough. It works like `getNearestPortInRange`, but for
+ * the free endpoints of dangling edges. Temporary and effectively hidden edges
+ * are skipped.
  *
+ * @param edges The edges to scan.
+ * @param point The point to measure from.
+ * @param range The maximum distance from `point`.
+ * @returns The nearest free endpoint, or `null`.
  * @public
  * @since 1.4.0
  * @category Utilities

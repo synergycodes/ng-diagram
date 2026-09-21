@@ -49,17 +49,17 @@ export interface LinkingActionState {
   /** Reason the linking gesture was cancelled (set by finishLinking on failure paths). */
   cancelReason?: EdgeDrawCancelReason;
   /**
-   * Present while an existing edge's endpoint is being relinked. The original
-   * edge is hidden and represented by the temporary edge until the gesture
-   * ends; `relink.end` is the end of the temporary edge that follows the
-   * pointer (a normal draw always drags the target end).
+   * Present while an endpoint of an existing edge is being relinked. Until the
+   * gesture ends, the original edge is not rendered and the temporary edge
+   * represents it. `relink.end` is the end of the temporary edge that follows
+   * the pointer (a normal draw always drags the target end).
    *
    * @since 1.4.0
    */
   relink?: LinkingRelinkContext;
   /**
    * Reason the relink gesture ended without changing the edge (set by
-   * finishRelinking on failure paths).
+   * `finishRelinking` when the relink fails).
    *
    * @since 1.4.0
    */

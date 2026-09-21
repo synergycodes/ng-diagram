@@ -170,10 +170,10 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   }
 
   /**
-   * Collects the free (unconnected) endpoints of all committed edges — a dual
-   * dangling edge yields two entries. Temporary and effectively hidden edges
+   * Returns the free (unconnected) endpoints of all edges in the model. A dual
+   * dangling edge gives two entries. Temporary and effectively hidden edges
    * are skipped.
-   * @returns Dangling endpoints with their edge, end and anchor position.
+   * @returns The free endpoints with their edge, end and anchor position.
    * @since 1.4.0
    */
   getDanglingEndpoints(): DanglingEndpoint[] {
@@ -184,12 +184,12 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   }
 
   /**
-   * Gets the free edge endpoint nearest to a point within a range — the
-   * dangling-edges sibling of {@link getNearestPortInRange}. Temporary and
-   * effectively hidden edges are skipped.
+   * Finds the free edge endpoint nearest to a point within a range. It works
+   * like {@link getNearestPortInRange}, but for the free endpoints of dangling
+   * edges. Temporary and effectively hidden edges are skipped.
    * @param point Point to check from.
    * @param range Range to check in.
-   * @returns Nearest dangling endpoint in range or null.
+   * @returns Nearest free endpoint in range, or null.
    * @since 1.4.0
    */
   getNearestDanglingEndpointInRange(point: Point, range: number): DanglingEndpoint | null {
@@ -200,18 +200,19 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   }
 
   /**
-   * Detaches one endpoint of an edge into a free (dangling) endpoint.
+   * Detaches one endpoint of an edge, so that it becomes a free (dangling)
+   * endpoint.
    *
    * When `position` is omitted, the endpoint stays anchored where it is now:
-   * at the port's current position when the edge was connected to a port, at
-   * the edge's routed endpoint otherwise.
+   * at the current position of the port when the edge was connected to a
+   * port, otherwise at the routed endpoint of the edge.
    *
-   * Requires `danglingEdges.enabled` — with the feature off this method is a
-   * no-op, so dangling edges only ever come into existence behind the flag.
+   * Requires `danglingEdges.enabled`. With the feature off, this method does
+   * nothing and logs a console warning.
    *
-   * @param edgeId The edge to detach.
+   * @param edgeId ID of the edge to detach.
    * @param end Which endpoint to detach.
-   * @param position Optional anchor position for the freed endpoint.
+   * @param position Optional anchor position for the freed endpoint, in flow coordinates.
    * @since 1.4.0
    */
   detachEdge(edgeId: string, end: EdgeEnd, position?: Point): Promise<void> {
@@ -254,14 +255,19 @@ export class NgDiagramModelService extends NgDiagramBaseService implements OnDes
   }
 
   /**
-   * Attaches one endpoint of an edge to a node (and optionally a port),
-   * running `linking.validateConnection` with the edge's endpoints in their
-   * proper roles — the symmetric counterpart of {@link detachEdge}.
+   * Attaches one endpoint of an edge to a node and, optionally, to a port.
+   * This is the opposite of {@link detachEdge}.
    *
-   * @param edgeId The edge to attach.
+   * The same checks as for a relink drop apply: the node must exist and be
+   * visible, and the port must exist, be visible and have the right direction.
+   * The connection is then validated with `linking.validateConnection`, which
+   * receives the attached node as `source` or `target` according to `end`,
+   * and a context with `reason: 'attach'`.
+   *
+   * @param edgeId ID of the edge to attach.
    * @param end Which endpoint to attach.
-   * @param nodeId The node to attach to.
-   * @param portId The port to attach to.
+   * @param nodeId ID of the node to attach to.
+   * @param portId ID of the port to attach to. When omitted, the endpoint is attached to the node without a port.
    * @returns Whether the connection was valid and applied.
    * @since 1.4.0
    */

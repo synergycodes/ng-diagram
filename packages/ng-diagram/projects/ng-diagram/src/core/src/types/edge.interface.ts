@@ -70,9 +70,9 @@ export interface Edge<T extends DataObject = DataObject> {
    */
   hidden?: boolean;
   /**
-   * Whether the user can relink the edge's endpoints. `true` allows both
-   * ends, an `EdgeEnd` allows only that end. When absent,
-   * `linking.defaultRelinkable` applies. Any other value locks both ends.
+   * Whether the user can relink the ends of this edge. `true` allows both
+   * ends, `'source'` or `'target'` allows only that end, and `false` allows
+   * neither. When not set, `linking.defaultRelinkable` applies.
    *
    * Set by the user; the library only reads it.
    * @since 1.4.0
