@@ -935,6 +935,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     groupMembershipChanged: EventEmitter<GroupMembershipChangedEvent>;
     // (undocumented)
     isGroup(node: Node_2): node is GroupNode<object>;
+    protected readonly linkingActive: Signal<boolean>;
     middlewares: InputSignal<MiddlewareChain>;
     model: InputSignal<ModelAdapter>;
     // (undocumented)

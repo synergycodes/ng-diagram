@@ -54,3 +54,10 @@ svg {
     fill: var(--edge-relink-handle-fill-hover, var(--ngd-relink-handle-fill-hover, currentColor));
   }
 }
+
+// The preview edge ends under the pointer; if it caught the pointer, the
+// cursor and :hover would flip between it and whatever lies beneath.
+:host.temporary svg,
+:host.temporary svg path {
+  pointer-events: none;
+}

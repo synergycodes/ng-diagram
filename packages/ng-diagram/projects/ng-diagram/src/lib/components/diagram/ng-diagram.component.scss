@@ -22,10 +22,11 @@
     }
   }
 
-  // While an edge endpoint is being dragged the handle itself is unmounted
-  // (the original edge is hidden), so the grabbing cursor is held at the host.
-  &.relinking,
-  &.relinking * {
+  // Held at the host for the whole gesture: the relink handle unmounts
+  // mid-gesture (the original edge is hidden) and a port drag has no handle
+  // at all. Child components (edges, nodes, ports) keep their own cursors.
+  &.linking,
+  &.relinking {
     cursor: grabbing;
   }
 

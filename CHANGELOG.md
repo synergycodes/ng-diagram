@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **The cursor no longer flickers while an edge is drawn or relinked** — the preview edge does not react to the pointer, and the diagram shows the grabbing hand over the canvas for the whole gesture ([#TBD](https://github.com/synergycodes/ng-diagram/pull/TBD))
 - **Arrow keys pan the viewport when the selection cannot move** — with `nodeDraggingEnabled: false` and a node selected, the arrow keys used to do nothing. The same happened when only `draggable: false` nodes were selected. Now the arrow keys pan the viewport whenever the selection would not move; with node dragging enabled, a movable selection still moves as before ([#809](https://github.com/synergycodes/ng-diagram/pull/809))
 - **`zoomToFit({ nodeIds })` frames only the requested nodes** — without `edgeIds`, the fit used to include every edge of the diagram, so fitting a few nodes in a connected diagram zoomed out to the whole network, and fitting only hidden nodes framed the whole diagram instead of doing nothing. Now only edges with both ends among the fitted nodes count; passing `edgeIds` works as before ([#808](https://github.com/synergycodes/ng-diagram/pull/808))
 - **Pasted manual-routing edges keep their shape at the new location** — an edge with `routingMode: 'manual'` pasted together with its nodes used to be drawn at the original location; its `points` now move with the pasted nodes ([#810](https://github.com/synergycodes/ng-diagram/pull/810))

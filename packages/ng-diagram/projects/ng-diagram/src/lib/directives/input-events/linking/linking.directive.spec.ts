@@ -4,6 +4,7 @@ import { By } from '@angular/platform-browser';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { FlowCoreProviderService } from '../../../services';
 import { LinkingEventService } from '../../../services/input-events/linking-event.service';
+import { LinkingGestureStateService } from '../../../services/input-events/linking-gesture-state.service';
 import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
 import { DiagramEventName, type PointerInputEvent } from '../../../types';
 import { LinkingInputDirective } from './linking.directive';
@@ -28,6 +29,7 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
   let fixture: ComponentFixture<HostComponent>;
   let directive: LinkingInputDirective;
   let touchState: TouchEventsStateService;
+  let gestureState: LinkingGestureStateService;
   let clearLinking: ReturnType<typeof vi.fn>;
   let cancelActiveInteraction: ReturnType<typeof vi.fn>;
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
@@ -62,7 +64,11 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
 
     TestBed.configureTestingModule({
       imports: [HostComponent],
-      providers: [{ provide: FlowCoreProviderService, useValue: mockFlowCoreProvider }, TouchEventsStateService],
+      providers: [
+        { provide: FlowCoreProviderService, useValue: mockFlowCoreProvider },
+        TouchEventsStateService,
+        LinkingGestureStateService,
+      ],
     });
     // LinkingEventService is a directive-level provider — override it there
     TestBed.overrideProvider(LinkingEventService, { useValue: mockLinkingEventService });
@@ -71,6 +77,7 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
     fixture.detectChanges();
     directive = fixture.debugElement.query(By.directive(LinkingInputDirective)).injector.get(LinkingInputDirective);
     touchState = TestBed.inject(TouchEventsStateService);
+    gestureState = TestBed.inject(LinkingGestureStateService);
   });
 
   it('leaves a marker owned by another gesture alone when destroyed as a bystander', () => {
@@ -135,5 +142,38 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
     directive.onPointerMove(makePointerEvent({ clientX: 300, clientY: 400 }));
 
     expect(linkingEventService.emitEnd).toHaveBeenCalledWith(expect.anything(), undefined, 'p1', true);
+    expect(gestureState.active()).toBe(false);
+  });
+
+  describe('shared draw-gesture state', () => {
+    it('is active from pointerdown until the pointerup', () => {
+      expect(gestureState.active()).toBe(false);
+
+      directive.onPointerDown(makePointerEvent());
+      expect(gestureState.active()).toBe(true);
+
+      directive.onPointerUp(makePointerEvent());
+      expect(gestureState.active()).toBe(false);
+    });
+
+    it('is cleared when the gesture owner is destroyed mid-gesture', () => {
+      directive.onPointerDown(makePointerEvent());
+
+      fixture.destroy();
+
+      expect(gestureState.active()).toBe(false);
+    });
+
+    it('is left alone when a bystander port is destroyed during another port’s gesture', () => {
+      // Another port's directive owns the running gesture; virtualization
+      // destroys this one while the pointer is still down.
+      touchState.currentEvent.set(DiagramEventName.Linking);
+      gestureState.active.set(true);
+
+      fixture.destroy();
+
+      expect(gestureState.active()).toBe(true);
+      expect(touchState.currentEvent()).toBe(DiagramEventName.Linking);
+    });
   });
 });

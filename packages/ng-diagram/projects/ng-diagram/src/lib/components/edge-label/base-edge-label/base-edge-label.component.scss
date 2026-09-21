@@ -2,3 +2,8 @@
   position: absolute;
   pointer-events: all;
 }
+
+// Labels carried by the relink preview must not catch the pointer either.
+:host-context(ng-diagram-base-edge.temporary) {
+  pointer-events: none;
+}
