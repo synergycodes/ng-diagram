@@ -100,19 +100,19 @@ export class NgDiagramPortComponent extends NodeContextGuardBase implements OnIn
   originPoint = input<OriginPoint>('center');
 
   /**
-   * Whether the port is hidden. Defaults to false.
+   * Whether the port is hidden. Defaults to `false`.
    *
-   * A hidden port stays mounted as `display: none`, creates no measurement
-   * expectation (it never blocks initialization or `waitForMeasurements`),
-   * and is excluded as a linking target and port-snap candidate. Unhiding
-   * re-measures it automatically.
+   * A hidden port stays in the DOM with `display: none` and never blocks
+   * initialization or `waitForMeasurements`. It cannot receive a link, and
+   * the linking preview does not snap to it. When the port becomes visible
+   * again, it is measured again automatically.
    *
-   * Edges attached to a hidden port keep the port's last measured geometry
-   * as their anchor; hide the edge itself via its `hidden` flag if it should
-   * disappear with the port.
+   * Edges connected to a hidden port stay visible and keep using the port's
+   * last measured position. If the edge should disappear with the port, hide
+   * the edge itself with its `hidden` flag.
    *
-   * Accepts the static attribute form too: a bare `hidden` attribute means
-   * hidden, matching native HTML semantics.
+   * A plain `hidden` attribute without a binding also works and means hidden,
+   * like the native HTML attribute.
    *
    * @since 1.4.0
    */

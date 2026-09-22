@@ -3,7 +3,6 @@ title: Labels
 description: Understanding how labels on edges work in ngDiagram
 sidebar:
   order: 5
-  badge: New
 ---
 
 import { Aside, Badge } from '@astrojs/starlight/components';
@@ -209,7 +208,7 @@ import MultipleLabels from '@components/angular/edges/labels/multiple-labels/mul
 
 ## Visibility
 
-Labels are declared in templates, so they are hidden declaratively through the `hidden` input — independently of their owning edge:
+Labels are declared in templates, so you hide them with the `hidden` input. It works independently of the edge that owns the label:
 
 ```html
 <ng-diagram-base-edge-label [id]="labelId" [positionOnEdge]="0.5" [hidden]="!showLabels()">
@@ -217,6 +216,6 @@ Labels are declared in templates, so they are hidden declaratively through the `
 </ng-diagram-base-edge-label>
 ```
 
-The static attribute form works too — a bare `hidden` attribute means hidden, matching native HTML semantics. A hidden label stays mounted, keeps its measured geometry, and never blocks initialization.
+A plain `hidden` attribute without a binding works too. It means hidden, like the native HTML attribute. A hidden label stays in the DOM, keeps its measured size, and never blocks initialization.
 
-See [Conditional Visibility](/docs/guides/conditional-visibility) for the full semantics and how hiding interacts with measurement.
+See [Conditional Visibility](/docs/guides/conditional-visibility) for the full rules and how hiding works with measurement.

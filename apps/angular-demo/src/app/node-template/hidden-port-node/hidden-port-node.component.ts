@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, input, linkedSignal } from '@angula
 import { NgDiagramNodeSelectedDirective, NgDiagramNodeTemplate, NgDiagramPortComponent, Node } from 'ng-diagram';
 
 /**
- * Unlike PortToggleNodeComponent (which unmounts ports with @if), this
- * template keeps the ports mounted and hides them declaratively via the
- * `[hidden]` port input.
+ * Unlike PortToggleNodeComponent, which removes ports with @if, this
+ * template keeps the ports in the DOM and hides them with the `[hidden]`
+ * port input.
  */
 @Component({
   selector: 'app-hidden-port-node',
@@ -20,8 +20,8 @@ import { NgDiagramNodeSelectedDirective, NgDiagramNodeTemplate, NgDiagramPortCom
 export class HiddenPortNodeComponent implements NgDiagramNodeTemplate<HiddenPortNodeData> {
   node = input.required<Node<HiddenPortNodeData>>();
 
-  // Seeded from the model so a node can start with hidden ports — they are
-  // declared hidden before registering for measurement, so they never block
+  // Seeded from the model so a node can start with hidden ports. They are
+  // declared hidden before they register for measurement, so they never block
   // initialization. The checkbox toggles the local state afterwards.
   portsHidden = linkedSignal(() => this.node().data.portsHidden === true);
 

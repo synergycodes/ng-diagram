@@ -187,8 +187,8 @@ Array of edges
 [`Rect`](/docs/api/types/geometry/rect/)
 
 Bounding rectangle containing all visible nodes and edges. When there is nothing to
-measure — both arrays are empty, no visible node has `measuredBounds`, and no visible edge
-has `points` — returns a zero-size rectangle at the origin (`{ x: 0, y: 0, width: 0, height: 0 }`).
+measure (both arrays are empty, no visible node has `measuredBounds`, and no visible edge
+has `points`), returns a zero-size rectangle at the origin (`{ x: 0, y: 0, width: 0, height: 0 }`).
 
 #### Since
 
@@ -196,16 +196,16 @@ has `points` — returns a zero-size rectangle at the origin (`{ x: 0, y: 0, wid
 
 Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
 
-Node bounds are derived from `measuredBounds` — which folds in measured ports and rotation —
-not from the raw `position`/`size` on the model. Nodes must therefore already be measured
-(rendered), and the result can extend beyond the raw node rects by the port extents.
-Edges contribute their routed `points` and measured labels.
+Node bounds come from `measuredBounds`, which includes the measured ports and the rotation,
+not from the raw `position` and `size` in the model. Nodes must therefore already be measured
+(rendered), and the result can be larger than the node rectangles because of the ports.
+Edges contribute their routed `points` and their measured labels.
 
 #### Remarks
 
-Since 1.4.0, effectively hidden elements (`computedHidden`) are excluded — their
-stale geometry does not inflate the result. An input consisting only of hidden elements
-yields the same zero-size rectangle at the origin as an unmeasured input.
+Since 1.4.0, effectively hidden elements (`computedHidden`) are left out, so their
+old geometry does not enlarge the result. If all given elements are hidden, the result is
+the same zero-size rectangle at the origin as for unmeasured elements.
 
 ***
 
@@ -237,9 +237,9 @@ A promise that resolves once the change has been applied to the model. Inside a 
 
 Deletes nodes by their IDs.
 
-Deleting a group cascades to all of its descendants (children, grandchildren, …),
-and edges connected to any deleted node are removed as well — the same semantics
-as deleting the selection.
+Deleting a group also deletes all of its descendants (children, grandchildren, and so on).
+Edges connected to any deleted node are removed as well. This is the same behavior as
+deleting the selection.
 
 #### Parameters
 

@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation 
 import { Edge, NgDiagramBaseEdgeComponent, NgDiagramBaseEdgeLabelComponent, NgDiagramEdgeTemplate } from 'ng-diagram';
 
 /**
- * Edge whose label is hidden via the `[hidden]` label input. The label stays
- * mounted but never measures, so it does not block initialization. Unhide it
- * by setting `data.labelHidden` to false on the edge.
+ * Edge whose label is hidden through the `[hidden]` label input. The label
+ * stays in the DOM but is never measured, so it does not block initialization.
+ * Unhide it by setting `data.labelHidden` to false on the edge.
  */
 @Component({
   selector: 'app-hidden-label-edge',

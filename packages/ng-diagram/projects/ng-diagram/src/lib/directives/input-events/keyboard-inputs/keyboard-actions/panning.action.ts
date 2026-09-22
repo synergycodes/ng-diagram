@@ -16,9 +16,9 @@ import type { KeyboardAction } from './keyboard-action.interface';
 @Injectable()
 export class PanningAction implements KeyboardAction {
   canHandle(shortcut: ShortcutDefinition, flowCore: FlowCore): boolean {
-    // Exact complement of MovingAction's gate: whenever the move handler
-    // would no-op (node dragging disabled, or the selection contains nothing
-    // movable — hidden or `draggable: false`), the arrows pan instead.
+    // Exact opposite of the MovingAction check: when nothing would move (node
+    // dragging disabled, or only hidden or `draggable: false` nodes selected),
+    // the arrow keys pan instead.
     return (
       flowCore.config.viewportPanningEnabled &&
       shortcut.actionName.startsWith('keyboardPan') &&

@@ -14,10 +14,10 @@ import { type TreeNodeData } from '../types';
  *
  * Renders a labeled node with top/bottom ports for edge connections.
  * When the node has outgoing edges, a toggle button is shown to expand or
- * collapse the subtree. Nodes inside a collapsed subtree carry the
- * model-level `hidden` flag, so the library keeps them out of rendering
- * and every interaction — the template needs no visibility handling of
- * its own.
+ * collapse the subtree. Nodes inside a collapsed subtree have the model
+ * `hidden` flag set, so the library hides them and ignores them in every
+ * interaction. The template does not need any visibility handling of its
+ * own.
  */
 @Component({
   imports: [NgDiagramPortComponent, NgDiagramBaseNodeTemplateComponent],

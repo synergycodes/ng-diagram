@@ -12,8 +12,8 @@ const VIRTUALIZATION_WARNING =
   'declaring it. Use the model-level `hidden` flag instead.';
 
 /**
- * The `NgDiagramHiddenDirective` hides the node or edge whose template it is
- * used in — the template-level equivalent of the model `hidden` flag.
+ * The `NgDiagramHiddenDirective` hides the node or edge from inside its
+ * template. It is the template equivalent of the model `hidden` flag.
  *
  * ## Example usage
  * ```html
@@ -23,17 +23,17 @@ const VIRTUALIZATION_WARNING =
  * </div>
  * ```
  *
- * The element is hidden when the model flag, this binding, or inheritance
- * (hidden ancestor group, hidden edge endpoint) says so — every source feeds
- * the same effective visibility. Hidden elements stay mounted as
- * `display: none`, never block initialization or measurement waits, and are
- * excluded from every interactive surface (programmatic APIs such as
- * `select` do not filter hidden elements).
+ * The element is hidden when any of these applies: the model `hidden` flag,
+ * this binding, a hidden ancestor group, or (for edges) a hidden endpoint
+ * node. All of them feed the same effective visibility. Hidden elements stay
+ * in the DOM with `display: none`, never block initialization or
+ * `waitForMeasurements`, and are ignored by user interactions. Programmatic
+ * APIs such as `select` do not skip hidden elements.
  *
- * Not supported with virtualization: a hidden element leaves the virtualized
- * render set, which destroys the template declaring the binding. With
- * virtualization enabled the binding is ignored (with a console warning) —
- * use the model-level `hidden` flag instead.
+ * Not supported with virtualization: hiding the element would remove the
+ * template that holds the binding. With virtualization enabled the binding is
+ * ignored and a console warning is logged. Use the model `hidden` flag
+ * instead.
  *
  * @public
  * @since 1.4.0
@@ -45,10 +45,10 @@ const VIRTUALIZATION_WARNING =
 })
 export class NgDiagramHiddenDirective implements OnDestroy {
   /**
-   * Whether the node or edge owning this template is hidden.
+   * Whether the node or edge that owns this template is hidden.
    *
-   * Accepts the static attribute form too: a bare `ngDiagramHidden` (no
-   * binding) means hidden, matching native HTML `hidden` semantics.
+   * A plain `ngDiagramHidden` attribute without a binding also works and
+   * means hidden, like the native HTML `hidden` attribute.
    */
   hidden = input.required<boolean, unknown>({ alias: 'ngDiagramHidden', transform: booleanAttribute });
 

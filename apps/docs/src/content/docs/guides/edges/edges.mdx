@@ -237,15 +237,15 @@ config: NgDiagramConfig = {
 
 ## Visibility
 
-Edges can be hidden without removing them from the model via the optional [`hidden`](/docs/api/types/model/edge#hidden) flag:
+You can hide an edge without removing it from the model. Set the optional [`hidden`](/docs/api/types/model/edge#hidden) flag:
 
 ```typescript
 await this.modelService.updateEdge('edge-1', { hidden: true });
 ```
 
-An edge is also hidden automatically whenever either of its endpoint nodes is effectively hidden — there is no need to touch the edge yourself when hiding nodes. The system-computed [`computedHidden`](/docs/api/types/model/edge#computedhidden) property exposes the resulting effective visibility.
+An edge is also hidden automatically when either of its endpoint nodes is effectively hidden, so you do not need to update edges when you hide nodes. The read-only [`computedHidden`](/docs/api/types/model/edge#computedhidden) property tells you whether an edge is effectively hidden.
 
-See [Conditional Visibility](/docs/guides/conditional-visibility) for the full semantics, template-driven hiding, and how visibility interacts with measurement and virtualization.
+See [Conditional Visibility](/docs/guides/conditional-visibility) for the full rules, hiding from templates, and how hiding works with measurement and virtualization.
 
 ## Further reading
 

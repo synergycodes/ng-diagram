@@ -43,9 +43,9 @@ Whether the size of the node is automatically resized based on the content.
 #### Remarks
 
 ComputedHidden is computed by the system and should not be set manually.
-The effective visibility applied to the node: true when its own `hidden`
-flag (or a template-level hidden binding) is set, or when any ancestor
-group is effectively hidden.
+The effective visibility of the node: `true` when its own `hidden` flag
+or a template binding is set, or when any ancestor group is effectively
+hidden.
 
 #### Since
 
@@ -94,19 +94,20 @@ The id of the parent node.
 
 > `optional` **hidden**: `boolean`
 
-Whether the node is hidden. Absent means visible.
+Whether the node is hidden. When not set, the node is visible.
 
-Hidden nodes keep their geometry, do not block initialization or
-measurement waits, and are excluded from every interactive surface
-(hit-testing, select-all, box selection, keyboard move, drag, linking,
-zoomToFit bounds, edge routing). In the default render mode they stay
-mounted in the DOM as `display: none`; with virtualization enabled they
-are unmounted instead (geometry survives in the model and re-measures on
-unhide). Hiding a group hides all of its descendants; hiding a node hides
-the edges connected to it.
+A hidden node keeps its size and position and does not block
+initialization or `waitForMeasurements`. User interactions ignore it:
+hit-testing, select-all, box selection, keyboard move, drag, linking,
+zoomToFit bounds and edge routing. In the default render mode the node
+stays in the DOM with `display: none`. With virtualization enabled it is
+removed from the DOM instead; its geometry stays in the model and is
+measured again when the node becomes visible. Hiding a group hides all
+of its descendants. Hiding a node hides the edges connected to it.
 
-Programmatic APIs (e.g. `select`, `centerOnNode`, z-order commands) do
-not filter hidden elements — acting on them is the caller's prerogative.
+Programmatic APIs such as `select`, `centerOnNode` and the z-order
+commands do not skip hidden elements. It is up to the caller whether to
+use them on hidden elements.
 
 Set by the user; the library only reads it.
 

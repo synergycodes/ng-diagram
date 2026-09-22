@@ -180,12 +180,12 @@ You can fully customize port appearance and behavior by:
 
 ## Visibility
 
-Ports are declared in templates, so they are hidden declaratively through the `hidden` input — independently of their owning node:
+Ports are declared in templates, so you hide them with the `hidden` input. It works independently of the node that owns the port:
 
 ```html
 <ng-diagram-port id="out" side="right" type="source" [hidden]="!editMode()" />
 ```
 
-The static attribute form works too — a bare `hidden` attribute means hidden, matching native HTML semantics. A hidden port is not a linking target or a port-snap candidate, and edges attached to it keep the port's last measured geometry as their anchor.
+A plain `hidden` attribute without a binding works too. It means hidden, like the native HTML attribute. A hidden port cannot receive a link, and the linking preview does not snap to it. Edges connected to a hidden port stay visible and keep using the port's last measured position.
 
-See [Conditional Visibility](/docs/guides/conditional-visibility) for the full semantics and how hiding interacts with measurement.
+See [Conditional Visibility](/docs/guides/conditional-visibility) for the full rules and how hiding works with measurement.

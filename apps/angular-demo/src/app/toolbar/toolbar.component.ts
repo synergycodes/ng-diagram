@@ -66,7 +66,7 @@ export class ToolbarComponent {
     this.ngDiagramNodeService.sendToBack();
   }
 
-  /** Sets `hidden: true` on every selected node and edge — hidden content stays selected, so other features can be exercised against it. */
+  /** Sets `hidden: true` on every selected node and edge. Hidden content stays selected, so other features can be tested against it. */
   onHideSelectionClick(): void {
     const { nodes, edges } = this.ngDiagramSelectionService.selection();
     if (nodes.length > 0) {
@@ -156,10 +156,10 @@ export class ToolbarComponent {
   }
 
   /**
-   * Demonstrates computePartsBounds with a nodes-only subset (edges: []).
-   * Computes the bounds of the selected nodes (or all nodes when nothing is
-   * selected) and centers the viewport on that rect — parts away from the
-   * origin must not drag the bounds back to (0, 0).
+   * Demonstrates computePartsBounds with nodes only (edges: []). Computes the
+   * bounds of the selected nodes (or of all nodes when nothing is selected) and
+   * centers the viewport on them. Nodes far from the origin must not pull the
+   * bounds back to (0, 0).
    */
   onCenterOnPartsBoundsClick() {
     const selectedNodes = this.ngDiagramSelectionService.selection().nodes;

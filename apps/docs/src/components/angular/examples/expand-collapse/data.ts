@@ -25,8 +25,8 @@ export const diagramModel: {
       data: { label: 'Components', collapsed: true },
       type: NodeTemplateType.TreeNode,
     },
-    // The "Components" subtree starts collapsed. Its children stay visible in
-    // the initial model so they are measured at init; LayoutService sets
+    // The "Components" subtree starts collapsed. Its children are visible in
+    // the initial model, so they are measured at init. LayoutService sets
     // their `hidden` flag together with the first layout.
     {
       id: 'buttons',

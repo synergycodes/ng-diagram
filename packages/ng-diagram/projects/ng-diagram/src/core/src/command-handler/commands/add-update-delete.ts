@@ -80,10 +80,10 @@ export const deleteNodes = async (commandHandler: CommandHandler, command: Delet
   const { edges } = commandHandler.flowCore.getState();
   const { modelLookup } = commandHandler.flowCore;
   const { ids } = command;
-  // Deleting a group cascades to its whole subtree (matching deleteSelection) —
-  // children left behind would keep a dangling groupId, and since a missing
-  // parent counts as visible, effectively hidden children would reappear as
-  // orphans on the computedHidden re-stamp.
+  // Deleting a group deletes its whole subtree, the same as deleteSelection.
+  // Children left behind would keep a groupId that points at a deleted node.
+  // A missing parent counts as visible, so hidden children would also become
+  // visible again when computedHidden is recomputed.
   const nodesToDeleteIds = new Set<string>(ids.flatMap((id) => [id, ...modelLookup.getAllDescendantIds(id)]));
   const { edgesToRemove, edgesToUpdate } = partitionIncidentEdges(commandHandler.flowCore, edges, nodesToDeleteIds);
   await commandHandler.flowCore.applyUpdate(
