@@ -4,17 +4,14 @@ import type { Node } from '../../../core/src';
 import { CursorPositionTrackerService } from '../cursor-position-tracker/cursor-position-tracker.service';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { LinkingEventService } from './linking-event.service';
-import { LinkingGestureStateService } from './linking-gesture-state.service';
 import { ManualLinkingService } from './manual-linking.service';
 
 describe('ManualLinkingService', () => {
   let service: ManualLinkingService;
-  let gestureState: LinkingGestureStateService;
   let emitStart: ReturnType<typeof vi.fn>;
   let emitContinue: ReturnType<typeof vi.fn>;
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
   let getNodeById: ReturnType<typeof vi.fn>;
-  let isLinking: ReturnType<typeof vi.fn>;
   let unregister: ReturnType<typeof vi.fn>;
   let registeredCleanups: (() => void)[];
 
@@ -30,12 +27,10 @@ describe('ManualLinkingService', () => {
       return unregister;
     });
     getNodeById = vi.fn().mockReturnValue(node);
-    isLinking = vi.fn().mockReturnValue(false);
 
     TestBed.configureTestingModule({
       providers: [
         ManualLinkingService,
-        LinkingGestureStateService,
         {
           provide: LinkingEventService,
           useValue: { emitStart, emitContinue, emitEnd: vi.fn() },
@@ -51,7 +46,7 @@ describe('ManualLinkingService', () => {
             provide: () => ({
               registerInteractionCleanup,
               getNodeById,
-              actionStateManager: { isLinking },
+              actionStateManager: { isLinking: () => false },
               config: { danglingEdges: { enabled: true } },
               commandHandler: { emit: vi.fn() },
             }),
@@ -61,7 +56,6 @@ describe('ManualLinkingService', () => {
     });
 
     service = TestBed.inject(ManualLinkingService);
-    gestureState = TestBed.inject(LinkingGestureStateService);
   });
 
   it('registers an interaction cleanup when linking starts', () => {
@@ -120,36 +114,5 @@ describe('ManualLinkingService', () => {
     expect(registerInteractionCleanup).not.toHaveBeenCalled();
 
     warnSpy.mockRestore();
-  });
-
-  describe('shared draw-gesture state', () => {
-    it('is active from startLinking until the registered cleanup runs', () => {
-      expect(gestureState.active()).toBe(false);
-
-      service.startLinking(node);
-      expect(gestureState.active()).toBe(true);
-
-      registeredCleanups[0]();
-      expect(gestureState.active()).toBe(false);
-    });
-
-    it('is active from startLinkingFromPosition until the finishing click', () => {
-      service.startLinkingFromPosition({ x: 0, y: 0 });
-      expect(gestureState.active()).toBe(true);
-
-      document.dispatchEvent(new Event('click'));
-      expect(gestureState.active()).toBe(false);
-    });
-
-    it('stays inactive when the start is refused because another gesture is in progress', () => {
-      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
-      isLinking.mockReturnValue(true);
-
-      service.startLinking(node);
-      service.startLinkingFromPosition({ x: 0, y: 0 });
-
-      expect(gestureState.active()).toBe(false);
-      warnSpy.mockRestore();
-    });
   });
 });

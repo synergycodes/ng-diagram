@@ -13,7 +13,6 @@ import { FlowOffsetService } from '../services/flow-offset/flow-offset.service';
 import { FlowResizeBatchProcessorService } from '../services/flow-resize-observer/flow-resize-processor.service';
 import { InputEventsRouterService } from '../services/input-events/input-events-router.service';
 import { LinkingEventService } from '../services/input-events/linking-event.service';
-import { LinkingGestureStateService } from '../services/input-events/linking-gesture-state.service';
 import { ManualLinkingService } from '../services/input-events/manual-linking.service';
 import { RelinkingEventService } from '../services/input-events/relinking-event.service';
 import { RelinkingGestureService } from '../services/input-events/relinking-gesture.service';
@@ -72,7 +71,6 @@ export function provideNgDiagram(): Provider[] {
     NgDiagramNodeService,
     NgDiagramGroupsService,
     LinkingEventService,
-    LinkingGestureStateService,
     ManualLinkingService,
     RelinkingEventService,
     RelinkingGestureService,

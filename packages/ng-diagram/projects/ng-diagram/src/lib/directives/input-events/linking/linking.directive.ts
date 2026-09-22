@@ -2,7 +2,6 @@ import { Directive, inject, input, OnDestroy, signal } from '@angular/core';
 import { FPS_60, NgDiagramMath, Node, Point } from '../../../../core/src';
 import { FlowCoreProviderService } from '../../../services';
 import { LinkingEventService } from '../../../services/input-events/linking-event.service';
-import { LinkingGestureStateService } from '../../../services/input-events/linking-gesture-state.service';
 import { TouchEventsStateService } from '../../../services/touch-events-state-service/touch-events-state-service.service';
 import { DiagramEventName, PointerInputEvent } from '../../../types';
 
@@ -18,8 +17,6 @@ export class LinkingInputDirective implements OnDestroy {
   private readonly linkingEventService = inject(LinkingEventService);
   private readonly flowCoreProviderService = inject(FlowCoreProviderService);
   private readonly touchEventsStateService = inject(TouchEventsStateService);
-  // Optional so TestBeds that mount a port with mocked services keep working.
-  private readonly linkingGestureState = inject(LinkingGestureStateService, { optional: true });
 
   private target = signal<Node | undefined>(undefined);
   private edgePanningInterval: number | null = null;
@@ -63,7 +60,6 @@ export class LinkingInputDirective implements OnDestroy {
     $event.linkingHandled = true;
     this.gestureActive = true;
     this.touchEventsStateService.currentEvent.set(DiagramEventName.Linking);
-    this.linkingGestureState?.active.set(true);
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
@@ -132,11 +128,9 @@ export class LinkingInputDirective implements OnDestroy {
     // The shared marker keeps concurrent gestures out (panningHandled() etc.), so
     // only its writer may clear it. gestureActive marks that writer — set only by
     // this instance's own pointerdown, so a bystander's destroy skips the clear.
-    // The same ownership rule guards the shared gesture-state signal.
     if (this.gestureActive) {
       this.gestureActive = false;
       this.touchEventsStateService.clearCurrentEvent();
-      this.linkingGestureState?.active.set(false);
     }
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);

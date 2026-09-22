@@ -3,6 +3,7 @@ import {
   booleanAttribute,
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   ElementRef,
   EventEmitter,
@@ -45,7 +46,7 @@ import type {
 
 import { MobileBoxSelectionDirective } from '../../../public-api';
 import { DiagramSelectionDirective } from '../../directives';
-import { LinkingGestureStateService } from '../../services/input-events/linking-gesture-state.service';
+import { NgDiagramService } from '../../public-services/ng-diagram.service';
 import { RelinkingGestureService } from '../../services/input-events/relinking-gesture.service';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { BoxSelectionDirective } from '../../directives/input-events/box-selection/box-selection.directive';
@@ -127,6 +128,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
   private readonly flowOffsetService = inject(FlowOffsetService);
   private readonly templateProviderService = inject(TemplateProviderService);
+  private readonly diagramService = inject(NgDiagramService);
 
   private initializedModel: ModelAdapter | null = null;
   private resizeObserver: ResizeObserver | null = null;
@@ -169,9 +171,11 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   /** Whether panning is enabled in the diagram. */
   readonly viewportPannable = this.renderer.viewportPannable;
 
-  /** Whether an edge is being drawn (port drag or manual linking) — holds the grabbing cursor at the host. */
-  protected readonly linkingActive =
-    inject(LinkingGestureStateService, { optional: true })?.active ?? signal(false).asReadonly();
+  /**
+   * Whether an edge is being drawn or relinked — holds the grabbing cursor at the host.
+   * The core sets this state once the gesture is accepted, so a refused start never shows the cursor.
+   */
+  protected readonly linkingActive = computed(() => !!this.diagramService.actionState().linking);
 
   /** Whether an edge endpoint is being dragged — holds the grabbing cursor at the host. */
   protected readonly relinkingActive =

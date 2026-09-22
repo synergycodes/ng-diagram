@@ -4,14 +4,12 @@ import { PointerInputEvent } from '../../types';
 import { CursorPositionTrackerService } from '../cursor-position-tracker/cursor-position-tracker.service';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
 import { LinkingEventService } from './linking-event.service';
-import { LinkingGestureStateService } from './linking-gesture-state.service';
 
 @Injectable()
 export class ManualLinkingService {
   private readonly linkingEventService = inject(LinkingEventService);
   private readonly cursorPositionTrackerService = inject(CursorPositionTrackerService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
-  private readonly linkingGestureState = inject(LinkingGestureStateService);
   private node: Node | undefined;
   private portId: string | undefined;
   private unregisterInteractionCleanup: (() => void) | null = null;
@@ -37,7 +35,6 @@ export class ManualLinkingService {
     this.removeListeners();
     this.node = node;
     this.portId = portId;
-    this.linkingGestureState.active.set(true);
     const position = this.cursorPositionTrackerService.getLastPosition();
 
     const startEvent = {
@@ -87,7 +84,6 @@ export class ManualLinkingService {
     this.removeListeners();
     this.node = undefined;
     this.portId = undefined;
-    this.linkingGestureState.active.set(true);
 
     flowCore.commandHandler.emit('startLinkingFromPosition', { position });
 
@@ -142,9 +138,6 @@ export class ManualLinkingService {
   private removeListeners() {
     this.unregisterInteractionCleanup?.();
     this.unregisterInteractionCleanup = null;
-    // Unconditional: both entry points refuse via isLinking() before reaching
-    // this call, so no port-drag gesture can own the signal at this point.
-    this.linkingGestureState.active.set(false);
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('click', this.onDocumentClick, true);
     document.removeEventListener('touchmove', this.onTouchMove);
