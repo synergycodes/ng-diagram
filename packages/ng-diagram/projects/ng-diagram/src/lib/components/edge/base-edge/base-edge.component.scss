@@ -54,3 +54,11 @@ svg {
     fill: var(--edge-relink-handle-fill-hover, var(--ngd-relink-handle-fill-hover, currentColor));
   }
 }
+
+// The preview edge ends under the pointer; if the path caught it, the cursor
+// and :hover would flip between the preview and whatever lies beneath. The
+// path opts in with visibleStroke above, so it needs its own rule; the svg
+// inherits none from the edges container.
+:host.temporary svg path {
+  pointer-events: none;
+}

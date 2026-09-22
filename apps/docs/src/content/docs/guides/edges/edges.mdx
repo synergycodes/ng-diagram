@@ -110,7 +110,7 @@ The default edge also uses these semantic variables that map to the design syste
 The base edge component exposes these classes for styling:
 
 - `.selected` - Applied when the edge is selected
-- `.temporary` - Applied when the edge is being drawn (preview state)
+- `.temporary` - Applied when the edge is being drawn (preview state). The edge wrapper element also gets the `ng-diagram-edge--temporary` class. Use it to keep interactive content in your own edge template from catching the pointer during a draw, for example `:host-context(.ng-diagram-edge--temporary) button { pointer-events: none; }`
 - `.dangling` - Applied when the edge has at least one free (unconnected) endpoint (see [Dangling Edges](/docs/guides/edges/dangling-edges)). The edge wrapper element also gets the `ng-diagram-edge--dangling` class
 
 See [Edge Selection](/docs/guides/edges/selection) for more details on customizing selection styles.

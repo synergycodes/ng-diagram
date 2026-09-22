@@ -72,6 +72,8 @@ describe('AngularAdapterDiagramComponent', () => {
           provide: NgDiagramService,
           useValue: {
             isInitialized: vi.fn().mockReturnValue(true),
+            // Drives the host's linking class; no gesture is in flight in these tests.
+            actionState: signal({}),
           },
         },
         {

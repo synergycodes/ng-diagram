@@ -275,11 +275,32 @@ test.describe('edge relinking', () => {
       'target handle of edge-ab'
     );
     const dst = await diagram.centerOf(diagram.port('node-c', 'port-left'), 'port node-c/port-left');
-    await diagram.beginDrag(handle, dst);
+    // Pause over empty canvas on the way (below the lowest node): the preview
+    // ends under the pointer there, so it must not be the element under the pointer.
+    const nodeC = (await diagram.node('node-c').boundingBox())!;
+    const canvasPoint = { x: handle.x + 60, y: nodeC.y + nodeC.height + 80 };
+    await diagram.beginDrag(handle, canvasPoint);
     // The original edge is hidden during the drag and replaced by the preview.
     await expect(diagram.edge('TEMPORARY_EDGE')).toBeAttached();
     await expect(diagram.edge('edge-ab')).toHaveCount(0);
+    await expect(diagram.page.locator('ng-diagram')).toHaveClass(/relinking/);
+    await expect(diagram.edge('TEMPORARY_EDGE').locator('svg path').first()).toHaveCSS('pointer-events', 'none');
+    expect(
+      await diagram.page.evaluate(
+        ([x, y]) => {
+          const el = document.elementFromPoint(x, y);
+          return {
+            cursor: el ? getComputedStyle(el).cursor : null,
+            onPreview: !!el?.closest('[data-edge-id="TEMPORARY_EDGE"]'),
+          };
+        },
+        [canvasPoint.x, canvasPoint.y] as const
+      )
+    ).toEqual({ cursor: 'grabbing', onPreview: false });
+
+    await diagram.page.mouse.move(dst.x, dst.y, { steps: 6 });
     await diagram.page.mouse.up();
+    await expect(diagram.page.locator('ng-diagram')).not.toHaveClass(/relinking/);
 
     await expect.poll(async () => (await diagram.model.getEdgeById('edge-ab'))?.target).toBe('node-c');
     const edge = await diagram.model.getEdgeById('edge-ab');
