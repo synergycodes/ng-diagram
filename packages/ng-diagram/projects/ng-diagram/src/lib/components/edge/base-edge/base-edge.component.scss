@@ -55,9 +55,10 @@ svg {
   }
 }
 
-// The wrapper already makes the preview non-interactive, but the path above
-// opts back in with visibleStroke, so it needs its own rule. The svg does not:
-// it inherits pointer-events from the edges container.
+// The preview edge ends under the pointer; if the path caught it, the cursor
+// and :hover would flip between the preview and whatever lies beneath. The
+// path opts in with visibleStroke above, so it needs its own rule; the svg
+// inherits none from the edges container.
 :host.temporary svg path {
   pointer-events: none;
 }
