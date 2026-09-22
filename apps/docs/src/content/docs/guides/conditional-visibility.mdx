@@ -6,7 +6,19 @@ sidebar:
   badge: New
 ---
 
-ngDiagram has built-in support for hidden content. You can hide nodes and edges through the model or from inside their templates, and ports and edge labels have their own `hidden` input. Hidden elements never block initialization and never break measurements.
+ngDiagram has built-in support for hidden content. This page explains the three tools you have, when to use each of them, and why plain CSS is not one of them.
+
+## Overview
+
+**Nodes and edges have an optional `hidden` flag.** Set `hidden: true` on a node or an edge in the model, and it disappears from the diagram. The element stays in the model and in the DOM (as `display: none`), keeps its size and position, and comes back when you set the flag to `false`. This is the main tool. Use it for expand/collapse, filtering, and any other visibility state that belongs to your data.
+
+**The `ngDiagramHidden` directive hides a node or edge from inside its template.** Use it when visibility is a UI state that you do not want to store in the model, for example a local `collapsed` signal in your node component. The effect is the same as with the flag.
+
+**Ports and edge labels have a `hidden` input.** They are declared in templates, not in the model, so they have no flag. Bind `[hidden]` on `ng-diagram-port` or `ng-diagram-base-edge-label` to hide them independently of their node or edge, for example ports that are visible only in an edit mode.
+
+**Why not plain CSS `display: none`?** The library measures every element after it renders, and it waits for these measurements before the diagram is ready. It cannot tell an element hidden with CSS from an element that is not measured yet, so it keeps waiting, and every load ends only after the measurement timeout (2 s). The flag, the directive and the input tell the library that the element is hidden on purpose. The library then skips it at initialization, leaves it out of user interactions such as hit-testing and `zoomToFit`, and measures it again when it becomes visible.
+
+The sections below show each tool with an example. [Choosing a pattern](#choosing-a-pattern) compares them side by side.
 
 ## Hiding nodes and edges with the `hidden` flag
 
@@ -22,10 +34,6 @@ await this.modelService.updateNodes(childIds.map((id) => ({ id, hidden: false })
 ```
 
 Hiding a **group** hides all of its descendants. Hiding a **node** hides every edge connected to it, so you do not need to update the edges yourself.
-
-:::caution
-Upgrading from a version before 1.4.0: `hidden` is now a library property on nodes and edges. If your application already stores `hidden: true` on nodes or edges for its own purposes, those elements disappear from the diagram after the upgrade.
-:::
 
 ## Hiding nodes and edges with the `ngDiagramHidden` directive
 
