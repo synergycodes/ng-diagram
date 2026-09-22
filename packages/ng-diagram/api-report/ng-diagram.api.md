@@ -593,6 +593,8 @@ export class LinkingInputDirective implements OnDestroy {
     // (undocumented)
     ngOnDestroy(): void;
     // (undocumented)
+    onPointerCancel: ($event: PointerInputEvent) => void;
+    // (undocumented)
     onPointerDown($event: PointerInputEvent): void;
     // (undocumented)
     onPointerMove: ($event: PointerInputEvent) => void;
@@ -935,6 +937,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
     groupMembershipChanged: EventEmitter<GroupMembershipChangedEvent>;
     // (undocumented)
     isGroup(node: Node_2): node is GroupNode<object>;
+    protected readonly linkingActive: Signal<boolean>;
     middlewares: InputSignal<MiddlewareChain>;
     model: InputSignal<ModelAdapter>;
     // (undocumented)

@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { Node, Point } from '../../../core/src';
 import { PointerInputEvent } from '../../types';
 import { CursorPositionTrackerService } from '../cursor-position-tracker/cursor-position-tracker.service';
@@ -6,13 +6,19 @@ import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provide
 import { LinkingEventService } from './linking-event.service';
 
 @Injectable()
-export class ManualLinkingService {
+export class ManualLinkingService implements OnDestroy {
   private readonly linkingEventService = inject(LinkingEventService);
   private readonly cursorPositionTrackerService = inject(CursorPositionTrackerService);
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
   private node: Node | undefined;
   private portId: string | undefined;
   private unregisterInteractionCleanup: (() => void) | null = null;
+
+  ngOnDestroy(): void {
+    // The diagram was torn down mid-draw (route change, @if). Without this the
+    // four document listeners survive and keep the dead injector reachable.
+    this.removeListeners();
+  }
 
   /** Call this method to start linking from your custom logic */
   startLinking(node: Node, portId?: string) {

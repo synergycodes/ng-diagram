@@ -22,6 +22,10 @@ import { Edge, isDanglingEdge } from '../../../core/src';
     // Styling hook for edges with a free (unconnected) endpoint — lets apps
     // style dangling edges without inspecting the model.
     '[class.ng-diagram-edge--dangling]': 'dangling()',
+    // Styling hook for the preview edge drawn during a draw or relink. The
+    // base edge label keys its pointer-transparency rule to it; custom
+    // templates can do the same for their own interactive content.
+    '[class.ng-diagram-edge--temporary]': 'temporary()',
   },
 })
 export class NgDiagramEdgeComponent {
@@ -31,4 +35,6 @@ export class NgDiagramEdgeComponent {
     const edge = this.edge();
     return isDanglingEdge(edge) && !edge.temporary;
   });
+
+  protected readonly temporary = computed(() => !!this.edge().temporary);
 }

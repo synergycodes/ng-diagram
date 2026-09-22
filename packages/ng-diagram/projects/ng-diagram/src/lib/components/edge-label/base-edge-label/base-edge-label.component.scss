@@ -2,3 +2,10 @@
   position: absolute;
   pointer-events: all;
 }
+
+// The host above opts into the pointer, so the preview edge needs this rule
+// to stay out of the pointer's way. Keyed to the wrapper class so labels on
+// custom edge templates are covered too.
+:host-context(.ng-diagram-edge--temporary) {
+  pointer-events: none;
+}

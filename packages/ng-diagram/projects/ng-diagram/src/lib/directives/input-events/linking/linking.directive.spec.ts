@@ -31,6 +31,7 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
   let clearLinking: ReturnType<typeof vi.fn>;
   let cancelActiveInteraction: ReturnType<typeof vi.fn>;
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
+  let isCancellingInteraction: ReturnType<typeof vi.fn>;
   let unregister: ReturnType<typeof vi.fn>;
   let linkingEventService: {
     emitStart: ReturnType<typeof vi.fn>;
@@ -43,6 +44,7 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
     cancelActiveInteraction = vi.fn().mockResolvedValue(true);
     unregister = vi.fn();
     registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
+    isCancellingInteraction = vi.fn().mockReturnValue(false);
 
     linkingEventService = {
       emitStart: vi.fn(),
@@ -55,7 +57,7 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
       provide: () => ({
         actionStateManager: { clearLinking, isLinking: () => false },
         cancelActiveInteraction,
-        isCancellingInteraction: () => false,
+        isCancellingInteraction,
         registerInteractionCleanup,
       }),
     };
@@ -135,5 +137,27 @@ describe('LinkingInputDirective (shared touch marker ownership)', () => {
     directive.onPointerMove(makePointerEvent({ clientX: 300, clientY: 400 }));
 
     expect(linkingEventService.emitEnd).toHaveBeenCalledWith(expect.anything(), undefined, 'p1', true);
+  });
+
+  it('refuses to start while an Escape cancel is still rolling back', () => {
+    // The linking handler bails while cancelling, so a gesture started here
+    // would attach listeners and claim state for a draw that never begins.
+    isCancellingInteraction.mockReturnValue(true);
+
+    directive.onPointerDown(makePointerEvent());
+
+    expect(linkingEventService.emitStart).not.toHaveBeenCalled();
+    expect(registerInteractionCleanup).not.toHaveBeenCalled();
+  });
+
+  it('aborts the draw when the browser takes the pointer away', () => {
+    directive.onPointerDown(makePointerEvent({ clientX: 10, clientY: 10 }));
+
+    directive.onPointerCancel(makePointerEvent({ clientX: 300, clientY: 400 }));
+
+    // Cancelled as taken over, not finished at the cancelled pointer's point.
+    expect(linkingEventService.emitEnd).toHaveBeenCalledWith(expect.anything(), undefined, 'p1', true);
+    expect(unregister).toHaveBeenCalled();
+    expect(touchState.currentEvent()).toBeNull();
   });
 });
