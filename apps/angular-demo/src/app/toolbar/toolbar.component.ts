@@ -156,10 +156,10 @@ export class ToolbarComponent {
   }
 
   /**
-   * Demonstrates computePartsBounds with a nodes-only subset (edges: []).
-   * Computes the bounds of the selected nodes (or all nodes when nothing is
-   * selected) and centers the viewport on that rect — parts away from the
-   * origin must not drag the bounds back to (0, 0).
+   * Demonstrates computePartsBounds with nodes only (edges: []). Computes the
+   * bounds of the selected nodes (or of all nodes when nothing is selected) and
+   * centers the viewport on them. Nodes far from the origin must not pull the
+   * bounds back to (0, 0).
    */
   onCenterOnPartsBoundsClick() {
     const selectedNodes = this.ngDiagramSelectionService.selection().nodes;

@@ -2,8 +2,8 @@ import { type Edge, type GroupNode, type Node } from 'ng-diagram';
 import { NodeTemplateType, type CollapsibleGroupData } from './types';
 
 /**
- * Initial diagram model representing an org-chart-style hierarchy
- * with nested collapsible groups and cross-group edges.
+ * Initial diagram model: an org-chart-like hierarchy with nested
+ * collapsible groups and edges that cross group boundaries.
  */
 export const diagramModel: {
   nodes: (Node<{ label: string }> | GroupNode<CollapsibleGroupData>)[];
@@ -67,7 +67,7 @@ export const diagramModel: {
       groupId: 'frontend-squad',
     },
 
-    // Direct children of Team Alpha (alongside Frontend Squad)
+    // Direct children of Team Alpha (next to Frontend Squad)
     {
       id: 'charlie',
       position: { x: 170, y: 560 },
@@ -112,7 +112,7 @@ export const diagramModel: {
       groupId: 'team-beta',
     },
 
-    // Direct child of Engineering (alongside the team groups)
+    // Direct child of Engineering (next to the team groups)
     {
       id: 'tech-lead',
       position: { x: 700, y: 790 },
@@ -120,7 +120,7 @@ export const diagramModel: {
       groupId: 'engineering',
     },
   ],
-  // Edges never need visibility handling: an edge is effectively hidden
+  // Edges need no visibility handling of their own: an edge is hidden
   // whenever one of its endpoint nodes is hidden.
   edges: [
     // Internal edge within Frontend Squad

@@ -16,10 +16,10 @@ import { NodeTemplateType } from './types';
 /**
  * Expand/Collapse Groups Example
  *
- * Demonstrates collapsible groups: collapsing a group hides its members with
- * the model-level `hidden` flag and shrinks the group to a header bar, while
- * edges crossing the group boundary are rerouted to the group so external
- * connections stay visible. Nested groups keep their own collapsed state.
+ * Demonstrates collapsible groups. Collapsing a group hides its members with
+ * the `hidden` flag and shrinks the group to a header bar. Edges that cross the
+ * group boundary are rerouted to the group, so external connections stay
+ * visible. Nested groups keep their own collapsed state.
  */
 @Component({
   selector: 'expand-collapse-groups-example',

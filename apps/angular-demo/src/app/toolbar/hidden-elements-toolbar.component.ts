@@ -139,9 +139,9 @@ export class HiddenElementsToolbarComponent {
   );
 
   /**
-   * Deletes only the group node — `deleteNodes` cascades to all descendants
-   * (hidden ones included) and their edges, so the collapsed children do not
-   * survive as orphans with a dangling `groupId`.
+   * Deletes only the group node. `deleteNodes` also deletes all descendants
+   * (hidden ones included) and their edges, so the collapsed children are not
+   * left behind with a `groupId` that points at a deleted node.
    */
   deleteGroup(): void {
     this.modelService.deleteNodes([COLLAPSIBLE_GROUP_ID]);

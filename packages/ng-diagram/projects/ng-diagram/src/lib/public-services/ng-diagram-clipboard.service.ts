@@ -27,9 +27,9 @@ export class NgDiagramClipboardService extends NgDiagramBaseService {
    * children of a collapsed group) and the edges between the copied nodes. Selected elements that
    * are effectively hidden are skipped, the same as in `deleteSelection`.
    *
-   * A selected edge is copied even when its endpoint nodes are not — {@link paste} then recreates
-   * it with the uncopied endpoints dangling instead of attached to the original nodes; see
-   * `paste` for details.
+   * A selected edge is copied even when its endpoint nodes are not. {@link paste} then recreates
+   * it with a free end in place of each node that was not copied, instead of connecting it to
+   * the original node. See `paste` for details.
    *
    * @returns A promise that resolves once the selection has been copied.
    */
@@ -52,15 +52,15 @@ export class NgDiagramClipboardService extends NgDiagramBaseService {
   /**
    * Pastes the clipboard content at the specified position.
    *
-   * @remarks Edge endpoints whose node was copied together with the edge are remapped to the
-   * newly pasted nodes. An endpoint whose node was NOT copied becomes dangling — empty
-   * `source`/`target` with `sourcePosition`/`targetPosition` at the edge's last attachment
-   * point — instead of being attached to the original node, so pasting a lone edge never
-   * duplicates the connection between the original nodes; reconnect or reposition the pasted
-   * edge as needed. Already-dangling endpoints stay dangling. Free endpoints anchor the pasted
-   * content at the target `position` exactly like node positions do — pasting only edges centers
-   * them at the cursor. An edge whose freed endpoint has no known position (it was never routed)
-   * is skipped.
+   * @remarks An edge endpoint whose node was copied together with the edge connects to the newly
+   * pasted node. An endpoint whose node was NOT copied is pasted as a free end: `source`/`target`
+   * is set to `''`, and `sourcePosition`/`targetPosition` holds the last position where the edge
+   * was attached, moved together with the pasted content. The end is not connected to the
+   * original node, so pasting a single edge never duplicates the connection between the original
+   * nodes. Reconnect or move the pasted edge as needed. Endpoints that were already free stay free.
+   * Free endpoints count like node positions when the pasted content is centered at `position`,
+   * so pasting only edges centers them at the cursor. An edge whose free end has no known position
+   * (the edge was never routed) is skipped.
    *
    * @param position The position where to paste the content.
    * @param options Optional settings. Set `waitForMeasurements: true` to resolve only after the

@@ -28,7 +28,7 @@ const calculateCenter = (points: Point[]): Point => {
   return { x: centerX, y: centerY };
 };
 
-/** One end of an edge: the node it hangs on, its port, its stored position, and where it lands if pasted free. */
+/** One end of an edge: its node, its port, its stored position, and the position it gets when pasted as a free end. */
 interface EdgeEnd {
   nodeId: string;
   port: string | undefined;
@@ -56,7 +56,7 @@ const getTargetEnd = (edge: Edge): EdgeEnd => ({
 const isPastedFree = (end: EdgeEnd, copiedNodeIds: Set<string>): boolean =>
   !end.nodeId || !copiedNodeIds.has(end.nodeId);
 
-/** Positions of the edge ends that will be pasted free — they anchor the pasted content at the cursor like node positions do. */
+/** Positions of the edge ends that will be pasted free. They count like node positions when the content is centered at the cursor. */
 const collectFreeEdgeEndpointPositions = (copiedEdges: Edge[], copiedNodeIds: Set<string>): Point[] => {
   const positions: Point[] = [];
 
@@ -98,8 +98,8 @@ const calculatePasteOffset = (copiedNodes: Node[], freeEndpointPositions: Point[
     return NgDiagramMath.subtractPoints(target, singleNode.position);
   }
 
-  // Maintain relative positioning with the center of the pasted content —
-  // node positions and free edge endpoints alike — at the cursor
+  // Keep the relative positions and put the center of the pasted content
+  // (node positions and free edge ends) at the cursor
   const center = calculateCenter([...copiedNodes.map((node) => node.position), ...freeEndpointPositions]);
   return NgDiagramMath.subtractPoints(command.position, center);
 };
@@ -166,14 +166,14 @@ const createPastedNodes = (
 const resolvePastedEnd = (end: EdgeEnd, nodeIdMap: Map<string, string>, offset: Point): EdgeEnd | undefined => {
   const pastedNodeId = nodeIdMap.get(end.nodeId);
   if (pastedNodeId) {
-    // Node copied too: hang the end on the pasted node, routing recomputes its position.
+    // The node was copied too: connect the end to the pasted node. Routing recomputes its position.
     return { ...end, nodeId: pastedNodeId };
   }
   if (!end.freePosition) {
     return undefined;
   }
-  // Node not copied (or the end was free already): paste the end free at its
-  // shifted position. Reattaching it to the original node would silently
+  // The node was not copied (or the end was already free): paste the end free
+  // at its shifted position. Connecting it to the original node would silently
   // duplicate the original connection.
   return {
     ...end,
@@ -317,9 +317,9 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
   // to content that does not exist yet.
   const hiddenCopiedNodeIds = computeHiddenNodeIds(copyPasteState.copiedNodes);
 
-  // Calculate paste offset from the visible copied nodes only — invisible
+  // Calculate the paste offset from the visible copied nodes only. Hidden
   // members must not pull the pasted content away from the cursor. Free edge
-  // endpoints (pasted dangling) anchor the content just like node positions.
+  // ends count like node positions.
   const visibleCopiedNodes = copyPasteState.copiedNodes.filter((node) => !hiddenCopiedNodeIds.has(node.id));
   const copiedNodeIds = new Set(copyPasteState.copiedNodes.map((node) => node.id));
   const freeEndpointPositions = collectFreeEdgeEndpointPositions(copyPasteState.copiedEdges, copiedNodeIds);
@@ -346,9 +346,8 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
     offset
   );
 
-  // Nothing pasteable (e.g. the clipboard held only edges whose freed
-  // endpoints have no position to dangle from) — leave the current
-  // selection untouched.
+  // Nothing to paste (for example, the clipboard held only edges whose free
+  // ends have no position). Leave the current selection as it is.
   if (newNodes.length === 0 && newEdges.length === 0) {
     return;
   }

@@ -8,7 +8,7 @@ import type { KeyboardAction } from './keyboard-action.interface';
  * Handles keyboard shortcuts for moving selected nodes
  *
  * This action:
- * - Only activates when the selection would actually move (see `hasMovableSelection`)
+ * - Only activates when the selection can move (see `hasMovableSelection`)
  * - Extracts direction from action name (keyboardMoveSelectionUp → 'top')
  * - Emits 'keyboardMoveSelection' event with direction data
  *
@@ -17,9 +17,8 @@ import type { KeyboardAction } from './keyboard-action.interface';
 @Injectable()
 export class MovingAction implements KeyboardAction {
   canHandle(shortcut: ShortcutDefinition, flowCore: FlowCore): boolean {
-    // Exact complement of PanningAction's arrow-key gate: both derive from
-    // hasMovableSelection so a selection the move handler would no-op on
-    // never swallows the arrow keys.
+    // Exact opposite of the PanningAction check. Both use hasMovableSelection,
+    // so a selection that cannot move never swallows the arrow keys.
     return shortcut.actionName.startsWith('keyboardMoveSelection') && hasMovableSelection(flowCore);
   }
 

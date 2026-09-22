@@ -130,9 +130,9 @@ export const equalPointsArrays = (path1: Point[], path2: Point[]) => {
 };
 
 /**
- * Calculates the axis-aligned bounding rectangle containing all given rectangles.
- * Returns `null` for an empty array — there is no neutral rectangle, and returning
- * a zero-area rect at the origin would drag any subsequent union back to (0, 0).
+ * Calculates the axis-aligned bounding rectangle that contains all given rectangles.
+ * Returns `null` for an empty array: there is no neutral rectangle, and a zero-size
+ * rectangle at the origin would pull every later union back to (0, 0).
  */
 export function unionRect(rects: readonly [Rect, ...Rect[]]): Rect;
 export function unionRect(rects: readonly Rect[]): Rect | null;

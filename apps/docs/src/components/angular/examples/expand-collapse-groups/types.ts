@@ -6,8 +6,8 @@ export enum NodeTemplateType {
 }
 
 /**
- * Records which endpoint of an edge was redirected to the group boundary
- * during collapse, so exactly that endpoint can be restored on expand.
+ * Records which end of an edge was redirected to the group during collapse,
+ * so that exactly this end can be restored on expand.
  */
 export interface ReroutedEdgeInfo {
   /** ID of the rerouted edge. */
@@ -21,8 +21,8 @@ export interface ReroutedEdgeInfo {
 }
 
 /**
- * Data payload for collapsible group nodes. Tracks collapse state
- * and information needed to restore the group on expand.
+ * Data of a collapsible group node. Holds the collapse state and the
+ * information needed to restore the group on expand.
  */
 export interface CollapsibleGroupData {
   /** Display title rendered in the group header. */
@@ -31,11 +31,11 @@ export interface CollapsibleGroupData {
   collapsed?: boolean;
   /**
    * Size of the group before it was collapsed,
-   * used to restore dimensions on expand.
+   * used to restore the size on expand.
    */
   expandedSize?: Size;
   /**
-   * Edges that were rerouted to point at the group boundary
+   * Edges that were rerouted to point at the group
    * during collapse.
    */
   reroutedEdges?: ReroutedEdgeInfo[];

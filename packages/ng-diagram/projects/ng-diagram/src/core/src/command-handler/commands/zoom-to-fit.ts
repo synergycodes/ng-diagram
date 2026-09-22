@@ -67,7 +67,7 @@ const filterTargetElements = (
   if (edgeIds?.length) {
     targetEdges = edges.filter((edge) => edgeIds.includes(edge.id));
   } else if (targetNodeIds) {
-    // Scope the fit to the requested nodes: only edges with both ends among them may contribute bounds
+    // Fit only the requested nodes: an edge counts only when both of its ends are among them
     targetEdges = edges.filter((edge) => targetNodeIds.has(edge.source) && targetNodeIds.has(edge.target));
   } else {
     targetEdges = edges;
