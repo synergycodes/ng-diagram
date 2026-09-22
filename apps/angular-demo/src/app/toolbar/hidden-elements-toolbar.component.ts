@@ -54,8 +54,8 @@ const isGroupNode = (node: Node): node is GroupNode => 'isGroup' in node && node
       <button (click)="logDomProof()">Log DOM proof</button>
       <button (click)="zoomToFit()">Zoom to Fit</button>
       <span class="group-label">
-        Effectively hidden: {{ hiddenNodeCount() }} node(s), {{ hiddenEdgeCount() }} edge(s) — all still in the model
-        and mounted in the DOM as display: none.
+        Effectively hidden: {{ hiddenNodeCount() }} node(s), {{ hiddenEdgeCount() }} edge(s). All of them are still in
+        the model and in the DOM as display: none.
       </span>
     </div>
   `,
@@ -78,7 +78,7 @@ export class HiddenElementsToolbarComponent {
 
   protected readonly isCollapsed = computed(() => this.groupChildren().some((node) => node.hidden));
 
-  // Read through the reactive nodes() signal — getNodeById is a plain lookup
+  // Read through the reactive nodes() signal. getNodeById is a plain lookup
   // and would leave these computeds stale after the first toggle.
   protected readonly wholeGroupHidden = computed(
     () => !!this.modelService.nodes().find((node) => node.id === COLLAPSIBLE_GROUP_ID)?.hidden
@@ -88,7 +88,7 @@ export class HiddenElementsToolbarComponent {
     () => !!this.modelService.nodes().find((node) => node.id === FAR_NODE_ID)?.hidden
   );
 
-  /** Effective visibility (computedHidden) — includes inherited hiding. */
+  /** Effective visibility (computedHidden), including inherited hiding. */
   protected readonly hiddenNodeCount = computed(
     () => this.modelService.nodes().filter((node) => node.computedHidden).length
   );
@@ -102,7 +102,7 @@ export class HiddenElementsToolbarComponent {
     this.modelService.updateNodes(this.groupChildren().map(({ id }) => ({ id, hidden })));
   }
 
-  /** Groups in the current selection — the target of the selected-group collapse. */
+  /** Groups in the current selection, the target of the selected-group collapse. */
   protected readonly selectedGroups = computed(() => this.selectionService.selection().nodes.filter(isGroupNode));
 
   private readonly selectedGroupChildren = computed(() => {
@@ -127,7 +127,7 @@ export class HiddenElementsToolbarComponent {
   }
 
   /**
-   * Hides the group node itself — its children (and their edges) disappear
+   * Hides the group node itself. Its children (and their edges) disappear
    * through inheritance even when their own `hidden` flags are false.
    */
   toggleWholeGroup(): void {
@@ -160,7 +160,7 @@ export class HiddenElementsToolbarComponent {
   }
 
   /**
-   * The far node sits well outside the rest of the content — hiding it and
+   * The far node sits far outside the rest of the content. Hiding it and
    * pressing Zoom to Fit visibly tightens the frame, because hidden geometry
    * is excluded from the bounds.
    */

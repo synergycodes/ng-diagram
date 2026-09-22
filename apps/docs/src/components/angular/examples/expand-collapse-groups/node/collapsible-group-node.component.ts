@@ -39,15 +39,15 @@ function endpointPatch(
 }
 
 /**
- * Group node that can be collapsed into a compact representation and expanded back.
+ * Group node that can be collapsed to a header bar and expanded back.
  *
- * Collapsing sets the model-level `hidden` flag on the group's direct children
- * and shrinks the group to a header bar. The library's effective-visibility
- * cascade does the rest: descendants of a hidden child group and edges touching
- * hidden nodes disappear automatically, and hidden elements are excluded from
- * hit-testing, selection and zoomToFit bounds. Edges crossing the group
- * boundary are temporarily rerouted to the group node itself so external
- * connections stay visible while collapsed.
+ * Collapsing sets the model `hidden` flag on the direct children of the group
+ * and shrinks the group to a header bar. The library does the rest: descendants
+ * of a hidden child group and edges connected to hidden nodes disappear
+ * automatically, and hidden elements are ignored by hit-testing, selection and
+ * zoomToFit bounds. Edges that cross the group boundary are temporarily
+ * rerouted to the group node itself, so connections to the outside stay
+ * visible while the group is collapsed.
  */
 @Component({
   selector: 'app-collapsible-group-node',
@@ -99,7 +99,7 @@ export class CollapsibleGroupNodeComponent implements NgDiagramGroupNodeTemplate
     this.diagramService.transaction(() => {
       // Hiding the direct children is enough: descendants of a hidden child
       // group and edges connected to hidden nodes are hidden automatically
-      // by the effective-visibility cascade.
+      // by the library.
       this.modelService.updateNodes(
         directChildren.map(({ id }) => ({ id, hidden: true }))
       );
@@ -138,13 +138,13 @@ export class CollapsibleGroupNodeComponent implements NgDiagramGroupNodeTemplate
       this.modelService.updateEdges(restoreUpdates);
 
       // Unhiding the direct children is enough. A nested group that was
-      // collapsed before this group keeps its own children's hidden flags,
-      // so its collapsed state survives the round trip.
+      // collapsed earlier keeps the hidden flags of its own children, so it
+      // stays collapsed.
       this.modelService.updateNodes(
         directChildren.map(({ id }) => ({ id, hidden: false }))
       );
 
-      // The collapse bookkeeping leaves the data together with the flag.
+      // The data no longer needs expandedSize and reroutedEdges once expanded.
       this.modelService.updateNode(node.id, {
         size: expandedSize ?? DEFAULT_EXPANDED_SIZE,
         data: { ...data, collapsed: false },
@@ -153,9 +153,9 @@ export class CollapsibleGroupNodeComponent implements NgDiagramGroupNodeTemplate
   }
 
   /**
-   * Find edges with exactly one endpoint inside the group — that endpoint is
-   * redirected to the group boundary while the group is collapsed. Edges
-   * fully inside the group need no handling: they hide with their endpoints.
+   * Find edges with exactly one endpoint inside the group. That endpoint is
+   * pointed at the group while the group is collapsed. Edges fully inside
+   * the group need no handling: they are hidden together with their endpoints.
    */
   private findBoundaryEdges(
     childIdSet: Set<string>,
@@ -167,8 +167,8 @@ export class CollapsibleGroupNodeComponent implements NgDiagramGroupNodeTemplate
       const sourceIsChild = childIdSet.has(edge.source);
       const targetIsChild = childIdSet.has(edge.target);
       if (sourceIsChild === targetIsChild) continue;
-      // An edge between a child and the group itself would end up with both
-      // endpoints on the group node — leave it alone.
+      // An edge between a child and the group itself would get both endpoints
+      // on the group node, so it is skipped.
       if (edge.source === groupId || edge.target === groupId) continue;
 
       reroutedEdges.push(
@@ -192,11 +192,10 @@ export class CollapsibleGroupNodeComponent implements NgDiagramGroupNodeTemplate
   }
 
   /**
-   * Partial edge updates that restore the recorded endpoints. Only an
-   * endpoint that still points at this group is restored: a sibling or outer
-   * group may have redirected the edge's other endpoint to itself in the
-   * meantime, and that reroute must stay until its own group expands. This
-   * keeps collapse/expand correct in any order.
+   * Edge updates that restore the recorded endpoints. An endpoint is restored
+   * only when it still points at this group: an outer group may have pointed
+   * it at itself in the meantime, and that change must stay until the outer
+   * group expands. This keeps collapse and expand correct in any order.
    */
   private buildRestoreUpdates(
     reroutedEdges: ReroutedEdgeInfo[],

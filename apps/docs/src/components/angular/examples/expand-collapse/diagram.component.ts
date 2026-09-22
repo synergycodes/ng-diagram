@@ -20,12 +20,11 @@ import { NodeTemplateType } from './types';
 /**
  * Expand/Collapse Subtree Example
  *
- * Demonstrates a collapsible tree layout using ng-diagram with ELK.js for
- * automatic node positioning. Nodes with children display a toggle button to
- * expand/collapse their subtree — collapsing sets the model-level `hidden`
- * flag on the subtree's nodes, and the edges leading into them disappear
- * automatically. Whether a node has children is derived from its edges, so
- * drawing or deleting edges only calls for a re-layout.
+ * Shows a collapsible tree laid out by ELK.js. Nodes with children have a
+ * toggle button that expands or collapses their subtree. Collapsing sets the
+ * model `hidden` flag on the nodes of the subtree, and the edges leading to
+ * them disappear automatically. Whether a node has children is derived from
+ * its edges, so drawing or deleting an edge only requires a new layout.
  */
 @Component({
   selector: 'expand-collapse-diagram-example',

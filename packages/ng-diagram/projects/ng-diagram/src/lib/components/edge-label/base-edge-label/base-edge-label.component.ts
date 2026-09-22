@@ -64,14 +64,14 @@ export class NgDiagramBaseEdgeLabelComponent implements OnInit, OnDestroy {
   positionOnEdge = input.required<EdgeLabel['positionOnEdge']>();
 
   /**
-   * Whether the label is hidden. Defaults to false.
+   * Whether the label is hidden. Defaults to `false`.
    *
-   * A hidden label stays mounted as `display: none` and creates no
-   * measurement expectation (it never blocks initialization or
-   * `waitForMeasurements`). Unhiding re-measures it automatically.
+   * A hidden label stays in the DOM with `display: none` and never blocks
+   * initialization or `waitForMeasurements`. When the label becomes visible
+   * again, it is measured again automatically.
    *
-   * Accepts the static attribute form too: a bare `hidden` attribute means
-   * hidden, matching native HTML semantics.
+   * A plain `hidden` attribute without a binding also works and means hidden,
+   * like the native HTML attribute.
    *
    * @since 1.4.0
    */

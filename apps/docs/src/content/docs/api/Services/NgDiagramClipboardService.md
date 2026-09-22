@@ -36,9 +36,9 @@ A promise that resolves once the selection has been copied.
 
 #### Remarks
 
-Since 1.4.0 the copy cascades: all descendants of the copied nodes travel with them
-(including hidden children of a collapsed group), together with the edges connecting copied
-nodes. Effectively hidden *selected* elements are skipped — consistent with `deleteSelection`.
+Since 1.4.0, copying a node also copies all of its descendants (including the hidden
+children of a collapsed group) and the edges between the copied nodes. Selected elements that
+are effectively hidden are skipped, the same as in `deleteSelection`.
 
 A selected edge is copied even when its endpoint nodes are not — [paste](/docs/api/services/ngdiagramclipboardservice/#paste) then recreates
 it with the uncopied endpoints dangling instead of attached to the original nodes; see
@@ -60,8 +60,8 @@ A promise that resolves once the change has been applied to the model. Inside a 
 
 #### Remarks
 
-Same cascade semantics as [copy](/docs/api/services/ngdiagramclipboardservice/#copy) — a cut collapsed group takes its hidden
-children through the clipboard and pasting restores them.
+Works like [copy](/docs/api/services/ngdiagramclipboardservice/#copy): cutting a collapsed group also cuts its hidden children,
+and pasting restores them.
 
 ***
 

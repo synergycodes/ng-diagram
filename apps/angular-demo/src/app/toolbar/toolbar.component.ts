@@ -66,7 +66,7 @@ export class ToolbarComponent {
     this.ngDiagramNodeService.sendToBack();
   }
 
-  /** Sets `hidden: true` on every selected node and edge — hidden content stays selected, so other features can be exercised against it. */
+  /** Sets `hidden: true` on every selected node and edge. Hidden content stays selected, so other features can be tested against it. */
   onHideSelectionClick(): void {
     const { nodes, edges } = this.ngDiagramSelectionService.selection();
     if (nodes.length > 0) {

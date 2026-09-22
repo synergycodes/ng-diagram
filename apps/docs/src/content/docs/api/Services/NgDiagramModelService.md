@@ -187,8 +187,8 @@ Array of edges
 [`Rect`](/docs/api/types/geometry/rect/)
 
 Bounding rectangle containing all visible nodes and edges. When there is nothing to
-measure — both arrays are empty, no visible node has `measuredBounds`, and no visible edge
-has `points` — returns a zero-size rectangle at the origin (`{ x: 0, y: 0, width: 0, height: 0 }`).
+measure (both arrays are empty, no visible node has `measuredBounds`, and no visible edge
+has `points`), returns a zero-size rectangle at the origin (`{ x: 0, y: 0, width: 0, height: 0 }`).
 
 #### Since
 
@@ -203,9 +203,9 @@ Edges contribute their routed `points` and measured labels.
 
 #### Remarks
 
-Since 1.4.0, effectively hidden elements (`computedHidden`) are excluded — their
-stale geometry does not inflate the result. An input consisting only of hidden elements
-yields the same zero-size rectangle at the origin as an unmeasured input.
+Since 1.4.0, effectively hidden elements (`computedHidden`) are left out, so their
+old geometry does not enlarge the result. If all given elements are hidden, the result is
+the same zero-size rectangle at the origin as for unmeasured elements.
 
 ***
 

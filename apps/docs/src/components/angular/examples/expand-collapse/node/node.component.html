@@ -1,4 +1,4 @@
-<!-- Base node template provides default selection, dragging, and sizing behaviour.
+<!-- Base node template provides default selection, dragging, and sizing behavior.
      The default left/right ports are removed: a tree only links top to bottom. -->
 <ng-diagram-base-node-template [node]="node()" [removeDefaultPorts]="true">
   <div class="tree-node-content">
@@ -6,8 +6,8 @@
   </div>
 </ng-diagram-base-node-template>
 
-<!-- Expand / collapse button, only rendered when the node has child edges.
-     Stopping pointerdown keeps the click from selecting or dragging the node. -->
+<!-- Expand/collapse button, rendered only when the node has outgoing edges.
+     Stopping pointerdown prevents the click from selecting or dragging the node. -->
 @if (hasChildren()) {
   <button
     type="button"

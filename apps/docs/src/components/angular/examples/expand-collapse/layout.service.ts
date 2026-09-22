@@ -4,7 +4,7 @@ import { performLayout, type PositionUpdate } from './perform-layout';
 import { type TreeNodeData } from './types';
 
 /**
- * Manages tree layout and expand/collapse behaviour.
+ * Manages tree layout and expand/collapse behavior.
  *
  * Uses ELK.js (via `performLayout`) to position visible nodes in a
  * top-down tree. Hidden nodes (inside collapsed subtrees) are excluded
@@ -19,11 +19,11 @@ export class LayoutService {
    * Apply the initial collapsed state and lay out the tree.
    *
    * Every node is visible in the initial model, so all of them are measured
-   * by the time the diagram initializes. The subtrees of nodes flagged
+   * by the time the diagram initializes. The subtrees of nodes marked
    * `collapsed` are hidden here, in the same transaction as the first
-   * layout — from now on each node has a real size for every layout pass.
-   * Nodes already hidden in the initial model stay hidden and are left
-   * out of the layout.
+   * layout. From now on each node has a real size for every layout pass.
+   * Nodes that are already hidden in the initial model stay hidden and are
+   * left out of the layout.
    */
   async applyInitialLayout(): Promise<void> {
     const hiddenIds = this.collapsedSubtreeIds();
@@ -54,10 +54,10 @@ export class LayoutService {
   /**
    * Toggle the collapsed state of a node's subtree.
    *
-   * The layout of the tree as it will look after the toggle is computed
-   * first. The collapsed flag, the subtree's `hidden` flags and every new
-   * position are then committed in a single transaction, so nodes that
-   * appear are rendered at their final position right away.
+   * The layout for the tree after the toggle is computed first. Then the
+   * collapsed flag, the `hidden` flags of the subtree and the new positions
+   * are committed in a single transaction, so nodes that appear are rendered
+   * at their final position right away.
    */
   async toggleCollapsed(nodeId: string): Promise<void> {
     const node = this.modelService.getNodeById<TreeNodeData>(nodeId);
@@ -86,8 +86,8 @@ export class LayoutService {
         collapsed,
       });
 
-      // The edges leading into hidden nodes disappear automatically — an
-      // edge is effectively hidden whenever one of its endpoint nodes is.
+      // Edges leading to hidden nodes disappear automatically: an edge is
+      // hidden whenever one of its endpoint nodes is hidden.
       this.modelService.updateNodes(
         [...subtreeIds].map((id) => ({ id, hidden: collapsed }))
       );
@@ -143,9 +143,9 @@ export class LayoutService {
   }
 
   /**
-   * Ids of every node that has a `collapsed` ancestor. One walk that starts
-   * below each collapsed node and descends through the whole subtree, so
-   * every node is visited once.
+   * Ids of every node that has a `collapsed` ancestor. The walk starts below
+   * each collapsed node and goes down through the whole subtree, visiting
+   * every node once.
    */
   private collapsedSubtreeIds(): Set<string> {
     const hiddenIds = new Set<string>();
@@ -168,9 +168,9 @@ export class LayoutService {
   }
 
   /**
-   * Walk the subtree starting from `nodeId`, collecting descendant IDs.
-   * Stops descending into children that are themselves collapsed, so
-   * their subtrees remain hidden when expanding a parent.
+   * Collect the ids of all descendants of `nodeId`. The walk does not go
+   * into children that are collapsed themselves, so their subtrees stay
+   * hidden when a parent is expanded.
    */
   private computeAvailableSubtreeIds(nodeId: string): Set<string> {
     const childrenIds = new Set<string>();

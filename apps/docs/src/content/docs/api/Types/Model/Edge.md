@@ -23,9 +23,9 @@ Interface representing an edge (connection) between nodes in the flow diagram
 #### Remarks
 
 ComputedHidden is computed by the system and should not be set manually.
-The effective visibility applied to the edge: true when its own `hidden`
-flag (or a template-level hidden binding) is set, or when either endpoint
-node is effectively hidden.
+The effective visibility of the edge: `true` when its own `hidden` flag
+or a template binding is set, or when either endpoint node is effectively
+hidden.
 
 #### Since
 
@@ -58,17 +58,18 @@ The data associated with the edge.
 
 > `optional` **hidden**: `boolean`
 
-Whether the edge is hidden. Absent means visible.
+Whether the edge is hidden. When not set, the edge is visible.
 
-Hidden edges keep their geometry, do not block initialization or
-measurement waits, are not routed, and are excluded from every
-interactive surface (select-all, box selection, zoomToFit bounds). In the
-default render mode they stay mounted in the DOM as `display: none`; with
-virtualization enabled they are unmounted instead. An edge is also
-effectively hidden when either endpoint node is effectively hidden.
+A hidden edge keeps its geometry, does not block initialization or
+`waitForMeasurements`, and is not routed. User interactions ignore it:
+select-all, box selection and zoomToFit bounds. In the default render
+mode the edge stays in the DOM with `display: none`. With virtualization
+enabled it is removed from the DOM instead. An edge is also effectively
+hidden when either endpoint node is effectively hidden.
 
-Programmatic APIs (e.g. `select`, z-order commands) do not filter hidden
-elements — acting on them is the caller's prerogative.
+Programmatic APIs such as `select` and the z-order commands do not skip
+hidden elements. It is up to the caller whether to use them on hidden
+elements.
 
 Set by the user; the library only reads it.
 
