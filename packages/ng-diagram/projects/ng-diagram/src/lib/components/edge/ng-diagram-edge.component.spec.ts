@@ -37,6 +37,15 @@ describe('NgDiagramEdgeComponent host display binding', () => {
     expect(edgeElement().isConnected).toBe(true);
   });
 
+  it('marks the preview edge, which is what makes it non-interactive whatever template renders it', () => {
+    expect(edgeElement().classList.contains('ng-diagram-edge--temporary')).toBe(false);
+
+    fixture.componentInstance.edge.set({ id: 'e1', source: 'a', target: 'b', data: {}, temporary: true } as Edge);
+    fixture.detectChanges();
+
+    expect(edgeElement().classList.contains('ng-diagram-edge--temporary')).toBe(true);
+  });
+
   it('drops the inline display value again when unhidden', () => {
     fixture.componentInstance.edge.set({ id: 'e1', source: 'a', target: 'b', data: {}, computedHidden: true } as Edge);
     fixture.detectChanges();

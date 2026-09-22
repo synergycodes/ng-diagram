@@ -593,6 +593,8 @@ export class LinkingInputDirective implements OnDestroy {
     // (undocumented)
     ngOnDestroy(): void;
     // (undocumented)
+    onPointerCancel: ($event: PointerInputEvent) => void;
+    // (undocumented)
     onPointerDown($event: PointerInputEvent): void;
     // (undocumented)
     onPointerMove: ($event: PointerInputEvent) => void;

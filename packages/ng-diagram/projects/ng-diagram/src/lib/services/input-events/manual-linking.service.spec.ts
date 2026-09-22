@@ -10,6 +10,7 @@ describe('ManualLinkingService', () => {
   let service: ManualLinkingService;
   let emitStart: ReturnType<typeof vi.fn>;
   let emitContinue: ReturnType<typeof vi.fn>;
+  let emitEnd: ReturnType<typeof vi.fn>;
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
   let getNodeById: ReturnType<typeof vi.fn>;
   let unregister: ReturnType<typeof vi.fn>;
@@ -20,6 +21,7 @@ describe('ManualLinkingService', () => {
   beforeEach(() => {
     emitStart = vi.fn();
     emitContinue = vi.fn();
+    emitEnd = vi.fn();
     unregister = vi.fn();
     registeredCleanups = [];
     registerInteractionCleanup = vi.fn().mockImplementation((cleanup: () => void) => {
@@ -33,7 +35,7 @@ describe('ManualLinkingService', () => {
         ManualLinkingService,
         {
           provide: LinkingEventService,
-          useValue: { emitStart, emitContinue, emitEnd: vi.fn() },
+          useValue: { emitStart, emitContinue, emitEnd },
         },
         {
           provide: CursorPositionTrackerService,
@@ -114,5 +116,17 @@ describe('ManualLinkingService', () => {
     expect(registerInteractionCleanup).not.toHaveBeenCalled();
 
     warnSpy.mockRestore();
+  });
+
+  it('tears the gesture down when the diagram is destroyed mid-draw', () => {
+    service.startLinking(node);
+
+    service.ngOnDestroy();
+
+    expect(unregister).toHaveBeenCalled();
+    // The document listeners are gone, so a later click elsewhere on the page
+    // no longer finishes a draw against the destroyed diagram.
+    document.dispatchEvent(new Event('click'));
+    expect(emitEnd).not.toHaveBeenCalled();
   });
 });

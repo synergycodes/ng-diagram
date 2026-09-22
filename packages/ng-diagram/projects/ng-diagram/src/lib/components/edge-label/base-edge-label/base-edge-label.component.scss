@@ -3,7 +3,8 @@
   pointer-events: all;
 }
 
-// Labels carried by the relink preview must not catch the pointer either.
-:host-context(ng-diagram-base-edge.temporary) {
+// The host above opts into the pointer, so the wrapper's rule does not reach
+// it. Keyed to the wrapper so labels on custom edge templates are covered too.
+:host-context(.ng-diagram-edge--temporary) {
   pointer-events: none;
 }

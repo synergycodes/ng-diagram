@@ -63,6 +63,7 @@ export class LinkingInputDirective implements OnDestroy {
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
+    document.addEventListener('pointercancel', this.onPointerCancel);
     this.unregisterInteractionCleanup = this.flowCoreProviderService
       .provide()
       .registerInteractionCleanup(() => this.removeListeners());
@@ -109,9 +110,23 @@ export class LinkingInputDirective implements OnDestroy {
     this.removeListeners();
   };
 
+  onPointerCancel = ($event: PointerInputEvent) => {
+    // The browser or the OS took the pointer away (palm rejection, a system
+    // gesture, a native drag). A cancelled pointer carries no usable
+    // coordinates, so the draw is aborted instead of finished at its point.
+    this.linkingEventService.emitEnd($event, this.target(), this.portId(), true);
+    this.removeListeners();
+  };
+
   private shouldHandle(event: PointerInputEvent) {
-    if (this.flowCoreProviderService.provide().actionStateManager.isLinking()) {
+    const flowCore = this.flowCoreProviderService.provide();
+    if (flowCore.actionStateManager.isLinking()) {
       this.target.set(undefined);
+      return false;
+    }
+
+    // An Escape-triggered cancel can still be rolling back state.
+    if (flowCore.isCancellingInteraction()) {
       return false;
     }
 
@@ -134,6 +149,7 @@ export class LinkingInputDirective implements OnDestroy {
     }
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
+    document.removeEventListener('pointercancel', this.onPointerCancel);
     this.stopEdgePanning();
   }
 

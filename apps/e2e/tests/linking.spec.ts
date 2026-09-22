@@ -46,6 +46,8 @@ test.describe('linking', () => {
     await diagram.beginDrag(from, start);
     await expect(diagram.edge('TEMPORARY_EDGE')).toBeAttached();
     await expect(host).toHaveClass(/\blinking\b/);
+    // The wrapper covers any edge template; the path opts back in, so it carries its own rule.
+    await expect(diagram.edge('TEMPORARY_EDGE')).toHaveCSS('pointer-events', 'none');
     await expect(diagram.edge('TEMPORARY_EDGE').locator('svg path').first()).toHaveCSS('pointer-events', 'none');
 
     for (let step = 1; step <= 8; step++) {
