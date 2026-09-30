@@ -170,8 +170,11 @@ Each handle has a larger invisible hit area around it. It is 24 screen pixels wi
 <Aside type="note">
   Handles are rendered as part of the edge. With
   [`zIndex.elevateOnSelection`](/docs/api/types/configuration/features/zindexconfig/#elevateonselection) set to `false`,
-  a handle can end up under an overlapping node, where the user cannot reach it. Keep selection elevation on (the
-  default), or raise the edge's `zOrder` when nodes may overlap edge endpoints.
+  a handle can end up under an overlapping node, where the user cannot reach it. On orthogonal and bezier edges the
+  handle sits on the port, so the port the edge is connected to then covers the handle and most of its hit area. The
+  same happens with [`zIndex.enabled`](/docs/api/types/configuration/features/zindexconfig/#enabled) set to `false`,
+  because nodes are then always above edges. Keep both settings on (the defaults), or, with elevation off, raise the
+  edge's `zOrder` when nodes may overlap edge endpoints.
 </Aside>
 
 ## Related Topics
