@@ -161,4 +161,25 @@ describe('EnvironmentProviderService', () => {
       expect(isUUID || isTimestampBased).toBe(true);
     });
   });
+
+  describe('coarsePointer', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it.each([true, false])('should be %s when the "(pointer: coarse)" media query matches %s', (matches) => {
+      vi.stubGlobal(
+        'matchMedia',
+        vi.fn((query: string) => ({ matches: matches && query === '(pointer: coarse)' }))
+      );
+
+      expect(new EnvironmentProviderService().coarsePointer).toBe(matches);
+    });
+
+    it('should be false when matchMedia is not available', () => {
+      vi.stubGlobal('matchMedia', undefined);
+
+      expect(new EnvironmentProviderService().coarsePointer).toBe(false);
+    });
+  });
 });

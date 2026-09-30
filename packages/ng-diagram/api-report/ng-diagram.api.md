@@ -826,13 +826,11 @@ export class NgDiagramBaseEdgeComponent {
     readonly path: Signal<string>;
     // (undocumented)
     readonly points: Signal<Point[]>;
-    protected readonly relinkDraggedEnd: Signal<EdgeEnd | undefined>;
     readonly relinkHandleHitRadius: Signal<number>;
+    protected readonly relinkHandles: Signal<RelinkHandleView[]>;
     readonly relinkSourceHandle: Signal<Point>;
-    protected readonly relinkSourceHandleInset: Signal<Point | undefined>;
     readonly relinkSourceHandleVisible: Signal<boolean>;
     readonly relinkTargetHandle: Signal<Point>;
-    protected readonly relinkTargetHandleInset: Signal<Point | undefined>;
     readonly relinkTargetHandleVisible: Signal<boolean>;
     routing: InputSignal<string | undefined>;
     // (undocumented)

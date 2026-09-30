@@ -13,6 +13,7 @@ import { isValidPosition } from '../../../../core/src/utils/measurement-validati
 import { EdgeSelectionDirective, InlineMarkersDirective, ZIndexDirective } from '../../../directives';
 import { RelinkHandleDirective } from '../../../directives/input-events/relinking/relinking.directive';
 import { FlowCoreProviderService } from '../../../services';
+import { EnvironmentProviderService } from '../../../services/environment-provider/environment-provider.service';
 import { MarkerRegistryService } from '../../../services/marker-registry/marker-registry.service';
 import { RendererService } from '../../../services/renderer/renderer.service';
 import { NgDiagramService } from '../../../public-services/ng-diagram.service';
@@ -39,14 +40,24 @@ const RELINK_HANDLE_HIT_RADIUS_PX = 12;
 /** Same as {@link RELINK_HANDLE_HIT_RADIUS_PX} for devices whose primary pointer is a finger. */
 const RELINK_HANDLE_TOUCH_HIT_RADIUS_PX = 22;
 
-const isCoarsePointer = (): boolean => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
-
 /** Routings that lay the last segment perpendicular to the side of the port, from outside the node. */
 const RELINK_HANDLE_INSET_ROUTINGS = new Set<string>(['orthogonal', 'bezier']);
 
-/** A line that ends within this angle of an axis counts as coming in straight at the port. */
-const RELINK_HANDLE_INSET_MAX_ANGLE = 10;
-const RELINK_HANDLE_INSET_MIN_AXIS_SHARE = Math.cos((RELINK_HANDLE_INSET_MAX_ANGLE * Math.PI) / 180);
+/** The ends of an edge in the order their handles are rendered. */
+const RELINK_HANDLE_ENDS: EdgeEnd[] = ['source', 'target'];
+
+const NO_INSET: Point = { x: 0, y: 0 };
+
+/** What the template needs to draw the default relink handle of one end. */
+interface RelinkHandleView {
+  end: EdgeEnd;
+  /** The end of the line. */
+  point: Point;
+  /** Unit vector into the port along which the stylesheet moves the handle, or zero. */
+  inset: Point;
+  /** Whether this end follows the pointer in a relink preview. */
+  dragging: boolean;
+}
 
 /**
  * Base edge component that handles edge rendering.
@@ -80,7 +91,7 @@ export class NgDiagramBaseEdgeComponent {
   // provideNgDiagram() keep working — without it the relink handles stay off.
   private readonly diagramService = inject(NgDiagramService, { optional: true });
   private readonly renderer = inject(RendererService, { optional: true });
-  private readonly relinkHandleHitRadiusPx = isCoarsePointer()
+  private readonly relinkHandleHitRadiusPx = inject(EnvironmentProviderService).coarsePointer
     ? RELINK_HANDLE_TOUCH_HIT_RADIUS_PX
     : RELINK_HANDLE_HIT_RADIUS_PX;
 
@@ -132,10 +143,16 @@ export class NgDiagramBaseEdgeComponent {
 
   readonly points = computed(() => this.edge().points ?? []);
 
+  /** The routing that draws this edge: its own when registered, otherwise the default one. */
+  private readonly drawnRouting = computed(() => {
+    const routing = this.routing() ?? this.edge().routing;
+    const routingManager = this.flowCoreProvider.provide().edgeRoutingManager;
+    return routing && routingManager.hasRouting(routing) ? routing : routingManager.getDefaultRouting();
+  });
+
   readonly path = computed(() => {
     const edge = this.edge();
-    const routingName = this.routing() ?? edge.routing;
-    const flowCore = this.flowCoreProvider.provide();
+    const routingManager = this.flowCoreProvider.provide().edgeRoutingManager;
 
     // Generate SVG path from points using the routing
     const points = this.points();
@@ -149,15 +166,9 @@ export class NgDiagramBaseEdgeComponent {
       return '';
     }
 
-    if (routingName && flowCore.edgeRoutingManager.hasRouting(routingName)) {
-      const path = flowCore.edgeRoutingManager.computePath(routingName, points);
-      return path;
-    }
-
-    // Use default routing if available
-    const defaultRouting = flowCore.edgeRoutingManager.getDefaultRouting();
-    if (flowCore.edgeRoutingManager.hasRouting(defaultRouting)) {
-      return flowCore.edgeRoutingManager.computePath(defaultRouting, points);
+    const routing = this.drawnRouting();
+    if (routingManager.hasRouting(routing)) {
+      return routingManager.computePath(routing, points);
     }
 
     // Fallback to simple straight line path
@@ -207,14 +218,6 @@ export class NgDiagramBaseEdgeComponent {
   );
 
   /**
-   * The end that follows the pointer when this edge is the preview of a
-   * relink, `undefined` on any other edge.
-   *
-   * @since 1.4.0
-   */
-  protected readonly relinkDraggedEnd = computed(() => this.relinkPreview()?.end);
-
-  /**
    * Whether the source endpoint handle is rendered. The edge must have routed
    * points. On a selected edge the handle is rendered when the source end
    * can be relinked. On the preview of a relink it is rendered when the
@@ -251,22 +254,22 @@ export class NgDiagramBaseEdgeComponent {
   readonly relinkTargetHandle = computed(() => this.points()[this.points().length - 1]);
 
   /**
-   * Unit vector along the last segment of the line, into the port, for the
-   * source end of an orthogonal or bezier edge that is connected to a port
-   * and comes in along an axis; `undefined` otherwise. The stylesheet moves
-   * the handle along it, so the handle covers the port and the line still
-   * ends under its ring.
+   * The default handles to draw, in render order: each end whose handle is
+   * visible (see {@link relinkSourceHandleVisible}) with the end of the line,
+   * the direction into the port along which the stylesheet moves the handle
+   * (zero when it stays at the end of the line) and whether the end is the
+   * dragged end of a relink preview.
    *
    * @since 1.4.0
    */
-  protected readonly relinkSourceHandleInset = computed(() => this.relinkHandleInset('source'));
-
-  /**
-   * Same as {@link relinkSourceHandleInset} for the target end.
-   *
-   * @since 1.4.0
-   */
-  protected readonly relinkTargetHandleInset = computed(() => this.relinkHandleInset('target'));
+  protected readonly relinkHandles = computed((): RelinkHandleView[] =>
+    RELINK_HANDLE_ENDS.filter((end) => this.relinkHandleVisible(end)).map((end) => ({
+      end,
+      point: end === 'source' ? this.relinkSourceHandle() : this.relinkTargetHandle(),
+      inset: this.relinkHandleInset(end),
+      dragging: this.relinkPreview()?.end === end,
+    }))
+  );
 
   /**
    * Radius of the invisible hit circle around each handle, in flow units. On
@@ -308,53 +311,43 @@ export class NgDiagramBaseEdgeComponent {
     if (this.points().length === 0) {
       return false;
     }
-    const defaultRelinkable = this.diagramService?.config().linking?.defaultRelinkable ?? false;
-
     const relink = this.relinkPreview();
+    // The config is read only for edges that may show a handle, so the other
+    // edges do not re-evaluate on a config change.
+    if (!relink && (!this.selected() || this.temporary())) {
+      return false;
+    }
+    const defaultRelinkable = this.diagramService?.config().linking?.defaultRelinkable ?? false;
     if (relink) {
       // The preview stands in for the relinked edge, which is not rendered
       // during the gesture, so the fixed end follows that edge's setting.
       return relink.end === end || isEdgeEndRelinkable(relink.originalEdge, end, defaultRelinkable);
     }
-
-    if (!this.selected() || this.temporary()) {
-      return false;
-    }
     return isEdgeEndRelinkable(this.edge(), end, defaultRelinkable);
   }
 
-  private relinkHandleInset(end: EdgeEnd): Point | undefined {
+  private relinkHandleInset(end: EdgeEnd): Point {
     const edge = this.edge();
     const port = end === 'source' ? edge.sourcePort : edge.targetPort;
     // Other routings and manual points can end along the node side or away
     // from the node, so their handle stays at the end of the line.
     if (!port || edge.routingMode === 'manual' || !RELINK_HANDLE_INSET_ROUTINGS.has(this.drawnRouting())) {
-      return undefined;
+      return NO_INSET;
     }
     const points = this.points();
     const [tip, previous] = end === 'source' ? [points[0], points[1]] : [points.at(-1), points.at(-2)];
-    // A zero-length last segment (a routing configured without a straight
-    // part at the port) gives no direction.
-    if (!tip || !previous || isSamePoint(tip, previous)) {
-      return undefined;
+    if (!tip || !previous) {
+      return NO_INSET;
     }
     const dx = tip.x - previous.x;
     const dy = tip.y - previous.y;
-    const length = Math.hypot(dx, dy);
-    if (Math.abs(dx) / length >= RELINK_HANDLE_INSET_MIN_AXIS_SHARE) {
-      return { x: Math.sign(dx), y: 0 };
+    // Both routings lay the last segment exactly along an axis. A zero-length
+    // segment (a routing configured without a straight part at the port) or
+    // a slanted one gives no direction.
+    if (isSamePoint(tip, previous) || (dx !== 0 && dy !== 0)) {
+      return NO_INSET;
     }
-    if (Math.abs(dy) / length >= RELINK_HANDLE_INSET_MIN_AXIS_SHARE) {
-      return { x: 0, y: Math.sign(dy) };
-    }
-    return undefined;
-  }
-
-  /** The routing that draws this edge: its own when registered, otherwise the default one. */
-  private drawnRouting(): string {
-    const routing = this.routing() ?? this.edge().routing;
-    const routingManager = this.flowCoreProvider.provide().edgeRoutingManager;
-    return routing && routingManager.hasRouting(routing) ? routing : routingManager.getDefaultRouting();
+    return { x: Math.sign(dx), y: Math.sign(dy) };
   }
 
   constructor() {

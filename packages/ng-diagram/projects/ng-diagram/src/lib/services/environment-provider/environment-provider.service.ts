@@ -21,6 +21,9 @@ export class EnvironmentProviderService implements EnvironmentInfo {
     return this.checkIfClient();
   }
 
+  /** Whether the primary pointer is a finger or another coarse pointer. Read once, when the app starts. */
+  readonly coarsePointer = this.isClient && typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+
   private detectOS(): EnvironmentInfo['os'] {
     if (!this.isClient) return null;
 

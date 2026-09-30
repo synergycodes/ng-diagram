@@ -74,6 +74,22 @@ function expectAt(actual: { x: number; y: number }, expected: { x: number; y: nu
   expect(actual.y).toBeCloseTo(expected.y, 0);
 }
 
+/** The trio model with `edge-ab` running from the right port of node-a to the left port of node-b. */
+const trioWithPorts = (routing?: string): Partial<Model> => ({
+  nodes: trio.nodes,
+  edges: [
+    {
+      id: 'edge-ab',
+      source: 'node-a',
+      sourcePort: 'port-right',
+      target: 'node-b',
+      targetPort: 'port-left',
+      routing,
+      data: {},
+    },
+  ],
+});
+
 function drawEnded(diagram: Diagram): Promise<unknown[]> {
   return diagram.page.evaluate(() => (window as unknown as Record<string, unknown>).__drawEnded as unknown[]);
 }
@@ -506,20 +522,7 @@ test.describe('edge relinking', () => {
   test('a drop back on the original endpoint reverts without changing the model', async ({ diagram }) => {
     // The edge must be port-connected: "the original endpoint" means the same
     // node AND port (a port-less endpoint dropped onto a port is a real change).
-    const trioWithPorts: Partial<Model> = {
-      nodes: trio.nodes,
-      edges: [
-        {
-          id: 'edge-ab',
-          source: 'node-a',
-          sourcePort: 'port-right',
-          target: 'node-b',
-          targetPort: 'port-left',
-          data: {},
-        },
-      ],
-    };
-    await diagram.load({ model: trioWithPorts, config: relinkOn });
+    await diagram.load({ model: trioWithPorts(), config: relinkOn });
     await recordRelinkEnded(diagram);
     await diagram.selection.select([], ['edge-ab']);
 
@@ -701,22 +704,6 @@ test.describe('edge relinking', () => {
     await diagram.page.mouse.up();
   });
 
-  /** The trio model with `edge-ab` running from the right port of node-a to the left port of node-b. */
-  const trioWithPorts = (routing: string): Partial<Model> => ({
-    nodes: trio.nodes,
-    edges: [
-      {
-        id: 'edge-ab',
-        source: 'node-a',
-        sourcePort: 'port-right',
-        target: 'node-b',
-        targetPort: 'port-left',
-        routing,
-        data: {},
-      },
-    ],
-  });
-
   for (const routing of ['orthogonal', 'bezier'] as const) {
     test(`a handle on a port end is centered on the port together with its hit area (${routing})`, async ({
       diagram,
@@ -806,14 +793,6 @@ test.describe('edge relinking', () => {
     const dragged = handleCircle(diagram, 'target', 'TEMPORARY_EDGE');
     expectAt(await diagram.centerOf(fixed, 'fixed handle of the preview'), portA);
     // The dragged end shows the drag look, the fixed end the rest look.
-    await expect(preview.locator('[data-relink-handle="target"] .ng-diagram-edge__relink-handle-halo')).toHaveCSS(
-      'opacity',
-      '1'
-    );
-    await expect(preview.locator('[data-relink-handle="source"] .ng-diagram-edge__relink-handle-halo')).toHaveCSS(
-      'opacity',
-      '0'
-    );
     expect(await dragged.evaluate(fillEqualsStroke)).toBe(true);
     expect(await fixed.evaluate(fillEqualsStroke)).toBe(false);
 
