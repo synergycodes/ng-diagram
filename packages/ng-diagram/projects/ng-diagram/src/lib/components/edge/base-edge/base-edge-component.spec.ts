@@ -385,6 +385,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
           selected: true,
           sourcePort: 'out',
           targetPort: 'in',
+          routing: 'orthogonal',
           points: [
             { x: 0, y: 0 },
             { x: 20, y: 0 },
@@ -402,12 +403,13 @@ describe('NgDiagramBaseEdgeComponent', () => {
         expect(inset('[data-relink-handle-hit="target"]')).toEqual(['1', '0']);
       });
 
-      it('should skip a repeated end point and leave an end without a port in place', () => {
+      it('should leave an end in place when its last segment has zero length or it has no port', () => {
         defaultRelinkable = true;
         fixture.componentRef.setInput('edge', {
           ...mockEdge,
           selected: true,
           sourcePort: 'out',
+          routing: 'orthogonal',
           points: [
             { x: 0, y: 0 },
             { x: 0, y: 0 },
@@ -416,27 +418,28 @@ describe('NgDiagramBaseEdgeComponent', () => {
         });
         fixture.detectChanges();
 
-        expect(component['relinkSourceHandleInset']()).toEqual({ x: 0, y: -1 });
+        expect(component['relinkSourceHandleInset']()).toBeUndefined();
         expect(component['relinkTargetHandleInset']()).toBeUndefined();
-        expect(inset('[data-relink-handle="target"]')).toEqual(['', '']);
+        expect(inset('[data-relink-handle="source"]')).toEqual(['0', '0']);
+        expect(inset('[data-relink-handle="target"]')).toEqual(['0', '0']);
       });
 
-      it('should snap a line that comes in within 10 degrees of an axis to that axis', () => {
+      it.each<[string, Point, Point | undefined]>([
+        ['9 degrees', { x: 100, y: 15.8 }, { x: 1, y: 0 }],
+        ['11 degrees', { x: 100, y: 19.5 }, undefined],
+      ])('should snap a line %s off an axis only within 10 degrees', (_angle, end, expected) => {
         defaultRelinkable = true;
         fixture.componentRef.setInput('edge', {
           ...mockEdge,
           selected: true,
           sourcePort: 'out',
           targetPort: 'in',
-          points: [
-            { x: 0, y: 0 },
-            { x: 100, y: 10 },
-          ],
+          routing: 'orthogonal',
+          points: [{ x: 0, y: 0 }, end],
         });
         fixture.detectChanges();
 
-        expect(component['relinkSourceHandleInset']()).toEqual({ x: -1, y: 0 });
-        expect(component['relinkTargetHandleInset']()).toEqual({ x: 1, y: 0 });
+        expect(component['relinkTargetHandleInset']()).toEqual(expected);
       });
 
       it('should leave the handles at the ends of a slanted line', () => {
@@ -446,6 +449,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
           selected: true,
           sourcePort: 'out',
           targetPort: 'in',
+          routing: 'orthogonal',
           points: [
             { x: 0, y: 0 },
             { x: 100, y: 80 },
@@ -455,13 +459,60 @@ describe('NgDiagramBaseEdgeComponent', () => {
 
         expect(component['relinkSourceHandleInset']()).toBeUndefined();
         expect(component['relinkTargetHandleInset']()).toBeUndefined();
-        expect(inset('[data-relink-handle="source"]')).toEqual(['', '']);
-        expect(inset('[data-relink-handle-hit="target"]')).toEqual(['', '']);
+        expect(inset('[data-relink-handle="source"]')).toEqual(['0', '0']);
+        expect(inset('[data-relink-handle-hit="target"]')).toEqual(['0', '0']);
+      });
+
+      // Along the last segment of a polyline or of manual points the handle
+      // could slide along the node side or leave the node.
+      it.each<[string, Partial<Edge>]>([
+        ['a polyline edge', { routing: 'polyline' }],
+        ['manual points', { routing: 'orthogonal', routingMode: 'manual' }],
+      ])('should leave the handles of %s at the ends of the line', (_case, edge) => {
+        defaultRelinkable = true;
+        fixture.componentRef.setInput('edge', {
+          ...mockEdge,
+          ...edge,
+          selected: true,
+          sourcePort: 'out',
+          targetPort: 'in',
+          points: [
+            { x: 0, y: 0 },
+            { x: 100, y: 0 },
+          ],
+        });
+        fixture.detectChanges();
+
+        expect(component['relinkSourceHandleInset']()).toBeUndefined();
+        expect(component['relinkTargetHandleInset']()).toBeUndefined();
+      });
+
+      it.each<[string, string, string | undefined, Point | undefined]>([
+        ['no routing', 'bezier', undefined, { x: 1, y: 0 }],
+        ['an unregistered routing', 'orthogonal', 'custom', { x: 1, y: 0 }],
+        ['no routing', 'polyline', undefined, undefined],
+      ])('should follow the default routing on an edge with %s (default %s)', (_case, fallback, routing, expected) => {
+        mockFlowCore.edgeRoutingManager.hasRouting.mockImplementation((name: string) => name !== 'custom');
+        mockFlowCore.edgeRoutingManager.getDefaultRouting.mockReturnValue(fallback);
+        defaultRelinkable = true;
+        fixture.componentRef.setInput('edge', {
+          ...mockEdge,
+          selected: true,
+          targetPort: 'in',
+          routing,
+          points: [
+            { x: 0, y: 0 },
+            { x: 100, y: 0 },
+          ],
+        });
+        fixture.detectChanges();
+
+        expect(component['relinkTargetHandleInset']()).toEqual(expected);
       });
     });
 
     describe('on the preview of a relink', () => {
-      const renderPreview = (end: EdgeEnd, relinkedEdge: Edge) => {
+      const startRelink = (end: EdgeEnd, relinkedEdge: Edge) =>
         actionState.set({
           linking: {
             sourceNodeId: relinkedEdge.source,
@@ -470,7 +521,10 @@ describe('NgDiagramBaseEdgeComponent', () => {
             relink: { edgeId: relinkedEdge.id, end, originalEdge: relinkedEdge },
           },
         });
-        fixture.componentRef.setInput('edge', { ...mockEdge, id: 'TEMPORARY_EDGE', temporary: true });
+
+      const renderPreview = (end: EdgeEnd, relinkedEdge: Edge, preview: Partial<Edge> = {}) => {
+        startRelink(end, relinkedEdge);
+        fixture.componentRef.setInput('edge', { ...mockEdge, ...preview, id: 'TEMPORARY_EDGE', temporary: true });
         fixture.detectChanges();
       };
 
@@ -494,6 +548,45 @@ describe('NgDiagramBaseEdgeComponent', () => {
         expect(draggingHandles()).toEqual(['target']);
       });
 
+      it('should show the fixed end when the relinked edge allows relinking it although the default is off', () => {
+        renderPreview('target', { ...mockEdge, relinkable: true });
+
+        expect(renderedHandles()).toEqual({ source: 1, target: 1 });
+      });
+
+      it('should move the handle of a fixed end connected to a port into the port', () => {
+        defaultRelinkable = true;
+        renderPreview('target', mockEdge, {
+          sourcePort: 'out',
+          routing: 'orthogonal',
+          points: [
+            { x: 0, y: 0 },
+            { x: 20, y: 0 },
+            { x: 20, y: 50 },
+            { x: 100, y: 50 },
+          ],
+        });
+
+        const style = (fixture.nativeElement.querySelector('[data-relink-handle="source"]') as HTMLElement).style;
+        expect(style.getPropertyValue('--ngd-relink-handle-inset-x')).toBe('-1');
+        expect(component['relinkTargetHandleInset']()).toBeUndefined();
+      });
+
+      it('should leave edges other than the preview as they are', () => {
+        defaultRelinkable = true;
+        startRelink('target', { ...mockEdge, id: 'other-edge' });
+        fixture.componentRef.setInput('edge', mockEdge);
+        fixture.detectChanges();
+
+        expect(renderedHandles()).toEqual({ source: 0, target: 0 });
+
+        fixture.componentRef.setInput('edge', { ...mockEdge, selected: true });
+        fixture.detectChanges();
+
+        expect(renderedHandles()).toEqual({ source: 1, target: 1 });
+        expect(draggingHandles()).toEqual([]);
+      });
+
       it('should render no hit circles', () => {
         defaultRelinkable = true;
         renderPreview('target', mockEdge);
@@ -512,7 +605,10 @@ describe('NgDiagramBaseEdgeComponent', () => {
 
     describe('hit area', () => {
       const hitRadiusFor = (coarsePointer: boolean): number => {
-        vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: coarsePointer }));
+        vi.stubGlobal(
+          'matchMedia',
+          vi.fn((query: string) => ({ matches: coarsePointer && query === '(pointer: coarse)' }))
+        );
         return TestBed.createComponent(NgDiagramBaseEdgeComponent).componentInstance.relinkHandleHitRadius();
       };
 

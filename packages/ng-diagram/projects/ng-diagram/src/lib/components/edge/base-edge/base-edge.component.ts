@@ -41,6 +41,9 @@ const RELINK_HANDLE_TOUCH_HIT_RADIUS_PX = 22;
 
 const isCoarsePointer = (): boolean => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 
+/** Routings that lay the last segment perpendicular to the side of the port, from outside the node. */
+const RELINK_HANDLE_INSET_ROUTINGS = new Set<string>(['orthogonal', 'bezier']);
+
 /** A line that ends within this angle of an axis counts as coming in straight at the port. */
 const RELINK_HANDLE_INSET_MAX_ANGLE = 10;
 const RELINK_HANDLE_INSET_MIN_AXIS_SHARE = Math.cos((RELINK_HANDLE_INSET_MAX_ANGLE * Math.PI) / 180);
@@ -230,24 +233,29 @@ export class NgDiagramBaseEdgeComponent {
   readonly relinkTargetHandleVisible = computed(() => this.relinkHandleVisible('target'));
 
   /**
-   * Position of the source endpoint handle (the first routed point).
+   * Position of the source end of the line (the first routed point). The
+   * default handle is drawn here, or moved into the port when the source end
+   * of an orthogonal or bezier edge is connected to a port.
    *
    * @since 1.4.0
    */
   readonly relinkSourceHandle = computed(() => this.points()[0]);
 
   /**
-   * Position of the target endpoint handle (the last routed point).
+   * Position of the target end of the line (the last routed point). The
+   * default handle is drawn here, or moved into the port when the target end
+   * of an orthogonal or bezier edge is connected to a port.
    *
    * @since 1.4.0
    */
   readonly relinkTargetHandle = computed(() => this.points()[this.points().length - 1]);
 
   /**
-   * Unit vector from the end of the line into the port, for a source end
-   * connected to a port whose line comes in along an axis; `undefined`
-   * otherwise. The stylesheet moves the handle along it, so the handle
-   * covers the port and the line still ends under its ring.
+   * Unit vector along the last segment of the line, into the port, for the
+   * source end of an orthogonal or bezier edge that is connected to a port
+   * and comes in along an axis; `undefined` otherwise. The stylesheet moves
+   * the handle along it, so the handle covers the port and the line still
+   * ends under its ring.
    *
    * @since 1.4.0
    */
@@ -317,29 +325,22 @@ export class NgDiagramBaseEdgeComponent {
 
   private relinkHandleInset(end: EdgeEnd): Point | undefined {
     const edge = this.edge();
-    if (!(end === 'source' ? edge.sourcePort : edge.targetPort)) {
+    const port = end === 'source' ? edge.sourcePort : edge.targetPort;
+    // Other routings and manual points can end along the node side or away
+    // from the node, so their handle stays at the end of the line.
+    if (!port || edge.routingMode === 'manual' || !RELINK_HANDLE_INSET_ROUTINGS.has(this.drawnRouting())) {
       return undefined;
     }
-    // Direction of the last segment, from the previous distinct point to the
-    // end of the line. The orthogonal and bezier routings lay that segment
-    // along the side of the port.
-    const ordered = end === 'source' ? [...this.points()].reverse() : this.points();
-    const tip = ordered[ordered.length - 1];
-    let previous: Point | undefined;
-    for (let i = ordered.length - 2; i >= 0 && !previous; i--) {
-      if (!isSamePoint(ordered[i], tip)) {
-        previous = ordered[i];
-      }
-    }
-    if (!tip || !previous) {
+    const points = this.points();
+    const [tip, previous] = end === 'source' ? [points[0], points[1]] : [points.at(-1), points.at(-2)];
+    // A zero-length last segment (a routing configured without a straight
+    // part at the port) gives no direction.
+    if (!tip || !previous || isSamePoint(tip, previous)) {
       return undefined;
     }
     const dx = tip.x - previous.x;
     const dy = tip.y - previous.y;
     const length = Math.hypot(dx, dy);
-    // Only a line that comes in along an axis is taken as perpendicular to
-    // the node side. A slanted line (polyline, manual points) keeps its
-    // handle at the end of the line.
     if (Math.abs(dx) / length >= RELINK_HANDLE_INSET_MIN_AXIS_SHARE) {
       return { x: Math.sign(dx), y: 0 };
     }
@@ -347,6 +348,13 @@ export class NgDiagramBaseEdgeComponent {
       return { x: 0, y: Math.sign(dy) };
     }
     return undefined;
+  }
+
+  /** The routing that draws this edge: its own when registered, otherwise the default one. */
+  private drawnRouting(): string {
+    const routing = this.routing() ?? this.edge().routing;
+    const routingManager = this.flowCoreProvider.provide().edgeRoutingManager;
+    return routing && routingManager.hasRouting(routing) ? routing : routingManager.getDefaultRouting();
   }
 
   constructor() {

@@ -71,7 +71,7 @@ svg {
   }
 
   // The component sets the direction into the port (a unit vector along an
-  // axis) on ends connected to a port whose line comes in straight; the
+  // axis) on port ends of orthogonal and bezier edges, 0 elsewhere; the
   // distance comes from CSS, so a restyled handle keeps the fit.
   .ng-diagram-edge__relink-handle,
   .ng-diagram-edge__relink-handle-hit {

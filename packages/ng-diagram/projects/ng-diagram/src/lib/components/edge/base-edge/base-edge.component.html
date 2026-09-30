@@ -30,8 +30,9 @@
        data-relink-handle-hit lets the stylesheet highlight the matching
        handle on hover. Each end renders only when it can be relinked. A
        relink preview has no hit circles: its handles only show the gesture.
-       On an end connected to a port the stylesheet moves the hit circle and
-       the handle into the port, along --ngd-relink-handle-inset-x/-y. -->
+       --ngd-relink-handle-inset-x/-y hold the direction into the port on port
+       ends of orthogonal and bezier edges (0 elsewhere); the stylesheet moves
+       the hit circle and the handle along it. -->
   @if (relinkSourceHandleVisible() && !temporary()) {
     <circle
       class="ng-diagram-edge__relink-handle-hit"
@@ -39,8 +40,8 @@
       ngDiagramRelinkHandle
       [edge]="edge()"
       end="source"
-      [style.--ngd-relink-handle-inset-x]="relinkSourceHandleInset()?.x ?? null"
-      [style.--ngd-relink-handle-inset-y]="relinkSourceHandleInset()?.y ?? null"
+      [style.--ngd-relink-handle-inset-x]="relinkSourceHandleInset()?.x ?? 0"
+      [style.--ngd-relink-handle-inset-y]="relinkSourceHandleInset()?.y ?? 0"
       [attr.cx]="relinkSourceHandle().x"
       [attr.cy]="relinkSourceHandle().y"
       [attr.r]="relinkHandleHitRadius()"
@@ -53,8 +54,8 @@
       ngDiagramRelinkHandle
       [edge]="edge()"
       end="target"
-      [style.--ngd-relink-handle-inset-x]="relinkTargetHandleInset()?.x ?? null"
-      [style.--ngd-relink-handle-inset-y]="relinkTargetHandleInset()?.y ?? null"
+      [style.--ngd-relink-handle-inset-x]="relinkTargetHandleInset()?.x ?? 0"
+      [style.--ngd-relink-handle-inset-y]="relinkTargetHandleInset()?.y ?? 0"
       [attr.cx]="relinkTargetHandle().x"
       [attr.cy]="relinkTargetHandle().y"
       [attr.r]="relinkHandleHitRadius()"
@@ -68,8 +69,8 @@
       ngDiagramRelinkHandle
       [edge]="edge()"
       end="source"
-      [style.--ngd-relink-handle-inset-x]="relinkSourceHandleInset()?.x ?? null"
-      [style.--ngd-relink-handle-inset-y]="relinkSourceHandleInset()?.y ?? null"
+      [style.--ngd-relink-handle-inset-x]="relinkSourceHandleInset()?.x ?? 0"
+      [style.--ngd-relink-handle-inset-y]="relinkSourceHandleInset()?.y ?? 0"
     >
       <circle
         class="ng-diagram-edge__relink-handle-halo"
@@ -91,8 +92,8 @@
       ngDiagramRelinkHandle
       [edge]="edge()"
       end="target"
-      [style.--ngd-relink-handle-inset-x]="relinkTargetHandleInset()?.x ?? null"
-      [style.--ngd-relink-handle-inset-y]="relinkTargetHandleInset()?.y ?? null"
+      [style.--ngd-relink-handle-inset-x]="relinkTargetHandleInset()?.x ?? 0"
+      [style.--ngd-relink-handle-inset-y]="relinkTargetHandleInset()?.y ?? 0"
     >
       <circle
         class="ng-diagram-edge__relink-handle-halo"

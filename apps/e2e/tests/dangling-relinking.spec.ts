@@ -57,9 +57,21 @@ async function recordDrawEnded(diagram: Diagram): Promise<void> {
   });
 }
 
-/** The visible circle of a relink handle of edge-ab. */
-function handleCircle(diagram: Diagram, end: 'source' | 'target') {
-  return diagram.edge('edge-ab').locator(`[data-relink-handle="${end}"] .ng-diagram-edge__relink-handle-circle`);
+/** The visible circle of a relink handle of edge-ab, or of the relink preview. */
+function handleCircle(diagram: Diagram, end: 'source' | 'target', edgeId = 'edge-ab') {
+  return diagram.edge(edgeId).locator(`[data-relink-handle="${end}"] .ng-diagram-edge__relink-handle-circle`);
+}
+
+/** Whether a handle circle shows the drag look (filled with its stroke color). */
+function fillEqualsStroke(element: Element): boolean {
+  const style = getComputedStyle(element);
+  return style.fill === style.stroke;
+}
+
+/** Expects two client points to match within half a pixel. */
+function expectAt(actual: { x: number; y: number }, expected: { x: number; y: number }): void {
+  expect(actual.x).toBeCloseTo(expected.x, 0);
+  expect(actual.y).toBeCloseTo(expected.y, 0);
 }
 
 function drawEnded(diagram: Diagram): Promise<unknown[]> {
@@ -649,105 +661,170 @@ test.describe('edge relinking', () => {
     await expect(halo).toHaveCSS('r', '8px');
     await expect(halo).toHaveCSS('stroke-width', '4px');
 
-    // A press below the move threshold keeps the original handle mounted.
+    // The halo lets the pointer through: on its ring the hit circle is under the pointer.
     const handle = await diagram.centerOf(visible, 'target handle of edge-ab');
+    const onHalo = await diagram.page.evaluate(
+      ({ x, y }) => document.elementFromPoint(x, y)?.getAttribute('class') ?? null,
+      { x: handle.x, y: handle.y - 8 }
+    );
+    expect(onHalo).toContain('ng-diagram-edge__relink-handle-hit');
+
+    // A press below the move threshold keeps the original handle mounted.
     const restFill = await circle.evaluate((element) => getComputedStyle(element).fill);
     await diagram.page.mouse.move(handle.x, handle.y);
     await diagram.page.mouse.down();
     await expect(halo).toHaveCSS('opacity', '1');
-    await expect
-      .poll(() =>
-        circle.evaluate((element) => {
-          const style = getComputedStyle(element);
-          return style.fill === style.stroke;
-        })
-      )
-      .toBe(true);
+    await expect.poll(() => circle.evaluate(fillEqualsStroke)).toBe(true);
     await diagram.page.mouse.up();
     await expect.poll(() => circle.evaluate((element) => getComputedStyle(element).fill)).toBe(restFill);
   });
 
-  for (const routing of ['orthogonal', 'bezier', 'polyline'] as const) {
-    test(`a handle on a port end is centered on the port (${routing})`, async ({ diagram }) => {
-      const withPorts: Partial<Model> = {
-        nodes: trio.nodes,
-        edges: [
-          {
-            id: 'edge-ab',
-            source: 'node-a',
-            sourcePort: 'port-right',
-            target: 'node-b',
-            targetPort: 'port-left',
-            routing,
-            data: {},
-          },
-        ],
-      };
-      await diagram.load({ model: withPorts, config: relinkOn });
+  test('the hit area of each end highlights and presses the handle of its own end', async ({ diagram }) => {
+    await diagram.load({ model: trio, config: relinkOn });
+    await diagram.viewport.zoom(0.5);
+    await diagram.selection.select([], ['edge-ab']);
+
+    const halo = (end: 'source' | 'target') =>
+      diagram.edge('edge-ab').locator(`[data-relink-handle="${end}"] .ng-diagram-edge__relink-handle-halo`);
+    const source = await diagram.centerOf(handleCircle(diagram, 'source'), 'source handle of edge-ab');
+    const target = await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab');
+
+    // At zoom 0.5, 9px above a handle center only its hit circle is under the pointer.
+    await diagram.page.mouse.move(source.x, source.y - 9);
+    await expect(halo('source')).toHaveCSS('opacity', '1');
+    await expect(halo('target')).toHaveCSS('opacity', '0');
+
+    await diagram.page.mouse.move(target.x, target.y - 9);
+    await diagram.page.mouse.down();
+    await expect.poll(() => handleCircle(diagram, 'target').evaluate(fillEqualsStroke)).toBe(true);
+    expect(await handleCircle(diagram, 'source').evaluate(fillEqualsStroke)).toBe(false);
+    await diagram.page.mouse.up();
+  });
+
+  /** The trio model with `edge-ab` running from the right port of node-a to the left port of node-b. */
+  const trioWithPorts = (routing: string): Partial<Model> => ({
+    nodes: trio.nodes,
+    edges: [
+      {
+        id: 'edge-ab',
+        source: 'node-a',
+        sourcePort: 'port-right',
+        target: 'node-b',
+        targetPort: 'port-left',
+        routing,
+        data: {},
+      },
+    ],
+  });
+
+  for (const routing of ['orthogonal', 'bezier'] as const) {
+    test(`a handle on a port end is centered on the port together with its hit area (${routing})`, async ({
+      diagram,
+    }) => {
+      await diagram.load({ model: trioWithPorts(routing), config: relinkOn });
       await diagram.selection.select([], ['edge-ab']);
       await diagram.page.mouse.move(5, 5);
       await diagram.nextFrame();
 
-      const source = await diagram.centerOf(handleCircle(diagram, 'source'), 'source handle of edge-ab');
-      const target = await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab');
       const portA = await diagram.centerOf(diagram.port('node-a', 'port-right'), 'right port of node-a');
       const portB = await diagram.centerOf(diagram.port('node-b', 'port-left'), 'left port of node-b');
-      expect(source.x).toBeCloseTo(portA.x, 0);
-      expect(source.y).toBeCloseTo(portA.y, 0);
-      expect(target.x).toBeCloseTo(portB.x, 0);
-      expect(target.y).toBeCloseTo(portB.y, 0);
+      expectAt(await diagram.centerOf(handleCircle(diagram, 'source'), 'source handle of edge-ab'), portA);
+      expectAt(await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab'), portB);
+      const hit = diagram.edge('edge-ab').locator('[data-relink-handle-hit="target"]');
+      expectAt(await diagram.centerOf(hit, 'target hit area of edge-ab'), portB);
     });
   }
 
-  test('a handle of a slanted straight edge stays at the end of the line', async ({ diagram }) => {
-    const slanted: Partial<Model> = {
+  test('a handle on a top or bottom port is centered on the port at any zoom', async ({ diagram }) => {
+    const stacked: Partial<Model> = {
       nodes: [
-        { id: 'node-a', position: { x: 80, y: 80 }, data: { label: 'A' } },
-        { id: 'node-b', position: { x: 320, y: 300 }, data: { label: 'B' } },
+        { id: 'node-a', type: 'vertical-ports', position: { x: 120, y: 60 }, data: { label: 'A' } },
+        { id: 'node-b', type: 'vertical-ports', position: { x: 120, y: 220 }, data: { label: 'B' } },
       ],
       edges: [
         {
           id: 'edge-ab',
           source: 'node-a',
-          sourcePort: 'port-right',
+          sourcePort: 'port-bottom',
           target: 'node-b',
-          targetPort: 'port-left',
-          routing: 'polyline',
+          targetPort: 'port-top',
           data: {},
         },
       ],
     };
-    await diagram.load({ model: slanted, config: relinkOn });
+    await diagram.load({ model: stacked, config: relinkOn });
     await diagram.selection.select([], ['edge-ab']);
     await diagram.page.mouse.move(5, 5);
-    await diagram.nextFrame();
 
-    const edge = await diagram.model.getEdgeById('edge-ab');
-    const start = await diagram.viewport.flowToClientPosition(edge!.points![0]);
-    const end = await diagram.viewport.flowToClientPosition(edge!.points!.at(-1)!);
-    const source = await diagram.centerOf(handleCircle(diagram, 'source'), 'source handle of edge-ab');
-    const target = await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab');
-    expect(source.x).toBeCloseTo(start.x, 0);
-    expect(source.y).toBeCloseTo(start.y, 0);
-    expect(target.x).toBeCloseTo(end.x, 0);
-    expect(target.y).toBeCloseTo(end.y, 0);
+    for (const zoom of [1, 2]) {
+      if (zoom !== 1) {
+        await diagram.viewport.zoom(zoom);
+      }
+      await diagram.nextFrame();
+      const portA = await diagram.centerOf(diagram.port('node-a', 'port-bottom'), 'bottom port of node-a');
+      const portB = await diagram.centerOf(diagram.port('node-b', 'port-top'), 'top port of node-b');
+      expectAt(await diagram.centerOf(handleCircle(diagram, 'source'), `source handle at zoom ${zoom}`), portA);
+      expectAt(await diagram.centerOf(handleCircle(diagram, 'target'), `target handle at zoom ${zoom}`), portB);
+    }
   });
 
-  test('a handle on an end without a port stays at the end of the line', async ({ diagram }) => {
-    await diagram.load({ model: trio, config: relinkOn });
-    await diagram.selection.select([], ['edge-ab']);
-    await diagram.page.mouse.move(5, 5);
-    await diagram.nextFrame();
+  // The last segment of a polyline can run along the node side or away from
+  // the node, so its handles never move into the port.
+  for (const [where, model] of [
+    ['on a polyline edge', trioWithPorts('polyline')],
+    ['on an end without a port', trio],
+  ] as const) {
+    test(`a handle ${where} stays at the end of the line`, async ({ diagram }) => {
+      await diagram.load({ model, config: relinkOn });
+      await diagram.selection.select([], ['edge-ab']);
+      await diagram.page.mouse.move(5, 5);
+      await diagram.nextFrame();
 
-    const edge = await diagram.model.getEdgeById('edge-ab');
-    const start = await diagram.viewport.flowToClientPosition(edge!.points![0]);
-    const end = await diagram.viewport.flowToClientPosition(edge!.points!.at(-1)!);
-    const source = await diagram.centerOf(handleCircle(diagram, 'source'), 'source handle of edge-ab');
-    const target = await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab');
-    expect(source.x).toBeCloseTo(start.x, 0);
-    expect(source.y).toBeCloseTo(start.y, 0);
-    expect(target.x).toBeCloseTo(end.x, 0);
-    expect(target.y).toBeCloseTo(end.y, 0);
+      const edge = await diagram.model.getEdgeById('edge-ab');
+      const start = await diagram.viewport.flowToClientPosition(edge!.points![0]);
+      const end = await diagram.viewport.flowToClientPosition(edge!.points!.at(-1)!);
+      expectAt(await diagram.centerOf(handleCircle(diagram, 'source'), 'source handle of edge-ab'), start);
+      expectAt(await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab'), end);
+    });
+  }
+
+  test('the relink preview keeps the fixed handle on its port and moves the dragged one onto a port', async ({
+    diagram,
+  }) => {
+    await diagram.load({ model: trioWithPorts('orthogonal'), config: relinkOn });
+    await diagram.selection.select([], ['edge-ab']);
+
+    const handle = await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab');
+    const portA = await diagram.centerOf(diagram.port('node-a', 'port-right'), 'right port of node-a');
+    const portC = await diagram.centerOf(diagram.port('node-c', 'port-left'), 'left port of node-c');
+    const nodeC = (await diagram.node('node-c').boundingBox())!;
+    await diagram.beginDrag(handle, { x: handle.x + 60, y: nodeC.y + nodeC.height + 80 });
+
+    const preview = diagram.edge('TEMPORARY_EDGE');
+    await expect(preview).toBeAttached();
+    const fixed = handleCircle(diagram, 'source', 'TEMPORARY_EDGE');
+    const dragged = handleCircle(diagram, 'target', 'TEMPORARY_EDGE');
+    expectAt(await diagram.centerOf(fixed, 'fixed handle of the preview'), portA);
+    // The dragged end shows the drag look, the fixed end the rest look.
+    await expect(preview.locator('[data-relink-handle="target"] .ng-diagram-edge__relink-handle-halo')).toHaveCSS(
+      'opacity',
+      '1'
+    );
+    await expect(preview.locator('[data-relink-handle="source"] .ng-diagram-edge__relink-handle-halo')).toHaveCSS(
+      'opacity',
+      '0'
+    );
+    expect(await dragged.evaluate(fillEqualsStroke)).toBe(true);
+    expect(await fixed.evaluate(fillEqualsStroke)).toBe(false);
+
+    await diagram.page.mouse.move(portC.x, portC.y, { steps: 6 });
+    await expect
+      .poll(async () => {
+        const center = await diagram.centerOf(dragged, 'dragged handle of the preview');
+        return Math.hypot(center.x - portC.x, center.y - portC.y);
+      })
+      .toBeLessThan(0.5);
+    await diagram.page.mouse.up();
   });
 });
 

@@ -23,7 +23,7 @@ Relinking is off by default. [`linking.defaultRelinkable`](/docs/api/types/confi
 
 <CodeSnippet relativePath="edges/relinking/relinking/diagram.component.ts" sectionId="config" />
 
-With `defaultRelinkable: true`, every selected edge rendered by [`ng-diagram-base-edge`](/docs/api/components/ngdiagrambaseedgecomponent) shows a handle at each end. Temporary edges (draw previews) never show handles.
+With `defaultRelinkable: true`, every selected edge rendered by [`ng-diagram-base-edge`](/docs/api/components/ngdiagrambaseedgecomponent) shows a handle at each end. The preview of a new edge that is being drawn never shows handles.
 
 ## Controlling Which Edges Can Be Relinked
 
@@ -129,7 +129,7 @@ onRelinkEnded(event: EdgeRelinkEndedEvent) {
 
 ### Relink Handles
 
-A handle is a ring at the end of the edge. When the edge comes in straight at a port (the orthogonal and bezier routings always do), the handle sits on the port and the edge ends under its ring; with the default sizes the handle is centered on the port, and a bigger or smaller handle keeps this fit. A straight edge that comes in at an angle keeps its handle at the end of the line. It shows a halo on hover, and it is filled while its end is dragged. Both handles stay visible during the drag.
+A handle is a ring at the end of the edge. On orthogonal and bezier edges, the handle of an end that is connected to a port sits on the port, and the edge ends under its ring. With the default sizes the handle is centered on the port. With a bigger or smaller handle the edge still ends under the ring. In all other cases the handle sits at the end of the line: on polyline and custom routings, on edges with manual points, on ends without a port, and when the routing has no straight part at the port (for example with `edgeRouting.bezier.bezierControlOffset` set to `0`). A handle shows a halo on hover and is filled while its end is dragged. The handles stay visible during the drag.
 
 Here are the CSS variables you can use to style the relink handles globally:
 
@@ -146,6 +146,8 @@ Here are the CSS variables you can use to style the relink handles globally:
   --ngd-relink-handle-halo-color-hover   // Halo color on hover
   --ngd-relink-handle-halo-color-drag    // Halo color while the end is dragged
 ```
+
+Give the size, the stroke width and the halo size a unit, for example `12px` or `0.75rem`. A number without a unit does not work for these three variables.
 
 You can also override them per edge with the matching `--edge-relink-handle-*` variables, in the same way as `--edge-stroke`. Each state has its own variable, so set the hover and drag colors together with the default ones:
 
