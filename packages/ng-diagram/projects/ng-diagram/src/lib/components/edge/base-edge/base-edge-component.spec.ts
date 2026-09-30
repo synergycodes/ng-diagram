@@ -3,7 +3,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ActionState, Edge, EdgeEnd, Point } from '../../../../core/src';
 import { FlowCoreProviderService, RendererService } from '../../../services';
-import { EnvironmentProviderService } from '../../../services/environment-provider/environment-provider.service';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
 import { RelinkingGestureService } from '../../../services/input-events/relinking-gesture.service';
 import { MarkerRegistryService } from '../../../services/marker-registry/marker-registry.service';
@@ -579,23 +578,14 @@ describe('NgDiagramBaseEdgeComponent', () => {
     });
 
     describe('hit area', () => {
-      // The component reads the environment when it is created, so it needs
-      // a module that provides the pointer type before it is created.
-      const hitRadiusFor = async (coarsePointer: boolean): Promise<number> => {
-        TestBed.resetTestingModule();
-        await TestBed.configureTestingModule({
-          providers: [...providers, { provide: EnvironmentProviderService, useValue: { coarsePointer } }],
-          imports: [NgDiagramBaseEdgeComponent],
-        }).compileComponents();
-        return TestBed.createComponent(NgDiagramBaseEdgeComponent).componentInstance.relinkHandleHitRadius();
-      };
-
-      it('should have a 12px radius for a fine pointer', async () => {
-        expect(await hitRadiusFor(false)).toBe(12);
+      it('should have a 12px radius at zoom 1', () => {
+        expect(component.relinkHandleHitRadius()).toBe(12);
       });
 
-      it('should have a 22px radius when the primary pointer is coarse', async () => {
-        expect(await hitRadiusFor(true)).toBe(22);
+      it('should keep a 12px radius on screen at other zoom levels', () => {
+        TestBed.inject(RendererService).viewport.set({ x: 0, y: 0, scale: 2 });
+
+        expect(component.relinkHandleHitRadius()).toBe(6);
       });
     });
   });

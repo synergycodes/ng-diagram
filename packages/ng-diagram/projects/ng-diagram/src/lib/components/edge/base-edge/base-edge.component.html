@@ -22,8 +22,8 @@
   />
   <path [attr.d]="path()" fill="none" stroke="none" stroke-width="20" stroke-opacity="0" />
 
-  <!-- Invisible hit circles: a finger-friendly grab area that keeps a
-       constant screen size at any zoom. Both hit circles render before both
+  <!-- Invisible hit circles: a grab area larger than the handle that keeps
+       a constant screen size at any zoom. Both hit circles render before both
        visible handles, so a visible handle is never covered by the other
        end's hit area on a short edge. The hit circle and the handle carry the
        same directive, so grabbing either starts the relink;

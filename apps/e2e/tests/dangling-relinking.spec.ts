@@ -829,13 +829,13 @@ test.describe('edge relinking on touch', () => {
     await cdp.detach();
   }
 
-  test('the hit area is 44px wide when the primary pointer is a finger', async ({ diagram }) => {
+  test('the hit area is 24px wide also when the primary pointer is a finger', async ({ diagram }) => {
     await diagram.load({ model: trio, config: relinkOn });
     await diagram.selection.select([], ['edge-ab']);
 
     const hit = await diagram.edge('edge-ab').locator('[data-relink-handle-hit="target"]').boundingBox();
-    expect(hit?.width).toBeCloseTo(44, 0);
-    expect(hit?.height).toBeCloseTo(44, 0);
+    expect(hit?.width).toBeCloseTo(24, 0);
+    expect(hit?.height).toBeCloseTo(24, 0);
   });
 
   test('a touch drag of the target handle reconnects the edge', async ({ diagram }) => {

@@ -5,7 +5,6 @@ import {
   equalPointsArrays,
   isDanglingEdge,
   isEdgeEndRelinkable,
-  isSamePoint,
   Point,
   RoutingMode,
 } from '../../../../core/src';
@@ -13,7 +12,6 @@ import { isValidPosition } from '../../../../core/src/utils/measurement-validati
 import { EdgeSelectionDirective, InlineMarkersDirective, ZIndexDirective } from '../../../directives';
 import { RelinkHandleDirective } from '../../../directives/input-events/relinking/relinking.directive';
 import { FlowCoreProviderService } from '../../../services';
-import { EnvironmentProviderService } from '../../../services/environment-provider/environment-provider.service';
 import { MarkerRegistryService } from '../../../services/marker-registry/marker-registry.service';
 import { RendererService } from '../../../services/renderer/renderer.service';
 import { NgDiagramService } from '../../../public-services/ng-diagram.service';
@@ -37,14 +35,8 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 /** Screen-pixel radius of the relink handles' invisible hit area. */
 const RELINK_HANDLE_HIT_RADIUS_PX = 12;
 
-/** Same as {@link RELINK_HANDLE_HIT_RADIUS_PX} for devices whose primary pointer is a finger. */
-const RELINK_HANDLE_TOUCH_HIT_RADIUS_PX = 22;
-
 /** Routings that lay the last segment perpendicular to the side of the port, from outside the node. */
 const RELINK_HANDLE_INSET_ROUTINGS = new Set<string>(['orthogonal', 'bezier']);
-
-/** The ends of an edge in the order their handles are rendered. */
-const RELINK_HANDLE_ENDS: EdgeEnd[] = ['source', 'target'];
 
 const NO_INSET: Point = { x: 0, y: 0 };
 
@@ -91,9 +83,6 @@ export class NgDiagramBaseEdgeComponent {
   // provideNgDiagram() keep working — without it the relink handles stay off.
   private readonly diagramService = inject(NgDiagramService, { optional: true });
   private readonly renderer = inject(RendererService, { optional: true });
-  private readonly relinkHandleHitRadiusPx = inject(EnvironmentProviderService).coarsePointer
-    ? RELINK_HANDLE_TOUCH_HIT_RADIUS_PX
-    : RELINK_HANDLE_HIT_RADIUS_PX;
 
   /**
    * Whether to use inline markers (Safari fallback).
@@ -260,29 +249,30 @@ export class NgDiagramBaseEdgeComponent {
    * (zero when it stays at the end of the line) and whether the end is the
    * dragged end of a relink preview.
    *
-   * @since 1.4.0
+   * @internal
    */
-  protected readonly relinkHandles = computed((): RelinkHandleView[] =>
-    RELINK_HANDLE_ENDS.filter((end) => this.relinkHandleVisible(end)).map((end) => ({
-      end,
-      point: end === 'source' ? this.relinkSourceHandle() : this.relinkTargetHandle(),
-      inset: this.relinkHandleInset(end),
-      dragging: this.relinkPreview()?.end === end,
-    }))
-  );
+  protected readonly relinkHandles = computed((): RelinkHandleView[] => {
+    const handles: RelinkHandleView[] = [];
+    if (this.relinkSourceHandleVisible()) {
+      handles.push(this.relinkHandleView('source', this.relinkSourceHandle()));
+    }
+    if (this.relinkTargetHandleVisible()) {
+      handles.push(this.relinkHandleView('target', this.relinkTargetHandle()));
+    }
+    return handles;
+  });
 
   /**
    * Radius of the invisible hit circle around each handle, in flow units. On
-   * screen the radius is 12px, or 22px when the primary pointer is a finger.
-   * The radius is divided by the viewport scale, so the hit area keeps this
-   * size at any zoom level. Without this, at zoom 0.5 the visible handle
-   * would give only a 3px target.
+   * screen the radius is 12px. The radius is divided by the viewport scale,
+   * so the hit area keeps this size at any zoom level. Without this, at zoom
+   * 0.5 the visible handle would give only a 3px target.
    *
    * @since 1.4.0
    */
   readonly relinkHandleHitRadius = computed(() => {
     const scale = this.renderer?.viewport().scale || 1;
-    return this.relinkHandleHitRadiusPx / scale;
+    return RELINK_HANDLE_HIT_RADIUS_PX / scale;
   });
 
   readonly class = computed(() => {
@@ -326,7 +316,11 @@ export class NgDiagramBaseEdgeComponent {
     return isEdgeEndRelinkable(this.edge(), end, defaultRelinkable);
   }
 
-  private relinkHandleInset(end: EdgeEnd): Point {
+  private relinkHandleView(end: EdgeEnd, point: Point): RelinkHandleView {
+    return { end, point, inset: this.relinkHandleInset(end, point), dragging: this.relinkPreview()?.end === end };
+  }
+
+  private relinkHandleInset(end: EdgeEnd, tip: Point): Point {
     const edge = this.edge();
     const port = end === 'source' ? edge.sourcePort : edge.targetPort;
     // Other routings and manual points can end along the node side or away
@@ -335,16 +329,16 @@ export class NgDiagramBaseEdgeComponent {
       return NO_INSET;
     }
     const points = this.points();
-    const [tip, previous] = end === 'source' ? [points[0], points[1]] : [points.at(-1), points.at(-2)];
-    if (!tip || !previous) {
+    const previous = end === 'source' ? points[1] : points.at(-2);
+    if (!previous) {
       return NO_INSET;
     }
     const dx = tip.x - previous.x;
     const dy = tip.y - previous.y;
-    // Both routings lay the last segment exactly along an axis. A zero-length
-    // segment (a routing configured without a straight part at the port) or
-    // a slanted one gives no direction.
-    if (isSamePoint(tip, previous) || (dx !== 0 && dy !== 0)) {
+    // Both routings lay the last segment exactly along an axis, so exactly one
+    // of dx and dy is non-zero. A zero-length segment (a routing configured
+    // without a straight part at the port) or a slanted one gives no direction.
+    if ((dx === 0) === (dy === 0)) {
       return NO_INSET;
     }
     return { x: Math.sign(dx), y: Math.sign(dy) };

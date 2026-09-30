@@ -34,10 +34,9 @@ Edge data model
 > `readonly` **relinkHandleHitRadius**: `Signal`\<`number`\>
 
 Radius of the invisible hit circle around each handle, in flow units. On
-screen the radius is 12px, or 22px when the primary pointer is a finger.
-The radius is divided by the viewport scale, so the hit area keeps this
-size at any zoom level. Without this, at zoom 0.5 the visible handle
-would give only a 3px target.
+screen the radius is 12px. The radius is divided by the viewport scale,
+so the hit area keeps this size at any zoom level. Without this, at zoom
+0.5 the visible handle would give only a 3px target.
 
 #### Since
 

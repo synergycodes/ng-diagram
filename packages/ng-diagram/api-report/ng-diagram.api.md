@@ -827,6 +827,7 @@ export class NgDiagramBaseEdgeComponent {
     // (undocumented)
     readonly points: Signal<Point[]>;
     readonly relinkHandleHitRadius: Signal<number>;
+    // @internal
     protected readonly relinkHandles: Signal<RelinkHandleView[]>;
     readonly relinkSourceHandle: Signal<Point>;
     readonly relinkSourceHandleVisible: Signal<boolean>;
