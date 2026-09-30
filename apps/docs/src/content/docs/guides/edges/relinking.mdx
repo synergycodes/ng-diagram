@@ -129,29 +129,41 @@ onRelinkEnded(event: EdgeRelinkEndedEvent) {
 
 ### Relink Handles
 
+A handle is a ring at the end of the edge. When the edge comes in straight at a port (the orthogonal and bezier routings always do), the handle sits on the port and the edge ends under its ring; with the default sizes the handle is centered on the port, and a bigger or smaller handle keeps this fit. A straight edge that comes in at an angle keeps its handle at the end of the line. It shows a halo on hover, and it is filled while its end is dragged. Both handles stay visible during the drag.
+
 Here are the CSS variables you can use to style the relink handles globally:
 
 ```
-  --ngd-relink-handle-size           // Diameter of the visible handle circle
-  --ngd-relink-handle-fill           // Fill color of the handle
-  --ngd-relink-handle-fill-hover     // Fill color on hover
-  --ngd-relink-handle-stroke         // Stroke (outline) color of the handle
-  --ngd-relink-handle-stroke-width   // Stroke width of the handle
+  --ngd-relink-handle-size               // Outer diameter of the handle (the stroke is inside)
+  --ngd-relink-handle-stroke-width       // Stroke width of the handle
+  --ngd-relink-handle-fill               // Fill color of the handle
+  --ngd-relink-handle-fill-hover         // Fill color on hover
+  --ngd-relink-handle-fill-drag          // Fill color while the end is dragged
+  --ngd-relink-handle-stroke             // Stroke (outline) color of the handle
+  --ngd-relink-handle-stroke-hover       // Stroke color on hover
+  --ngd-relink-handle-stroke-drag        // Stroke color while the end is dragged
+  --ngd-relink-handle-halo-size          // Width of the halo around the handle
+  --ngd-relink-handle-halo-color-hover   // Halo color on hover
+  --ngd-relink-handle-halo-color-drag    // Halo color while the end is dragged
 ```
 
-You can also override them per edge with the matching `--edge-relink-handle-*` variables, in the same way as `--edge-stroke`:
+You can also override them per edge with the matching `--edge-relink-handle-*` variables, in the same way as `--edge-stroke`. Each state has its own variable, so set the hover and drag colors together with the default ones:
 
 ```scss
 ng-diagram-base-edge.my-edge {
   --edge-relink-handle-size: 0.875rem;
   --edge-relink-handle-fill: #fff;
-  --edge-relink-handle-fill-hover: #3b82f6;
+  --edge-relink-handle-fill-hover: #fff;
+  --edge-relink-handle-fill-drag: #3b82f6;
   --edge-relink-handle-stroke: #3b82f6;
-  --edge-relink-handle-stroke-width: 2px;
+  --edge-relink-handle-stroke-hover: #3b82f6;
+  --edge-relink-handle-stroke-drag: #3b82f6;
+  --edge-relink-handle-halo-color-hover: rgba(59, 130, 246, 0.4);
+  --edge-relink-handle-halo-color-drag: rgba(59, 130, 246, 0.4);
 }
 ```
 
-Each visible handle has a larger invisible hit circle of about 12 screen pixels. Its size is adjusted for zoom, so the handles stay easy to touch at any zoom level without growing visually. Hovering over the hit circle highlights the visible handle, the same as hovering over the handle itself.
+Each handle has a larger invisible hit area around it. It is 24 screen pixels wide, or 44 screen pixels on devices where the primary pointer is a finger. Its size is adjusted for zoom, so the handles stay easy to grab at any zoom level without growing visually. Hovering over the hit area shows the halo, the same as hovering over the handle itself.
 
 <Aside type="note">
   Handles are rendered as part of the edge. With

@@ -5,6 +5,7 @@ import {
   equalPointsArrays,
   isDanglingEdge,
   isEdgeEndRelinkable,
+  isSamePoint,
   Point,
   RoutingMode,
 } from '../../../../core/src';
@@ -34,6 +35,15 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 
 /** Screen-pixel radius of the relink handles' invisible hit area. */
 const RELINK_HANDLE_HIT_RADIUS_PX = 12;
+
+/** Same as {@link RELINK_HANDLE_HIT_RADIUS_PX} for devices whose primary pointer is a finger. */
+const RELINK_HANDLE_TOUCH_HIT_RADIUS_PX = 22;
+
+const isCoarsePointer = (): boolean => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+
+/** A line that ends within this angle of an axis counts as coming in straight at the port. */
+const RELINK_HANDLE_INSET_MAX_ANGLE = 10;
+const RELINK_HANDLE_INSET_MIN_AXIS_SHARE = Math.cos((RELINK_HANDLE_INSET_MAX_ANGLE * Math.PI) / 180);
 
 /**
  * Base edge component that handles edge rendering.
@@ -67,6 +77,9 @@ export class NgDiagramBaseEdgeComponent {
   // provideNgDiagram() keep working — without it the relink handles stay off.
   private readonly diagramService = inject(NgDiagramService, { optional: true });
   private readonly renderer = inject(RendererService, { optional: true });
+  private readonly relinkHandleHitRadiusPx = isCoarsePointer()
+    ? RELINK_HANDLE_TOUCH_HIT_RADIUS_PX
+    : RELINK_HANDLE_HIT_RADIUS_PX;
 
   /**
    * Whether to use inline markers (Safari fallback).
@@ -183,10 +196,27 @@ export class NgDiagramBaseEdgeComponent {
 
   readonly labels = computed(() => this.edge().measuredLabels ?? []);
 
+  /** The relink gesture that this edge previews. Set only on the temporary edge of a relink. */
+  private readonly relinkPreview = computed(() =>
+    // Only a temporary edge reads the action state, so edges in the model do
+    // not re-evaluate on every pointer move of a gesture.
+    this.temporary() ? this.diagramService?.actionState().linking?.relink : undefined
+  );
+
   /**
-   * Whether the source endpoint handle is rendered. It is rendered when the
-   * edge is selected, is not a temporary edge, has routed points, and its
-   * source end can be relinked.
+   * The end that follows the pointer when this edge is the preview of a
+   * relink, `undefined` on any other edge.
+   *
+   * @since 1.4.0
+   */
+  protected readonly relinkDraggedEnd = computed(() => this.relinkPreview()?.end);
+
+  /**
+   * Whether the source endpoint handle is rendered. The edge must have routed
+   * points. On a selected edge the handle is rendered when the source end
+   * can be relinked. On the preview of a relink it is rendered when the
+   * source end is the dragged end, or when the relinked edge allows relinking
+   * its source end. Other temporary edges (draw previews) have no handles.
    *
    * @since 1.4.0
    */
@@ -214,16 +244,34 @@ export class NgDiagramBaseEdgeComponent {
   readonly relinkTargetHandle = computed(() => this.points()[this.points().length - 1]);
 
   /**
-   * Radius of the invisible hit circle around each handle, in flow units. The
-   * radius is divided by the viewport scale, so the hit area keeps a constant,
-   * finger-friendly size on screen at any zoom level. Without this, at zoom
-   * 0.5 the visible 5px circle would give only a 2.5px touch target.
+   * Unit vector from the end of the line into the port, for a source end
+   * connected to a port whose line comes in along an axis; `undefined`
+   * otherwise. The stylesheet moves the handle along it, so the handle
+   * covers the port and the line still ends under its ring.
+   *
+   * @since 1.4.0
+   */
+  protected readonly relinkSourceHandleInset = computed(() => this.relinkHandleInset('source'));
+
+  /**
+   * Same as {@link relinkSourceHandleInset} for the target end.
+   *
+   * @since 1.4.0
+   */
+  protected readonly relinkTargetHandleInset = computed(() => this.relinkHandleInset('target'));
+
+  /**
+   * Radius of the invisible hit circle around each handle, in flow units. On
+   * screen the radius is 12px, or 22px when the primary pointer is a finger.
+   * The radius is divided by the viewport scale, so the hit area keeps this
+   * size at any zoom level. Without this, at zoom 0.5 the visible handle
+   * would give only a 3px target.
    *
    * @since 1.4.0
    */
   readonly relinkHandleHitRadius = computed(() => {
     const scale = this.renderer?.viewport().scale || 1;
-    return RELINK_HANDLE_HIT_RADIUS_PX / scale;
+    return this.relinkHandleHitRadiusPx / scale;
   });
 
   readonly class = computed(() => {
@@ -249,11 +297,56 @@ export class NgDiagramBaseEdgeComponent {
   private prevPoints: Point[] | undefined;
 
   private relinkHandleVisible(end: EdgeEnd): boolean {
-    if (!this.selected() || this.temporary() || this.points().length === 0) {
+    if (this.points().length === 0) {
       return false;
     }
     const defaultRelinkable = this.diagramService?.config().linking?.defaultRelinkable ?? false;
+
+    const relink = this.relinkPreview();
+    if (relink) {
+      // The preview stands in for the relinked edge, which is not rendered
+      // during the gesture, so the fixed end follows that edge's setting.
+      return relink.end === end || isEdgeEndRelinkable(relink.originalEdge, end, defaultRelinkable);
+    }
+
+    if (!this.selected() || this.temporary()) {
+      return false;
+    }
     return isEdgeEndRelinkable(this.edge(), end, defaultRelinkable);
+  }
+
+  private relinkHandleInset(end: EdgeEnd): Point | undefined {
+    const edge = this.edge();
+    if (!(end === 'source' ? edge.sourcePort : edge.targetPort)) {
+      return undefined;
+    }
+    // Direction of the last segment, from the previous distinct point to the
+    // end of the line. The orthogonal and bezier routings lay that segment
+    // along the side of the port.
+    const ordered = end === 'source' ? [...this.points()].reverse() : this.points();
+    const tip = ordered[ordered.length - 1];
+    let previous: Point | undefined;
+    for (let i = ordered.length - 2; i >= 0 && !previous; i--) {
+      if (!isSamePoint(ordered[i], tip)) {
+        previous = ordered[i];
+      }
+    }
+    if (!tip || !previous) {
+      return undefined;
+    }
+    const dx = tip.x - previous.x;
+    const dy = tip.y - previous.y;
+    const length = Math.hypot(dx, dy);
+    // Only a line that comes in along an axis is taken as perpendicular to
+    // the node side. A slanted line (polyline, manual points) keeps its
+    // handle at the end of the line.
+    if (Math.abs(dx) / length >= RELINK_HANDLE_INSET_MIN_AXIS_SHARE) {
+      return { x: Math.sign(dx), y: 0 };
+    }
+    if (Math.abs(dy) / length >= RELINK_HANDLE_INSET_MIN_AXIS_SHARE) {
+      return { x: 0, y: Math.sign(dy) };
+    }
+    return undefined;
   }
 
   constructor() {

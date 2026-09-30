@@ -24,56 +24,87 @@
 
   <!-- Invisible hit circles: a finger-friendly grab area that keeps a
        constant screen size at any zoom. Both hit circles render before both
-       visible circles, so a visible handle is never covered by the other
-       end's hit area on a short edge. Each circle carries the same directive,
-       so grabbing either starts the relink; data-relink-handle-hit lets the
-       stylesheet highlight the matching visible circle on hover. Each end
-       renders only when it can be relinked. -->
-  @if (relinkSourceHandleVisible()) {
+       visible handles, so a visible handle is never covered by the other
+       end's hit area on a short edge. The hit circle and the handle carry the
+       same directive, so grabbing either starts the relink;
+       data-relink-handle-hit lets the stylesheet highlight the matching
+       handle on hover. Each end renders only when it can be relinked. A
+       relink preview has no hit circles: its handles only show the gesture.
+       On an end connected to a port the stylesheet moves the hit circle and
+       the handle into the port, along --ngd-relink-handle-inset-x/-y. -->
+  @if (relinkSourceHandleVisible() && !temporary()) {
     <circle
       class="ng-diagram-edge__relink-handle-hit"
       data-relink-handle-hit="source"
       ngDiagramRelinkHandle
       [edge]="edge()"
       end="source"
+      [style.--ngd-relink-handle-inset-x]="relinkSourceHandleInset()?.x ?? null"
+      [style.--ngd-relink-handle-inset-y]="relinkSourceHandleInset()?.y ?? null"
       [attr.cx]="relinkSourceHandle().x"
       [attr.cy]="relinkSourceHandle().y"
       [attr.r]="relinkHandleHitRadius()"
     />
   }
-  @if (relinkTargetHandleVisible()) {
+  @if (relinkTargetHandleVisible() && !temporary()) {
     <circle
       class="ng-diagram-edge__relink-handle-hit"
       data-relink-handle-hit="target"
       ngDiagramRelinkHandle
       [edge]="edge()"
       end="target"
+      [style.--ngd-relink-handle-inset-x]="relinkTargetHandleInset()?.x ?? null"
+      [style.--ngd-relink-handle-inset-y]="relinkTargetHandleInset()?.y ?? null"
       [attr.cx]="relinkTargetHandle().x"
       [attr.cy]="relinkTargetHandle().y"
       [attr.r]="relinkHandleHitRadius()"
     />
   }
   @if (relinkSourceHandleVisible()) {
-    <circle
+    <g
       class="ng-diagram-edge__relink-handle"
+      [class.ng-diagram-edge__relink-handle--dragging]="relinkDraggedEnd() === 'source'"
       data-relink-handle="source"
       ngDiagramRelinkHandle
       [edge]="edge()"
       end="source"
-      [attr.cx]="relinkSourceHandle().x"
-      [attr.cy]="relinkSourceHandle().y"
-    />
+      [style.--ngd-relink-handle-inset-x]="relinkSourceHandleInset()?.x ?? null"
+      [style.--ngd-relink-handle-inset-y]="relinkSourceHandleInset()?.y ?? null"
+    >
+      <circle
+        class="ng-diagram-edge__relink-handle-halo"
+        [attr.cx]="relinkSourceHandle().x"
+        [attr.cy]="relinkSourceHandle().y"
+      />
+      <circle
+        class="ng-diagram-edge__relink-handle-circle"
+        [attr.cx]="relinkSourceHandle().x"
+        [attr.cy]="relinkSourceHandle().y"
+      />
+    </g>
   }
   @if (relinkTargetHandleVisible()) {
-    <circle
+    <g
       class="ng-diagram-edge__relink-handle"
+      [class.ng-diagram-edge__relink-handle--dragging]="relinkDraggedEnd() === 'target'"
       data-relink-handle="target"
       ngDiagramRelinkHandle
       [edge]="edge()"
       end="target"
-      [attr.cx]="relinkTargetHandle().x"
-      [attr.cy]="relinkTargetHandle().y"
-    />
+      [style.--ngd-relink-handle-inset-x]="relinkTargetHandleInset()?.x ?? null"
+      [style.--ngd-relink-handle-inset-y]="relinkTargetHandleInset()?.y ?? null"
+    >
+      <circle
+        class="ng-diagram-edge__relink-handle-halo"
+        [attr.cx]="relinkTargetHandle().x"
+        [attr.cy]="relinkTargetHandle().y"
+      />
+      <circle
+        class="ng-diagram-edge__relink-handle-circle"
+        [attr.cx]="relinkTargetHandle().x"
+        [attr.cy]="relinkTargetHandle().y"
+      />
+    </g>
   }
 </svg>
 
