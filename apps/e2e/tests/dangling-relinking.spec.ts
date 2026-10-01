@@ -74,6 +74,21 @@ function expectAt(actual: { x: number; y: number }, expected: { x: number; y: nu
   expect(actual.y).toBeCloseTo(expected.y, 0);
 }
 
+/**
+ * Client position of the default handle of an edge end at zoom 1: 4px (half
+ * the default 12px handle minus 2px) past the end of the line, along its end segment.
+ */
+async function pastLineEnd(diagram: Diagram, end: 'source' | 'target', edgeId = 'edge-ab') {
+  const points = (await diagram.model.getEdgeById(edgeId))!.points!;
+  const [tip, previous] = end === 'source' ? [points[0], points[1]] : [points.at(-1)!, points.at(-2)!];
+  const length = Math.hypot(tip.x - previous.x, tip.y - previous.y);
+  const client = await diagram.viewport.flowToClientPosition(tip);
+  return {
+    x: client.x + (4 * (tip.x - previous.x)) / length,
+    y: client.y + (4 * (tip.y - previous.y)) / length,
+  };
+}
+
 /** The trio model with `edge-ab` running from the right port of node-a to the left port of node-b. */
 const trioWithPorts = (routing?: string): Partial<Model> => ({
   nodes: trio.nodes,
@@ -704,7 +719,7 @@ test.describe('edge relinking', () => {
     await diagram.page.mouse.up();
   });
 
-  for (const routing of ['orthogonal', 'bezier'] as const) {
+  for (const routing of ['orthogonal', 'bezier', 'polyline'] as const) {
     test(`a handle on a port end is centered on the port together with its hit area (${routing})`, async ({
       diagram,
     }) => {
@@ -755,23 +770,57 @@ test.describe('edge relinking', () => {
     }
   });
 
-  // The last segment of a polyline can run along the node side or away from
-  // the node, so its handles never move into the port.
-  for (const [where, model] of [
-    ['on a polyline edge', trioWithPorts('polyline')],
-    ['on an end without a port', trio],
+  const slantedPolyline: Partial<Model> = {
+    nodes: trio.nodes,
+    edges: [
+      {
+        id: 'edge-ab',
+        source: 'node-a',
+        sourcePort: 'port-right',
+        target: 'node-c',
+        targetPort: 'port-left',
+        routing: 'polyline',
+        data: {},
+      },
+    ],
+  };
+  const freeEnd: Partial<Model> = {
+    nodes: trio.nodes,
+    edges: [
+      {
+        id: 'edge-ab',
+        source: 'node-a',
+        sourcePort: 'port-right',
+        target: '',
+        targetPosition: { x: 520, y: 300 },
+        data: {},
+      },
+    ],
+  };
+
+  for (const [where, model, slanted] of [
+    ['on an end without a port', trio, false],
+    ['on a slanted polyline', slantedPolyline, true],
+    ['on a free end', freeEnd, false],
   ] as const) {
-    test(`a handle ${where} stays at the end of the line`, async ({ diagram }) => {
+    test(`a handle ${where} sits past the end of the line along its end segment`, async ({ diagram }) => {
       await diagram.load({ model, config: relinkOn });
       await diagram.selection.select([], ['edge-ab']);
       await diagram.page.mouse.move(5, 5);
       await diagram.nextFrame();
 
-      const edge = await diagram.model.getEdgeById('edge-ab');
-      const start = await diagram.viewport.flowToClientPosition(edge!.points![0]);
-      const end = await diagram.viewport.flowToClientPosition(edge!.points!.at(-1)!);
-      expectAt(await diagram.centerOf(handleCircle(diagram, 'source'), 'source handle of edge-ab'), start);
-      expectAt(await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab'), end);
+      if (slanted) {
+        const [previous, tip] = (await diagram.model.getEdgeById('edge-ab'))!.points!.slice(-2);
+        expect(tip.x !== previous.x && tip.y !== previous.y).toBe(true);
+      }
+      expectAt(
+        await diagram.centerOf(handleCircle(diagram, 'source'), 'source handle of edge-ab'),
+        await pastLineEnd(diagram, 'source')
+      );
+      expectAt(
+        await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab'),
+        await pastLineEnd(diagram, 'target')
+      );
     });
   }
 
@@ -804,6 +853,31 @@ test.describe('edge relinking', () => {
       })
       .toBeLessThan(0.5);
     await diagram.page.mouse.up();
+  });
+
+  test('a free end dropped on empty canvas keeps its handle where the drag showed it', async ({ diagram }) => {
+    await diagram.load({
+      model: trioWithPorts('orthogonal'),
+      config: { ...relinkOn, danglingEdges: { enabled: true } },
+    });
+    await diagram.selection.select([], ['edge-ab']);
+
+    const handle = await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab');
+    const drop = { x: handle.x + 150, y: handle.y + 160 };
+    await diagram.beginDrag(handle, drop);
+    await expect(diagram.edge('TEMPORARY_EDGE')).toBeAttached();
+    await diagram.nextFrame();
+    const dragged = await diagram.centerOf(
+      handleCircle(diagram, 'target', 'TEMPORARY_EDGE'),
+      'dragged handle of the preview'
+    );
+    // The end of the line follows the pointer and the handle sits 4px past it.
+    expect(Math.hypot(dragged.x - drop.x, dragged.y - drop.y)).toBeCloseTo(4, 0);
+
+    await diagram.page.mouse.up();
+    await expect.poll(async () => (await diagram.model.getEdgeById('edge-ab'))?.target).toBe('');
+    await diagram.nextFrame();
+    expectAt(await diagram.centerOf(handleCircle(diagram, 'target'), 'target handle of edge-ab'), dragged);
   });
 });
 

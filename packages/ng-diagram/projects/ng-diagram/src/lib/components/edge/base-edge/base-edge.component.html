@@ -30,7 +30,7 @@
        data-relink-handle-hit lets the stylesheet highlight the matching
        handle on hover. A relink preview has no hit circles: its handles only
        show the gesture. The stylesheet moves the hit circle and the handle
-       into the port along --ngd-relink-handle-inset-x/-y. -->
+       past the end of the line along --ngd-relink-handle-inset-x/-y. -->
   @if (!temporary()) {
     @for (handle of relinkHandles(); track handle.end) {
       <circle

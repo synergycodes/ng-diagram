@@ -376,7 +376,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
       expect(handles()).toEqual({ source: false, target: false });
     });
 
-    describe('inset into the port', () => {
+    describe('inset past the end of the line', () => {
       /** A selected orthogonal edge with a port at each end. */
       const portEdge = (points: Point[], overrides: Partial<Edge> = {}): Edge => ({
         ...mockEdge,
@@ -392,7 +392,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
         defaultRelinkable = true;
       });
 
-      it('should point the handle and its hit circle into the port along the last segment', () => {
+      it('should point the handle and its hit circle out of the line along the end segment', () => {
         fixture.componentRef.setInput(
           'edge',
           portEdge([
@@ -410,44 +410,53 @@ describe('NgDiagramBaseEdgeComponent', () => {
         expect(inset('[data-relink-handle-hit="target"]')).toEqual(['1', '0']);
       });
 
-      it('should leave an end in place when its last segment has zero length or it has no port', () => {
-        fixture.componentRef.setInput(
-          'edge',
-          portEdge(
-            [
-              { x: 0, y: 0 },
-              { x: 0, y: 0 },
-              { x: 0, y: 40 },
-            ],
-            { targetPort: undefined }
-          )
-        );
-        fixture.detectChanges();
-
-        expect(inset('[data-relink-handle="source"]')).toEqual(['0', '0']);
-        expect(inset('[data-relink-handle="target"]')).toEqual(['0', '0']);
-      });
-
-      it('should leave the handles at the ends of a slanted line', () => {
+      it('should leave an end in place when its end segment has zero length', () => {
         fixture.componentRef.setInput(
           'edge',
           portEdge([
             { x: 0, y: 0 },
-            { x: 100, y: 80 },
+            { x: 0, y: 0 },
+            { x: 0, y: 40 },
           ])
         );
         fixture.detectChanges();
 
         expect(inset('[data-relink-handle="source"]')).toEqual(['0', '0']);
-        expect(inset('[data-relink-handle="target"]')).toEqual(['0', '0']);
+        expect(inset('[data-relink-handle="target"]')).toEqual(['0', '1']);
       });
 
-      // Along the last segment of a polyline or of manual points the handle
-      // could slide along the node side or leave the node.
+      it('should follow a slanted end segment', () => {
+        fixture.componentRef.setInput(
+          'edge',
+          portEdge([
+            { x: 0, y: 0 },
+            { x: 30, y: 40 },
+          ])
+        );
+        fixture.detectChanges();
+
+        expect(inset('[data-relink-handle="source"]')).toEqual(['-0.6', '-0.8']);
+        expect(inset('[data-relink-handle="target"]')).toEqual(['0.6', '0.8']);
+      });
+
       it.each<[string, Partial<Edge>]>([
         ['a polyline edge', { routing: 'polyline' }],
         ['manual points', { routingMode: 'manual' }],
-      ])('should leave the handles of %s at the ends of the line', (_case, edge) => {
+        ['an unregistered routing', { routing: 'custom' }],
+        ['ends without a port', { sourcePort: undefined, targetPort: undefined }],
+        [
+          'free ends',
+          {
+            source: '',
+            sourcePort: undefined,
+            sourcePosition: { x: 0, y: 0 },
+            target: '',
+            targetPort: undefined,
+            targetPosition: { x: 100, y: 0 },
+          },
+        ],
+      ])('should move the handles of %s past the ends of the line', (_case, edge) => {
+        mockFlowCore.edgeRoutingManager.hasRouting.mockImplementation((name: string) => name !== 'custom');
         fixture.componentRef.setInput(
           'edge',
           portEdge(
@@ -460,30 +469,8 @@ describe('NgDiagramBaseEdgeComponent', () => {
         );
         fixture.detectChanges();
 
-        expect(inset('[data-relink-handle="source"]')).toEqual(['0', '0']);
-        expect(inset('[data-relink-handle="target"]')).toEqual(['0', '0']);
-      });
-
-      it.each<[string, string, string | undefined, string[]]>([
-        ['no routing', 'bezier', undefined, ['1', '0']],
-        ['an unregistered routing', 'orthogonal', 'custom', ['1', '0']],
-        ['no routing', 'polyline', undefined, ['0', '0']],
-      ])('should follow the default routing on an edge with %s (default %s)', (_case, fallback, routing, expected) => {
-        mockFlowCore.edgeRoutingManager.hasRouting.mockImplementation((name: string) => name !== 'custom');
-        mockFlowCore.edgeRoutingManager.getDefaultRouting.mockReturnValue(fallback);
-        fixture.componentRef.setInput(
-          'edge',
-          portEdge(
-            [
-              { x: 0, y: 0 },
-              { x: 100, y: 0 },
-            ],
-            { routing }
-          )
-        );
-        fixture.detectChanges();
-
-        expect(inset('[data-relink-handle="target"]')).toEqual(expected);
+        expect(inset('[data-relink-handle="source"]')).toEqual(['-1', '0']);
+        expect(inset('[data-relink-handle="target"]')).toEqual(['1', '0']);
       });
     });
 
@@ -539,10 +526,14 @@ describe('NgDiagramBaseEdgeComponent', () => {
         expect(renderedHandles()).toEqual({ source: 1, target: 1 });
       });
 
-      it('should move the handle of a fixed end connected to a port into the port', () => {
+      // The dragged end keeps the inset as well, so its handle does not move
+      // when the drop on empty canvas commits the free end at the pointer.
+      it('should move the handles of the fixed and the dragged end past the ends of the line', () => {
         renderPreview('target', mockEdge, {
           sourcePort: 'out',
           routing: 'orthogonal',
+          target: '',
+          targetPosition: { x: 100, y: 50 },
           points: [
             { x: 0, y: 0 },
             { x: 20, y: 0 },
@@ -552,7 +543,7 @@ describe('NgDiagramBaseEdgeComponent', () => {
         });
 
         expect(inset('[data-relink-handle="source"]')).toEqual(['-1', '0']);
-        expect(inset('[data-relink-handle="target"]')).toEqual(['0', '0']);
+        expect(inset('[data-relink-handle="target"]')).toEqual(['1', '0']);
       });
 
       it('should leave edges other than the preview as they are', () => {

@@ -49,8 +49,9 @@ so the hit area keeps this size at any zoom level. Without this, at zoom
 > `readonly` **relinkSourceHandle**: `Signal`\<[`Point`](/docs/api/types/geometry/point/)\>
 
 Position of the source end of the line (the first routed point). The
-default handle is drawn here, or moved into the port when the source end
-of an orthogonal or bezier edge is connected to a port.
+default handle is moved a little past this point along the first segment
+of the line, so the line ends under its ring and, on an end connected to
+a port, the handle sits on the port.
 
 #### Since
 
@@ -79,8 +80,9 @@ its source end. Other temporary edges (draw previews) have no handles.
 > `readonly` **relinkTargetHandle**: `Signal`\<[`Point`](/docs/api/types/geometry/point/)\>
 
 Position of the target end of the line (the last routed point). The
-default handle is drawn here, or moved into the port when the target end
-of an orthogonal or bezier edge is connected to a port.
+default handle is moved a little past this point along the last segment
+of the line, so the line ends under its ring and, on an end connected to
+a port, the handle sits on the port.
 
 #### Since
 

@@ -35,9 +35,6 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 /** Screen-pixel radius of the relink handles' invisible hit area. */
 const RELINK_HANDLE_HIT_RADIUS_PX = 12;
 
-/** Routings that lay the last segment perpendicular to the side of the port, from outside the node. */
-const RELINK_HANDLE_INSET_ROUTINGS = new Set<string>(['orthogonal', 'bezier']);
-
 const NO_INSET: Point = { x: 0, y: 0 };
 
 /** What the template needs to draw the default relink handle of one end. */
@@ -45,7 +42,7 @@ interface RelinkHandleView {
   end: EdgeEnd;
   /** The end of the line. */
   point: Point;
-  /** Unit vector into the port along which the stylesheet moves the handle, or zero. */
+  /** Unit vector out of the line along its end segment, along which the stylesheet moves the handle, or zero. */
   inset: Point;
   /** Whether this end follows the pointer in a relink preview. */
   dragging: boolean;
@@ -226,8 +223,9 @@ export class NgDiagramBaseEdgeComponent {
 
   /**
    * Position of the source end of the line (the first routed point). The
-   * default handle is drawn here, or moved into the port when the source end
-   * of an orthogonal or bezier edge is connected to a port.
+   * default handle is moved a little past this point along the first segment
+   * of the line, so the line ends under its ring and, on an end connected to
+   * a port, the handle sits on the port.
    *
    * @since 1.4.0
    */
@@ -235,8 +233,9 @@ export class NgDiagramBaseEdgeComponent {
 
   /**
    * Position of the target end of the line (the last routed point). The
-   * default handle is drawn here, or moved into the port when the target end
-   * of an orthogonal or bezier edge is connected to a port.
+   * default handle is moved a little past this point along the last segment
+   * of the line, so the line ends under its ring and, on an end connected to
+   * a port, the handle sits on the port.
    *
    * @since 1.4.0
    */
@@ -245,9 +244,9 @@ export class NgDiagramBaseEdgeComponent {
   /**
    * The default handles to draw, in render order: each end whose handle is
    * visible (see {@link relinkSourceHandleVisible}) with the end of the line,
-   * the direction into the port along which the stylesheet moves the handle
-   * (zero when it stays at the end of the line) and whether the end is the
-   * dragged end of a relink preview.
+   * the direction along which the stylesheet moves the handle past the end of
+   * the line (zero when it stays at the end of the line) and whether the end
+   * is the dragged end of a relink preview.
    *
    * @internal
    */
@@ -321,13 +320,6 @@ export class NgDiagramBaseEdgeComponent {
   }
 
   private relinkHandleInset(end: EdgeEnd, tip: Point): Point {
-    const edge = this.edge();
-    const port = end === 'source' ? edge.sourcePort : edge.targetPort;
-    // Other routings and manual points can end along the node side or away
-    // from the node, so their handle stays at the end of the line.
-    if (!port || edge.routingMode === 'manual' || !RELINK_HANDLE_INSET_ROUTINGS.has(this.drawnRouting())) {
-      return NO_INSET;
-    }
     const points = this.points();
     const previous = end === 'source' ? points[1] : points.at(-2);
     if (!previous) {
@@ -335,13 +327,13 @@ export class NgDiagramBaseEdgeComponent {
     }
     const dx = tip.x - previous.x;
     const dy = tip.y - previous.y;
-    // Both routings lay the last segment exactly along an axis, so exactly one
-    // of dx and dy is non-zero. A zero-length segment (a routing configured
-    // without a straight part at the port) or a slanted one gives no direction.
-    if ((dx === 0) === (dy === 0)) {
+    const length = Math.hypot(dx, dy);
+    // A zero-length segment (a routing configured without a straight part at
+    // the port) gives no direction, so the handle stays at the end of the line.
+    if (length === 0) {
       return NO_INSET;
     }
-    return { x: Math.sign(dx), y: Math.sign(dy) };
+    return { x: dx / length, y: dy / length };
   }
 
   constructor() {

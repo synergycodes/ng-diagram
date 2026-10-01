@@ -4,9 +4,9 @@
 $relink-handle-size: var(--edge-relink-handle-size, var(--ngd-relink-handle-size, 0.75rem));
 $relink-handle-stroke-width: var(--edge-relink-handle-stroke-width, var(--ngd-relink-handle-stroke-width, 0.1875rem));
 $relink-handle-halo-size: var(--edge-relink-handle-halo-size, var(--ngd-relink-handle-halo-size, 0.25rem));
-// How far a handle on a port end moves off the end of the line into the port:
-// the default 12px handle is then centered on the default 8px port, and the
-// line still ends under the ring for any handle size.
+// How far a handle moves past the end of the line: on a port end the default
+// 12px handle is then centered on the default 8px port, and the line still
+// ends under the ring for any handle size.
 $relink-handle-inset: calc(#{$relink-handle-size} / 2 - 0.125rem);
 
 :host {
@@ -70,9 +70,9 @@ svg {
     }
   }
 
-  // The component sets the direction into the port (a unit vector along an
-  // axis) on port ends of orthogonal and bezier edges, 0 elsewhere; the
-  // distance comes from CSS, so a restyled handle keeps the fit.
+  // The component sets the direction of the end segment (a unit vector out of
+  // the line, 0 when the segment has no length); the distance comes from CSS,
+  // so a restyled handle keeps the fit.
   .ng-diagram-edge__relink-handle,
   .ng-diagram-edge__relink-handle-hit {
     transform: translate(
