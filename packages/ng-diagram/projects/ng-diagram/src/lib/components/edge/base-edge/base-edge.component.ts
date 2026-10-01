@@ -129,16 +129,10 @@ export class NgDiagramBaseEdgeComponent {
 
   readonly points = computed(() => this.edge().points ?? []);
 
-  /** The routing that draws this edge: its own when registered, otherwise the default one. */
-  private readonly drawnRouting = computed(() => {
-    const routing = this.routing() ?? this.edge().routing;
-    const routingManager = this.flowCoreProvider.provide().edgeRoutingManager;
-    return routing && routingManager.hasRouting(routing) ? routing : routingManager.getDefaultRouting();
-  });
-
   readonly path = computed(() => {
     const edge = this.edge();
-    const routingManager = this.flowCoreProvider.provide().edgeRoutingManager;
+    const routingName = this.routing() ?? edge.routing;
+    const flowCore = this.flowCoreProvider.provide();
 
     // Generate SVG path from points using the routing
     const points = this.points();
@@ -152,9 +146,15 @@ export class NgDiagramBaseEdgeComponent {
       return '';
     }
 
-    const routing = this.drawnRouting();
-    if (routingManager.hasRouting(routing)) {
-      return routingManager.computePath(routing, points);
+    if (routingName && flowCore.edgeRoutingManager.hasRouting(routingName)) {
+      const path = flowCore.edgeRoutingManager.computePath(routingName, points);
+      return path;
+    }
+
+    // Use default routing if available
+    const defaultRouting = flowCore.edgeRoutingManager.getDefaultRouting();
+    if (flowCore.edgeRoutingManager.hasRouting(defaultRouting)) {
+      return flowCore.edgeRoutingManager.computePath(defaultRouting, points);
     }
 
     // Fallback to simple straight line path
@@ -224,8 +224,7 @@ export class NgDiagramBaseEdgeComponent {
   /**
    * Position of the source end of the line (the first routed point). The
    * default handle is moved a little past this point along the first segment
-   * of the line, so the line ends under its ring and, on an end connected to
-   * a port, the handle sits on the port.
+   * of the line, so the line ends under its ring.
    *
    * @since 1.4.0
    */
@@ -234,8 +233,7 @@ export class NgDiagramBaseEdgeComponent {
   /**
    * Position of the target end of the line (the last routed point). The
    * default handle is moved a little past this point along the last segment
-   * of the line, so the line ends under its ring and, on an end connected to
-   * a port, the handle sits on the port.
+   * of the line, so the line ends under its ring.
    *
    * @since 1.4.0
    */
