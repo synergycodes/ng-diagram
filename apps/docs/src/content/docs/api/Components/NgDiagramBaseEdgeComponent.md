@@ -33,10 +33,10 @@ Edge data model
 
 > `readonly` **relinkHandleHitRadius**: `Signal`\<`number`\>
 
-Radius of the invisible hit circle around each handle, in flow units. The
-radius is divided by the viewport scale, so the hit area keeps a constant,
-finger-friendly size on screen at any zoom level. Without this, at zoom
-0.5 the visible 5px circle would give only a 2.5px touch target.
+Radius of the invisible hit circle around each handle, in flow units. On
+screen the radius is 12px. The radius is divided by the viewport scale,
+so the hit area keeps this size at any zoom level. Without this, at zoom
+0.5 the visible handle would give only a 3px target.
 
 #### Since
 
@@ -48,7 +48,9 @@ finger-friendly size on screen at any zoom level. Without this, at zoom
 
 > `readonly` **relinkSourceHandle**: `Signal`\<[`Point`](/docs/api/types/geometry/point/)\>
 
-Position of the source endpoint handle (the first routed point).
+Position of the source end of the line (the first routed point). The
+default handle is moved a little past this point along the first segment
+of the line, so the line ends under its ring.
 
 #### Since
 
@@ -60,9 +62,11 @@ Position of the source endpoint handle (the first routed point).
 
 > `readonly` **relinkSourceHandleVisible**: `Signal`\<`boolean`\>
 
-Whether the source endpoint handle is rendered. It is rendered when the
-edge is selected, is not a temporary edge, has routed points, and its
-source end can be relinked.
+Whether the source endpoint handle is rendered. The edge must have routed
+points. On a selected edge the handle is rendered when the source end
+can be relinked. On the preview of a relink it is rendered when the
+source end is the dragged end, or when the relinked edge allows relinking
+its source end. Other temporary edges (draw previews) have no handles.
 
 #### Since
 
@@ -74,7 +78,9 @@ source end can be relinked.
 
 > `readonly` **relinkTargetHandle**: `Signal`\<[`Point`](/docs/api/types/geometry/point/)\>
 
-Position of the target endpoint handle (the last routed point).
+Position of the target end of the line (the last routed point). The
+default handle is moved a little past this point along the last segment
+of the line, so the line ends under its ring.
 
 #### Since
 

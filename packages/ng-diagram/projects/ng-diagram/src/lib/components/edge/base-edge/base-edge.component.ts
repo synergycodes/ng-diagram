@@ -35,6 +35,19 @@ Documentation: https://www.ngdiagram.dev/docs/guides/edges/edges/
 /** Screen-pixel radius of the relink handles' invisible hit area. */
 const RELINK_HANDLE_HIT_RADIUS_PX = 12;
 
+const NO_INSET: Point = { x: 0, y: 0 };
+
+/** What the template needs to draw the default relink handle of one end. */
+interface RelinkHandleView {
+  end: EdgeEnd;
+  /** The end of the line. */
+  point: Point;
+  /** Unit vector out of the line along its end segment, along which the stylesheet moves the handle, or zero. */
+  inset: Point;
+  /** Whether this end follows the pointer in a relink preview. */
+  dragging: boolean;
+}
+
 /**
  * Base edge component that handles edge rendering.
  * It can be extended or used directly to render edges in the diagram.
@@ -183,10 +196,19 @@ export class NgDiagramBaseEdgeComponent {
 
   readonly labels = computed(() => this.edge().measuredLabels ?? []);
 
+  /** The relink gesture that this edge previews. Set only on the temporary edge of a relink. */
+  private readonly relinkPreview = computed(() =>
+    // Only a temporary edge reads the action state, so edges in the model do
+    // not re-evaluate on every pointer move of a gesture.
+    this.temporary() ? this.diagramService?.actionState().linking?.relink : undefined
+  );
+
   /**
-   * Whether the source endpoint handle is rendered. It is rendered when the
-   * edge is selected, is not a temporary edge, has routed points, and its
-   * source end can be relinked.
+   * Whether the source endpoint handle is rendered. The edge must have routed
+   * points. On a selected edge the handle is rendered when the source end
+   * can be relinked. On the preview of a relink it is rendered when the
+   * source end is the dragged end, or when the relinked edge allows relinking
+   * its source end. Other temporary edges (draw previews) have no handles.
    *
    * @since 1.4.0
    */
@@ -200,24 +222,48 @@ export class NgDiagramBaseEdgeComponent {
   readonly relinkTargetHandleVisible = computed(() => this.relinkHandleVisible('target'));
 
   /**
-   * Position of the source endpoint handle (the first routed point).
+   * Position of the source end of the line (the first routed point). The
+   * default handle is moved a little past this point along the first segment
+   * of the line, so the line ends under its ring.
    *
    * @since 1.4.0
    */
   readonly relinkSourceHandle = computed(() => this.points()[0]);
 
   /**
-   * Position of the target endpoint handle (the last routed point).
+   * Position of the target end of the line (the last routed point). The
+   * default handle is moved a little past this point along the last segment
+   * of the line, so the line ends under its ring.
    *
    * @since 1.4.0
    */
   readonly relinkTargetHandle = computed(() => this.points()[this.points().length - 1]);
 
   /**
-   * Radius of the invisible hit circle around each handle, in flow units. The
-   * radius is divided by the viewport scale, so the hit area keeps a constant,
-   * finger-friendly size on screen at any zoom level. Without this, at zoom
-   * 0.5 the visible 5px circle would give only a 2.5px touch target.
+   * The default handles to draw, in render order: each end whose handle is
+   * visible (see {@link relinkSourceHandleVisible}) with the end of the line,
+   * the direction along which the stylesheet moves the handle past the end of
+   * the line (zero when it stays at the end of the line) and whether the end
+   * is the dragged end of a relink preview.
+   *
+   * @internal
+   */
+  protected readonly relinkHandles = computed((): RelinkHandleView[] => {
+    const handles: RelinkHandleView[] = [];
+    if (this.relinkSourceHandleVisible()) {
+      handles.push(this.relinkHandleView('source', this.relinkSourceHandle()));
+    }
+    if (this.relinkTargetHandleVisible()) {
+      handles.push(this.relinkHandleView('target', this.relinkTargetHandle()));
+    }
+    return handles;
+  });
+
+  /**
+   * Radius of the invisible hit circle around each handle, in flow units. On
+   * screen the radius is 12px. The radius is divided by the viewport scale,
+   * so the hit area keeps this size at any zoom level. Without this, at zoom
+   * 0.5 the visible handle would give only a 3px target.
    *
    * @since 1.4.0
    */
@@ -249,11 +295,43 @@ export class NgDiagramBaseEdgeComponent {
   private prevPoints: Point[] | undefined;
 
   private relinkHandleVisible(end: EdgeEnd): boolean {
-    if (!this.selected() || this.temporary() || this.points().length === 0) {
+    if (this.points().length === 0) {
+      return false;
+    }
+    const relink = this.relinkPreview();
+    // The config is read only for edges that may show a handle, so the other
+    // edges do not re-evaluate on a config change.
+    if (!relink && (!this.selected() || this.temporary())) {
       return false;
     }
     const defaultRelinkable = this.diagramService?.config().linking?.defaultRelinkable ?? false;
+    if (relink) {
+      // The preview stands in for the relinked edge, which is not rendered
+      // during the gesture, so the fixed end follows that edge's setting.
+      return relink.end === end || isEdgeEndRelinkable(relink.originalEdge, end, defaultRelinkable);
+    }
     return isEdgeEndRelinkable(this.edge(), end, defaultRelinkable);
+  }
+
+  private relinkHandleView(end: EdgeEnd, point: Point): RelinkHandleView {
+    return { end, point, inset: this.relinkHandleInset(end, point), dragging: this.relinkPreview()?.end === end };
+  }
+
+  private relinkHandleInset(end: EdgeEnd, tip: Point): Point {
+    const points = this.points();
+    const previous = end === 'source' ? points[1] : points.at(-2);
+    if (!previous) {
+      return NO_INSET;
+    }
+    const dx = tip.x - previous.x;
+    const dy = tip.y - previous.y;
+    const length = Math.hypot(dx, dy);
+    // A zero-length segment (a routing configured without a straight part at
+    // the port) gives no direction, so the handle stays at the end of the line.
+    if (length === 0) {
+      return NO_INSET;
+    }
+    return { x: dx / length, y: dy / length };
   }
 
   constructor() {

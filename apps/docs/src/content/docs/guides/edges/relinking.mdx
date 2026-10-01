@@ -23,7 +23,7 @@ Relinking is off by default. [`linking.defaultRelinkable`](/docs/api/types/confi
 
 <CodeSnippet relativePath="edges/relinking/relinking/diagram.component.ts" sectionId="config" />
 
-With `defaultRelinkable: true`, every selected edge rendered by [`ng-diagram-base-edge`](/docs/api/components/ngdiagrambaseedgecomponent) shows a handle at each end. Temporary edges (draw previews) never show handles.
+With `defaultRelinkable: true`, every selected edge rendered by [`ng-diagram-base-edge`](/docs/api/components/ngdiagrambaseedgecomponent) shows a handle at each end. The preview of a new edge that is being drawn never shows handles.
 
 ## Controlling Which Edges Can Be Relinked
 
@@ -129,35 +129,47 @@ onRelinkEnded(event: EdgeRelinkEndedEvent) {
 
 ### Relink Handles
 
+A handle is a ring at each end of the edge. A handle shows a halo on hover and is filled while its end is dragged. The handles stay visible during the drag.
+
 Here are the CSS variables you can use to style the relink handles globally:
 
 ```
-  --ngd-relink-handle-size           // Diameter of the visible handle circle
-  --ngd-relink-handle-fill           // Fill color of the handle
-  --ngd-relink-handle-fill-hover     // Fill color on hover
-  --ngd-relink-handle-stroke         // Stroke (outline) color of the handle
-  --ngd-relink-handle-stroke-width   // Stroke width of the handle
+  --ngd-relink-handle-size               // Outer diameter of the handle (the stroke is inside)
+  --ngd-relink-handle-stroke-width       // Stroke width of the handle
+  --ngd-relink-handle-fill               // Fill color of the handle
+  --ngd-relink-handle-fill-hover         // Fill color on hover
+  --ngd-relink-handle-fill-drag          // Fill color while the end is dragged
+  --ngd-relink-handle-stroke             // Stroke (outline) color of the handle
+  --ngd-relink-handle-stroke-hover       // Stroke color on hover
+  --ngd-relink-handle-stroke-drag        // Stroke color while the end is dragged
+  --ngd-relink-handle-halo-size          // Width of the halo around the handle
+  --ngd-relink-handle-halo-color-hover   // Halo color on hover
+  --ngd-relink-handle-halo-color-drag    // Halo color while the end is dragged
 ```
 
-You can also override them per edge with the matching `--edge-relink-handle-*` variables, in the same way as `--edge-stroke`:
+You can also override them per edge with the matching `--edge-relink-handle-*` variables, in the same way as `--edge-stroke`. Each state has its own variable, so set the hover and drag colors together with the default ones:
 
 ```scss
 ng-diagram-base-edge.my-edge {
   --edge-relink-handle-size: 0.875rem;
   --edge-relink-handle-fill: #fff;
-  --edge-relink-handle-fill-hover: #3b82f6;
+  --edge-relink-handle-fill-hover: #fff;
+  --edge-relink-handle-fill-drag: #3b82f6;
   --edge-relink-handle-stroke: #3b82f6;
-  --edge-relink-handle-stroke-width: 2px;
+  --edge-relink-handle-stroke-hover: #3b82f6;
+  --edge-relink-handle-stroke-drag: #3b82f6;
+  --edge-relink-handle-halo-color-hover: rgba(59, 130, 246, 0.4);
+  --edge-relink-handle-halo-color-drag: rgba(59, 130, 246, 0.4);
 }
 ```
 
-Each visible handle has a larger invisible hit circle of about 12 screen pixels. Its size is adjusted for zoom, so the handles stay easy to touch at any zoom level without growing visually. Hovering over the hit circle highlights the visible handle, the same as hovering over the handle itself.
+Each handle has a larger invisible hit area around it. It is 24 screen pixels wide. Its size is adjusted for zoom, so the handles stay easy to grab at any zoom level without growing visually. Hovering over the hit area shows the halo, the same as hovering over the handle itself.
 
 <Aside type="note">
   Handles are rendered as part of the edge. With
-  [`zIndex.elevateOnSelection`](/docs/api/types/configuration/features/zindexconfig/#elevateonselection) set to `false`,
-  a handle can end up under an overlapping node, where the user cannot reach it. Keep selection elevation on (the
-  default), or raise the edge's `zOrder` when nodes may overlap edge endpoints.
+  [`zIndex.elevateOnSelection`](/docs/api/types/configuration/features/zindexconfig/#elevateonselection) or
+  [`zIndex.enabled`](/docs/api/types/configuration/features/zindexconfig/#enabled) set to `false`, a node can cover a
+  handle, so the user cannot grab it. Keep both settings on (the defaults).
 </Aside>
 
 ## Related Topics

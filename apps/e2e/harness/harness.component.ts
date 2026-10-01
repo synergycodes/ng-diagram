@@ -23,6 +23,7 @@ import { DirectiveHiddenNodeComponent } from './directive-hidden-node.component'
 import { HiddenPortsNodeComponent } from './hidden-ports-node.component';
 import { LabelledEdgeComponent } from './labelled-edge.component';
 import { ResizeSidesNodeComponent } from './resize-sides-node.component';
+import { VerticalPortsNodeComponent } from './vertical-ports-node.component';
 
 declare global {
   interface Window extends HarnessBridge {}
@@ -145,6 +146,7 @@ export class HarnessComponent {
     ['resize-sides', ResizeSidesNodeComponent],
     ['hidden-ports', HiddenPortsNodeComponent],
     ['directive-hidden', DirectiveHiddenNodeComponent],
+    ['vertical-ports', VerticalPortsNodeComponent],
   ]);
   readonly edgeTemplateMap = new NgDiagramEdgeTemplateMap([['labelled', LabelledEdgeComponent]]);
 
