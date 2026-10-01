@@ -129,7 +129,7 @@ onRelinkEnded(event: EdgeRelinkEndedEvent) {
 
 ### Relink Handles
 
-A handle is a ring at the end of the edge. It sits a little past the end of the line, in the direction of the last segment, so the edge ends under its ring. On an end that is connected to a port, the handle sits on the port. With the default sizes it is centered on the port when the edge meets the port at a right angle, as orthogonal and bezier edges do. With a bigger or smaller handle the edge still ends under the ring. When the routing has no straight part at the port (for example with `edgeRouting.bezier.bezierControlOffset` set to `0`), the handle sits at the end of the line. A handle shows a halo on hover and is filled while its end is dragged. The handles stay visible during the drag.
+A handle is a ring at each end of the edge. A handle shows a halo on hover and is filled while its end is dragged. The handles stay visible during the drag.
 
 Here are the CSS variables you can use to style the relink handles globally:
 
@@ -146,8 +146,6 @@ Here are the CSS variables you can use to style the relink handles globally:
   --ngd-relink-handle-halo-color-hover   // Halo color on hover
   --ngd-relink-handle-halo-color-drag    // Halo color while the end is dragged
 ```
-
-Give the size, the stroke width and the halo size a unit, for example `12px` or `0.75rem`. A number without a unit does not work for these three variables.
 
 You can also override them per edge with the matching `--edge-relink-handle-*` variables, in the same way as `--edge-stroke`. Each state has its own variable, so set the hover and drag colors together with the default ones:
 
@@ -169,13 +167,9 @@ Each handle has a larger invisible hit area around it. It is 24 screen pixels wi
 
 <Aside type="note">
   Handles are rendered as part of the edge. With
-  [`zIndex.elevateOnSelection`](/docs/api/types/configuration/features/zindexconfig/#elevateonselection) set to `false`,
-  a handle can end up under an overlapping node, where the user cannot reach it. The handle of an end that is connected
-  to a node sits on the port, or just inside the node on an end without a port, so that node then covers the handle and
-  most of its hit area. The same happens with
-  [`zIndex.enabled`](/docs/api/types/configuration/features/zindexconfig/#enabled) set to `false`, because nodes are
-  then always above edges. Keep both settings on (the defaults), or, with elevation off, raise the edge's `zOrder` when
-  nodes may overlap edge endpoints.
+  [`zIndex.elevateOnSelection`](/docs/api/types/configuration/features/zindexconfig/#elevateonselection) or
+  [`zIndex.enabled`](/docs/api/types/configuration/features/zindexconfig/#enabled) set to `false`, a node can cover a
+  handle, so the user cannot grab it. Keep both settings on (the defaults).
 </Aside>
 
 ## Related Topics
