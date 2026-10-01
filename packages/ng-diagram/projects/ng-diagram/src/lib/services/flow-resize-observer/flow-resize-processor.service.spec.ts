@@ -145,6 +145,15 @@ describe('FlowResizeBatchProcessorService', () => {
     expect(mockInternalUpdater.applyPortChanges).toHaveBeenCalled();
   });
 
+  it('should measure the ports of a resized node on the observed element itself', () => {
+    const entry = { target: document.createElement('div') } as unknown as ResizeObserverEntry;
+    arrangeNodeEntry('n1', { size: { width: 1, height: 2 } }, { width: 10, height: 20 });
+
+    service['processAllResizes']([{ entry, resizingNodeId: undefined }]);
+
+    expect(mockUpdatePortsService.getNodePortsData).toHaveBeenCalledExactlyOnceWith(entry.target);
+  });
+
   it('should skip port measurement during active resize', () => {
     const entry = { target: {} } as ResizeObserverEntry;
     arrangeNodeEntry('n1', { size: { width: 1, height: 2 } }, { width: 10, height: 20 }, true);

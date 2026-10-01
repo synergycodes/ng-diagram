@@ -26,8 +26,8 @@ export interface DiagramHandle {
 
 /**
  * The contract between Playwright tests and the harness. Tests:
- *   1. Optionally set `__diagramSeed` / `__diagramConfig` / `__diagramTabbable`
- *      via `addInitScript`.
+ *   1. Optionally set `__diagramSeed` / `__diagramConfig` / `__diagramTabbable` /
+ *      `__diagramOutsideProviderHost` via `addInitScript`.
  *   2. Wait for `__diagramReady` to become `true`.
  *   3. Drive the diagram through `__diagram`.
  */
@@ -37,6 +37,8 @@ export interface HarnessBridge {
   /** Renders the palette panel next to the diagram. Off by default so other specs keep a full-viewport canvas. */
   __diagramPalette?: boolean;
   __diagramTabbable?: boolean;
+  /** Renders `<ng-diagram>` outside the DOM of the component that declares `provideNgDiagram()`. */
+  __diagramOutsideProviderHost?: boolean;
   __diagram?: DiagramHandle;
   __diagramReady?: boolean;
 }
