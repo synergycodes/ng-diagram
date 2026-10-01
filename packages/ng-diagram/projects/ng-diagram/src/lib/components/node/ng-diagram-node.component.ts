@@ -63,14 +63,14 @@ export class NgDiagramNodeComponent {
     if (isResizing) {
       // For resizing we don't have to wait for transforms to compute and removing the "wait"
       // helps to minimize visual lag between new port positions and edge routing applied afterwards the ports are measured
-      const portsData = this.portsService.getNodePortsData(this.hostElement.nativeElement);
+      const portsData = this.portsService.getNodePortsData(this.hostElement.nativeElement, id);
       flowCore.updater.applyPortChanges(id, toPortUpdates(portsData));
     } else {
       // Async for rotation and other cases - wait for browser to apply transforms
       queueMicrotask(() => {
         // A destroyed node's element is detached, so it has no geometry to measure
         if (this.destroyed) return;
-        const portsData = this.portsService.getNodePortsData(this.hostElement.nativeElement);
+        const portsData = this.portsService.getNodePortsData(this.hostElement.nativeElement, id);
         flowCore.updater.applyPortChanges(id, toPortUpdates(portsData));
       });
     }

@@ -151,7 +151,7 @@ describe('FlowResizeBatchProcessorService', () => {
 
     service['processAllResizes']([{ entry, resizingNodeId: undefined }]);
 
-    expect(mockUpdatePortsService.getNodePortsData).toHaveBeenCalledExactlyOnceWith(entry.target);
+    expect(mockUpdatePortsService.getNodePortsData).toHaveBeenCalledExactlyOnceWith(entry.target, 'n1');
   });
 
   it('should skip port measurement during active resize', () => {

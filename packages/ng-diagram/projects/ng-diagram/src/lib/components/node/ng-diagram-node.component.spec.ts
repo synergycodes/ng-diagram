@@ -16,7 +16,7 @@ class HostComponent {
   node = signal<Node>({ id: 'n1', position: { x: 0, y: 0 }, data: {} } as Node);
 }
 
-/** FlowCoreProviderService stub with just what the node component's port sync reads. */
+/** FlowCoreProviderService stub with what the node component and the real UpdatePortsService read. */
 const flowCoreStub = (applyPortChanges = vi.fn(), isResizing = () => false) => ({
   provide: FlowCoreProviderService,
   useValue: {
@@ -118,7 +118,7 @@ describe('NgDiagramNodeComponent port measurement', () => {
     setNodeWidth(200);
     await Promise.resolve();
 
-    expect(getNodePortsData).toHaveBeenCalledExactlyOnceWith(nodeElement());
+    expect(getNodePortsData).toHaveBeenCalledExactlyOnceWith(nodeElement(), 'n1');
     expect(applyPortChanges).toHaveBeenCalledExactlyOnceWith('n1', [
       { portId: 'p1', portChanges: { size: measuredPort.size, position: measuredPort.position } },
     ]);
@@ -129,7 +129,7 @@ describe('NgDiagramNodeComponent port measurement', () => {
 
     setNodeWidth(200);
 
-    expect(getNodePortsData).toHaveBeenCalledExactlyOnceWith(nodeElement());
+    expect(getNodePortsData).toHaveBeenCalledExactlyOnceWith(nodeElement(), 'n1');
     expect(applyPortChanges).toHaveBeenCalledOnce();
   });
 

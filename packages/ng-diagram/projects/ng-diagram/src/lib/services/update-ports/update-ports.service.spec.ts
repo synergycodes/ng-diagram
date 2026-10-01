@@ -41,13 +41,13 @@ describe('UpdatePortsService', () => {
 
   describe('getNodePortsData', () => {
     it('measures every port of the given node element relative to that element', () => {
-      const node = element(rect(100, 50, 200, 80), { 'data-node-id': 'n1' });
+      const node = element(rect(100, 50, 200, 80));
       node.append(
         element(rect(90, 80, 20, 20), { 'data-port-id': 'left' }),
         element(rect(290, 80, 20, 20), { 'data-port-id': 'right' })
       );
 
-      expect(service.getNodePortsData(node)).toEqual([
+      expect(service.getNodePortsData(node, 'n1')).toEqual([
         { id: 'left', position: { x: -10, y: 30 }, size: { width: 20, height: 20 } },
         { id: 'right', position: { x: 190, y: 30 }, size: { width: 20, height: 20 } },
       ]);
@@ -55,27 +55,27 @@ describe('UpdatePortsService', () => {
 
     it('converts screen pixels to flow units with the viewport scale', () => {
       scale = 2;
-      const node = element(rect(100, 50, 400, 160), { 'data-node-id': 'n1' });
+      const node = element(rect(100, 50, 400, 160));
       node.append(element(rect(480, 110, 40, 40), { 'data-port-id': 'right' }));
 
-      expect(service.getNodePortsData(node)).toEqual([
+      expect(service.getNodePortsData(node, 'n1')).toEqual([
         { id: 'right', position: { x: 190, y: 30 }, size: { width: 20, height: 20 } },
       ]);
     });
 
     it('returns an empty list for a node without ports', () => {
-      expect(service.getNodePortsData(element(rect(0, 0, 100, 40)))).toEqual([]);
+      expect(service.getNodePortsData(element(rect(0, 0, 100, 40)), 'n1')).toEqual([]);
     });
 
     it('skips a port with an empty id and reports it with the node id', () => {
       const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-      const node = element(rect(0, 0, 100, 40), { 'data-node-id': 'n1' });
+      const node = element(rect(0, 0, 100, 40));
       node.append(
         element(rect(0, 10, 20, 20), { 'data-port-id': '' }),
         element(rect(80, 10, 20, 20), { 'data-port-id': 'right' })
       );
 
-      expect(service.getNodePortsData(node).map(({ id }) => id)).toEqual(['right']);
+      expect(service.getNodePortsData(node, 'n1').map(({ id }) => id)).toEqual(['right']);
       expect(consoleError).toHaveBeenCalledExactlyOnceWith(expect.stringContaining('Node ID: n1'));
     });
   });

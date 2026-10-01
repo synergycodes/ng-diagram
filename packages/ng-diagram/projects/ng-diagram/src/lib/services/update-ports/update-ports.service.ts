@@ -42,7 +42,7 @@ export class UpdatePortsService {
     return this.measurePort(port, nodeElement.getBoundingClientRect(), this.getScale());
   }
 
-  getNodePortsData(nodeElement: HTMLElement): Required<Pick<Port, 'id' | MeasuredPortProperty>>[] {
+  getNodePortsData(nodeElement: HTMLElement, nodeId: string): Required<Pick<Port, 'id' | MeasuredPortProperty>>[] {
     const ports = nodeElement.querySelectorAll('[data-port-id]') as NodeListOf<HTMLElement>;
     const portsData: Required<Pick<Port, 'id' | MeasuredPortProperty>>[] = [];
     const nodeRect = nodeElement.getBoundingClientRect();
@@ -51,7 +51,7 @@ export class UpdatePortsService {
     ports.forEach((port) => {
       const portId = port.getAttribute('data-port-id');
       if (!portId) {
-        console.error(PORT_ID_MISSING_ERROR(port.id, nodeElement.getAttribute('data-node-id') ?? ''));
+        console.error(PORT_ID_MISSING_ERROR(port.id, nodeId));
         return;
       }
 
