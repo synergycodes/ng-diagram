@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  DestroyRef,
+  effect,
+  ElementRef,
+  inject,
+  input,
+} from '@angular/core';
 import { Node } from '../../../core/src';
 import { toPortUpdates } from '../../../core/src/port-batch-processor/port-batch-processor';
 
@@ -30,6 +39,9 @@ import { FlowCoreProviderService, UpdatePortsService } from '../../services';
 export class NgDiagramNodeComponent {
   private readonly portsService = inject(UpdatePortsService);
   private readonly flowCore = inject(FlowCoreProviderService);
+  private readonly hostElement = inject(ElementRef<HTMLElement>);
+
+  private destroyed = false;
 
   node = input.required<Node>();
 
@@ -39,6 +51,7 @@ export class NgDiagramNodeComponent {
   readonly size = computed(() => this.node().size);
 
   constructor() {
+    inject(DestroyRef).onDestroy(() => (this.destroyed = true));
     this.setupPortSyncEffect();
   }
 
@@ -50,12 +63,14 @@ export class NgDiagramNodeComponent {
     if (isResizing) {
       // For resizing we don't have to wait for transforms to compute and removing the "wait"
       // helps to minimize visual lag between new port positions and edge routing applied afterwards the ports are measured
-      const portsData = this.portsService.getNodePortsData(id);
+      const portsData = this.portsService.getNodePortsData(this.hostElement.nativeElement, id);
       flowCore.updater.applyPortChanges(id, toPortUpdates(portsData));
     } else {
       // Async for rotation and other cases - wait for browser to apply transforms
       queueMicrotask(() => {
-        const portsData = this.portsService.getNodePortsData(id);
+        // A destroyed node's element is detached, so it has no geometry to measure
+        if (this.destroyed) return;
+        const portsData = this.portsService.getNodePortsData(this.hostElement.nativeElement, id);
         flowCore.updater.applyPortChanges(id, toPortUpdates(portsData));
       });
     }

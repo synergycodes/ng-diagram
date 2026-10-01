@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import {
+  type AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+  type TemplateRef,
+  viewChild,
+  ViewContainerRef,
+} from '@angular/core';
 import {
   initializeModel,
   NgDiagramBackgroundComponent,
@@ -34,6 +44,7 @@ declare global {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    NgTemplateOutlet,
     NgDiagramComponent,
     NgDiagramBackgroundComponent,
     NgDiagramPaletteItemComponent,
@@ -58,6 +69,11 @@ declare global {
           }
         </div>
       }
+      @if (!outsideProviderHost) {
+        <ng-container *ngTemplateOutlet="canvas" />
+      }
+    </div>
+    <ng-template #canvas>
       <div class="diagram-container" data-testid="diagram-container">
         <ng-diagram
           [model]="model()"
@@ -70,7 +86,7 @@ declare global {
           <ng-diagram-background type="grid"></ng-diagram-background>
         </ng-diagram>
       </div>
-    </div>
+    </ng-template>
   `,
   styles: [
     `
@@ -124,7 +140,8 @@ declare global {
     `,
   ],
 })
-export class HarnessComponent {
+export class HarnessComponent implements AfterViewInit {
+  private readonly viewContainerRef = inject(ViewContainerRef);
   private readonly ngDiagramService = inject(NgDiagramService);
   private readonly modelService = inject(NgDiagramModelService);
   private readonly nodeService = inject(NgDiagramNodeService);
@@ -142,6 +159,8 @@ export class HarnessComponent {
     { type: 'wide', data: { label: 'Wide' } },
   ];
   readonly tabbable = window.__diagramTabbable ?? true;
+  readonly outsideProviderHost = window.__diagramOutsideProviderHost ?? false;
+  private readonly canvas = viewChild.required<TemplateRef<unknown>>('canvas');
   readonly nodeTemplateMap = new NgDiagramNodeTemplateMap([
     ['resize-sides', ResizeSidesNodeComponent],
     ['hidden-ports', HiddenPortsNodeComponent],
@@ -149,6 +168,14 @@ export class HarnessComponent {
     ['vertical-ports', VerticalPortsNodeComponent],
   ]);
   readonly edgeTemplateMap = new NgDiagramEdgeTemplateMap([['labelled', LabelledEdgeComponent]]);
+
+  ngAfterViewInit(): void {
+    if (this.outsideProviderHost) {
+      // This component's own view container inserts views as siblings of <harness-root>,
+      // so the diagram renders outside the element that declares provideNgDiagram().
+      this.viewContainerRef.createEmbeddedView(this.canvas()).detectChanges();
+    }
+  }
 
   onDiagramInit(): void {
     window.__diagram = {
