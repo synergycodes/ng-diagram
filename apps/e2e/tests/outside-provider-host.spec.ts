@@ -15,7 +15,16 @@ const rightPortX = async (diagram: Diagram, nodeId: string): Promise<number> => 
 };
 
 test.describe('diagram outside the provider host', () => {
+  let errors: string[];
+
   test.beforeEach(async ({ diagram }) => {
+    errors = [];
+    // Registered before load, so the initial measurement of every node is covered too
+    diagram.page.on('console', (msg) => {
+      if (msg.type() === 'error') {
+        errors.push(msg.text());
+      }
+    });
     await diagram.load({ outsideProviderHost: true });
   });
 
@@ -27,16 +36,10 @@ test.describe('diagram outside the provider host', () => {
     expect(hostContainsDiagram).toBe(false);
     await expect(diagram.allNodes).toHaveCount(3);
     await expect(diagram.node('node-a')).toBeVisible();
+    expect(errors).toEqual([]);
   });
 
   test('re-measures ports when a node size changes', async ({ diagram }) => {
-    const errors: string[] = [];
-    diagram.page.on('console', (msg) => {
-      if (msg.type() === 'error') {
-        errors.push(msg.text());
-      }
-    });
-
     const widthBefore = (await diagram.model.getNodeById('node-a'))!.size!.width;
     const portXBefore = await rightPortX(diagram, 'node-a');
 

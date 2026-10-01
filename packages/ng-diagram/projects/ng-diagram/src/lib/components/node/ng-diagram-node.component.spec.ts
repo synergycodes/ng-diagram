@@ -16,6 +16,22 @@ class HostComponent {
   node = signal<Node>({ id: 'n1', position: { x: 0, y: 0 }, data: {} } as Node);
 }
 
+/** FlowCoreProviderService stub with just what the node component's port sync reads. */
+const flowCoreStub = (applyPortChanges = vi.fn(), isResizing = () => false) => ({
+  provide: FlowCoreProviderService,
+  useValue: {
+    isInitialized: () => true,
+    provide: () => ({
+      actionStateManager: { isResizing },
+      updater: { applyPortChanges },
+      getState: () => ({ metadata: { viewport: { scale: 1 } } }),
+    }),
+  },
+});
+
+const sizedNode = (width: number) =>
+  ({ id: 'n1', position: { x: 0, y: 0 }, data: {}, size: { width, height: 40 } }) as Node;
+
 describe('NgDiagramNodeComponent host display binding', () => {
   let fixture: ReturnType<typeof TestBed.createComponent<HostComponent>>;
 
@@ -26,16 +42,7 @@ describe('NgDiagramNodeComponent host display binding', () => {
       imports: [HostComponent],
       providers: [
         { provide: UpdatePortsService, useValue: { getNodePortsData: vi.fn().mockReturnValue([]) } },
-        {
-          provide: FlowCoreProviderService,
-          useValue: {
-            isInitialized: () => true,
-            provide: () => ({
-              actionStateManager: { isResizing: () => false },
-              updater: { applyPortChanges: vi.fn() },
-            }),
-          },
-        },
+        flowCoreStub(),
       ],
     });
     // The host display binding is what is under test — the content template and
@@ -79,12 +86,7 @@ describe('NgDiagramNodeComponent port measurement', () => {
   const nodeElement = (): HTMLElement => fixture.debugElement.query(By.directive(NgDiagramNodeComponent)).nativeElement;
 
   const setNodeWidth = (width: number) => {
-    fixture.componentInstance.node.set({
-      id: 'n1',
-      position: { x: 0, y: 0 },
-      data: {},
-      size: { width, height: 40 },
-    } as Node);
+    fixture.componentInstance.node.set(sizedNode(width));
     fixture.detectChanges();
   };
 
@@ -97,16 +99,7 @@ describe('NgDiagramNodeComponent port measurement', () => {
       imports: [HostComponent],
       providers: [
         { provide: UpdatePortsService, useValue: { getNodePortsData } },
-        {
-          provide: FlowCoreProviderService,
-          useValue: {
-            isInitialized: () => true,
-            provide: () => ({
-              actionStateManager: { isResizing: () => isResizing },
-              updater: { applyPortChanges },
-            }),
-          },
-        },
+        flowCoreStub(applyPortChanges, () => isResizing),
       ],
     });
     TestBed.overrideComponent(NgDiagramNodeComponent, { set: { template: '', hostDirectives: [] } });
@@ -189,19 +182,7 @@ describe('NgDiagramNodeComponent rendered outside the component that provides th
 
     TestBed.configureTestingModule({
       imports: [OutletParentComponent],
-      providers: [
-        {
-          provide: FlowCoreProviderService,
-          useValue: {
-            isInitialized: () => true,
-            provide: () => ({
-              actionStateManager: { isResizing: () => false },
-              updater: { applyPortChanges },
-              getState: () => ({ metadata: { viewport: { scale: 1 } } }),
-            }),
-          },
-        },
-      ],
+      providers: [flowCoreStub(applyPortChanges)],
     });
     TestBed.overrideComponent(NgDiagramNodeComponent, { set: { template: '<ng-content />', hostDirectives: [] } });
 
@@ -219,12 +200,7 @@ describe('NgDiagramNodeComponent rendered outside the component that provides th
     const node = fixture.debugElement.query(By.directive(NgDiagramNodeComponent));
     expect(provider.nativeElement.contains(node.nativeElement)).toBe(false);
 
-    provider.componentInstance.node.set({
-      id: 'n1',
-      position: { x: 0, y: 0 },
-      data: {},
-      size: { width: 200, height: 40 },
-    } as Node);
+    provider.componentInstance.node.set(sizedNode(200));
     fixture.detectChanges();
     await Promise.resolve();
 
