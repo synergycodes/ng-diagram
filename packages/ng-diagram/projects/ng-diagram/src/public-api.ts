@@ -26,7 +26,6 @@ export { BoxSelectionDirective } from './lib/directives/input-events/box-selecti
 export { MobileBoxSelectionDirective } from './lib/directives/input-events/box-selection/mobile-box-selection.directive';
 export { KeyboardInputsDirective } from './lib/directives/input-events/keyboard-inputs/keyboard-inputs.directive';
 export { LinkingInputDirective } from './lib/directives/input-events/linking/linking.directive';
-export { RelinkHandleDirective } from './lib/directives/input-events/relinking/relinking.directive';
 export {
   DiagramSelectionDirective,
   EdgeSelectionDirective,

@@ -11,12 +11,7 @@ import { PointerInputEvent } from '../../../types';
  * element is removed from the DOM. This happens on every relink, because the
  * original edge is not rendered while its endpoint is being dragged.
  *
- * `ng-diagram-base-edge` renders its own handles with this directive. Use it
- * directly in fully custom edge templates that do not use the base edge.
- *
- * @public
- * @since 1.4.0
- * @category Directives
+ * `ng-diagram-base-edge` renders its relink handles with this directive.
  */
 @Directive({
   selector: '[ngDiagramRelinkHandle]',
