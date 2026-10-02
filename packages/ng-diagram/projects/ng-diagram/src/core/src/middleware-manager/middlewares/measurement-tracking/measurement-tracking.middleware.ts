@@ -25,36 +25,58 @@ export const createMeasurementTrackingMiddleware = (
       return;
     }
 
-    const { helpers } = context;
+    const { helpers, nodesMap, edgesMap } = context;
+
+    // Effectively hidden elements render as display: none and never deliver
+    // valid measurements — they must not be waited for.
+    const isNodeHidden = (id: string) => nodesMap.get(id)?.computedHidden === true;
+    const isEdgeHidden = (id: string) => edgesMap.get(id)?.computedHidden === true;
 
     if (isFirstPass) {
-      // First pass: register ALL changed entities as participants.
+      // First pass: register ALL changed visible entities as participants.
       // Any property change (data, position, size, custom fields, etc.) could indirectly
       // trigger DOM measurements via Angular template bindings or CSS changes.
       const entityIds: string[] = [];
+      const hiddenEntityIds: string[] = [];
 
       if (helpers.anyNodesAdded()) {
         for (const node of helpers.getAddedNodes()) {
-          entityIds.push(`node:${node.id}`);
+          (node.computedHidden ? hiddenEntityIds : entityIds).push(`node:${node.id}`);
         }
       }
 
       if (helpers.anyEdgesAdded()) {
         for (const edge of helpers.getAddedEdges()) {
-          entityIds.push(`edge:${edge.id}`);
+          (edge.computedHidden ? hiddenEntityIds : entityIds).push(`edge:${edge.id}`);
         }
       }
 
       for (const id of helpers.getChangedNodeIds()) {
-        entityIds.push(`node:${id}`);
+        (isNodeHidden(id) ? hiddenEntityIds : entityIds).push(`node:${id}`);
       }
 
       for (const id of helpers.getChangedEdgeIds()) {
-        entityIds.push(`edge:${id}`);
+        (isEdgeHidden(id) ? hiddenEntityIds : entityIds).push(`edge:${id}`);
       }
 
       measurementTracker.registerParticipants(entityIds);
+      // Entities hidden in this same pass may still be pending from an earlier
+      // round — hiding clears their measurement expectations.
+      measurementTracker.unregisterParticipants(hiddenEntityIds);
     } else {
+      // Entities that became hidden while a round is pending stop being waited for.
+      const hiddenToggledIds = [
+        ...helpers
+          .getAffectedNodeIds(['computedHidden'])
+          .filter(isNodeHidden)
+          .map((id) => `node:${id}`),
+        ...helpers
+          .getAffectedEdgeIds(['computedHidden'])
+          .filter(isEdgeHidden)
+          .map((id) => `edge:${id}`),
+      ];
+      measurementTracker.unregisterParticipants(hiddenToggledIds);
+
       // Subsequent passes: signal measurement arrivals only for measurement-related properties.
       // These are the properties that indicate DOM measurements have been applied.
       if (helpers.checkIfAnyNodePropsChanged(['size', 'position', 'measuredPorts', 'angle'])) {

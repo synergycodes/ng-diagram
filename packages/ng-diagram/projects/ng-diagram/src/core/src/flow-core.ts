@@ -50,7 +50,8 @@ import {
 import { InitUpdater } from './updater/init-updater/init-updater';
 import { InternalUpdater } from './updater/internal-updater/internal-updater';
 import { Updater } from './updater/updater.interface';
-import { deepMerge, Semaphore } from './utils';
+import { ChangeGeneration, deepMerge, Semaphore } from './utils';
+import { TemplateVisibilityRegistry } from './visibility/template-visibility-registry';
 
 export class FlowCore {
   private _model: ModelAdapter;
@@ -72,6 +73,16 @@ export class FlowCore {
   readonly eventManager: EventManager;
   readonly shortcutManager: ShortcutManager;
   readonly measurementTracker: MeasurementTracker;
+  readonly templateVisibilityRegistry: TemplateVisibilityRegistry;
+
+  /**
+   * Bumped by the hidden-computation middleware whenever a pass changed some
+   * element's effective visibility (`computedHidden`). Render caches keyed on
+   * things a visibility toggle does not change (element counts, viewport)
+   * compare its version as an O(1) invalidation signal.
+   * @internal
+   */
+  readonly visibilityGeneration = new ChangeGeneration();
 
   private readonly interactionCoordinator: InteractionCoordinator;
   private readonly directRenderStrategy: DirectRenderStrategy;
@@ -108,6 +119,18 @@ export class FlowCore {
     this.portBatchProcessor = new PortBatchProcessor(this.getNodeById.bind(this));
     this.labelBatchProcessor = new LabelBatchProcessor(this.getEdgeById.bind(this));
     this.measurementTracker = new MeasurementTracker();
+    this.templateVisibilityRegistry = new TemplateVisibilityRegistry();
+    // Template-declared hidden state lives outside the model, so its changes
+    // must run their own middleware pass to re-stamp computedHidden. During
+    // initialization they additionally prune measurement expectations so a
+    // template-hidden element does not block init until the safety timeout.
+    // Both are COALESCED into one deferred flush per microtask tick: K
+    // template bindings toggling in one change-detection cycle cost one pass,
+    // and the flush runs outside any Angular reactive context, so a registry
+    // write inside an effect can never reach a signal write synchronously
+    // (NG0600 on Angular 18).
+    this.templateVisibilityRegistry.onNodeOrEdgeVisibilityChange = () => this.scheduleTemplateVisibilityFlush(true);
+    this.templateVisibilityRegistry.onPortOrLabelVisibilityChange = () => this.scheduleTemplateVisibilityFlush(false);
     this.edgeRoutingManager = new EdgeRoutingManager(
       this.config.edgeRouting.defaultRouting,
       () => this.config.edgeRouting || {}
@@ -123,9 +146,46 @@ export class FlowCore {
   }
 
   destroy() {
+    this.destroyed = true;
     this.virtualizedRenderStrategy.destroy();
     this.eventManager.offAll();
     this.model.destroy();
+  }
+
+  private destroyed = false;
+  /** Whether a template-visibility flush microtask is already queued. */
+  private templateVisibilityFlushScheduled = false;
+  /** Whether the queued flush must run a middleware pass (node/edge change). */
+  private templateVisibilityFlushNeedsPass = false;
+
+  /**
+   * Coalesces template-visibility registry callbacks: any number of registry
+   * writes landing in the same microtask tick get one
+   * {@link InitUpdater.refreshHiddenEntities} prune and (for node/edge
+   * changes) one `templateVisibilityChange` middleware pass. Both flags are
+   * cleared BEFORE the flush body runs, so a write landing while the pass is
+   * still in flight re-arms the flush and gets exactly one follow-up.
+   */
+  private scheduleTemplateVisibilityFlush(needsPass: boolean): void {
+    this.templateVisibilityFlushNeedsPass ||= needsPass;
+    if (this.templateVisibilityFlushScheduled) {
+      return;
+    }
+    this.templateVisibilityFlushScheduled = true;
+    queueMicrotask(() => {
+      this.templateVisibilityFlushScheduled = false;
+      const needsPass = this.templateVisibilityFlushNeedsPass;
+      this.templateVisibilityFlushNeedsPass = false;
+      if (this.destroyed) {
+        return;
+      }
+      this.initUpdater.refreshHiddenEntities();
+      if (needsPass) {
+        this.applyUpdate({}, 'templateVisibilityChange').catch((error) => {
+          console.error('[ngDiagram] Failed to apply template visibility change.', error);
+        });
+      }
+    });
   }
 
   private init() {

@@ -57,25 +57,33 @@ export class NgDiagramPaletteItemComponent {
   }
 
   /**
-   * Clones the preview element and appends it to document.body so that setDragImage
+   * Appends a scaled clone of the preview to document.body so that setDragImage
    * is immune to ancestor overflow:hidden clipping. The clone is removed on the next frame.
    */
   private setDragPreviewImage(event: DragEvent) {
-    const previewHtmlElement = this.paletteItemPreviewComponent()?.preview();
-    if (!previewHtmlElement?.nativeElement || !event.dataTransfer) {
+    if (!event.dataTransfer) {
       return;
     }
 
-    const clone = previewHtmlElement.nativeElement.cloneNode(true) as HTMLElement;
-    clone.classList.add('dragged-node');
-    clone.style.position = 'fixed';
+    const clone = this.paletteItemPreviewComponent()?.createDragImage();
+    if (!clone) {
+      return;
+    }
 
     document.body.appendChild(clone);
 
-    event.dataTransfer.setDragImage(clone, 0, 0);
+    try {
+      event.dataTransfer.setDragImage(clone, 0, 0);
+    } catch {
+      // A wrapped or polyfilled DataTransfer may throw — the clone must not outlive the gesture.
+      clone.remove();
+      return;
+    }
 
-    // Clean up the temporary clone. This is safe because setDragImage captures the bitmap
-    // synchronously during dragstart — the browser already has the image before the next frame.
-    requestAnimationFrame(() => clone.remove());
+    // setDragImage captures the bitmap synchronously during dragstart, so the clone can go on the
+    // next frame. dragend backstops the cleanup: rAF stays suspended while the tab is occluded.
+    const removeClone = () => clone.remove();
+    requestAnimationFrame(removeClone);
+    event.target?.addEventListener('dragend', removeClone, { once: true });
   }
 }

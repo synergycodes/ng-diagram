@@ -6,6 +6,23 @@ import { isValidPosition, isValidSize } from '../../utils/measurement-validation
 const ID_SEPARATOR = '->';
 
 /**
+ * Decides which entities create measurement expectations during initialization.
+ * Effectively hidden elements render as `display: none` and never deliver valid
+ * measurements — expecting them would block init until the safety timeout.
+ */
+export interface InitMeasurementFilter {
+  isNodeMeasurable(nodeId: string): boolean;
+  isPortMeasurable(nodeId: string, portId: string): boolean;
+  isLabelMeasurable(edgeId: string, labelId: string): boolean;
+}
+
+const MEASURE_EVERYTHING: InitMeasurementFilter = {
+  isNodeMeasurable: () => true,
+  isPortMeasurable: () => true,
+  isLabelMeasurable: () => true,
+};
+
+/**
  * Represents the complete state during initialization.
  *
  * Purpose: Single source of truth for all initialization data collection and state application.
@@ -17,6 +34,8 @@ const ID_SEPARATOR = '->';
  * - Applies all collected data to diagram state in a single batch update
  */
 export class InitState {
+  constructor(private readonly measurementFilter: InitMeasurementFilter = MEASURE_EVERYTHING) {}
+
   /** Ports added during initialization, keyed by compound ID (nodeId->portId) */
   readonly initializedPorts = new Map<string, Port>();
 
@@ -107,7 +126,12 @@ export class InitState {
   addPort(nodeId: string, port: Port): void {
     const key = this.getCompoundId(nodeId, port.id);
     this.initializedPorts.set(key, port);
-    this.portsToMeasure.add(key);
+
+    // Hidden ports still land in the model (edges may reference them) but
+    // create no measurement expectation — they cannot deliver a valid size.
+    if (this.measurementFilter.isPortMeasurable(nodeId, port.id)) {
+      this.portsToMeasure.add(key);
+    }
   }
 
   /**
@@ -120,7 +144,11 @@ export class InitState {
   addLabel(edgeId: string, label: EdgeLabel): void {
     const key = this.getCompoundId(edgeId, label.id);
     this.initializedLabels.set(key, label);
-    this.labelsToMeasure.add(key);
+
+    // See addPort — hidden labels create no measurement expectation.
+    if (this.measurementFilter.isLabelMeasurable(edgeId, label.id)) {
+      this.labelsToMeasure.add(key);
+    }
   }
 
   /**
@@ -132,14 +160,21 @@ export class InitState {
    */
   collectAlreadyMeasuredItems(nodes: Node[], edges: Edge[]): void {
     for (const node of nodes) {
-      this.nodesToMeasure.add(node.id);
+      // Effectively hidden nodes render as display: none and never deliver a
+      // valid measurement — expecting them would block init until the timeout.
+      const nodeMeasurable = this.measurementFilter.isNodeMeasurable(node.id);
+      if (nodeMeasurable) {
+        this.nodesToMeasure.add(node.id);
+      }
 
       if (isValidSize(node.size)) {
         this.measuredNodes.add(node.id);
       }
 
       for (const port of node.measuredPorts ?? []) {
-        this.trackPreExistingPort(node.id, port.id);
+        if (nodeMeasurable && this.measurementFilter.isPortMeasurable(node.id, port.id)) {
+          this.trackPreExistingPort(node.id, port.id);
+        }
 
         if (isValidSize(port.size) && isValidPosition(port.position)) {
           const key = this.getCompoundId(node.id, port.id);
@@ -150,7 +185,9 @@ export class InitState {
 
     for (const edge of edges) {
       for (const label of edge.measuredLabels ?? []) {
-        this.trackPreExistingLabel(edge.id, label.id);
+        if (this.measurementFilter.isLabelMeasurable(edge.id, label.id)) {
+          this.trackPreExistingLabel(edge.id, label.id);
+        }
 
         if (isValidSize(label.size)) {
           const key = this.getCompoundId(edge.id, label.id);
@@ -167,11 +204,46 @@ export class InitState {
    * @returns True if all nodes, ports, and labels have valid measurements
    */
   allEntitiesHaveMeasurements(): boolean {
+    // Subset checks, not size comparisons: hidden entities can carry valid
+    // pre-loaded measurements (counted in measured*) without being expected
+    // (absent from *ToMeasure).
     const allNodesMeasured = [...this.nodesToMeasure].every((id) => this.measuredNodes.has(id));
-    const allPortsMeasured = this.measuredPorts.size === this.portsToMeasure.size;
-    const allLabelsMeasured = this.measuredLabels.size === this.labelsToMeasure.size;
+    const allPortsMeasured = [...this.portsToMeasure].every((id) => this.measuredPorts.has(id));
+    const allLabelsMeasured = [...this.labelsToMeasure].every((id) => this.measuredLabels.has(id));
 
     return allNodesMeasured && allPortsMeasured && allLabelsMeasured;
+  }
+
+  /**
+   * Re-applies the measurement filter to the expectation sets.
+   * Called when hidden state changes during initialization (e.g. a template
+   * declares an element hidden after expectations were collected) so newly
+   * hidden entities stop blocking init. Entities that became visible are not
+   * re-added — they re-measure through the observer path without blocking.
+   */
+  pruneUnmeasurableExpectations(): void {
+    for (const id of [...this.nodesToMeasure]) {
+      if (!this.measurementFilter.isNodeMeasurable(id)) {
+        this.nodesToMeasure.delete(id);
+      }
+    }
+
+    for (const key of [...this.portsToMeasure]) {
+      const { entityId, itemId } = this.splitCompoundId(key);
+      if (
+        !this.measurementFilter.isNodeMeasurable(entityId) ||
+        !this.measurementFilter.isPortMeasurable(entityId, itemId)
+      ) {
+        this.portsToMeasure.delete(key);
+      }
+    }
+
+    for (const key of [...this.labelsToMeasure]) {
+      const { entityId, itemId } = this.splitCompoundId(key);
+      if (!this.measurementFilter.isLabelMeasurable(entityId, itemId)) {
+        this.labelsToMeasure.delete(key);
+      }
+    }
   }
 
   /**
@@ -289,7 +361,10 @@ export class InitState {
    */
   private updateNodes(nodes: Node[], nodePortsMap: Map<string, Port[]>): Node[] {
     return nodes.map((node) => {
-      const size = this.nodeSizes.get(node.id) || node.size;
+      // On force-finish the collected size can be invalid (e.g. 0×0 from a
+      // display: none element) — it must not overwrite the node's existing size.
+      const collectedSize = this.nodeSizes.get(node.id);
+      const size = collectedSize && isValidSize(collectedSize) ? collectedSize : node.size;
       const newPorts = nodePortsMap.get(node.id);
 
       // Merge existing and new ports (new ports take priority)
@@ -314,7 +389,9 @@ export class InitState {
           const key = this.getCompoundId(node.id, port.id);
           const rect = this.portRects.get(key);
 
-          if (!rect) return port;
+          // Same force-finish guard as node sizes: keep the port's existing
+          // geometry when the collected measurement is invalid.
+          if (!rect || !isValidSize(rect.size) || !isValidPosition(rect.position)) return port;
 
           return {
             ...port,
@@ -366,7 +443,9 @@ export class InitState {
           const key = this.getCompoundId(edge.id, label.id);
           const size = this.edgeLabelSizes.get(key);
 
-          if (!size) return label;
+          // Same force-finish guard as node sizes: keep the label's existing
+          // size when the collected measurement is invalid.
+          if (!size || !isValidSize(size)) return label;
 
           return { ...label, size };
         });

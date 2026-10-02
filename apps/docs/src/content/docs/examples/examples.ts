@@ -39,6 +39,20 @@ export const examples: ContentTile[] = [
     imageAlt: 'Screenshot of Context Menu example',
   },
   {
+    title: 'Expand/Collapse Subtree',
+    description: 'Collapse and expand tree subtrees, with ELK.js re-layouting the visible nodes.',
+    href: '/docs/examples/expand-collapse',
+    image: '/docs/assets/examples/expand-collapse.png',
+    imageAlt: 'Screenshot of Expand/Collapse Subtree example',
+  },
+  {
+    title: 'Expand/Collapse Groups',
+    description: 'Collapse groups to a header bar, rerouting boundary edges so external connections stay visible.',
+    href: '/docs/examples/expand-collapse-groups',
+    image: '/docs/assets/examples/expand-collapse-groups.png',
+    imageAlt: 'Screenshot of Expand/Collapse Groups example',
+  },
+  {
     title: 'Properties Sidebar',
     description:
       'Build an interactive properties panel that updates when nodes are selected and allows real-time editing of attributes.',

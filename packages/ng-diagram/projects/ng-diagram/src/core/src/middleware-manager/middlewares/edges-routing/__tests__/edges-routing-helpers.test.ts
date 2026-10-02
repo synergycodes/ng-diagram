@@ -116,6 +116,7 @@ describe('Edge Routing Helper Functions', () => {
         'routing',
         'routingMode',
         'measuredLabels',
+        'computedHidden',
       ]);
     });
 
@@ -197,6 +198,27 @@ describe('Edge Routing Helper Functions', () => {
 
       expect(result).toBe(true);
       expect(mockHelpers.checkIfEdgeAdded).toHaveBeenCalledWith('edge-4');
+    });
+
+    it('should return false for an edge with computedHidden even when the edge or nodes changed', () => {
+      const edge: Edge = { ...mockEdge, id: 'edge-1', computedHidden: true };
+      mockHelpers.checkIfEdgeAdded = vi.fn().mockReturnValue(true);
+      mockHelpers.checkIfEdgeChanged = vi.fn().mockReturnValue(true);
+      mockHelpers.checkIfNodeChanged = vi.fn().mockReturnValue(true);
+
+      const result = shouldRouteEdge(edge, mockHelpers, ['updateEdges']);
+
+      expect(result).toBe(false);
+    });
+
+    it('should return false for an edge with computedHidden even on init', () => {
+      const edge: Edge = { ...mockEdge, computedHidden: true };
+      mockHelpers.checkIfEdgeChanged = vi.fn().mockReturnValue(false);
+      mockHelpers.checkIfNodeChanged = vi.fn().mockReturnValue(false);
+
+      const result = shouldRouteEdge(edge, mockHelpers, ['init']);
+
+      expect(result).toBe(false);
     });
   });
 
@@ -782,6 +804,48 @@ describe('Edge Routing Helper Functions', () => {
         targetPosition: { x: 90, y: 90 },
         computedZIndex: 1000,
       });
+    });
+
+    it('should reposition the labels of a relink preview along the new points', () => {
+      const temporaryEdge: Edge = {
+        ...mockEdge,
+        id: 'temp-edge',
+        temporary: true,
+        routing: 'polyline',
+        measuredLabels: [{ id: 'label-1', positionOnEdge: 0.5, position: { x: 999, y: 999 } }],
+      };
+      mockRoutingManager.computePointOnPath = vi.fn().mockReturnValue({ x: 50, y: 50 });
+
+      const result = createUpdatedTemporaryEdge(
+        temporaryEdge,
+        new Map(),
+        mockRoutingManager as EdgeRoutingManager,
+        1000
+      );
+
+      expect(mockRoutingManager.computePointOnPath).toHaveBeenCalledWith(
+        'polyline',
+        [
+          { x: 10, y: 10 },
+          { x: 50, y: 50 },
+          { x: 90, y: 90 },
+        ],
+        0.5
+      );
+      expect(result.measuredLabels).toEqual([{ id: 'label-1', positionOnEdge: 0.5, position: { x: 50, y: 50 } }]);
+    });
+
+    it('should keep measuredLabels undefined for a preview without labels', () => {
+      const temporaryEdge: Edge = { ...mockEdge, id: 'temp-edge', temporary: true };
+
+      const result = createUpdatedTemporaryEdge(
+        temporaryEdge,
+        new Map(),
+        mockRoutingManager as EdgeRoutingManager,
+        1000
+      );
+
+      expect(result.measuredLabels).toBeUndefined();
     });
 
     it('should preserve other edge properties', () => {

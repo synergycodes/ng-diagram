@@ -45,6 +45,7 @@ export { ZIndexDirective } from './lib/directives/z-index/z-index.directive';
 // Public directives
 export { NgDiagramMinimapNavigationDirective } from './lib/components/minimap/ng-diagram-minimap-navigation.directive';
 export { NgDiagramGroupHighlightedDirective } from './lib/directives/group-highlighted/ng-diagram-group-highlighted.directive';
+export { NgDiagramHiddenDirective } from './lib/directives/hidden/ng-diagram-hidden.directive';
 export { NgDiagramNodeSelectedDirective } from './lib/directives/node-selected/ng-diagram-node-selected.directive';
 
 // Services
@@ -58,6 +59,16 @@ export { NgDiagramService } from './lib/public-services/ng-diagram.service';
 
 // Configuration helpers
 export { configureShortcuts } from './core/src';
+
+// Dangling-edge and relinking utilities
+export {
+  computeDetachAnchor,
+  getDanglingEndpoints,
+  getNearestDanglingEndpointInRange,
+  hasFreeEndpoint,
+  isDanglingEdge,
+  isEdgeEndRelinkable,
+} from './core/src';
 export { NgDiagramMinimapNodeTemplateMap } from './lib/components/minimap/ng-diagram-minimap.types';
 export { initializeModel, initializeModelAdapter, type InitializeModelOptions } from './lib/model/initialize-model';
 export {
@@ -94,7 +105,10 @@ export type {
   BackgroundConfig,
   BoxSelectionConfig,
   ClipboardPastedEvent,
+  ConnectionValidationContext,
   CopyPasteActionState,
+  DanglingEdgesConfig,
+  DanglingEndpoint,
   DataObject,
   DefaultNodeTemplateConfig,
   DiagramEventMap,
@@ -104,8 +118,12 @@ export type {
   EdgeDrawCancelReason,
   EdgeDrawEndedEvent,
   EdgeDrawnEvent,
+  EdgeEnd,
   EdgeLabel,
   EdgeLabelPosition,
+  EdgeRelinkCancelReason,
+  EdgeRelinkEndedEvent,
+  EdgeRelinkStartedEvent,
   EdgeRouting,
   EdgeRoutingConfig,
   EdgeRoutingContext,
@@ -129,6 +147,7 @@ export type {
   KeyboardZoomAction,
   LinkingActionState,
   LinkingConfig,
+  LinkingRelinkContext,
   loggerMiddleware,
   Metadata,
   Middleware,

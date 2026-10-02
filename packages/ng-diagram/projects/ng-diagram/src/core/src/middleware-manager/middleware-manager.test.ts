@@ -29,7 +29,7 @@ const mockMeasurementTrackingMiddleware = vi.hoisted(() => ({
 vi.mock('./middlewares', () => ({
   createEventEmitterMiddleware: vi.fn(),
   createMeasurementTrackingMiddleware: vi.fn().mockReturnValue(mockMeasurementTrackingMiddleware),
-  measuredBoundsMiddleware: mockMeasuredBoundsMiddleware,
+  createMeasuredBoundsMiddleware: vi.fn().mockReturnValue(mockMeasuredBoundsMiddleware),
   loggerMiddleware: mockLoggerMiddleware,
 }));
 

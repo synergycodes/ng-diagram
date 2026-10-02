@@ -25,6 +25,13 @@ const FALLBACKS: Record<NgDiagramPanelPosition, NgDiagramPanelPosition[]> = {
 export class NgDiagramWatermarkComponent {
   readonly preferredPosition = input<NgDiagramPanelPosition | undefined>(undefined);
 
+  /**
+   * Whether the watermark link takes part in the sequential Tab order.
+   * When false the link gets tabindex="-1" — skipped by Tab, but still
+   * clickable and present in the accessibility tree.
+   */
+  readonly tabbable = input(true);
+
   private readonly panelRegistry = inject(PanelRegistryService);
 
   /**

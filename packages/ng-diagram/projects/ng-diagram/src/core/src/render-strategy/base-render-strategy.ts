@@ -18,11 +18,25 @@ export abstract class BaseRenderStrategy implements RenderStrategy {
 
   protected render(): void {
     const { nodes, edges, metadata } = this.flowCore.getState();
-    const temporaryEdge = this.flowCore.actionStateManager.linking?.temporaryEdge;
+    const linking = this.flowCore.actionStateManager.linking;
+    const temporaryEdge = linking?.temporaryEdge;
 
-    const { nodes: visibleNodes, edges: visibleEdges } = this.process(nodes, edges, metadata.viewport);
+    const { nodes: visibleNodes, edges: processedEdges } = this.process(nodes, edges, metadata.viewport);
 
-    const finalEdges = temporaryEdge?.temporary ? [...visibleEdges, temporaryEdge] : visibleEdges;
+    // An edge whose endpoint is being relinked is represented by the temporary
+    // edge for the duration of the gesture — rendering both would show the
+    // stale original underneath the preview.
+    const relinkedEdgeId = linking?.relink?.edgeId;
+    const visibleEdges = relinkedEdgeId ? processedEdges.filter((edge) => edge.id !== relinkedEdgeId) : processedEdges;
+
+    // The temporary edge lives in action state, so hidden-computation never
+    // stamps it — check its anchored end here, or hiding that node mid-gesture
+    // leaves a rubber band dangling from nothing. During a target-end drag the
+    // anchored end is the source; during a source-end relink it is the target.
+    const anchoredEndNodeId = linking?.relink?.end === 'source' ? temporaryEdge?.target : temporaryEdge?.source;
+    const isTemporaryEdgeVisible =
+      temporaryEdge?.temporary && !(anchoredEndNodeId && this.flowCore.getNodeById(anchoredEndNodeId)?.computedHidden);
+    const finalEdges = isTemporaryEdgeVisible ? [...visibleEdges, temporaryEdge] : visibleEdges;
 
     this.performanceLogger.withPerformanceLogging(
       () => this.flowCore.renderer.draw(visibleNodes, finalEdges, metadata.viewport),

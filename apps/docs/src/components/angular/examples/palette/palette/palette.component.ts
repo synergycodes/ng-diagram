@@ -7,6 +7,7 @@ import {
   type NgDiagramPaletteItem,
 } from 'ng-diagram';
 import { PaletteItemComponent } from './palette-item.component';
+import { PaletteItemPreviewComponent } from './palette-item-preview.component';
 
 @Component({
   selector: 'palette-container',
@@ -16,6 +17,7 @@ import { PaletteItemComponent } from './palette-item.component';
     NgDiagramPaletteItemComponent,
     NgDiagramPaletteItemPreviewComponent,
     PaletteItemComponent,
+    PaletteItemPreviewComponent,
   ],
 })
 export class Palette {

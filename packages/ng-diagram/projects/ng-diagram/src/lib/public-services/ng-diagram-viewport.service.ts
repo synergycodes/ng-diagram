@@ -181,7 +181,8 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
    *
    * @param options Optional configuration object
    * @param options.nodeIds Array of node IDs to fit. If not provided, all nodes are included.
-   * @param options.edgeIds Array of edge IDs to fit. If not provided, all edges are included.
+   * @param options.edgeIds Array of edge IDs to fit. If not provided, only edges with both ends among the fitted
+   *   nodes are included. When `nodeIds` is not provided either, all edges are included.
    * @param options.padding Padding around the content (default: 50). Supports CSS-like syntax:
    *   - Single number: uniform padding on all sides
    *   - [top/bottom, left/right]: vertical and horizontal padding
@@ -207,6 +208,7 @@ export class NgDiagramViewportService extends NgDiagramBaseService {
    * const anchor = { x: 0.5, y: 0.5 };
    * const { width, height } = this.modelService.metadata().viewport;
    * const bounds = this.modelService.computePartsBounds(nodes, edges);
+   * if (!bounds.width || !bounds.height) return; // nothing measurable to fit
    * const scale = Math.min(width / bounds.width, height / bounds.height);
    * const x = width * anchor.x - (bounds.x + bounds.width * anchor.x) * scale;
    * const y = height * anchor.y - (bounds.y + bounds.height * anchor.y) * scale;

@@ -56,10 +56,19 @@ export class Diagram {
   // ──────────────────────────────────────────────────────────────────────
 
   /**
-   * Navigate to the harness. Optionally seed the model and/or config — both
-   * land on `window` before bootstrap via `addInitScript`.
+   * Navigate to the harness. Optionally seed the model, config, the palette, the
+   * `tabbable` input and/or the outside-provider-host layout — all land on `window`
+   * before bootstrap via `addInitScript`.
    */
-  async load(options: { model?: Partial<Model>; config?: Partial<NgDiagramConfig> } = {}): Promise<void> {
+  async load(
+    options: {
+      model?: Partial<Model>;
+      config?: Partial<NgDiagramConfig>;
+      palette?: boolean;
+      tabbable?: boolean;
+      outsideProviderHost?: boolean;
+    } = {}
+  ): Promise<void> {
     if (options.model !== undefined) {
       await this.page.addInitScript((m) => {
         window.__diagramSeed = m;
@@ -69,6 +78,21 @@ export class Diagram {
       await this.page.addInitScript((c) => {
         window.__diagramConfig = c;
       }, options.config);
+    }
+    if (options.palette) {
+      await this.page.addInitScript(() => {
+        window.__diagramPalette = true;
+      });
+    }
+    if (options.tabbable !== undefined) {
+      await this.page.addInitScript((t) => {
+        window.__diagramTabbable = t;
+      }, options.tabbable);
+    }
+    if (options.outsideProviderHost) {
+      await this.page.addInitScript(() => {
+        window.__diagramOutsideProviderHost = true;
+      });
     }
     await this.page.goto('/');
     await this.page.waitForFunction(() => window.__diagramReady === true);
@@ -80,6 +104,16 @@ export class Diagram {
 
   get container(): Locator {
     return this.page.getByTestId('diagram-container');
+  }
+
+  /** The harness palette panel. Only rendered when the diagram is loaded with `{ palette: true }`. */
+  get palettePanel(): Locator {
+    return this.page.getByTestId('palette-panel');
+  }
+
+  /** The off-screen copies of the palette previews, one per palette item. */
+  get parkedPalettePreviews(): Locator {
+    return this.page.locator('ng-diagram-palette-item-preview .dragged-node');
   }
 
   /** All rendered nodes — matches the `data-node-id` attribute emitted by ng-diagram. */

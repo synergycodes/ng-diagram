@@ -23,6 +23,7 @@ export interface PointerInputEvent extends PointerEvent {
   moveSelectionHandled?: boolean;
   zoomingHandled?: boolean;
   linkingHandled?: boolean;
+  relinkHandled?: boolean;
   rotateHandled?: boolean;
   selectHandled?: boolean;
   boxSelectionHandled?: boolean;

@@ -16,8 +16,17 @@ export class EdgeDrawEndedEmitter implements EventEmitter {
       return;
     }
 
-    const sourceNode = context.nodesMap.get(linking.sourceNodeId);
-    if (!sourceNode) {
+    // Relink gestures share the linking action state but report through
+    // edgeRelinkEnded — see EdgeRelinkEndedEmitter.
+    if (linking.relink) {
+      return;
+    }
+
+    // Draws started from empty canvas (startLinkingFromPosition) legitimately
+    // have no source node. A draw that HAD a source node which has since
+    // vanished keeps the pre-existing behavior of not reporting at all.
+    const sourceNode = linking.sourceNodeId ? context.nodesMap.get(linking.sourceNodeId) : undefined;
+    if (linking.sourceNodeId && !sourceNode) {
       return;
     }
 

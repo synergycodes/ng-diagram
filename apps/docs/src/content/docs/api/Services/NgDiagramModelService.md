@@ -113,6 +113,57 @@ A promise that resolves once the change has been applied to the model. Inside a 
 
 ***
 
+### attachEdge()
+
+> **attachEdge**(`edgeId`, `end`, `nodeId`, `portId?`): `Promise`\<`boolean`\>
+
+Attaches one endpoint of an edge to a node and, optionally, to a port.
+This is the opposite of [detachEdge](/docs/api/services/ngdiagrammodelservice/#detachedge).
+
+The same checks as for a relink drop apply: the node must exist and be
+visible, and the port must exist, be visible and have the right direction.
+The connection is then validated with `linking.validateConnection`, which
+receives the attached node as `source` or `target` according to `end`,
+and a context with `reason: 'attach'`.
+
+#### Parameters
+
+##### edgeId
+
+`string`
+
+ID of the edge to attach.
+
+##### end
+
+[`EdgeEnd`](/docs/api/types/model/edgeend/)
+
+Which endpoint to attach.
+
+##### nodeId
+
+`string`
+
+ID of the node to attach to.
+
+##### portId?
+
+`string`
+
+ID of the port to attach to. When omitted, the endpoint is attached to the node without a port.
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+Whether the connection was valid and applied.
+
+#### Since
+
+1.4.0
+
+***
+
 ### computePartsBounds()
 
 > **computePartsBounds**(`nodes`, `edges`): [`Rect`](/docs/api/types/geometry/rect/)
@@ -135,13 +186,26 @@ Array of edges
 
 [`Rect`](/docs/api/types/geometry/rect/)
 
-Bounding rectangle containing all nodes and edges
+Bounding rectangle containing all visible nodes and edges. When there is nothing to
+measure (both arrays are empty, no visible node has `measuredBounds`, and no visible edge
+has `points`), returns a zero-size rectangle at the origin (`{ x: 0, y: 0, width: 0, height: 0 }`).
 
 #### Since
 
 0.9.0
 
 Computes the axis-aligned bounding rectangle that contains all specified nodes and edges.
+
+Node bounds come from `measuredBounds`, which includes the measured ports and the rotation,
+not from the raw `position` and `size` in the model. Nodes must therefore already be measured
+(rendered), and the result can be larger than the node rectangles because of the ports.
+Edges contribute their routed `points` and their measured labels.
+
+#### Remarks
+
+Since 1.4.0, effectively hidden elements (`computedHidden`) are left out, so their
+old geometry does not enlarge the result. If all given elements are hidden, the result is
+the same zero-size rectangle at the origin as for unmeasured elements.
 
 ***
 
@@ -173,6 +237,10 @@ A promise that resolves once the change has been applied to the model. Inside a 
 
 Deletes nodes by their IDs.
 
+Deleting a group also deletes all of its descendants (children, grandchildren, and so on).
+Edges connected to any deleted node are removed as well. This is the same behavior as
+deleting the selection.
+
 #### Parameters
 
 ##### ids
@@ -186,6 +254,50 @@ Array of node IDs to delete.
 `Promise`\<`void`\>
 
 A promise that resolves once the change has been applied to the model. Inside a transaction, the promise resolves right away and the change is applied when the transaction commits.
+
+***
+
+### detachEdge()
+
+> **detachEdge**(`edgeId`, `end`, `position?`): `Promise`\<`void`\>
+
+Detaches one endpoint of an edge, so that it becomes a free (dangling)
+endpoint.
+
+When `position` is omitted, the endpoint stays anchored where it is now:
+at the current position of the port when the edge was connected to a
+port, otherwise at the routed endpoint of the edge.
+
+Requires `danglingEdges.enabled`. With the feature off, this method does
+nothing and logs a console warning.
+
+#### Parameters
+
+##### edgeId
+
+`string`
+
+ID of the edge to detach.
+
+##### end
+
+[`EdgeEnd`](/docs/api/types/model/edgeend/)
+
+Which endpoint to detach.
+
+##### position?
+
+[`Point`](/docs/api/types/geometry/point/)
+
+Optional anchor position for the freed endpoint, in flow coordinates.
+
+#### Returns
+
+`Promise`\<`void`\>
+
+#### Since
+
+1.4.0
 
 ***
 
@@ -309,6 +421,26 @@ Array of nodes connected to the given node
 
 ***
 
+### getDanglingEndpoints()
+
+> **getDanglingEndpoints**(): [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)[]
+
+Returns the free (unconnected) endpoints of all edges in the model. A dual
+dangling edge gives two entries. Temporary and effectively hidden edges
+are skipped.
+
+#### Returns
+
+[`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)[]
+
+The free endpoints with their edge, end and anchor position.
+
+#### Since
+
+1.4.0
+
+***
+
 ### getEdgeById()
 
 > **getEdgeById**\<`T`\>(`edgeId`): `null` \| [`Edge`](/docs/api/types/model/edge/)\<`T`\>
@@ -349,6 +481,40 @@ Returns null if flowCore is not initialized.
 #### Returns
 
 [`ModelAdapter`](/docs/api/types/model/modeladapter/)
+
+***
+
+### getNearestDanglingEndpointInRange()
+
+> **getNearestDanglingEndpointInRange**(`point`, `range`): `null` \| [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)
+
+Finds the free edge endpoint nearest to a point within a range. It works
+like [getNearestPortInRange](/docs/api/services/ngdiagrammodelservice/#getnearestportinrange), but for the free endpoints of dangling
+edges. Temporary and effectively hidden edges are skipped.
+
+#### Parameters
+
+##### point
+
+[`Point`](/docs/api/types/geometry/point/)
+
+Point to check from.
+
+##### range
+
+`number`
+
+Range to check in.
+
+#### Returns
+
+`null` \| [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)
+
+Nearest free endpoint in range, or null.
+
+#### Since
+
+1.4.0
 
 ***
 

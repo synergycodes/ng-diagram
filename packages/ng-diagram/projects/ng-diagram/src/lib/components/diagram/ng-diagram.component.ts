@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import {
+  booleanAttribute,
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   ElementRef,
   EventEmitter,
@@ -10,6 +12,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  signal,
   untracked,
 } from '@angular/core';
 import { Edge, Node } from '../../../core/src';
@@ -19,6 +22,8 @@ import type {
   DiagramInitEvent,
   EdgeDrawEndedEvent,
   EdgeDrawnEvent,
+  EdgeRelinkEndedEvent,
+  EdgeRelinkStartedEvent,
   GroupMembershipChangedEvent,
   GroupNode,
   MiddlewareChain,
@@ -41,6 +46,8 @@ import type {
 
 import { MobileBoxSelectionDirective } from '../../../public-api';
 import { DiagramSelectionDirective } from '../../directives';
+import { NgDiagramService } from '../../public-services/ng-diagram.service';
+import { RelinkingGestureService } from '../../services/input-events/relinking-gesture.service';
 import { CursorPositionTrackerDirective } from '../../directives/cursor-position-tracker/cursor-position-tracker.directive';
 import { BoxSelectionDirective } from '../../directives/input-events/box-selection/box-selection.directive';
 import { KeyboardInputsDirective } from '../../directives/input-events/keyboard-inputs/keyboard-inputs.directive';
@@ -109,6 +116,9 @@ import { NgDiagramWatermarkComponent } from '../watermark/watermark.component';
   ],
   host: {
     '[class.pannable]': 'viewportPannable()',
+    '[class.linking]': 'linkingActive()',
+    '[class.relinking]': 'relinkingActive()',
+    '[attr.tabindex]': `tabbable() ? '0' : '-1'`,
   },
 })
 export class NgDiagramComponent implements OnInit, OnDestroy {
@@ -118,6 +128,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   private readonly flowResizeBatchProcessor = inject(FlowResizeBatchProcessorService);
   private readonly flowOffsetService = inject(FlowOffsetService);
   private readonly templateProviderService = inject(TemplateProviderService);
+  private readonly diagramService = inject(NgDiagramService);
 
   private initializedModel: ModelAdapter | null = null;
   private resizeObserver: ResizeObserver | null = null;
@@ -161,6 +172,42 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
   readonly viewportPannable = this.renderer.viewportPannable;
 
   /**
+   * Whether an edge is being drawn or relinked — holds the grabbing cursor at the host.
+   * The core sets this state once the gesture is accepted, so a refused start never shows the cursor.
+   */
+  protected readonly linkingActive = computed(() => !!this.diagramService.actionState().linking);
+
+  /** Whether an edge endpoint is being dragged — holds the grabbing cursor at the host. */
+  protected readonly relinkingActive =
+    inject(RelinkingGestureService, { optional: true })?.active ?? signal(false).asReadonly();
+
+  /**
+   * Whether the diagram container takes part in the page's sequential Tab order.
+   *
+   * This covers the two Tab stops the diagram itself adds: the container element and the
+   * watermark link. With `false` both render with `tabindex="-1"`, so Tab skips them, but
+   * they stay clickable and can be focused from code. Keyboard shortcuts keep working
+   * whenever focus is inside the diagram — clicking the diagram still focuses it.
+   *
+   * Focusable content rendered by your own node and edge templates is not affected and
+   * keeps its own Tab stops, so the application stays in control of those.
+   *
+   * Set it to `false` when the application manages the diagram's Tab order itself,
+   * for example with a roving tabindex on the nodes.
+   *
+   * Accepts the static attribute forms too: `tabbable` on its own means `true` and
+   * `tabbable="false"` means `false`. Binding `undefined` or `null` keeps the default.
+   *
+   * @default true
+   * @since 1.4.0
+   */
+  readonly tabbable = input(true, {
+    // Angular's booleanAttribute maps null/undefined to false, which would flip the
+    // default for an unbound optional binding like [tabbable]="options?.tabbable"
+    transform: (value: unknown) => (value == null ? true : booleanAttribute(value)),
+  });
+
+  /**
    * Event emitted when the diagram initialization is complete.
    *
    * This event fires after all nodes and edges including their internal parts
@@ -186,6 +233,25 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * For cancelled draws, includes the cancellation reason.
    */
   @Output() edgeDrawEnded = new EventEmitter<EdgeDrawEndedEvent>();
+
+  /**
+   * Event emitted when the user starts dragging an endpoint of an existing
+   * edge (the relinking gesture; see the `linking.defaultRelinkable` config).
+   *
+   * @since 1.4.0
+   */
+  @Output() edgeRelinkStarted = new EventEmitter<EdgeRelinkStartedEvent>();
+
+  /**
+   * Event emitted when an edge relink gesture ends, regardless of outcome.
+   *
+   * Fires when the dragged endpoint is dropped, whether it was reconnected to
+   * a port, left dangling on empty canvas, or reverted (invalid drop or
+   * cancelled gesture).
+   *
+   * @since 1.4.0
+   */
+  @Output() edgeRelinkEnded = new EventEmitter<EdgeRelinkEndedEvent>();
 
   /**
    * Event emitted when selected nodes are moved within the diagram.
@@ -494,6 +560,8 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
 
     eventManager.on('edgeDrawn', (event) => this.edgeDrawn.emit(event));
     eventManager.on('edgeDrawEnded', (event) => this.edgeDrawEnded.emit(event));
+    eventManager.on('edgeRelinkStarted', (event) => this.edgeRelinkStarted.emit(event));
+    eventManager.on('edgeRelinkEnded', (event) => this.edgeRelinkEnded.emit(event));
     eventManager.on('selectionMoved', (event) => this.selectionMoved.emit(event));
     eventManager.on('selectionChanged', (event) => this.selectionChanged.emit(event));
     eventManager.on('selectionGestureEnded', (event) => this.selectionGestureEnded.emit(event));

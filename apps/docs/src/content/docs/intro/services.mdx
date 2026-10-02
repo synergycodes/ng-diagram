@@ -28,6 +28,7 @@ The main orchestration service that provides access to the action state and midd
 - Access action state and environment information
 - Manage edges routing
 - Manage event listeners
+- Start linking programmatically from a node, a port, or a point on the canvas
 - [Invalidate element measurements](/docs/guides/nodes/ports#port-measurement) after CSS-driven position changes
 
 **Usage Example:**
@@ -62,6 +63,7 @@ Handles all model-related operations including node and edge updates, spatial qu
 - Perform spatial queries to find nearby elements
 - Access nodes, edges, and metadata as reactive signals
 - Find elements by ID
+- Detach and attach edge endpoints, and find free (dangling) endpoints
 
 Every mutating method returns a promise that resolves once the change has been applied to the
 model, so operations can be sequenced with `await` — see
@@ -305,6 +307,13 @@ Handles copy, cut, and paste operations for diagram elements with support for po
 - Copy selected elements to clipboard
 - Cut elements (copy + delete)
 - Paste elements at specific positions
+
+:::note
+When you paste an edge, each end whose node was copied with it connects to the new node. An end whose
+node was **not** copied is pasted as a free end. It does not connect back to the original node, so pasting
+an edge on its own never duplicates the original connection. Move or reconnect the free end as needed.
+See [`paste`](/docs/api/services/ngdiagramclipboardservice/#paste) for details.
+:::
 
 **Usage Example:**
 

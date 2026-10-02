@@ -34,11 +34,13 @@ describe('ResizeDirective (shared touch marker ownership)', () => {
   let directive: ResizeDirective;
   let touchState: TouchEventsStateService;
   let clearResize: ReturnType<typeof vi.fn>;
+  let cancelActiveInteraction: ReturnType<typeof vi.fn>;
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
   let unregister: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     clearResize = vi.fn();
+    cancelActiveInteraction = vi.fn().mockResolvedValue(true);
     unregister = vi.fn();
     registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
 
@@ -54,6 +56,8 @@ describe('ResizeDirective (shared touch marker ownership)', () => {
       isInitialized: () => true,
       provide: () => ({
         actionStateManager: { clearResize },
+        cancelActiveInteraction,
+        isCancellingInteraction: () => false,
         registerInteractionCleanup,
       }),
     };
@@ -89,15 +93,33 @@ describe('ResizeDirective (shared touch marker ownership)', () => {
     fixture.destroy();
 
     expect(touchState.currentEvent()).toBe(DiagramEventName.Panning);
+    expect(cancelActiveInteraction).not.toHaveBeenCalled();
     expect(clearResize).not.toHaveBeenCalled();
   });
 
-  it('clears its own marker and the resize state when destroyed mid-gesture', () => {
+  it('clears its own marker and cancels the gesture when destroyed mid-gesture', async () => {
     directive.onPointerDown(makePointerEvent());
 
     fixture.destroy();
 
     expect(touchState.currentEvent()).toBeNull();
+    // The full cancel flow pairs nodeResizeStarted with a cancelled Ended
+    // event — the bare state clear must stay out of its way.
+    expect(cancelActiveInteraction).toHaveBeenCalled();
+    await Promise.resolve();
+    expect(clearResize).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the bare state clear when the destroy-time cancel is refused', async () => {
+    // cancelActiveInteraction refuses e.g. while a transaction is active — the
+    // resize state must still be cleared, or it suppresses every subsequent
+    // node size measurement.
+    cancelActiveInteraction.mockResolvedValue(false);
+    directive.onPointerDown(makePointerEvent());
+
+    fixture.destroy();
+
+    await Promise.resolve();
     expect(clearResize).toHaveBeenCalled();
   });
 

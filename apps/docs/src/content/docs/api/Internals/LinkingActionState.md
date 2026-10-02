@@ -26,6 +26,34 @@ Position where the pointer was released.
 
 ***
 
+### relink?
+
+> `optional` **relink**: [`LinkingRelinkContext`](/docs/api/internals/linkingrelinkcontext/)
+
+Present while an endpoint of an existing edge is being relinked. Until the
+gesture ends, the original edge is not rendered and the temporary edge
+represents it. `relink.end` is the end of the temporary edge that follows
+the pointer (a normal draw always drags the target end).
+
+#### Since
+
+1.4.0
+
+***
+
+### relinkCancelReason?
+
+> `optional` **relinkCancelReason**: [`EdgeRelinkCancelReason`](/docs/api/types/events/edgerelinkcancelreason/)
+
+Reason the relink gesture ended without changing the edge (set by
+`finishRelinking` when the relink fails).
+
+#### Since
+
+1.4.0
+
+***
+
 ### sourceNodeId
 
 > **sourceNodeId**: `string`

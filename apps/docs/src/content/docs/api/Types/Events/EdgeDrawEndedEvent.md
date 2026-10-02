@@ -38,11 +38,13 @@ The reason the draw was cancelled (only present on cancel)
 
 ***
 
-### source
+### source?
 
-> **source**: [`Node`](/docs/api/types/model/node/)
+> `optional` **source**: [`Node`](/docs/api/types/model/node/)
 
-The source node from which the edge was drawn
+The source node from which the edge was drawn.
+Undefined for draws started from empty canvas
+(see [NgDiagramService.startLinkingFromPosition](/docs/api/services/ngdiagramservice/#startlinkingfromposition)).
 
 ***
 

@@ -24,14 +24,24 @@ export const cancelLinking = async (commandHandler: CommandHandler): Promise<voi
 
   linking._finishing = true;
   const gestureId = linking._gestureId;
-  linking.cancelReason = 'cancelled';
-  linking.dropPosition ??= linking.temporaryEdge?.targetPosition ?? { x: 0, y: 0 };
+  // The dragged end is the one that followed the pointer — for a source-end
+  // relink that is the source, not the target.
+  const draggedEndPosition =
+    linking.relink?.end === 'source' ? linking.temporaryEdge?.sourcePosition : linking.temporaryEdge?.targetPosition;
+  linking.dropPosition ??= draggedEndPosition ?? { x: 0, y: 0 };
 
-  // The empty pass emits edgeDrawEnded and erases the temporary edge (see
-  // runCancelledFinishPass); the stamped clear in finally survives a throwing
-  // middleware and spares a linking that replaced this one mid-pass.
+  // The empty pass emits edgeDrawEnded (or edgeRelinkEnded for a relink
+  // gesture) and erases the temporary edge (see runCancelledFinishPass); the
+  // stamped clear in finally survives a throwing middleware and spares a
+  // linking that replaced this one mid-pass.
   try {
-    await runCancelledFinishPass(commandHandler);
+    if (linking.relink) {
+      linking.relinkCancelReason = 'cancelled';
+      await commandHandler.flowCore.applyUpdate({}, 'finishRelinking');
+    } else {
+      linking.cancelReason = 'cancelled';
+      await runCancelledFinishPass(commandHandler);
+    }
   } finally {
     clearLinkingForGesture(commandHandler.flowCore.actionStateManager, gestureId);
   }

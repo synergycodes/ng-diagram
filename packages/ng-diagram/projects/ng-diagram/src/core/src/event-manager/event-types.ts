@@ -1,4 +1,4 @@
-import type { Edge, GroupNode, Node, Point, Size, Viewport } from '../types';
+import type { Edge, EdgeEnd, GroupNode, Node, Point, Size, Viewport } from '../types';
 
 /**
  * Map of all available diagram events and their payload types
@@ -76,6 +76,23 @@ export interface DiagramEventMap {
    * @since 1.2.0
    */
   edgeDrawEnded: EdgeDrawEndedEvent;
+  /**
+   * Event emitted when the user starts dragging an endpoint of an existing
+   * edge (the relinking gesture).
+   *
+   * @since 1.4.0
+   */
+  edgeRelinkStarted: EdgeRelinkStartedEvent;
+  /**
+   * Event emitted when an edge relink gesture ends, regardless of outcome.
+   *
+   * Fires when the dragged endpoint is dropped, whether it was reconnected to
+   * a port, left dangling on empty canvas, or reverted (invalid drop or
+   * cancelled gesture).
+   *
+   * @since 1.4.0
+   */
+  edgeRelinkEnded: EdgeRelinkEndedEvent;
   /**
    * Event emitted when clipboard content is pasted into the diagram.
    *
@@ -301,8 +318,12 @@ export type GestureCancelReason = 'cancelled';
  * @category Types/Events
  */
 export interface EdgeDrawEndedEvent {
-  /** The source node from which the edge was drawn */
-  source: Node;
+  /**
+   * The source node from which the edge was drawn.
+   * Undefined for draws started from empty canvas
+   * (see {@link NgDiagramService.startLinkingFromPosition}).
+   */
+  source?: Node;
   /** Source port identifier if connected to a specific port */
   sourcePort?: string;
   /** The position where the pointer was released */
@@ -317,6 +338,76 @@ export interface EdgeDrawEndedEvent {
   targetPort?: string;
   /** The reason the draw was cancelled (only present on cancel) */
   reason?: EdgeDrawCancelReason;
+}
+
+/**
+ * Reason an edge relink gesture ended without changing the edge.
+ *
+ * - `noTarget` — the endpoint was dropped on empty canvas while dangling
+ *   edges are disabled, or `danglingEdges.shouldKeepOnDrop` returned false
+ *   for the detached edge
+ * - `invalidConnection` — the drop target failed validation: it was rejected
+ *   by `linking.validateConnection` (context reason `relink`), or it is not a
+ *   valid target at all (hidden node, hidden or missing port, port with the
+ *   wrong direction)
+ * - `cancelled` — the gesture was aborted (Esc key,
+ *   {@link NgDiagramService.cancelActiveInteraction}, or another gesture took
+ *   over the pointer), or the endpoint was dropped back on its original node
+ *   and port, which changes nothing
+ *
+ * @public
+ * @since 1.4.0
+ * @category Types/Events
+ */
+export type EdgeRelinkCancelReason = 'noTarget' | 'invalidConnection' | 'cancelled';
+
+/**
+ * Event payload emitted when the user starts dragging an endpoint of an
+ * existing edge.
+ *
+ * @public
+ * @since 1.4.0
+ * @category Types/Events
+ */
+export interface EdgeRelinkStartedEvent {
+  /** The edge being relinked (snapshot at gesture start). */
+  edge: Edge;
+  /** Which endpoint is being dragged. */
+  end: EdgeEnd;
+}
+
+/**
+ * Event payload emitted when an edge relink gesture ends, regardless of outcome.
+ *
+ * On success the edge was either reconnected (`target` and `targetPort` are
+ * set) or left dangling (`edge` has a free endpoint anchored at
+ * `dropPosition`). On failure the edge is unchanged and `reason` explains why.
+ *
+ * @public
+ * @since 1.4.0
+ * @category Types/Events
+ */
+export interface EdgeRelinkEndedEvent {
+  /** The edge after the relink (unchanged snapshot when `success` is false). */
+  edge: Edge;
+  /** Which endpoint was dragged. */
+  end: EdgeEnd;
+  /** The node the endpoint was connected to before the relink, if any. */
+  previousNode?: Node;
+  /** The port the endpoint was connected to before the relink, if any. */
+  previousPort?: string;
+  /** The anchor position of the endpoint before the relink, present only when the endpoint was free (dangling). */
+  previousPosition?: Point;
+  /** The position where the pointer was released. */
+  dropPosition: Point;
+  /** Whether the edge was changed (reconnected or left dangling). */
+  success: boolean;
+  /** The node the endpoint was reconnected to (only present on reconnect). */
+  target?: Node;
+  /** The port the endpoint was reconnected to (only present on reconnect). */
+  targetPort?: string;
+  /** The reason the relink was reverted (only present on failure). */
+  reason?: EdgeRelinkCancelReason;
 }
 
 /**
@@ -385,6 +476,15 @@ export interface SelectionRemovedEvent {
   deletedNodes: Node[];
   /** Edges that were deleted from the diagram */
   deletedEdges: Edge[];
+  /**
+   * Edges that were detached into dangling edges instead of being deleted
+   * (see `danglingEdges.detachOnNodeDelete`). The snapshots are taken after
+   * the detach: the freed endpoints already have an empty `source`/`target`
+   * and their anchor positions set. Empty when nothing was detached.
+   *
+   * @since 1.4.0
+   */
+  detachedEdges: Edge[];
 }
 
 /**

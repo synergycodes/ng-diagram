@@ -13,6 +13,12 @@ export const startLinkingFromPosition = async (
 ) => {
   const { position } = command;
 
+  // A draw or relink already owns the linking state — clobbering it would
+  // strand its gesture (hidden edge, unbalanced started/ended events).
+  if (commandHandler.flowCore.actionStateManager.isLinking()) {
+    return;
+  }
+
   const temporaryEdge = createTemporaryEdge(commandHandler.flowCore.config, {
     source: '',
     sourcePosition: position,

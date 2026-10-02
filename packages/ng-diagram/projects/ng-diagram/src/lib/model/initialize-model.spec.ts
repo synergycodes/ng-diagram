@@ -34,6 +34,7 @@ function createNodesWithComputedProperties(): Node[] {
       measuredPorts: [createMockPort('port1', 'node1'), createMockPort('port2', 'node1')],
       measuredBounds: { x: -5, y: -5, width: 110, height: 60 },
       computedZIndex: 1,
+      computedHidden: true,
       size: { width: 100, height: 50 },
     },
     {
@@ -208,6 +209,17 @@ describe('initializeModel', () => {
     }
   });
 
+  it('should strip computedHidden from nodes but keep the user hidden flag', () => {
+    const nodesWithComputed = createNodesWithComputedProperties().map((node) => ({ ...node, hidden: true }));
+    const adapter = TestBed.runInInjectionContext(() => initializeModel({ nodes: nodesWithComputed }));
+
+    const nodes = adapter.getNodes();
+    for (const node of nodes) {
+      expect(node.computedHidden).toBeUndefined();
+      expect(node.hidden).toBe(true);
+    }
+  });
+
   it('should strip stale _internalId from nodes', () => {
     const nodesWithStaleId = mockNodes.map((node) => ({
       ...node,
@@ -273,6 +285,21 @@ describe('initializeModel', () => {
     const edges = adapter.getEdges();
     for (const edge of edges) {
       expect(edge.computedZIndex).toBeUndefined();
+    }
+  });
+
+  it('should strip computedHidden from edges but keep the user hidden flag', () => {
+    const edgesWithComputed = createEdgesWithComputedProperties().map((edge) => ({
+      ...edge,
+      hidden: true,
+      computedHidden: true,
+    }));
+    const adapter = TestBed.runInInjectionContext(() => initializeModel({ edges: edgesWithComputed }));
+
+    const edges = adapter.getEdges();
+    for (const edge of edges) {
+      expect(edge.computedHidden).toBeUndefined();
+      expect(edge.hidden).toBe(true);
     }
   });
 

@@ -38,3 +38,8 @@ __tmp__*
 
 # Kiro
 .kiro
+
+# Codex
+.codex
+.agents
+AGENTS.md

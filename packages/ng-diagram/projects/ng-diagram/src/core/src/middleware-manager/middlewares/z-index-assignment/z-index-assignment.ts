@@ -41,7 +41,8 @@ function collectDirtyEdgeIds(
   initialConnectedEdgesMap: Map<string, string[]>,
   isEdgeAdded: boolean,
   hasEdgeSelectionChange: boolean,
-  hasEdgeZOrderChange: boolean
+  hasEdgeZOrderChange: boolean,
+  hasEdgeEndpointChange: boolean
 ): Set<string> {
   const dirtyEdgeIds = new Set<string>();
 
@@ -53,6 +54,10 @@ function collectDirtyEdgeIds(
   }
   if (hasEdgeZOrderChange) {
     for (const id of helpers.getAffectedEdgeIds(['zOrder'])) dirtyEdgeIds.add(id);
+  }
+  if (hasEdgeEndpointChange) {
+    // A relinked or detached edge derives its z from different nodes now.
+    for (const id of helpers.getAffectedEdgeIds(['source', 'target'])) dirtyEdgeIds.add(id);
   }
   if (recomputedNodesMap.size > 0) {
     for (const nodeId of recomputedNodesMap.keys()) {
@@ -268,6 +273,7 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
     const isEdgeAdded = checkIfIsEdgeAdded(modelActionTypes);
     const hasEdgeSelectionChange = helpers.checkIfAnyEdgePropsChanged(['selected']);
     const hasEdgeZOrderChange = helpers.checkIfAnyEdgePropsChanged(['zOrder']);
+    const hasEdgeEndpointChange = helpers.checkIfAnyEdgePropsChanged(['source', 'target']);
 
     let childrenByGroupId: Map<string, Node[]> | undefined;
     const getChildrenByGroupId = () => {
@@ -285,7 +291,13 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
     } else {
       const dirtyNodeIds = collectDirtyNodeIds(helpers, nodesMap);
 
-      if (dirtyNodeIds.size === 0 && !isEdgeAdded && !hasEdgeSelectionChange && !hasEdgeZOrderChange) {
+      if (
+        dirtyNodeIds.size === 0 &&
+        !isEdgeAdded &&
+        !hasEdgeSelectionChange &&
+        !hasEdgeZOrderChange &&
+        !hasEdgeEndpointChange
+      ) {
         next();
         return;
       }
@@ -315,7 +327,8 @@ export const zIndexMiddleware: Middleware<'z-index'> = {
           initialConnectedEdgesMap,
           isEdgeAdded,
           hasEdgeSelectionChange,
-          hasEdgeZOrderChange
+          hasEdgeZOrderChange,
+          hasEdgeEndpointChange
         );
 
     const edgesToUpdate = computeEdgeUpdates(

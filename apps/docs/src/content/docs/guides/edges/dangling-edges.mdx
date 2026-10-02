@@ -1,0 +1,184 @@
+---
+version: 'since v1.4.0'
+title: Dangling Edges
+description: Understanding how dangling edges work in ngDiagram
+sidebar:
+  order: 6
+  badge: New
+---
+
+import CodeSnippet from '@components/code-snippet/code-snippet.astro';
+import DanglingEdgesDemo from '@components/angular/edges/dangling-edges/dangling-edges/dangling-edges.astro';
+
+Dangling edges are edges with one or both endpoints not connected to any node. They are useful when connections are sketched before both nodes exist, when deleting a node should keep its connections, or when free-floating lines (for example annotations) are part of your diagram.
+
+The feature is fully opt-in. With the default settings, an edge dropped on empty canvas is discarded, and deleting a node deletes its edges.
+
+Try it below: draw an edge from a port onto empty canvas to keep it as a dangling edge, select a node and press <kbd>Delete</kbd> to detach its edges instead of deleting them, or select the connected edge and drag one of its handles onto empty canvas to detach that end.
+
+<DanglingEdgesDemo />
+
+## Model Shape
+
+A free (unconnected) endpoint has an empty string in [`source`](/docs/api/types/model/edge/#source) or [`target`](/docs/api/types/model/edge/#target), and its anchor position is stored in [`sourcePosition`](/docs/api/types/model/edge/#sourceposition) or [`targetPosition`](/docs/api/types/model/edge/#targetposition):
+
+<CodeSnippet relativePath="edges/dangling-edges/dangling-edges/diagram.component.ts" sectionId="model-shape" />
+
+A free endpoint never has a port: when an endpoint is detached, its `sourcePort` or `targetPort` is cleared. An edge with both endpoints free is a **dual dangling edge**. It routes between its two anchor positions.
+
+## Enabling the Feature
+
+Dangling edges are controlled by the [`danglingEdges`](/docs/api/types/configuration/features/danglingedgesconfig) configuration:
+
+<CodeSnippet relativePath="edges/dangling-edges/dangling-edges/diagram.component.ts" sectionId="config" />
+
+[`enabled`](/docs/api/types/configuration/features/danglingedgesconfig/#enabled) is the master switch. When true:
+
+- An edge drawn onto empty canvas is kept as a dangling edge instead of being discarded.
+- An [edge relink](/docs/guides/edges/relinking) dropped on empty canvas detaches that endpoint.
+- [`detachEdge`](/docs/api/services/ngdiagrammodelservice/#detachedge) and [`startLinkingFromPosition`](/docs/api/services/ngdiagramservice/#startlinkingfromposition) become available. With the feature off, they do nothing and log a console warning.
+
+## Keeping Edges Dropped on Empty Canvas
+
+With `enabled: true`, every edge draw released on empty canvas is kept as a dangling edge, anchored where the pointer was released. A drop on a port that the edge cannot connect to (for example a port with the wrong direction) does not count as a drop on empty canvas, so the draw is discarded. To decide per edge, provide [`shouldKeepOnDrop`](/docs/api/types/configuration/features/danglingedgesconfig/#shouldkeepondrop):
+
+```typescript
+const config: NgDiagramConfig = {
+  danglingEdges: {
+    enabled: true,
+    // Keep only edges drawn from "output" ports as dangling
+    shouldKeepOnDrop: (edge, dropPosition) => edge.sourcePort?.startsWith('output') ?? false,
+  },
+};
+```
+
+The `edge` argument is the final edge, after [`linking.finalEdgeDataBuilder`](/docs/api/types/configuration/features/linkingconfig/#finaledgedatabuilder) has run. Returning `false` discards the edge, which is also what happens when the feature is off. The same callback runs for a [relink](/docs/guides/edges/relinking) dropped on empty canvas. There it receives the edge as it would be after the detach, and returning `false` reverts the relink.
+
+## Detaching Edges on Node Delete
+
+By default, deleting a node deletes all of its edges. Set [`detachOnNodeDelete`](/docs/api/types/configuration/features/danglingedgesconfig/#detachonnodedelete) to keep them as dangling edges instead, anchored where their port was:
+
+```typescript
+const config: NgDiagramConfig = {
+  danglingEdges: {
+    enabled: true,
+    detachOnNodeDelete: true,
+  },
+};
+```
+
+For per-edge control, provide [`shouldDetachOnNodeDelete`](/docs/api/types/configuration/features/danglingedgesconfig/#shoulddetachonnodedelete). It is called once for each endpoint that loses its node, and returning `false` deletes the edge:
+
+```typescript
+const config: NgDiagramConfig = {
+  danglingEdges: {
+    enabled: true,
+    detachOnNodeDelete: true,
+    shouldDetachOnNodeDelete: (edge, deletedNode, end) => edge.data?.keepOnDelete === true,
+  },
+};
+```
+
+The detach rules are:
+
+- **An explicit delete always wins.** An edge that is itself part of the deleted selection is deleted, never detached.
+- **Hidden wiring never becomes visible.** An edge that is hidden only because of the node it loses (for example the edges of the collapsed children of a deleted group) is deleted. Detaching it would turn invisible wiring into a visible dangling edge. An edge that is hidden for another reason (its own `hidden` flag, a template binding, or a hidden node at the other end) is detached like any other edge and stays hidden.
+- **An edge that loses both endpoints in one delete is deleted by default.** It becomes a dual dangling edge only when `shouldDetachOnNodeDelete` is defined and returns `true` for both ends.
+- Deleting a node with the <kbd>Delete</kbd> key follows the same rules. The detached edges are reported in the [`selectionRemoved`](/docs/api/types/events/selectionremovedevent) event (see [Events](#events) below).
+
+## Dual Dangling Edges
+
+An edge with both endpoints free is fully supported:
+
+- **Routing** — the edge routes between its two anchor positions with any routing algorithm, like a connected edge.
+- **Persistence** — `toJSON()` saves the `sourcePosition`/`targetPosition` of free endpoints, and [`initializeModel`](/docs/api/utilities/initializemodel) restores them, so dangling edges survive a save and load cycle.
+- **Box selection** — a free endpoint counts by its anchor position, so a box drawn around a dangling end selects the edge.
+
+## Drawing Edges from a Position
+
+[`NgDiagramService.startLinkingFromPosition`](/docs/api/services/ngdiagramservice/#startlinkingfromposition) starts drawing an edge from a point on the canvas instead of from a node, for example from a context menu action:
+
+```typescript
+private ngDiagramService = inject(NgDiagramService);
+private viewportService = inject(NgDiagramViewportService);
+
+startDrawingAt(event: MouseEvent) {
+  const position = this.viewportService.clientToFlowPosition({ x: event.clientX, y: event.clientY });
+  this.ngDiagramService.startLinkingFromPosition(position);
+}
+```
+
+The free end of the edge follows the pointer until a click finishes the draw. A click on a port connects the edge to that port. A click on empty canvas leaves both ends free (a dual dangling edge), and the edge is kept when `shouldKeepOnDrop` allows it. An edge drawn from a position has no source node, so it is a dangling edge from the start. For that reason this method requires `danglingEdges.enabled`; with the feature off, the call is ignored and a console warning is logged. For draws started this way, [`linking.validateConnection`](/docs/api/types/configuration/features/linkingconfig/#validateconnection) receives `null` as the source node.
+
+## Utilities and Service Methods
+
+The package exports these helper functions. Import them from `ng-diagram` like any other symbol:
+
+```typescript
+import { hasFreeEndpoint, isDanglingEdge } from 'ng-diagram';
+
+private modelService = inject(NgDiagramModelService);
+
+readonly danglingEdges = computed(() => this.modelService.edges().filter(isDanglingEdge));
+
+isSourceFree(edge: Edge): boolean {
+  return hasFreeEndpoint(edge, 'source');
+}
+```
+
+- [`isDanglingEdge(edge)`](/docs/api/utilities/isdanglingedge) — whether the edge has at least one free endpoint.
+- [`hasFreeEndpoint(edge, end?)`](/docs/api/utilities/hasfreeendpoint) — whether the given endpoint (or either, when `end` is omitted) is free.
+- [`getDanglingEndpoints(edges)`](/docs/api/utilities/getdanglingendpoints) — collects the free endpoints of the given edges as [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint) entries (a dual dangling edge gives two).
+- [`getNearestDanglingEndpointInRange(edges, point, range)`](/docs/api/utilities/getnearestdanglingendpointinrange) — the free endpoint nearest to a point within a range.
+- [`computeDetachAnchor(edge, end, node)`](/docs/api/utilities/computedetachanchor) — the position where a detached endpoint stays: the port's current position, otherwise the edge's routed endpoint, or the node's center as a last resort.
+
+[`NgDiagramModelService`](/docs/api/services/ngdiagrammodelservice) provides the model-level operations:
+
+- [`getDanglingEndpoints()`](/docs/api/services/ngdiagrammodelservice/#getdanglingendpoints) and [`getNearestDanglingEndpointInRange(point, range)`](/docs/api/services/ngdiagrammodelservice/#getnearestdanglingendpointinrange) — the same queries, run over all edges in the model.
+- [`detachEdge(edgeId, end, position?)`](/docs/api/services/ngdiagrammodelservice/#detachedge) — detaches one endpoint into a free endpoint. Without `position`, the endpoint stays anchored where it is now. Requires `danglingEdges.enabled`; with the feature off, it does nothing and logs a console warning.
+- [`attachEdge(edgeId, end, nodeId, portId?)`](/docs/api/services/ngdiagrammodelservice/#attachedge) — the opposite operation: connects a free endpoint to a node and, optionally, a port. It applies the same checks as a relink drop (the node must exist and be visible, the port must exist and have the right direction) and runs [`linking.validateConnection`](/docs/api/types/configuration/features/linkingconfig/#validateconnection) with `reason: 'attach'`. It returns whether the connection was valid and applied.
+
+```typescript
+private modelService = inject(NgDiagramModelService);
+
+async reconnectLooseEnds() {
+  for (const { edge, end, position } of this.modelService.getDanglingEndpoints()) {
+    const port = this.modelService.getNearestPortInRange(position, 50);
+    if (port) {
+      await this.modelService.attachEdge(edge.id, end, port.nodeId, port.id);
+    }
+  }
+}
+```
+
+## Styling
+
+Dangling edges get dedicated CSS classes, so you can style them without checking the model:
+
+- The edge wrapper element gets the `ng-diagram-edge--dangling` class. Temporary draw previews do not get it, even though they always have a free end.
+- [`ng-diagram-base-edge`](/docs/api/components/ngdiagrambaseedgecomponent) gets the `dangling` host class, and its `path` carries the `dangling` class as well.
+
+```scss
+// Dashed rendering for any edge with a free endpoint
+ng-diagram-base-edge.dangling {
+  --edge-stroke-dasharray: 6 4;
+  --edge-stroke-opacity: 0.7;
+}
+```
+
+## Events
+
+- [`edgeDrawEnded`](/docs/api/types/events/edgedrawendedevent) — a canvas drop kept as a dangling edge reports `success: true` with the created `edge`, but **no** `target`/`targetPort`. To tell a connected draw from a kept dangling draw, check `event.target`. The deprecated `edgeDrawn` event does not fire for dangling edges; it only reports node-to-node connections.
+- [`selectionRemoved`](/docs/api/types/events/selectionremovedevent) — the `detachedEdges` field lists the edges that were detached instead of deleted. The snapshots are taken after the detach, so the freed endpoints already have an empty `source`/`target` and their positions set. The field is always present and is `[]` when nothing was detached.
+
+```typescript
+onEdgeDrawEnded(event: EdgeDrawEndedEvent) {
+  if (event.success && !event.target) {
+    console.log('Kept as dangling edge:', event.edge!.id);
+  }
+}
+```
+
+## Related Topics
+
+[Edge Relinking →](/docs/guides/edges/relinking) | [Floating Edges →](/docs/guides/edges/floating-edges) | [Configuration →](/docs/guides/configuration/)

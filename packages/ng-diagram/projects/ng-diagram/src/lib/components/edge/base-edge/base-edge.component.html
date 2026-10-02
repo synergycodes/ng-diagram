@@ -21,6 +21,47 @@
     [attr.stroke-opacity]="strokeOpacity() || 'var(--edge-stroke-opacity, 1)'"
   />
   <path [attr.d]="path()" fill="none" stroke="none" stroke-width="20" stroke-opacity="0" />
+
+  <!-- Invisible hit circles: a grab area larger than the handle that keeps
+       a constant screen size at any zoom. Both hit circles render before both
+       visible handles, so a visible handle is never covered by the other
+       end's hit area on a short edge. The hit circle and the handle carry the
+       same directive, so grabbing either starts the relink;
+       data-relink-handle-hit lets the stylesheet highlight the matching
+       handle on hover. A relink preview has no hit circles: its handles only
+       show the gesture. The stylesheet moves the hit circle and the handle
+       past the end of the line along --ngd-relink-handle-inset-x/-y. -->
+  @if (!temporary()) {
+    @for (handle of relinkHandles(); track handle.end) {
+      <circle
+        class="ng-diagram-edge__relink-handle-hit"
+        [attr.data-relink-handle-hit]="handle.end"
+        ngDiagramRelinkHandle
+        [edge]="edge()"
+        [end]="handle.end"
+        [style.--ngd-relink-handle-inset-x]="handle.inset.x"
+        [style.--ngd-relink-handle-inset-y]="handle.inset.y"
+        [attr.cx]="handle.point.x"
+        [attr.cy]="handle.point.y"
+        [attr.r]="relinkHandleHitRadius()"
+      />
+    }
+  }
+  @for (handle of relinkHandles(); track handle.end) {
+    <g
+      class="ng-diagram-edge__relink-handle"
+      [class.ng-diagram-edge__relink-handle--dragging]="handle.dragging"
+      [attr.data-relink-handle]="handle.end"
+      ngDiagramRelinkHandle
+      [edge]="edge()"
+      [end]="handle.end"
+      [style.--ngd-relink-handle-inset-x]="handle.inset.x"
+      [style.--ngd-relink-handle-inset-y]="handle.inset.y"
+    >
+      <circle class="ng-diagram-edge__relink-handle-halo" [attr.cx]="handle.point.x" [attr.cy]="handle.point.y" />
+      <circle class="ng-diagram-edge__relink-handle-circle" [attr.cx]="handle.point.x" [attr.cy]="handle.point.y" />
+    </g>
+  }
 </svg>
 
 <ng-content />

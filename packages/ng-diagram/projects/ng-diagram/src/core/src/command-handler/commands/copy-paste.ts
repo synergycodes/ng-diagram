@@ -1,6 +1,7 @@
 import { NgDiagramMath } from '../../math';
 import type { CommandHandler, Edge, FlowConfig, FlowStateUpdate, Node, Point } from '../../types';
 import { snapNodePosition } from '../../utils';
+import { computeHiddenNodeIds, isEdgeEffectivelyHidden } from '../../visibility/effective-visibility';
 
 const OFFSET = 20;
 
@@ -14,25 +15,66 @@ export interface PasteCommand {
 }
 
 /**
- * Calculate the center point of a collection of nodes
+ * Calculate the center point of a collection of points
  */
-const calculateNodeCenter = (nodes: Node[]): Point => {
-  if (nodes.length === 0) {
+const calculateCenter = (points: Point[]): Point => {
+  if (points.length === 0) {
     return { x: 0, y: 0 };
   }
 
-  const centerX = nodes.reduce((sum, node) => sum + node.position.x, 0) / nodes.length;
-  const centerY = nodes.reduce((sum, node) => sum + node.position.y, 0) / nodes.length;
+  const centerX = points.reduce((sum, point) => sum + point.x, 0) / points.length;
+  const centerY = points.reduce((sum, point) => sum + point.y, 0) / points.length;
 
   return { x: centerX, y: centerY };
+};
+
+/** One end of an edge: its node, its port, its stored position, and the position it gets when pasted as a free end. */
+interface EdgeEnd {
+  nodeId: string;
+  port: string | undefined;
+  position: Point | undefined;
+  // The stored end position, or the matching end of the routed path when no
+  // end position is stored (an edge that was never routed has neither).
+  freePosition: Point | undefined;
+}
+
+const getSourceEnd = (edge: Edge): EdgeEnd => ({
+  nodeId: edge.source,
+  port: edge.sourcePort,
+  position: edge.sourcePosition,
+  freePosition: edge.sourcePosition ?? edge.points?.at(0),
+});
+
+const getTargetEnd = (edge: Edge): EdgeEnd => ({
+  nodeId: edge.target,
+  port: edge.targetPort,
+  position: edge.targetPosition,
+  freePosition: edge.targetPosition ?? edge.points?.at(-1),
+});
+
+/** An end is pasted free when it has no node or its node was not copied. */
+const isPastedFree = (end: EdgeEnd, copiedNodeIds: Set<string>): boolean =>
+  !end.nodeId || !copiedNodeIds.has(end.nodeId);
+
+/** Positions of the edge ends that will be pasted free. They count like node positions when the content is centered at the cursor. */
+const collectFreeEdgeEndpointPositions = (copiedEdges: Edge[], copiedNodeIds: Set<string>): Point[] => {
+  const positions: Point[] = [];
+
+  for (const edge of copiedEdges) {
+    for (const end of [getSourceEnd(edge), getTargetEnd(edge)]) {
+      if (isPastedFree(end, copiedNodeIds) && end.freePosition) {
+        positions.push(end.freePosition);
+      }
+    }
+  }
+
+  return positions;
 };
 
 /**
  * Calculate the paste position and offset based on command parameters
  */
-const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point => {
-  const center = calculateNodeCenter(copiedNodes);
-
+const calculatePasteOffset = (copiedNodes: Node[], freeEndpointPositions: Point[], command: PasteCommand): Point => {
   if (!command.position) {
     // Default behavior: offset from original center
     return {
@@ -41,7 +83,7 @@ const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point
     };
   }
 
-  if (copiedNodes.length === 1) {
+  if (copiedNodes.length === 1 && freeEndpointPositions.length === 0) {
     // Single node: center the node at cursor position, accounting for node size
     const singleNode = copiedNodes[0];
     const nodeWidth = singleNode.size?.width ?? 0;
@@ -56,7 +98,9 @@ const calculatePasteOffset = (copiedNodes: Node[], command: PasteCommand): Point
     return NgDiagramMath.subtractPoints(target, singleNode.position);
   }
 
-  // Multiple nodes: maintain relative positioning with center at cursor
+  // Keep the relative positions and put the center of the pasted content
+  // (node positions and free edge ends) at the cursor
+  const center = calculateCenter([...copiedNodes.map((node) => node.position), ...freeEndpointPositions]);
   return NgDiagramMath.subtractPoints(command.position, center);
 };
 
@@ -86,7 +130,8 @@ const createPastedNodes = (
   config: FlowConfig,
   copiedNodes: Node[],
   offset: Point,
-  nodeIdMap: Map<string, string>
+  nodeIdMap: Map<string, string>,
+  hiddenCopiedNodeIds: Set<string>
 ): Node[] => {
   copiedNodes.forEach((node) => {
     const newNodeId = config.computeNodeId();
@@ -105,7 +150,9 @@ const createPastedNodes = (
         x: node.position.x + offset.x,
         y: node.position.y + offset.y,
       },
-      selected: true,
+      // Hidden pasted content must not become an invisible selection the next
+      // Delete or arrow key would act on sight unseen.
+      selected: !hiddenCopiedNodeIds.has(node.id),
     };
 
     // Update port nodeIds
@@ -115,22 +162,68 @@ const createPastedNodes = (
   });
 };
 
-/**
- * Create new edges with updated IDs and references
- */
-const createPastedEdges = (config: FlowConfig, copiedEdges: Edge[], nodeIdMap: Map<string, string>): Edge[] => {
-  return copiedEdges.map((edge) => {
-    const newEdgeId = config.computeEdgeId();
-    const newEdge: Edge = {
-      ...edge,
-      id: newEdgeId,
-      source: nodeIdMap.get(edge.source) || edge.source,
-      target: nodeIdMap.get(edge.target) || edge.target,
-      selected: true,
-    };
+/** Resolves one end of a pasted edge; undefined when the end must be pasted free but has no position. */
+const resolvePastedEnd = (end: EdgeEnd, nodeIdMap: Map<string, string>, offset: Point): EdgeEnd | undefined => {
+  const pastedNodeId = nodeIdMap.get(end.nodeId);
+  if (pastedNodeId) {
+    // The node was copied too: connect the end to the pasted node. Routing recomputes its position.
+    return { ...end, nodeId: pastedNodeId };
+  }
+  if (!end.freePosition) {
+    return undefined;
+  }
+  // The node was not copied (or the end was already free): paste the end free
+  // at its shifted position. Connecting it to the original node would silently
+  // duplicate the original connection.
+  return {
+    ...end,
+    nodeId: '',
+    port: undefined,
+    position: { x: end.freePosition.x + offset.x, y: end.freePosition.y + offset.y },
+  };
+};
 
-    return newEdge;
-  });
+/** Create new edges with updated IDs and references; an edge whose free end has no position is skipped. */
+const createPastedEdges = (
+  config: FlowConfig,
+  copiedEdges: Edge[],
+  nodeIdMap: Map<string, string>,
+  hiddenCopiedNodeIds: Set<string>,
+  offset: Point
+): Edge[] => {
+  const pastedEdges: Edge[] = [];
+
+  for (const edge of copiedEdges) {
+    const source = resolvePastedEnd(getSourceEnd(edge), nodeIdMap, offset);
+    const target = resolvePastedEnd(getTargetEnd(edge), nodeIdMap, offset);
+    if (!source || !target) {
+      continue;
+    }
+
+    // A manual-routing edge keeps its stored points verbatim, and every end
+    // that survives resolvePastedEnd moves by exactly `offset`, so the whole
+    // stored path moves with it. Auto-routed edges re-route from their new ends.
+    const points =
+      edge.routingMode === 'manual' && edge.points
+        ? edge.points.map((point) => ({ x: point.x + offset.x, y: point.y + offset.y }))
+        : edge.points;
+
+    pastedEdges.push({
+      ...edge,
+      id: config.computeEdgeId(),
+      source: source.nodeId,
+      sourcePort: source.port,
+      sourcePosition: source.position,
+      target: target.nodeId,
+      targetPort: target.port,
+      targetPosition: target.position,
+      points,
+      // See createPastedNodes — hidden pasted edges stay deselected.
+      selected: !isEdgeEffectivelyHidden(edge, hiddenCopiedNodeIds),
+    });
+  }
+
+  return pastedEdges;
 };
 
 /**
@@ -163,9 +256,39 @@ const createDeselectUpdates = (
 
 export const copy = async (commandHandler: CommandHandler) => {
   const { nodes, edges } = commandHandler.flowCore.getState();
+  const { modelLookup } = commandHandler.flowCore;
 
-  const copiedNodes = nodes.filter((node) => node.selected);
-  const copiedEdges = edges.filter((edge) => edge.selected);
+  // Roots: visible selected nodes. Hidden selected elements are skipped —
+  // consistent with deleteSelection, so `cut` neither copies nor deletes them.
+  const copiedNodeIds = new Set(nodes.filter((node) => node.selected && !node.computedHidden).map((node) => node.id));
+
+  // Cascade: descendants of copied nodes travel with them regardless of their
+  // own hidden state (e.g. the hidden children of a copied collapsed group) —
+  // mirroring deleteSelection, so cut/paste round-trips a collapsed group.
+  for (const id of [...copiedNodeIds]) {
+    for (const descendantId of modelLookup.getAllDescendantIds(id)) {
+      copiedNodeIds.add(descendantId);
+    }
+  }
+
+  const copiedNodes = nodes.filter((node) => copiedNodeIds.has(node.id));
+
+  // "Fully inside" the copied node set: with dangling edges enabled only the
+  // connected endpoints count, so a dangling edge travels with its one node (a
+  // dual dangling edge still only copies when selected). With the feature off
+  // the old rule applies unchanged, so the same model copies identically.
+  const danglingEnabled = commandHandler.flowCore.config.danglingEdges?.enabled;
+  const isInsideCopiedSet = (edge: Edge): boolean => {
+    if (danglingEnabled) {
+      const connectedEndpoints = [edge.source, edge.target].filter(Boolean);
+      return connectedEndpoints.length > 0 && connectedEndpoints.every((nodeId) => copiedNodeIds.has(nodeId));
+    }
+    return copiedNodeIds.has(edge.source) && copiedNodeIds.has(edge.target);
+  };
+
+  // Edges: explicitly selected visible edges, plus every edge fully inside the
+  // copied node set (the internal wiring of copied groups, hidden or not).
+  const copiedEdges = edges.filter((edge) => (edge.selected && !edge.computedHidden) || isInsideCopiedSet(edge));
 
   commandHandler.flowCore.actionStateManager.copyPaste = {
     copiedNodes,
@@ -189,13 +312,45 @@ export const paste = async (commandHandler: CommandHandler, command: PasteComman
   const { nodes, edges } = commandHandler.flowCore.getState();
   const nodeIdMap = new Map<string, string>();
 
-  // Calculate paste offset
-  const offset = calculatePasteOffset(copyPasteState.copiedNodes, command);
+  // Effective visibility WITHIN the copied set (original ids): the copied
+  // snapshots carry user `hidden` flags; the template registry does not apply
+  // to content that does not exist yet.
+  const hiddenCopiedNodeIds = computeHiddenNodeIds(copyPasteState.copiedNodes);
+
+  // Calculate the paste offset from the visible copied nodes only. Hidden
+  // members must not pull the pasted content away from the cursor. Free edge
+  // ends count like node positions.
+  const visibleCopiedNodes = copyPasteState.copiedNodes.filter((node) => !hiddenCopiedNodeIds.has(node.id));
+  const copiedNodeIds = new Set(copyPasteState.copiedNodes.map((node) => node.id));
+  const freeEndpointPositions = collectFreeEdgeEndpointPositions(copyPasteState.copiedEdges, copiedNodeIds);
+  const offset = calculatePasteOffset(
+    visibleCopiedNodes.length > 0 ? visibleCopiedNodes : copyPasteState.copiedNodes,
+    freeEndpointPositions,
+    command
+  );
 
   // Create new nodes and edges
-  const newNodes = createPastedNodes(commandHandler.flowCore.config, copyPasteState.copiedNodes, offset, nodeIdMap);
+  const newNodes = createPastedNodes(
+    commandHandler.flowCore.config,
+    copyPasteState.copiedNodes,
+    offset,
+    nodeIdMap,
+    hiddenCopiedNodeIds
+  );
   applySnappingToNodes(newNodes, commandHandler.flowCore.config);
-  const newEdges = createPastedEdges(commandHandler.flowCore.config, copyPasteState.copiedEdges, nodeIdMap);
+  const newEdges = createPastedEdges(
+    commandHandler.flowCore.config,
+    copyPasteState.copiedEdges,
+    nodeIdMap,
+    hiddenCopiedNodeIds,
+    offset
+  );
+
+  // Nothing to paste (for example, the clipboard held only edges whose free
+  // ends have no position). Leave the current selection as it is.
+  if (newNodes.length === 0 && newEdges.length === 0) {
+    return;
+  }
 
   // Create deselect updates
   const { nodesToUpdate, edgesToUpdate } = createDeselectUpdates(nodes, edges);

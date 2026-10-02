@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import type { BaseInputEvent, Direction, FlowCore, ShortcutDefinition } from '../../../../../core/src';
+import { hasMovableSelection } from '../../../../../core/src/input-events/handlers/movable-selection';
 import type { KeyboardAction } from './keyboard-action.interface';
 
 /**
  * Handles keyboard shortcuts for panning the viewport
  *
  * This action:
- * - Only activates when NO nodes are selected
+ * - Only activates when the arrow keys would not move the selection (see `hasMovableSelection`)
  * - Extracts direction from action name (keyboardPanUp → 'top')
  * - Emits 'keyboardPanning' event with direction data
  *
@@ -15,10 +16,13 @@ import type { KeyboardAction } from './keyboard-action.interface';
 @Injectable()
 export class PanningAction implements KeyboardAction {
   canHandle(shortcut: ShortcutDefinition, flowCore: FlowCore): boolean {
+    // Exact opposite of the MovingAction check: when nothing would move (node
+    // dragging disabled, or only hidden or `draggable: false` nodes selected),
+    // the arrow keys pan instead.
     return (
       flowCore.config.viewportPanningEnabled &&
       shortcut.actionName.startsWith('keyboardPan') &&
-      flowCore.modelLookup.getSelectedNodes().length === 0
+      !hasMovableSelection(flowCore)
     );
   }
 

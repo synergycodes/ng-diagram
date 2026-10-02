@@ -2,6 +2,7 @@ import { FlowCore } from '../../flow-core';
 import type { LabelUpdate } from '../../label-batch-processor/label-batch-processor';
 import type { PortUpdate } from '../../port-batch-processor/port-batch-processor';
 import { Edge, EdgeLabel, Node, Port } from '../../types';
+import { computeHiddenNodeIds, isEdgeEffectivelyHidden } from '../../visibility/effective-visibility';
 import { Updater } from '../updater.interface';
 import { InitState } from './init-state';
 import { LateArrivalQueue } from './late-arrival-queue';
@@ -74,13 +75,27 @@ export class InitUpdater implements Updater {
   /** Safety timeout to prevent indefinite waiting for measurements */
   private measurementTimeout: ReturnType<typeof setTimeout> | null = null;
 
+  /** Effectively hidden node ids at init time — populated in start() */
+  private hiddenNodeIds = new Set<string>();
+
+  /** Effectively hidden edge ids at init time — populated in start() */
+  private hiddenEdgeIds = new Set<string>();
+
   /**
    * Creates a new InitUpdater.
    *
    * @param flowCore - The FlowCore instance to update
    */
   constructor(private flowCore: FlowCore) {
-    this.initState = new InitState();
+    // Effectively hidden elements are display: none — they never deliver valid
+    // measurements and must not create expectations that block initialization.
+    this.initState = new InitState({
+      isNodeMeasurable: (nodeId) => !this.hiddenNodeIds.has(nodeId),
+      isPortMeasurable: (nodeId, portId) =>
+        !this.hiddenNodeIds.has(nodeId) && !this.flowCore.templateVisibilityRegistry?.isPortHidden(nodeId, portId),
+      isLabelMeasurable: (edgeId, labelId) =>
+        !this.hiddenEdgeIds.has(edgeId) && !this.flowCore.templateVisibilityRegistry?.isLabelHidden(edgeId, labelId),
+    });
     this.lateArrivalQueue = new LateArrivalQueue();
   }
 
@@ -94,6 +109,12 @@ export class InitUpdater implements Updater {
    */
   start(nodes: Node[], edges: Edge[], onComplete?: () => void | Promise<void>) {
     this.onCompleteCallback = onComplete;
+
+    const registry = this.flowCore.templateVisibilityRegistry;
+    this.hiddenNodeIds = computeHiddenNodeIds(nodes, registry);
+    this.hiddenEdgeIds = new Set(
+      edges.filter((edge) => isEdgeEffectivelyHidden(edge, this.hiddenNodeIds, registry)).map((edge) => edge.id)
+    );
 
     const hasNodes = nodes.length > 0;
     const hasEdges = edges.length > 0;
@@ -113,6 +134,29 @@ export class InitUpdater implements Updater {
         console.error(INIT_STABILIZATION_FAILED_ERROR(err));
         this.forceFinish();
       });
+  }
+
+  /**
+   * Recomputes effective visibility and drops measurement expectations for
+   * entities that became hidden — hidden elements never deliver valid
+   * measurements and must not keep initialization waiting. Entities that
+   * became visible are not re-added; they measure through the observer path.
+   * Safe no-op after initialization completes.
+   */
+  refreshHiddenEntities(): void {
+    if (this.isInitialized) {
+      return;
+    }
+
+    const { nodes, edges } = this.flowCore.getState();
+    const registry = this.flowCore.templateVisibilityRegistry;
+    this.hiddenNodeIds = computeHiddenNodeIds(nodes, registry);
+    this.hiddenEdgeIds = new Set(
+      edges.filter((edge) => isEdgeEffectivelyHidden(edge, this.hiddenNodeIds, registry)).map((edge) => edge.id)
+    );
+
+    this.initState.pruneUnmeasurableExpectations();
+    this.tryFinish();
   }
 
   /**
@@ -295,7 +339,8 @@ export class InitUpdater implements Updater {
 
         console.warn(
           '[InitUpdater] Measurement timeout reached. Some entities may not be measurable (e.g., display: none).' +
-            ' Ensure the model provided to ng-diagram was created with initializeModel() or initializeModelAdapter() (for custom ModelAdapter).',
+            ' Ensure the model provided to ng-diagram was created with initializeModel() or initializeModelAdapter() (for custom ModelAdapter).' +
+            ' To intentionally hide elements, use the `hidden` flag on nodes/edges or the `hidden` input on ports and edge labels — hidden elements create no measurement expectations.',
           {
             nodes: { expected: expectedNodes, measured: measuredNodes },
             ports: { expected: expectedPorts, measured: measuredPorts },

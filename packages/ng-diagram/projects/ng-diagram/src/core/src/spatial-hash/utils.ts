@@ -30,7 +30,12 @@ export const getNearestNodeInRange = (flowCore: FlowCore, point: Point, range: n
 export const getNearestPortInRange = (flowCore: FlowCore, point: Point, range: number): Port | null => {
   const nodeToPortsMap = new Map<Node, Port[]>();
   getNodesInRange(flowCore, point, range).forEach((node) => {
-    nodeToPortsMap.set(node, node.measuredPorts || []);
+    // Template-hidden ports are not snap candidates (hidden nodes never get
+    // here — the spatial hash excludes them).
+    const ports = (node.measuredPorts || []).filter(
+      (port) => !flowCore.templateVisibilityRegistry?.isPortHidden(node.id, port.id)
+    );
+    nodeToPortsMap.set(node, ports);
   });
   let minDistance = Infinity;
   let nearestPort: Port | null = null;

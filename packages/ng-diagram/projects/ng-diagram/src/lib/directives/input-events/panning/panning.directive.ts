@@ -165,6 +165,7 @@ export class PanningDirective implements OnDestroy {
       event.moveSelectionHandled ||
       event.zoomingHandled ||
       event.linkingHandled ||
+      event.relinkHandled ||
       event.rotateHandled ||
       event.boxSelectionHandled
     );

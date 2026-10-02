@@ -1,13 +1,13 @@
-# ng-diagram
+# ngDiagram
 
 [![npm version](https://badge.fury.io/js/ng-diagram.svg)](https://badge.fury.io/js/ng-diagram)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202-blue)](https://opensource.org/license/apache-2-0)
 
 A robust Angular library for building interactive diagrams, node-based editors, and visual programming interfaces. Designed with Angular and TypeScript, it offers a complete toolkit to create sophisticated, customizable, and high-performance diagramming applications.
 
-Unlike generic diagramming libraries, **ng-diagram** is Angular-first - built on Angular signals and templates for seamless integration and performance.
+Unlike generic diagramming libraries, **ngDiagram** is Angular-first - built on Angular signals and templates for seamless integration and performance.
 
-![Interactive ng-diagram editor: custom Angular components as nodes — including a live chart — with groups, edge drawing, rotation, and zooming](https://raw.githubusercontent.com/synergycodes/ng-diagram/main/.github/assets/ngdiagram-hero.gif)
+![Interactive ngDiagram editor: custom Angular components as nodes — including a live chart — with groups, edge drawing, rotation, and zooming](https://raw.githubusercontent.com/synergycodes/ng-diagram/main/.github/assets/ngdiagram-hero.gif)
 
 ## ✨ Features
 
@@ -27,7 +27,7 @@ Unlike generic diagramming libraries, **ng-diagram** is Angular-first - built on
 
 ## 📚 What You Can Build
 
-With ng-diagram, you can create:
+With ngDiagram, you can create:
 
 - **Flow Diagrams**: Process flows, decision trees, and workflow visualizations
 - **Node-Based Editors**: Visual programming interfaces and data flow editors
@@ -40,11 +40,21 @@ See our [Templates](#-templates) for production-ready examples you can fork and 
 
 ## 🎮 Try the Demo
 
-See ng-diagram in action: **[Live Demo](https://synergycodes.github.io/ng-diagram-demo/)** | **[Source Code](https://github.com/synergycodes/ng-diagram-demo)**
+See ngDiagram in action: **[Live Demo](https://synergycodes.github.io/ng-diagram-demo/)** | **[Source Code](https://github.com/synergycodes/ng-diagram-demo)**
+
+## 🎓 Video Course
+
+Learn ngDiagram by building an Angular workflow builder from scratch — a step-by-step video series by the team:
+
+1. **[Angular workflow builder from scratch | ngDiagram Ep. 1: Project setup](https://youtu.be/Ck_lPtyKE_Q)**
+2. **[Angular signals, zero glue code | ngDiagram Ep. 2: Properties panel](https://youtu.be/8CdH9Rk99KE)**
+3. **[Custom nodes in an Angular workflow builder | ngDiagram Ep. 3: Node types](https://youtu.be/UzK0h9wcyEo)**
+
+The series is ongoing — new episodes are in production. Follow the [Synergy Codes YouTube channel](https://www.youtube.com/@synergycodes) to catch the next one.
 
 ## 🧩 Templates
 
-Production-ready starter kits built with ng-diagram. Fork, customize, ship.
+Production-ready starter kits built with ngDiagram. Fork, customize, ship.
 
 | Template                | Description                                                                                                                   | Demo                                                                  | Source                                                                   |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------ |
@@ -175,7 +185,7 @@ The library ships **components** for the diagram canvas, backgrounds, ports, pal
 
 ## 👩‍💻 About the Creators
 
-ng-diagram is built and maintained by [**Synergy Codes**](https://www.synergycodes.com) - a team of developers who’ve spent **over a decade designing and delivering diagramming solutions** for clients worldwide.
+ngDiagram is built and maintained by [**Synergy Codes**](https://www.synergycodes.com) - a team of developers who’ve spent **over a decade designing and delivering diagramming solutions** for clients worldwide.
 
 We are continuously distilling everything we know about building interactive diagrams, editors, and visual tools into this library. Our goal is simple: to empower Angular developers to create diagramming applications faster, easier, and with confidence.
 
@@ -197,7 +207,7 @@ The documentation includes:
 
 ## 🤖 MCP Server
 
-Use AI assistants like Claude, Cursor, or Windsurf to search ng-diagram docs and API directly from your editor. No browser needed.
+Use AI assistants like Claude, Cursor, or Windsurf to search ngDiagram docs and API directly from your editor. No browser needed.
 
 ```json
 {
@@ -227,7 +237,7 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](https:
 - **Documentation**: [https://www.ngdiagram.dev/docs](https://www.ngdiagram.dev/docs)
 - **GitHub**: [https://github.com/synergycodes/ng-diagram](https://github.com/synergycodes/ng-diagram)
 - **NPM**: [https://www.npmjs.com/package/ng-diagram](https://www.npmjs.com/package/ng-diagram)
-- **MCP Server**: [@ng-diagram/mcp](https://www.npmjs.com/package/@ng-diagram/mcp) - let AI assistants search ng-diagram docs and API
+- **MCP Server**: [@ng-diagram/mcp](https://www.npmjs.com/package/@ng-diagram/mcp) - let AI assistants search ngDiagram docs and API
 - **Website**: [https://www.ngdiagram.dev](https://www.ngdiagram.dev)
 
 ## 🆘 Support

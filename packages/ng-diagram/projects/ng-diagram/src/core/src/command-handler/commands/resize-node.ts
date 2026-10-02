@@ -137,10 +137,15 @@ const handleGroupNodeResize = async (
   command: ResizeNodeCommand,
   node: GroupNode
 ): Promise<void> => {
-  const children = commandHandler.flowCore.modelLookup.getNodeChildren(command.id, { directOnly: false });
+  // Effectively hidden children do not constrain the resize — blocking the
+  // user on invisible content is worse than revealing it outside the group
+  // on a later unhide (a collapsed group must be freely resizable).
+  const children = commandHandler.flowCore.modelLookup
+    .getNodeChildren(command.id, { directOnly: false })
+    .filter((child) => !child.computedHidden);
 
   if (children.length === 0) {
-    // if the group has no children, we fallback to single node mode
+    // if the group has no (visible) children, we fallback to single node mode
     await handleSingleNodeResize(commandHandler, command);
     return;
   }

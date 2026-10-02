@@ -1,0 +1,14 @@
+<label class="hidden-port-label">
+  <input
+    class="hidden-port-checkbox"
+    type="checkbox"
+    [checked]="portsHidden()"
+    (change)="togglePorts()"
+    (keydown)="$event.stopPropagation()"
+    (keypress)="$event.stopPropagation()"
+    (keyup)="$event.stopPropagation()"
+  />
+  {{ node().data.text }}
+</label>
+<ng-diagram-port id="port-left" type="both" side="left" [hidden]="portsHidden()" />
+<ng-diagram-port id="port-right" type="both" side="right" [hidden]="portsHidden()" />

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, expect, it } from 'vitest';
 import { Node } from '../../../../types';
+import { TemplateVisibilityRegistry } from '../../../../visibility/template-visibility-registry';
 import { isNodeFullyMeasured } from '../is-node-fully-measured';
 
 describe('isNodeFullyMeasured', () => {
@@ -206,5 +207,40 @@ describe('isNodeFullyMeasured', () => {
       measuredPorts: undefined,
     };
     expect(isNodeFullyMeasured(node)).toBe(true);
+  });
+
+  it('should ignore registry-hidden ports that never measured', () => {
+    const registry = new TemplateVisibilityRegistry();
+    registry.setPortHidden('node1', 'port1', true);
+    registry.setPortHidden('node1', 'port2', true);
+
+    const node: Node = {
+      id: 'node1',
+      position: { x: 100, y: 50 },
+      size: { width: 200, height: 100 },
+      data: {},
+      measuredPorts: [
+        { id: 'port1', position: undefined, size: undefined, type: 'both', nodeId: 'node1', side: 'left' },
+        { id: 'port2', position: undefined, size: undefined, type: 'both', nodeId: 'node1', side: 'right' },
+      ],
+    };
+    expect(isNodeFullyMeasured(node, registry)).toBe(true);
+  });
+
+  it('should still require visible ports to be measured when a registry is provided', () => {
+    const registry = new TemplateVisibilityRegistry();
+    registry.setPortHidden('node1', 'port1', true);
+
+    const node: Node = {
+      id: 'node1',
+      position: { x: 100, y: 50 },
+      size: { width: 200, height: 100 },
+      data: {},
+      measuredPorts: [
+        { id: 'port1', position: undefined, size: undefined, type: 'both', nodeId: 'node1', side: 'left' },
+        { id: 'port2', position: undefined, size: undefined, type: 'both', nodeId: 'node1', side: 'right' },
+      ],
+    };
+    expect(isNodeFullyMeasured(node, registry)).toBe(false);
   });
 });

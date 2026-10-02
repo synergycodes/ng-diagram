@@ -69,8 +69,11 @@ export type ModelActionType =
   | 'resizeNodeStop'
   | 'cancelResize'
   | 'startLinking'
+  | 'startLinkingFromPosition'
   | 'moveTemporaryEdge'
   | 'finishLinking'
+  | 'startRelinking'
+  | 'finishRelinking'
   | 'zoom'
   | 'changeZOrder'
   | 'rotateNodeTo'
@@ -83,7 +86,8 @@ export type ModelActionType =
   | 'moveNodesStart'
   | 'moveNodesStop'
   | 'cancelDrag'
-  | 'selectEnd';
+  | 'selectEnd'
+  | 'templateVisibilityChange';
 
 /**
  * The complete state of the flow diagram.

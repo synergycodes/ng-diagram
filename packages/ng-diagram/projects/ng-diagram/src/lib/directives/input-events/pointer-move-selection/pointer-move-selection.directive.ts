@@ -33,11 +33,20 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   ngOnDestroy() {
     const wasMidGesture = this.gestureActive;
     this.removeListeners();
-    // Destroyed mid-gesture (e.g. the dragged node was deleted): the pointerup
-    // will never be routed, so the dragging state must be cleared here — a
-    // leaked dragging state keeps hasActiveInteraction() true forever.
+    // Destroyed mid-gesture (the dragged node was deleted or hidden): the
+    // pointerup will never be routed. Run the full cancel flow — paired
+    // nodeDragEnded ('cancelled'), group-highlight clear, geometry rollback —
+    // not a bare state clear that strands Started events without Ended ones.
     if (wasMidGesture && this.flowCoreProvider.isInitialized()) {
-      this.flowCoreProvider.provide().actionStateManager.clearDragging();
+      const flowCore = this.flowCoreProvider.provide();
+      void flowCore.cancelActiveInteraction().then((cancelled) => {
+        // Refused cancel (e.g. active transaction): fall back to the bare
+        // clear — a leaked dragging state keeps hasActiveInteraction() true
+        // forever. Skip while another cancel owns the state mid-rollback.
+        if (!cancelled && !flowCore.isCancellingInteraction()) {
+          flowCore.actionStateManager.clearDragging();
+        }
+      });
     }
   }
 

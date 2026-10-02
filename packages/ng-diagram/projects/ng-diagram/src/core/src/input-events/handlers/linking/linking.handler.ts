@@ -30,6 +30,14 @@ export class LinkingEventHandler extends EventHandler<LinkingInputEvent> {
           throw new Error(LINKING_MISSING_TARGET_ERROR(event));
         }
 
+        // A draw or relink already owns the linking state — clobbering it
+        // would strand its gesture (hidden edge, unbalanced started/ended
+        // events, orphaned document listeners).
+        if (this.flow.actionStateManager.isLinking()) {
+          console.warn('[ngDiagram] startLinking ignored: another linking or relinking gesture is in progress.');
+          break;
+        }
+
         this.flow.actionStateManager.linking = createLinkingState({
           sourceNodeId,
           sourcePortId: event.portId,

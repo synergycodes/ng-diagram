@@ -126,6 +126,135 @@ describe('InternalUpdater', () => {
     });
   });
 
+  describe('zero-size measurement guard', () => {
+    it('should reject a 0×0 node size so it never overwrites existing geometry', () => {
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        size: { width: 100, height: 100 },
+      });
+
+      internalUpdater.applyNodeSize('node-1', { width: 0, height: 0 });
+
+      expect(commandHandler.emit).not.toHaveBeenCalled();
+    });
+
+    it('should reject a 0×0 node size even when the node has no size yet', () => {
+      getNodeByIdMock.mockReturnValue({ ...mockNode, size: undefined });
+
+      internalUpdater.applyNodeSize('node-1', { width: 0, height: 0 });
+
+      expect(commandHandler.emit).not.toHaveBeenCalled();
+    });
+
+    it('should apply a degenerate-but-visible measurement (200×0)', () => {
+      getNodeByIdMock.mockReturnValue({
+        ...mockNode,
+        size: { width: 100, height: 100 },
+      });
+
+      internalUpdater.applyNodeSize('node-1', { width: 200, height: 0 });
+
+      expect(commandHandler.emit).toHaveBeenCalledWith('updateNodes', {
+        nodes: [{ id: 'node-1', size: { width: 200, height: 0 } }],
+      });
+    });
+
+    it('should drop port geometry updates carrying a 0×0 size', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [{ ...mockPort, id: 'port-1', size: { width: 10, height: 10 }, position: { x: 5, y: 5 } }],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      internalUpdater.applyPortChanges('node-1', [
+        { portId: 'port-1', portChanges: { size: { width: 0, height: 0 }, position: { x: 0, y: 0 } } },
+      ]);
+
+      expect(portBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should keep non-measured properties of a port update carrying a 0×0 size', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [
+          {
+            ...mockPort,
+            id: 'port-1',
+            side: 'top' as const,
+            size: { width: 10, height: 10 },
+            position: { x: 5, y: 5 },
+          },
+        ],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      internalUpdater.applyPortChanges('node-1', [
+        {
+          portId: 'port-1',
+          portChanges: { side: 'bottom', size: { width: 0, height: 0 }, position: { x: 0, y: 0 } },
+        },
+      ]);
+
+      expect(portBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        'node-1',
+        { portId: 'port-1', portChanges: { side: 'bottom' } },
+        expect.any(Function)
+      );
+    });
+
+    it('should apply a degenerate-but-visible port measurement (200×0)', () => {
+      const node = {
+        ...mockNode,
+        measuredPorts: [{ ...mockPort, id: 'port-1', size: { width: 10, height: 10 }, position: { x: 5, y: 5 } }],
+      };
+      getNodeByIdMock.mockReturnValue(node);
+
+      internalUpdater.applyPortChanges('node-1', [
+        { portId: 'port-1', portChanges: { size: { width: 200, height: 0 }, position: { x: 5, y: 5 } } },
+      ]);
+
+      expect(portBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        'node-1',
+        { portId: 'port-1', portChanges: { size: { width: 200, height: 0 }, position: { x: 5, y: 5 } } },
+        expect.any(Function)
+      );
+    });
+
+    it('should drop label geometry updates carrying a 0×0 size', () => {
+      const edge = {
+        ...mockEdge,
+        measuredLabels: [{ ...mockEdgeLabel, size: { width: 100, height: 100 } }],
+      };
+      getEdgeByIdMock.mockReturnValue(edge);
+
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { size: { width: 0, height: 0 } } },
+      ]);
+
+      expect(labelBatchProcessor.processUpdate).not.toHaveBeenCalled();
+    });
+
+    it('should apply a degenerate-but-visible label measurement (200×0)', () => {
+      const edge = {
+        ...mockEdge,
+        measuredLabels: [{ ...mockEdgeLabel, size: { width: 100, height: 100 } }],
+      };
+      getEdgeByIdMock.mockReturnValue(edge);
+
+      labelBatchProcessor.processUpdate = vi.fn();
+
+      internalUpdater.applyEdgeLabelChanges(edge.id, [
+        { labelId: mockEdgeLabel.id, labelChanges: { size: { width: 200, height: 0 } } },
+      ]);
+
+      expect(labelBatchProcessor.processUpdate).toHaveBeenCalledWith(
+        edge.id,
+        { labelId: mockEdgeLabel.id, labelChanges: { size: { width: 200, height: 0 } } },
+        expect.any(Function)
+      );
+    });
+  });
+
   describe('deletePort', () => {
     it('should process port deletion through portBatchProcessor', () => {
       portBatchProcessor.processDelete = vi.fn().mockImplementation((nodeId, portId, callback) => {

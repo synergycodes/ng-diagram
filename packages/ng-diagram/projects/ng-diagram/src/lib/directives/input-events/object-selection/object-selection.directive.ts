@@ -64,6 +64,12 @@ abstract class ObjectSelectionDirective implements OnDestroy {
     if (event.boxSelectionHandled || event.selectHandled) {
       return false;
     }
+    // A pointerdown on an edge endpoint handle starts a relink — never a
+    // selection change (the edge is already selected; handles only render on
+    // selected edges).
+    if (event.relinkHandled) {
+      return false;
+    }
     if (event.linkingHandled && !this.flowCoreProvider.provide().config.linking.selectNodeOnPortPress) {
       return false;
     }

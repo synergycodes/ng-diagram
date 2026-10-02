@@ -1,4 +1,5 @@
-<div class="diagram-container">
+<div class="diagram-container" [class.reveal-hidden-ghosts]="revealHiddenGhosts()">
+  <app-palette [model]="paletteModel" />
   <ng-diagram
     [nodeTemplateMap]="nodeTemplateMap"
     [edgeTemplateMap]="edgeTemplateMap"
@@ -13,6 +14,8 @@
     (nodeRotateEnded)="onNodeRotateEnded($event)"
     (edgeDrawn)="onEdgeDrawn($event)"
     (edgeDrawEnded)="onEdgeDrawEnded($event)"
+    (edgeRelinkStarted)="onEdgeRelinkStarted($event)"
+    (edgeRelinkEnded)="onEdgeRelinkEnded($event)"
     (clipboardPasted)="onClipboardPasted($event)"
     (nodeResized)="onNodeResized($event)"
     (nodeResizeStarted)="onNodeResizeStarted($event)"
@@ -31,11 +34,17 @@
     <app-measurement-tests (exit)="exitMeasurementTest()" />
   } @else if (awaitableTestMode()) {
     <app-awaitable-tests (exit)="exitAwaitableTest()" />
+  } @else if (hiddenElementsDemoMode()) {
+    <app-hidden-elements-toolbar (exit)="exitHiddenElementsDemo()" (revealGhosts)="revealHiddenGhosts.set($event)" />
+  } @else if (relinkingTestMode()) {
+    <app-relinking-toolbar (exit)="exitRelinkingTest()" (resetScene)="resetRelinkingScene()" />
   } @else {
     <app-toolbar
       (enterBatchTest)="enterBatchTest()"
       (measurementTestEnter)="enterMeasurementTest()"
       (awaitableTestEnter)="enterAwaitableTest()"
+      (hiddenElementsDemoEnter)="enterHiddenElementsDemo()"
+      (relinkingTestEnter)="enterRelinkingTest()"
       (testVirtualizationClick)="enableVirtualizationTest()"
       (reinitializeModelClick)="onReinitializeModel()"
       (saveModelClick)="onSaveModel()"
@@ -43,5 +52,4 @@
       (simulateModelDownloadClick)="onSimulateModelDownload()"
     />
   }
-  <app-palette [model]="paletteModel" />
 </div>

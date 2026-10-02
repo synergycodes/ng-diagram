@@ -35,6 +35,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
       environment: mockEnvironment,
       modelLookup: {
         getSelectedNodesWithChildren: vi.fn().mockReturnValue([mockNode]),
+        getAllDescendantIds: vi.fn().mockReturnValue([]),
       },
       model: {
         getMetadata: vi.fn().mockReturnValue({
@@ -423,6 +424,75 @@ describe('KeyboardMoveSelectionEventHandler', () => {
           nodes: [parentNode, draggableChild],
           delta: { x: 10, y: 0 },
         });
+      });
+    });
+
+    describe('hidden nodes filtering', () => {
+      it('should not emit moveNodesBy when the only selected node has computedHidden', () => {
+        const hiddenNode = { ...mockNode, computedHidden: true };
+        (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+          hiddenNode,
+        ]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).not.toHaveBeenCalled();
+      });
+
+      it('should exclude nodes with computedHidden from the emitted move set in mixed selection', () => {
+        const visibleNode = { ...mockNode, id: 'visible' };
+        const hiddenNode = { ...mockNode, id: 'hidden', computedHidden: true };
+        (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+          visibleNode,
+          hiddenNode,
+        ]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [visibleNode],
+          delta: { x: 10, y: 0 },
+        });
+      });
+
+      it('should move hidden descendants along with their visible selected group', () => {
+        // A collapsed group: the group is visible and selected, its child hidden.
+        const group = { ...mockNode, id: 'group', selected: true, isGroup: true };
+        const hiddenChild = { ...mockNode, id: 'child', groupId: 'group', computedHidden: true };
+        (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+          group,
+          hiddenChild,
+        ]);
+        (mockFlowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+          id === 'group' ? ['child'] : []
+        );
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
+          nodes: [group, hiddenChild],
+          delta: { x: 10, y: 0 },
+        });
+      });
+
+      it('should not move hidden descendants of a hidden selected group', () => {
+        const hiddenGroup = { ...mockNode, id: 'group', selected: true, isGroup: true, computedHidden: true };
+        const hiddenChild = { ...mockNode, id: 'child', groupId: 'group', computedHidden: true };
+        (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+          hiddenGroup,
+          hiddenChild,
+        ]);
+        (mockFlowCore.modelLookup.getAllDescendantIds as ReturnType<typeof vi.fn>).mockImplementation((id: string) =>
+          id === 'group' ? ['child'] : []
+        );
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).not.toHaveBeenCalled();
       });
     });
 

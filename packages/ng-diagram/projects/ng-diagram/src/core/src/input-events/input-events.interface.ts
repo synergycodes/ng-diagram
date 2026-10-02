@@ -17,6 +17,7 @@ export type InputEventName =
   | 'resize'
   | 'zoom'
   | 'linking'
+  | 'relinking'
   | 'rotate'
   | 'paletteDrop'
   | 'boxSelection'

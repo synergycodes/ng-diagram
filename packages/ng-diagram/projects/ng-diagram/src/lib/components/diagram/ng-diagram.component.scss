@@ -22,6 +22,15 @@
     }
   }
 
+  // Held at the host for the whole gesture: the pressed relink handle unmounts
+  // mid-gesture (the original edge is hidden), the handles of the preview do
+  // not react to the pointer, and a port drag has no handle at all. Child
+  // components (edges, nodes, ports) keep their own cursors.
+  &.linking,
+  &.relinking {
+    cursor: grabbing;
+  }
+
   .diagram-background-container {
     width: 100%;
     height: 100%;

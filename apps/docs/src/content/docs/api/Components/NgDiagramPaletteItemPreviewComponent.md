@@ -6,8 +6,8 @@ prev: false
 title: "NgDiagramPaletteItemPreviewComponent"
 ---
 
-The `NgDiagramPaletteItemPreviewComponent` is responsible for rendering a live preview of a palette item
-when it is being dragged or hovered in the palette.
+The `NgDiagramPaletteItemPreviewComponent` defines the preview of a palette item shown while it is
+dragged onto the canvas.
 
 ## Example usage
 ```html
@@ -15,3 +15,29 @@ when it is being dragged or hovered in the palette.
   <!-- Palette item content here -->
 </ng-diagram-palette-item-preview>
 ```
+
+## Properties
+
+### preview
+
+> `readonly` **preview**: `Signal`\<`undefined` \| `ElementRef`\<`HTMLElement`\>\>
+
+The element holding the preview content. It is not rendered in the page flow, so read the
+preview's natural size or content from it — its position is meaningless.
+
+## Accessors
+
+### scaleTransform
+
+#### Get Signature
+
+> **get** **scaleTransform**(): `string`
+
+:::caution[Deprecated]
+The drag image is scaled internally, so this value is no longer used. It will be
+removed in the next major version.
+:::
+
+##### Returns
+
+`string`

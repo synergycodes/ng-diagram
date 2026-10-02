@@ -1,0 +1,13 @@
+ng-diagram-base-edge.hidden-label-edge {
+  --edge-stroke: black;
+}
+
+.hidden-edge-label {
+  background-color: white;
+  border: 1px dashed #e91e63;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}

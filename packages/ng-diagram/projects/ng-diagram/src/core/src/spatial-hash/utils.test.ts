@@ -146,6 +146,29 @@ describe('SpatialHash utils', () => {
 
       expect(result).toEqual(node1.measuredPorts[1]);
     });
+
+    it('should skip template-hidden ports as snap candidates', () => {
+      const node1 = {
+        ...mockNode,
+        id: '1',
+        position: { x: 0, y: 0 },
+        size: { width: 5, height: 5 },
+        measuredPorts: [
+          { id: 'far', position: { x: 0, y: 0 }, size: { width: 2, height: 2 } },
+          { id: 'nearHidden', position: { x: 5, y: 5 }, size: { width: 2, height: 2 } },
+        ],
+      };
+
+      mockGetNodeById.mockImplementation((id: string) => (id === '1' ? node1 : null));
+      mockQueryIds.mockReturnValue(['1']);
+      (flowCore as unknown as { templateVisibilityRegistry: unknown }).templateVisibilityRegistry = {
+        isPortHidden: (nodeId: string, portId: string) => nodeId === '1' && portId === 'nearHidden',
+      };
+
+      const result = getNearestPortInRange(flowCore, { x: 6, y: 6 }, 10);
+
+      expect(result).toEqual(node1.measuredPorts[0]);
+    });
   });
 
   describe('getNodesInRect', () => {

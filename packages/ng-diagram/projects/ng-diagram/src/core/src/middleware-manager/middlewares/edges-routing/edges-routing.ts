@@ -38,6 +38,9 @@ export const checkIfShouldRouteEdges = ({
       'routing',
       'routingMode',
       'measuredLabels',
+      // Unhiding an edge must re-route it — its points can be stale from
+      // changes that happened while routing was skipped.
+      'computedHidden',
     ])
   );
 };
@@ -50,6 +53,13 @@ export const shouldRouteEdge = (
   helpers: MiddlewareContext['helpers'],
   modelActionTypes: MiddlewareContext['modelActionTypes']
 ): boolean => {
+  // Effectively hidden edges are not routed — endpoint geometry of hidden
+  // nodes is stale and must not produce paths. Unhiding re-triggers routing
+  // through the computedHidden change itself (checkIfEdgeChanged).
+  if (edge.computedHidden) {
+    return false;
+  }
+
   const isEdgeOrNodesChanged =
     helpers.checkIfEdgeAdded(edge.id) ||
     helpers.checkIfEdgeChanged(edge.id) ||
@@ -190,6 +200,9 @@ export const createUpdatedTemporaryEdge = (
     points,
     sourcePosition: sourcePoint,
     targetPosition: targetPoint,
+    // A relink preview carries the original edge's labels; repositioning them
+    // on every pass keeps them on the path that follows the pointer.
+    measuredLabels: updateLabelPositions(temporaryEdge, points ?? [], routingManager),
     computedZIndex: zIndex,
   };
 };
@@ -221,9 +234,17 @@ export const edgesRoutingMiddleware: Middleware = {
       ? processEdgesForRouting(edges, nodesMap, edgeRoutingManager, helpers, modelActionTypes)
       : [];
 
-    const newTemporaryEdge = temporaryEdge
-      ? createUpdatedTemporaryEdge(temporaryEdge, nodesMap, edgeRoutingManager, temporaryEdgeZIndex)
-      : undefined;
+    // A temporary edge whose anchored end became effectively hidden mid-gesture
+    // is not re-routed — its geometry is stale and the render layer skips it.
+    // The anchored end is the source for draws and target-end relinks, and the
+    // target while a source endpoint is being relinked.
+    const anchoredEndNodeId =
+      actionStateManager.linking?.relink?.end === 'source' ? temporaryEdge?.target : temporaryEdge?.source;
+    const isAnchoredEndHidden = anchoredEndNodeId ? nodesMap.get(anchoredEndNodeId)?.computedHidden : false;
+    const newTemporaryEdge =
+      temporaryEdge && !isAnchoredEndHidden
+        ? createUpdatedTemporaryEdge(temporaryEdge, nodesMap, edgeRoutingManager, temporaryEdgeZIndex)
+        : undefined;
 
     if (newTemporaryEdge && actionStateManager.linking) {
       actionStateManager.linking = {

@@ -15,6 +15,8 @@ import { ZoomAction } from './keyboard-actions/zoom.action';
   providers: [PanningAction, MovingAction, PasteAction, ZoomAction],
   host: {
     '(document:keydown)': 'onKeyDown($event)',
+    // Makes the element focusable so shortcuts have somewhere to land. NgDiagramComponent
+    // overrides it with a binding driven by its `tabbable` input.
     tabindex: '0',
   },
 })

@@ -37,6 +37,18 @@
   --ngd-resize-handle-border-color: var(--ngd-transform-box);
   --ngd-resize-handle-border-radius: 0;
 
+  --ngd-relink-handle-size: 0.75rem;
+  --ngd-relink-handle-fill: var(--ngd-edge-handle-fill-default);
+  --ngd-relink-handle-fill-hover: var(--ngd-edge-handle-fill-hover);
+  --ngd-relink-handle-fill-drag: var(--ngd-edge-handle-fill-drag);
+  --ngd-relink-handle-stroke: var(--ngd-edge-handle-stroke-default);
+  --ngd-relink-handle-stroke-hover: var(--ngd-edge-handle-stroke-hover);
+  --ngd-relink-handle-stroke-drag: var(--ngd-edge-handle-stroke-drag);
+  --ngd-relink-handle-stroke-width: 0.1875rem;
+  --ngd-relink-handle-halo-size: 0.25rem;
+  --ngd-relink-handle-halo-color-hover: var(--ngd-edge-handle-halo-hover);
+  --ngd-relink-handle-halo-color-drag: var(--ngd-edge-handle-halo-drag);
+
   --ngd-port-size: 0.25rem;
   --ngd-port-background-color: var(--ngd-node-port-fill-default);
   --ngd-port-border-color: var(--ngd-node-port-stroke-default);

@@ -50,6 +50,12 @@ To define the preview, wrap your content in [`<ng-diagram-palette-item-preview>`
 
 The preview itself can be any HTML or Angular component.
 
+The preview can render any element, of any size. It takes no space in your layout and never shows up on the page — place [`<ng-diagram-palette-item-preview>`](/docs/api/components/ngdiagrampaletteitempreviewcomponent) anywhere inside the palette item and lay out the palette like any other panel.
+
+During a drag, the preview is scaled to the current zoom of the diagram (up to 3x) and shown under the cursor, so the drag image matches the node that will be dropped.
+
+In the example below, each preview renders the same shape and size as the node its item creates, so the image under the cursor is exactly what lands on the canvas.
+
 import Palette from '@examples/palette/palette.astro';
 
 <Palette />

@@ -28,12 +28,22 @@ export class LinkingInputDirective implements OnDestroy {
   ngOnDestroy(): void {
     const wasMidGesture = this.gestureActive;
     this.removeListeners();
-    // Destroyed mid-gesture (e.g. the source node was deleted while linking): the
-    // pointerup will never be routed and finishLinking will never run. The state
-    // must be cleared here — a stranded linking state permanently disables linking,
-    // because shouldHandle refuses to start while isLinking() is true.
+    // Destroyed mid-gesture (the source node was deleted or hidden while
+    // linking): the pointerup will never be routed and finishLinking will
+    // never run. Run the full cancel flow — cancelLinking erases the temporary
+    // edge and emits edgeDrawEnded ('cancelled') — not a bare state clear that
+    // strands an edgeDrawStarted without its Ended.
     if (wasMidGesture && this.flowCoreProviderService.isInitialized()) {
-      this.flowCoreProviderService.provide().actionStateManager.clearLinking();
+      const flowCore = this.flowCoreProviderService.provide();
+      void flowCore.cancelActiveInteraction().then((cancelled) => {
+        // Refused cancel (e.g. active transaction): fall back to the bare
+        // clear — a stranded linking state permanently disables linking,
+        // because shouldHandle refuses to start while isLinking() is true.
+        // Skip while another cancel owns the state mid-rollback.
+        if (!cancelled && !flowCore.isCancellingInteraction()) {
+          flowCore.actionStateManager.clearLinking();
+        }
+      });
     }
   }
 
@@ -53,6 +63,7 @@ export class LinkingInputDirective implements OnDestroy {
 
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
+    document.addEventListener('pointercancel', this.onPointerCancel);
     this.unregisterInteractionCleanup = this.flowCoreProviderService
       .provide()
       .registerInteractionCleanup(() => this.removeListeners());
@@ -99,9 +110,23 @@ export class LinkingInputDirective implements OnDestroy {
     this.removeListeners();
   };
 
+  onPointerCancel = ($event: PointerInputEvent) => {
+    // The browser or the OS took the pointer away (palm rejection, a system
+    // gesture, a native drag). A cancelled pointer carries no usable
+    // coordinates, so the draw is aborted instead of finished at its point.
+    this.linkingEventService.emitEnd($event, this.target(), this.portId(), true);
+    this.removeListeners();
+  };
+
   private shouldHandle(event: PointerInputEvent) {
-    if (this.flowCoreProviderService.provide().actionStateManager.isLinking()) {
+    const flowCore = this.flowCoreProviderService.provide();
+    if (flowCore.actionStateManager.isLinking()) {
       this.target.set(undefined);
+      return false;
+    }
+
+    // An Escape-triggered cancel can still be rolling back state.
+    if (flowCore.isCancellingInteraction()) {
       return false;
     }
 
@@ -124,6 +149,7 @@ export class LinkingInputDirective implements OnDestroy {
     }
     document.removeEventListener('pointermove', this.onPointerMove);
     document.removeEventListener('pointerup', this.onPointerUp);
+    document.removeEventListener('pointercancel', this.onPointerCancel);
     this.stopEdgePanning();
   }
 

@@ -1,3 +1,14 @@
+// Theme through --ngd-relink-handle-* (declared in styles.css, palette
+// defaults); override per edge through --edge-relink-handle-* like
+// --edge-stroke.
+$relink-handle-size: var(--edge-relink-handle-size, var(--ngd-relink-handle-size, 0.75rem));
+$relink-handle-stroke-width: var(--edge-relink-handle-stroke-width, var(--ngd-relink-handle-stroke-width, 0.1875rem));
+$relink-handle-halo-size: var(--edge-relink-handle-halo-size, var(--ngd-relink-handle-halo-size, 0.25rem));
+// How far a handle moves past the end of the line: on a port end the default
+// 12px handle is then centered on the default 8px port, and the line still
+// ends under the ring for any handle size.
+$relink-handle-inset: calc(#{$relink-handle-size} / 2 - 0.125rem);
+
 :host {
   position: relative;
 }
@@ -12,4 +23,109 @@ svg {
     cursor: pointer;
     transition: var(--edge-stroke-transition, none);
   }
+
+  .ng-diagram-edge__relink-handle {
+    pointer-events: all;
+    cursor: grab;
+    touch-action: none;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  .ng-diagram-edge__relink-handle-circle {
+    // The stroke lies inside the handle size.
+    r: calc((#{$relink-handle-size} - #{$relink-handle-stroke-width}) / 2);
+    fill: var(--edge-relink-handle-fill, var(--ngd-relink-handle-fill, #fff));
+    stroke: var(--edge-relink-handle-stroke, var(--ngd-relink-handle-stroke, currentColor));
+    stroke-width: $relink-handle-stroke-width;
+  }
+
+  // Ring around the circle, shown on hover and while the end is dragged.
+  .ng-diagram-edge__relink-handle-halo {
+    pointer-events: none;
+    r: calc((#{$relink-handle-size} + #{$relink-handle-halo-size}) / 2);
+    fill: none;
+    stroke: var(
+      --edge-relink-handle-halo-color-hover,
+      var(--ngd-relink-handle-halo-color-hover, color-mix(in srgb, currentColor 40%, transparent))
+    );
+    stroke-width: $relink-handle-halo-size;
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out;
+  }
+
+  // Enlarged invisible grab area for the handles (touch, low zoom). It sits
+  // under the visible handle, so the pointer is over exactly one of the two.
+  .ng-diagram-edge__relink-handle-hit {
+    pointer-events: all;
+    cursor: grab;
+    touch-action: none;
+    fill: transparent;
+    stroke: none;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  // The component sets the direction of the end segment (a unit vector out of
+  // the line, 0 when the segment has no length); the distance comes from CSS,
+  // so a restyled handle keeps the fit.
+  .ng-diagram-edge__relink-handle,
+  .ng-diagram-edge__relink-handle-hit {
+    transform: translate(
+      calc(var(--ngd-relink-handle-inset-x, 0) * #{$relink-handle-inset}),
+      calc(var(--ngd-relink-handle-inset-y, 0) * #{$relink-handle-inset})
+    );
+  }
+
+  // Hover: the pointer is over the handle or over the hit area of the same
+  // end (an earlier sibling in the template).
+  .ng-diagram-edge__relink-handle:hover,
+  .ng-diagram-edge__relink-handle-hit[data-relink-handle-hit='source']:hover
+    ~ .ng-diagram-edge__relink-handle[data-relink-handle='source'],
+  .ng-diagram-edge__relink-handle-hit[data-relink-handle-hit='target']:hover
+    ~ .ng-diagram-edge__relink-handle[data-relink-handle='target'] {
+    .ng-diagram-edge__relink-handle-circle {
+      fill: var(--edge-relink-handle-fill-hover, var(--ngd-relink-handle-fill-hover, #fff));
+      stroke: var(--edge-relink-handle-stroke-hover, var(--ngd-relink-handle-stroke-hover, currentColor));
+    }
+
+    .ng-diagram-edge__relink-handle-halo {
+      opacity: 1;
+    }
+  }
+
+  // Drag: the handle is pressed, or it is the dragged end of a relink
+  // preview. Declared after hover, so a pressed handle shows the drag look.
+  .ng-diagram-edge__relink-handle:active,
+  .ng-diagram-edge__relink-handle--dragging,
+  .ng-diagram-edge__relink-handle-hit[data-relink-handle-hit='source']:active
+    ~ .ng-diagram-edge__relink-handle[data-relink-handle='source'],
+  .ng-diagram-edge__relink-handle-hit[data-relink-handle-hit='target']:active
+    ~ .ng-diagram-edge__relink-handle[data-relink-handle='target'] {
+    .ng-diagram-edge__relink-handle-circle {
+      fill: var(--edge-relink-handle-fill-drag, var(--ngd-relink-handle-fill-drag, currentColor));
+      stroke: var(--edge-relink-handle-stroke-drag, var(--ngd-relink-handle-stroke-drag, currentColor));
+    }
+
+    .ng-diagram-edge__relink-handle-halo {
+      stroke: var(
+        --edge-relink-handle-halo-color-drag,
+        var(--ngd-relink-handle-halo-color-drag, color-mix(in srgb, currentColor 40%, transparent))
+      );
+      opacity: 1;
+    }
+  }
+}
+
+// The preview edge ends under the pointer; if the path or a handle caught it,
+// the cursor and :hover would flip between the preview and whatever lies
+// beneath. Both opt in to pointer events above, so they need their own rule;
+// the svg inherits none from the edges container.
+:host.temporary svg path,
+:host.temporary svg .ng-diagram-edge__relink-handle {
+  pointer-events: none;
 }

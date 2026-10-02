@@ -19,6 +19,8 @@ export class InteractionCoordinator {
    * adding one entry here.
    */
   private readonly cancellableGestures: readonly { event: InputEventName; isActive: () => boolean }[] = [
+    // The `linking` entry covers relinking too: a relink keeps `isLinking()`
+    // true and `cancelLinking` branches on `linking.relink`.
     { event: 'linking', isActive: () => this.flowCore.actionStateManager.isLinking() },
     { event: 'pointerMoveSelection', isActive: () => this.flowCore.actionStateManager.isDragging() },
     { event: 'resize', isActive: () => this.flowCore.actionStateManager.isResizing() },

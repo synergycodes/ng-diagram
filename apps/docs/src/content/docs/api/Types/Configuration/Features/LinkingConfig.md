@@ -10,6 +10,35 @@ Configuration for linking (edge creation) behavior.
 
 ## Properties
 
+### defaultRelinkable
+
+> **defaultRelinkable**: `boolean` \| [`EdgeEnd`](/docs/api/types/model/edgeend/)
+
+Default `relinkable` value for edges that do not set their own. `true`
+lets the user drag both ends of an edge to another port, `'source'` or
+`'target'` allows only that end, and `false` allows neither. A selected
+edge shows a handle at each end that can be relinked. Dragging a handle
+previews the new connection and commits it on drop. A drop on empty
+canvas detaches the endpoint when `danglingEdges.enabled` is true;
+otherwise the relink is reverted.
+
+Relinking uses the same `portSnapDistance`, edge panning and
+`temporaryEdgeDataBuilder` settings as edge drawing. Each drop is
+validated with `validateConnection`, which receives a context with
+`reason: 'relink'` and the edge being relinked.
+
+#### Default
+
+```ts
+false
+```
+
+#### Since
+
+1.4.0
+
+***
+
 ### edgePanningEnabled
 
 > **edgePanningEnabled**: `boolean`
@@ -149,15 +178,23 @@ The Edge object to use for the temporary edge.
 
 ### validateConnection()
 
-> **validateConnection**: (`source`, `sourcePort`, `target`, `targetPort`) => `boolean`
+> **validateConnection**: (`source`, `sourcePort`, `target`, `targetPort`, `context?`) => `boolean`
 
 Validates whether a connection between two nodes and ports is allowed.
+
+Called for every operation that creates a connection: drawing a new edge,
+relinking an endpoint of an existing edge, and `attachEdge`. The optional
+`context` tells which operation is being validated (since 1.4.0).
+
+`source` is `null` for draws started with `startLinkingFromPosition`.
+When an edge is relinked or attached, the other end of that edge can be
+free (dangling); the `source` or `target` for that end is then `null`.
 
 #### Parameters
 
 ##### source
 
-The source node.
+The source node, or `null` when the source end is free.
 
 `null` | [`Node`](/docs/api/types/model/node/)
 
@@ -169,7 +206,7 @@ The source port.
 
 ##### target
 
-The target node.
+The target node, or `null` when the target end is free.
 
 `null` | [`Node`](/docs/api/types/model/node/)
 
@@ -178,6 +215,12 @@ The target node.
 The target port.
 
 `null` | [`Port`](/docs/api/types/model/port/)
+
+##### context?
+
+[`ConnectionValidationContext`](/docs/api/types/configuration/features/connectionvalidationcontext/)
+
+The operation being validated (`draw` when omitted).
 
 #### Returns
 

@@ -1,5 +1,27 @@
 import { describe, expect, it } from 'vitest';
-import { isValidPosition, isValidSize } from '../measurement-validation';
+import { isValidPosition, isValidSize, isZeroSize } from '../measurement-validation';
+
+describe('isZeroSize', () => {
+  it('should return true only when both dimensions are exactly zero', () => {
+    expect(isZeroSize({ width: 0, height: 0 })).toBe(true);
+  });
+
+  it('should return false for a degenerate-but-visible measurement (200×0)', () => {
+    // The boundary the guard is built around: 0×0 is the display:none
+    // signature, a single-zero dimension is a legitimate measurement.
+    expect(isZeroSize({ width: 200, height: 0 })).toBe(false);
+    expect(isZeroSize({ width: 0, height: 200 })).toBe(false);
+  });
+
+  it('should return false for a normal size', () => {
+    expect(isZeroSize({ width: 100, height: 50 })).toBe(false);
+  });
+
+  it('should return false for undefined and null', () => {
+    expect(isZeroSize(undefined)).toBe(false);
+    expect(isZeroSize(null)).toBe(false);
+  });
+});
 
 describe('isValidSize', () => {
   it('should return true for valid size with positive dimensions', () => {

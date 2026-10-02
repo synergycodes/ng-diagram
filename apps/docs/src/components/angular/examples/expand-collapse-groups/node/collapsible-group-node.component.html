@@ -1,0 +1,47 @@
+<!-- Groups stay resizable while expanded (the input overrides the diagram
+     config, which turns resizing off for the member nodes). -->
+<ng-diagram-node-resize-adornment [defaultResizable]="!collapsed()">
+  <div
+    class="collapsible-group-node"
+    [class.collapsed]="collapsed()"
+    ngDiagramNodeSelected
+    [node]="node()"
+    ngDiagramGroupHighlighted
+  >
+    <div class="collapsible-group-node-header">
+      <button
+        type="button"
+        class="collapse-toggle"
+        [attr.aria-expanded]="!collapsed()"
+        [attr.aria-label]="collapsed() ? 'Expand group' : 'Collapse group'"
+        (pointerdown)="$event.stopPropagation()"
+        (click)="toggleCollapse()"
+      >
+        <!-- Chevron pointing right; rotates to point down while expanded. -->
+        <svg
+          class="collapse-toggle-icon"
+          [class.expanded]="!collapsed()"
+          viewBox="0 0 16 16"
+          width="16"
+          height="16"
+          aria-hidden="true"
+        >
+          <path
+            d="M6 3.5 10.5 8 6 12.5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.75"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+      <div class="collapsible-group-node-header-title">
+        {{ node().data.title }}
+      </div>
+      @if (collapsed()) {
+        <span class="child-count">{{ childCount() }}</span>
+      }
+    </div>
+  </div>
+</ng-diagram-node-resize-adornment>

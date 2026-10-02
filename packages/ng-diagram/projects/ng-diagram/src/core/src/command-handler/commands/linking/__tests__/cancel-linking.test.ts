@@ -114,6 +114,51 @@ describe('cancelLinking', () => {
     expect(mockFlowCore.actionStateManager.clearLinking).not.toHaveBeenCalled();
   });
 
+  describe('during a relink gesture', () => {
+    const originalEdge: Edge = {
+      id: 'edge-1',
+      source: 'source-node',
+      sourcePort: 'source-port',
+      target: 'target-node',
+      targetPort: 'target-port',
+      data: {},
+    };
+
+    it('should run a finishRelinking pass with the cancelled relink reason', async () => {
+      const linking: LinkingActionState = {
+        sourceNodeId: 'source-node',
+        sourcePortId: 'source-port',
+        temporaryEdge: mockTemporaryEdge,
+        relink: { edgeId: 'edge-1', end: 'target', originalEdge },
+      };
+      mockFlowCore.actionStateManager.linking = linking;
+
+      await cancelLinking(mockCommandHandler);
+
+      expect(linking.relinkCancelReason).toBe('cancelled');
+      expect(linking.cancelReason).toBeUndefined();
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishRelinking');
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalledWith({}, 'finishLinking');
+      expect(mockFlowCore.actionStateManager.clearLinking).toHaveBeenCalled();
+    });
+
+    it('should keep the finishLinking pass for a plain draw gesture', async () => {
+      const linking: LinkingActionState = {
+        sourceNodeId: 'source-node',
+        sourcePortId: 'source-port',
+        temporaryEdge: mockTemporaryEdge,
+      };
+      mockFlowCore.actionStateManager.linking = linking;
+
+      await cancelLinking(mockCommandHandler);
+
+      expect(linking.cancelReason).toBe('cancelled');
+      expect(linking.relinkCancelReason).toBeUndefined();
+      expect(mockFlowCore.applyUpdate).toHaveBeenCalledWith({}, 'finishLinking');
+      expect(mockFlowCore.applyUpdate).not.toHaveBeenCalledWith({}, 'finishRelinking');
+    });
+  });
+
   it('should fall back to a zero drop position without a temporary edge', async () => {
     const linking: LinkingActionState = {
       sourceNodeId: 'source-node',

@@ -11,6 +11,15 @@ import { DataObject, Point, Size } from './utils';
 export type RoutingMode = 'manual' | 'auto';
 
 /**
+ * Identifies one endpoint of an edge.
+ *
+ * @public
+ * @since 1.4.0
+ * @category Types/Model
+ */
+export type EdgeEnd = 'source' | 'target';
+
+/**
  * Interface representing an edge (connection) between nodes in the flow diagram
  *
  * @public
@@ -42,6 +51,43 @@ export interface Edge<T extends DataObject = DataObject> {
    * Whether the edge is selected
    */
   selected?: boolean;
+  /**
+   * Whether the edge is hidden. When not set, the edge is visible.
+   *
+   * A hidden edge keeps its geometry, does not block initialization or
+   * `waitForMeasurements`, and is not routed. User interactions ignore it:
+   * select-all, box selection and zoomToFit bounds. In the default render
+   * mode the edge stays in the DOM with `display: none`. With virtualization
+   * enabled it is removed from the DOM instead. An edge is also effectively
+   * hidden when either endpoint node is effectively hidden.
+   *
+   * Programmatic APIs such as `select` and the z-order commands do not skip
+   * hidden elements. It is up to the caller whether to use them on hidden
+   * elements.
+   *
+   * Set by the user; the library only reads it.
+   * @see {@link computedHidden} for the derived effective visibility.
+   * @since 1.4.0
+   */
+  hidden?: boolean;
+  /**
+   * Whether the user can relink the ends of this edge. `true` allows both
+   * ends, `'source'` or `'target'` allows only that end, and `false` allows
+   * neither. When not set, `linking.defaultRelinkable` applies.
+   *
+   * Set by the user; the library only reads it.
+   * @since 1.4.0
+   */
+  relinkable?: boolean | EdgeEnd;
+  /**
+   * @readonly
+   * @remarks ComputedHidden is computed by the system and should not be set manually.
+   * The effective visibility of the edge: `true` when its own `hidden` flag
+   * or a template binding is set, or when either endpoint node is effectively
+   * hidden.
+   * @since 1.4.0
+   */
+  readonly computedHidden?: boolean;
   /**
    * The type of the edge declared in edgeTemplateMap.
    */

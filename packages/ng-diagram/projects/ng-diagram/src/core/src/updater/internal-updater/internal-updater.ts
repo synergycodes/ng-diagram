@@ -3,7 +3,7 @@ import type { LabelUpdate } from '../../label-batch-processor/label-batch-proces
 import type { PortUpdate } from '../../port-batch-processor/port-batch-processor';
 import type { Node, Port } from '../../types';
 import { EdgeLabel, MEASURED_LABEL_PROPERTIES, MEASURED_PORT_PROPERTIES } from '../../types';
-import { getRect, hasChangedProperties, isSameRect, omitProperties } from '../../utils';
+import { getRect, hasChangedProperties, isSameRect, isZeroSize, omitProperties } from '../../utils';
 import { Updater } from '../updater.interface';
 
 export class InternalUpdater implements Updater {
@@ -43,6 +43,8 @@ export class InternalUpdater implements Updater {
     const isResizing = this.flowCore.actionStateManager.isResizing();
 
     const filtered = updates.filter(({ id, size }) => {
+      // 0×0 is the display: none signature — never overwrite geometry with it.
+      if (isZeroSize(size)) return false;
       const node = this.flowCore.getNodeById(id);
       if (!node) return false;
       // During active user resize, only accept initial sizes (nodes without size yet).
@@ -87,7 +89,7 @@ export class InternalUpdater implements Updater {
       return;
     }
 
-    const filteredUpdates = this.filterUnchangedPortUpdates(node, portUpdates);
+    const filteredUpdates = this.filterUnchangedPortUpdates(node, this.rejectZeroSizePortGeometry(portUpdates));
     if (filteredUpdates.length === 0) {
       return;
     }
@@ -124,7 +126,7 @@ export class InternalUpdater implements Updater {
    * Filters out updates where no property actually differs from current state.
    */
   applyEdgeLabelChanges(edgeId: string, labelUpdates: LabelUpdate[]): void {
-    const filteredUpdates = this.filterUnchangedLabelUpdates(edgeId, labelUpdates);
+    const filteredUpdates = this.filterUnchangedLabelUpdates(edgeId, this.rejectZeroSizeLabelGeometry(labelUpdates));
     if (filteredUpdates.length === 0) {
       return;
     }
@@ -132,6 +134,34 @@ export class InternalUpdater implements Updater {
     for (const labelUpdate of filteredUpdates) {
       this.flowCore.labelBatchProcessor.processUpdate(edgeId, labelUpdate, this.onLabelUpdatesFlush);
     }
+  }
+
+  /**
+   * Drops measured geometry (size + position) from updates carrying a 0×0 size —
+   * the display: none signature — so hiding an observed port never corrupts its
+   * last valid geometry. Non-measured properties in the same update still apply.
+   */
+  private rejectZeroSizePortGeometry(portUpdates: PortUpdate[]): PortUpdate[] {
+    return portUpdates
+      .map((update) =>
+        isZeroSize(update.portChanges.size)
+          ? { ...update, portChanges: omitProperties(update.portChanges, MEASURED_PORT_PROPERTIES) }
+          : update
+      )
+      .filter(({ portChanges }) => Object.keys(portChanges).length > 0);
+  }
+
+  /**
+   * See {@link rejectZeroSizePortGeometry} — same guard for edge labels.
+   */
+  private rejectZeroSizeLabelGeometry(labelUpdates: LabelUpdate[]): LabelUpdate[] {
+    return labelUpdates
+      .map((update) =>
+        isZeroSize(update.labelChanges.size)
+          ? { ...update, labelChanges: omitProperties(update.labelChanges, MEASURED_LABEL_PROPERTIES) }
+          : update
+      )
+      .filter(({ labelChanges }) => Object.keys(labelChanges).length > 0);
   }
 
   /**

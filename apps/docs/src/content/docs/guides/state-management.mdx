@@ -1,8 +1,6 @@
 ---
 title: State Management
 description: Learn how to create models, access the model service, and perform operations on your diagram data
-sidebar:
-  badge: New
 ---
 
 import { Aside, Badge } from '@astrojs/starlight/components';
@@ -283,6 +281,9 @@ this.modelService.deleteNodes(['node-1', 'node-2']);
 // Delete edges
 this.modelService.deleteEdges(['edge-1', 'edge-2']);
 ```
+
+Deleting a node also removes the edges connected to it. Deleting a group also deletes all of its
+descendants (children, grandchildren, and so on). This is the same behavior as deleting the selection.
 
 ### Querying Elements
 

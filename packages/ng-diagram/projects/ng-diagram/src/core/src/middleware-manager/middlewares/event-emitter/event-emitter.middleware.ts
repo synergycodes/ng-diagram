@@ -1,10 +1,13 @@
 import type { EventManager } from '../../../event-manager/event-manager';
 import type { Middleware, MiddlewareContext } from '../../../types';
+import type { TemplateVisibilityRegistry } from '../../../visibility/template-visibility-registry';
 import {
   ClipboardPastedEmitter,
   DiagramInitEmitter,
   EdgeDrawEndedEmitter,
   EdgeDrawnEmitter,
+  EdgeRelinkEndedEmitter,
+  EdgeRelinkStartedEmitter,
   EventEmitter,
   GroupMembershipChangedEmitter,
   NodeDragEndedEmitter,
@@ -37,9 +40,12 @@ The diagram will continue to function, but some events may not be emitted.
  * Creates an event emitter middleware that analyzes state changes and emits appropriate events.
  * This middleware is designed to run last and leverages the context maps for optimal performance.
  */
-export const createEventEmitterMiddleware = (eventManager: EventManager): Middleware => {
+export const createEventEmitterMiddleware = (
+  eventManager: EventManager,
+  templateVisibilityRegistry?: TemplateVisibilityRegistry
+): Middleware => {
   const emitters: EventEmitter[] = [
-    new DiagramInitEmitter(),
+    new DiagramInitEmitter(templateVisibilityRegistry),
     new SelectionChangedEmitter(),
     new SelectionGestureEndedEmitter(),
     new SelectionMovedEmitter(),
@@ -49,6 +55,8 @@ export const createEventEmitterMiddleware = (eventManager: EventManager): Middle
     new ViewportChangedEmitter(),
     new EdgeDrawnEmitter(),
     new EdgeDrawEndedEmitter(),
+    new EdgeRelinkStartedEmitter(),
+    new EdgeRelinkEndedEmitter(),
     new ClipboardPastedEmitter(),
     new NodeResizedEmitter(),
     new PaletteItemDroppedEmitter(),

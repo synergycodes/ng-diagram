@@ -29,11 +29,20 @@ export class ResizeDirective implements OnDestroy {
   ngOnDestroy() {
     const wasMidGesture = this.gestureActive;
     this.removeListeners();
-    // Destroyed mid-gesture (e.g. the node was deleted while resizing): the pointerup
-    // will never be routed, so the resize state must be cleared here — a leaked
-    // resize state suppresses every subsequent node size measurement.
+    // Destroyed mid-gesture (the node was deleted or hidden while resizing):
+    // the pointerup will never be routed. Run the full cancel flow — paired
+    // nodeResizeEnded ('cancelled') and geometry rollback — not a bare state
+    // clear that strands Started events without Ended ones.
     if (wasMidGesture && this.flowCoreProvider.isInitialized()) {
-      this.flowCoreProvider.provide().actionStateManager.clearResize();
+      const flowCore = this.flowCoreProvider.provide();
+      void flowCore.cancelActiveInteraction().then((cancelled) => {
+        // Refused cancel (e.g. active transaction): fall back to the bare
+        // clear — a leaked resize state suppresses every subsequent node size
+        // measurement. Skip while another cancel owns the state mid-rollback.
+        if (!cancelled && !flowCore.isCancellingInteraction()) {
+          flowCore.actionStateManager.clearResize();
+        }
+      });
     }
   }
   onPointerDown(event: PointerInputEvent): void {

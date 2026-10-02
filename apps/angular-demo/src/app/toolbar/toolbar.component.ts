@@ -36,6 +36,8 @@ export class ToolbarComponent {
 
   measurementTestEnter = output<void>();
   awaitableTestEnter = output<void>();
+  hiddenElementsDemoEnter = output<void>();
+  relinkingTestEnter = output<void>();
   isNodeSelected = computed(() => this.ngDiagramSelectionService.selection().nodes.length > 0);
   isAnythingSelected = computed(() => {
     const selection = this.ngDiagramSelectionService.selection();
@@ -62,6 +64,29 @@ export class ToolbarComponent {
 
   onSendToBackClick(): void {
     this.ngDiagramNodeService.sendToBack();
+  }
+
+  /** Sets `hidden: true` on every selected node and edge. Hidden content stays selected, so other features can be tested against it. */
+  onHideSelectionClick(): void {
+    const { nodes, edges } = this.ngDiagramSelectionService.selection();
+    if (nodes.length > 0) {
+      this.ngDiagramModelService.updateNodes(nodes.map(({ id }) => ({ id, hidden: true })));
+    }
+    if (edges.length > 0) {
+      this.ngDiagramModelService.updateEdges(edges.map(({ id }) => ({ id, hidden: true })));
+    }
+  }
+
+  /** Clears the `hidden` flag on every node and edge that has it set. */
+  onShowAllClick(): void {
+    const hiddenNodes = this.ngDiagramModelService.nodes().filter((node) => node.hidden);
+    const hiddenEdges = this.ngDiagramModelService.edges().filter((edge) => edge.hidden);
+    if (hiddenNodes.length > 0) {
+      this.ngDiagramModelService.updateNodes(hiddenNodes.map(({ id }) => ({ id, hidden: false })));
+    }
+    if (hiddenEdges.length > 0) {
+      this.ngDiagramModelService.updateEdges(hiddenEdges.map(({ id }) => ({ id, hidden: false })));
+    }
   }
 
   onToggleLabelPositionClick(): void {
@@ -128,6 +153,27 @@ export class ToolbarComponent {
 
     const updated = this.ngDiagramModelService.getNodeById(group.id);
     console.log('[demo] Group size after resize', updated?.size);
+  }
+
+  /**
+   * Demonstrates computePartsBounds with nodes only (edges: []). Computes the
+   * bounds of the selected nodes (or of all nodes when nothing is selected) and
+   * centers the viewport on them. Nodes far from the origin must not pull the
+   * bounds back to (0, 0).
+   */
+  onCenterOnPartsBoundsClick() {
+    const selectedNodes = this.ngDiagramSelectionService.selection().nodes;
+    const nodes = selectedNodes.length > 0 ? selectedNodes : this.ngDiagramModelService.nodes();
+
+    const bounds = this.ngDiagramModelService.computePartsBounds(nodes, []);
+
+    if (!bounds || (!bounds.width && !bounds.height)) {
+      console.warn('[demo] computePartsBounds returned an empty rect — no measured nodes to compute bounds for.');
+      return;
+    }
+
+    console.log('[demo] computePartsBounds of', nodes.length, 'node(s):', bounds);
+    this.ngDiagramViewportService.centerOnRect(bounds);
   }
 
   onChangeNodeTypeClick() {

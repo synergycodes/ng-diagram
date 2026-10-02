@@ -97,12 +97,15 @@ test.describe('Escape cancels the in-flight gesture', () => {
     const from = await diagram.centerOf(diagram.port('node-a', 'port-right'), 'port node-a/port-right');
     await diagram.beginDrag(from, { x: from.x + 120, y: from.y + 90 });
     await expect(diagram.edge('TEMPORARY_EDGE')).toBeAttached();
+    await expect(diagram.page.locator('ng-diagram')).toHaveClass(/\blinking\b/);
 
     await diagram.page.keyboard.press('Escape');
 
     await expect(diagram.allEdges).toHaveCount(0);
     await expect.poll(() => endedEvents(diagram)).toEqual(['link:cancelled']);
     await expect.poll(async () => (await diagram.diagram.actionState()).linking).toBeUndefined();
+    // The cancel tears the gesture down, so the host drops the grabbing cursor too
+    await expect(diagram.page.locator('ng-diagram')).not.toHaveClass(/\blinking\b/);
 
     await diagram.page.mouse.up();
     await diagram.nextFrame();

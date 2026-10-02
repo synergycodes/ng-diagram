@@ -40,11 +40,13 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
   let registerInteractionCleanup: ReturnType<typeof vi.fn>;
   let unregister: ReturnType<typeof vi.fn>;
   let clearDragging: ReturnType<typeof vi.fn>;
+  let cancelActiveInteraction: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     unregister = vi.fn();
     registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
     clearDragging = vi.fn();
+    cancelActiveInteraction = vi.fn().mockResolvedValue(true);
     const mockRouter = {
       getBaseEvent: () => ({
         id: 'id',
@@ -65,6 +67,8 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
           selectionMoving: { edgePanningThreshold: 10, edgePanningEnabled: false, edgePanningForce: 20 },
         },
         actionStateManager: { clearDragging },
+        cancelActiveInteraction,
+        isCancellingInteraction: () => false,
         registerInteractionCleanup,
       }),
     };
@@ -108,18 +112,36 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
     expect(touchState.currentEvent()).toBe(DiagramEventName.Panning);
   });
 
-  it('clears its own marker and the dragging state when destroyed mid-gesture', () => {
+  it('clears its own marker and cancels the gesture when destroyed mid-gesture', async () => {
     directive.onPointerDown(makePointerEvent());
 
     fixture.destroy();
 
     expect(touchState.currentEvent()).toBeNull();
+    // The full cancel flow pairs nodeDragStarted with a cancelled Ended event
+    // and clears the drop-target highlight — the bare state clear must stay
+    // out of its way.
+    expect(cancelActiveInteraction).toHaveBeenCalled();
+    await Promise.resolve();
+    expect(clearDragging).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the bare state clear when the destroy-time cancel is refused', async () => {
+    // cancelActiveInteraction refuses e.g. while a transaction is active — a
+    // leaked dragging state keeps hasActiveInteraction() true forever.
+    cancelActiveInteraction.mockResolvedValue(false);
+    directive.onPointerDown(makePointerEvent());
+
+    fixture.destroy();
+
+    await Promise.resolve();
     expect(clearDragging).toHaveBeenCalled();
   });
 
-  it('does not clear the dragging state when destroyed as a bystander', () => {
+  it('does not cancel anything when destroyed as a bystander', () => {
     fixture.destroy();
 
+    expect(cancelActiveInteraction).not.toHaveBeenCalled();
     expect(clearDragging).not.toHaveBeenCalled();
   });
 

@@ -72,6 +72,35 @@ Use `edgeDrawEnded` instead, which fires for both successful and cancelled draws
 
 ***
 
+### edgeRelinkEnded
+
+> **edgeRelinkEnded**: `EventEmitter`\<[`EdgeRelinkEndedEvent`](/docs/api/types/events/edgerelinkendedevent/)\>
+
+Event emitted when an edge relink gesture ends, regardless of outcome.
+
+Fires when the dragged endpoint is dropped, whether it was reconnected to
+a port, left dangling on empty canvas, or reverted (invalid drop or
+cancelled gesture).
+
+#### Since
+
+1.4.0
+
+***
+
+### edgeRelinkStarted
+
+> **edgeRelinkStarted**: `EventEmitter`\<[`EdgeRelinkStartedEvent`](/docs/api/types/events/edgerelinkstartedevent/)\>
+
+Event emitted when the user starts dragging an endpoint of an existing
+edge (the relinking gesture; see the `linking.defaultRelinkable` config).
+
+#### Since
+
+1.4.0
+
+***
+
 ### edgeTemplateMap
 
 > **edgeTemplateMap**: `InputSignal`\<[`NgDiagramEdgeTemplateMap`](/docs/api/types/templates/ngdiagramedgetemplatemap/)\>
@@ -261,6 +290,38 @@ Event emitted when a node is rotated in the diagram.
 
 This event fires when the user rotates a node manually using the rotation handle
 or programmatically using the `NgDiagramNodeService` rotation methods.
+
+***
+
+### tabbable
+
+> `readonly` **tabbable**: `InputSignalWithTransform`\<`boolean`, `unknown`\>
+
+Whether the diagram container takes part in the page's sequential Tab order.
+
+This covers the two Tab stops the diagram itself adds: the container element and the
+watermark link. With `false` both render with `tabindex="-1"`, so Tab skips them, but
+they stay clickable and can be focused from code. Keyboard shortcuts keep working
+whenever focus is inside the diagram — clicking the diagram still focuses it.
+
+Focusable content rendered by your own node and edge templates is not affected and
+keeps its own Tab stops, so the application stays in control of those.
+
+Set it to `false` when the application manages the diagram's Tab order itself,
+for example with a roving tabindex on the nodes.
+
+Accepts the static attribute forms too: `tabbable` on its own means `true` and
+`tabbable="false"` means `false`. Binding `undefined` or `null` keeps the default.
+
+#### Default
+
+```ts
+true
+```
+
+#### Since
+
+1.4.0
 
 ***
 

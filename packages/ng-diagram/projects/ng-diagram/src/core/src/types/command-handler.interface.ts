@@ -27,9 +27,11 @@ import {
   CancelLinkingCommand,
   FinishLinkingCommand,
   FinishLinkingToPositionCommand,
+  FinishRelinkingCommand,
   MoveTemporaryEdgeCommand,
   StartLinkingCommand,
   StartLinkingFromPositionCommand,
+  StartRelinkingCommand,
 } from '../command-handler/commands/linking';
 import { MoveNodesByCommand } from '../command-handler/commands/move';
 import { MoveNodesStartCommand, MoveNodesStopCommand } from '../command-handler/commands/move-nodes-lifecycle';
@@ -85,6 +87,8 @@ export type Command =
   | CancelLinkingCommand
   | StartLinkingFromPositionCommand
   | FinishLinkingToPositionCommand
+  | StartRelinkingCommand
+  | FinishRelinkingCommand
   | ResizeNodeCommand
   | ResizeNodeStartCommand
   | ResizeNodeStopCommand

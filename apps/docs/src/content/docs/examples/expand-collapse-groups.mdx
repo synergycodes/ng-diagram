@@ -1,0 +1,31 @@
+---
+title: Expand/Collapse Groups Example
+description: Example of collapsible groups with boundary edges rerouted to the collapsed group
+version: 'since v1.4.0'
+sidebar:
+  order: 7
+  label: Expand/Collapse Groups
+  badge: New
+---
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
+import ExpandCollapseGroups from '@examples/expand-collapse-groups/expand-collapse-groups.astro';
+
+This example shows collapsible groups, including nested ones. Collapsing a group hides its members with the model [`hidden`](/docs/guides/conditional-visibility/) flag and shrinks the group to a header bar. Edges that cross the group boundary are temporarily rerouted to the group, so connections to the outside stay visible.
+
+<br />
+
+<ExpandCollapseGroups />
+<CodeViewer dirName="examples/expand-collapse-groups" />
+
+## Additional Explanation
+
+### Key Concepts
+
+- **Hiding with the `hidden` flag:** Collapsing a group sets [`hidden`](/docs/api/types/model/simplenode/#hidden) only on the group's **direct children**, in one [`updateNodes`](/docs/api/services/ngdiagrammodelservice/#updatenodes) call. The library does the rest: descendants of a hidden child group are hidden automatically, and so is every edge connected to a hidden node.
+- **Nested groups keep their state:** A collapsed nested group keeps the `hidden` flags of its own children. Collapsing and expanding an outer group does not change the collapsed state of the inner group, so you do not need to track nested visibility yourself.
+- **No interaction workarounds:** The library ignores hidden members in hit-testing, `selectAll`, box selection, `zoomToFit` bounds and the minimap. No `pointer-events` or CSS visibility workarounds are needed.
+- **Boundary edge rerouting:** An edge with exactly one endpoint inside the collapsed group would disappear together with its hidden endpoint. The example points that endpoint at the group node while the group is collapsed, and restores it on expand. Each group changes only the endpoint on its own side, so sibling and nested groups can be collapsed and expanded in any order.
+- **Group behavior:** The group template uses the [resize adornment](/docs/api/components/ngdiagramnoderesizeadornmentcomponent/), [`ngDiagramNodeSelected`](/docs/api/directives/ngdiagramnodeselecteddirective/) and [`ngDiagramGroupHighlighted`](/docs/api/directives/ngdiagramgrouphighlighteddirective/). See the [Groups guide](/docs/guides/nodes/groups/). An expanded group can be resized, but not below the bounds of its visible children.
+
+**Learn more:** [Conditional Visibility guide →](/docs/guides/conditional-visibility/)

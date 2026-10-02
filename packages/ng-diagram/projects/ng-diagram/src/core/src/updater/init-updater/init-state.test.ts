@@ -558,5 +558,132 @@ describe('InitState', () => {
       expect(setStateCall.metadata).toEqual({ viewport: { x: 0, y: 0, zoom: 1 } });
       expect(setStateCall.otherProp).toBe('test');
     });
+
+    describe('force-finish zero-size guard', () => {
+      it('should not overwrite node size with a collected 0×0 measurement', () => {
+        const node = createMockNode('node1');
+        mockFlowCore.getState.mockReturnValue({
+          nodes: [node],
+          edges: [],
+        });
+
+        initState.trackNodeMeasurement('node1', createInvalidSize());
+        initState.applyToDiagramState(mockFlowCore);
+
+        const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+        expect(setStateCall.nodes[0].size).toEqual(createValidSize());
+      });
+
+      it('should keep node size undefined when only a 0×0 measurement was collected', () => {
+        const node: Node = { ...createMockNode('node1'), size: undefined };
+        mockFlowCore.getState.mockReturnValue({
+          nodes: [node],
+          edges: [],
+        });
+
+        initState.trackNodeMeasurement('node1', createInvalidSize());
+        initState.applyToDiagramState(mockFlowCore);
+
+        const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+        expect(setStateCall.nodes[0].size).toBeUndefined();
+      });
+
+      it('should not overwrite port geometry with a collected invalid measurement', () => {
+        const existingPort = createMockPort('port1', 'node1');
+        const node: Node = { ...createMockNode('node1'), measuredPorts: [existingPort] };
+        mockFlowCore.getState.mockReturnValue({
+          nodes: [node],
+          edges: [],
+        });
+
+        initState.trackPortMeasurement('node1', 'port1', createInvalidSize(), { x: 0, y: 0 });
+        initState.applyToDiagramState(mockFlowCore);
+
+        const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+        expect(setStateCall.nodes[0].measuredPorts[0].size).toEqual(existingPort.size);
+        expect(setStateCall.nodes[0].measuredPorts[0].position).toEqual(existingPort.position);
+      });
+
+      it('should ignore expectations for entities the measurement filter excludes', () => {
+        const filteredInitState = new InitState({
+          isNodeMeasurable: (nodeId) => nodeId !== 'hiddenNode',
+          isPortMeasurable: (_nodeId, portId) => portId !== 'hiddenPort',
+          isLabelMeasurable: (_edgeId, labelId) => labelId !== 'hiddenLabel',
+        });
+
+        const hiddenNode: Node = {
+          ...createMockNode('hiddenNode'),
+          size: undefined,
+          measuredPorts: [{ ...createMockPort('hiddenPort', 'hiddenNode'), size: undefined, position: undefined }],
+        };
+        const edge: Edge = {
+          ...createMockEdge('edge1'),
+          measuredLabels: [{ ...createMockEdgeLabel('hiddenLabel'), size: undefined }],
+        };
+
+        filteredInitState.collectAlreadyMeasuredItems([hiddenNode], [edge]);
+
+        expect(filteredInitState.nodesToMeasure.size).toBe(0);
+        expect(filteredInitState.portsToMeasure.size).toBe(0);
+        expect(filteredInitState.labelsToMeasure.size).toBe(0);
+        expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(true);
+      });
+
+      it('should still register filtered ports and labels in the model data', () => {
+        const filteredInitState = new InitState({
+          isNodeMeasurable: () => true,
+          isPortMeasurable: () => false,
+          isLabelMeasurable: () => false,
+        });
+
+        filteredInitState.addPort('node1', createMockPort('port1', 'node1'));
+        filteredInitState.addLabel('edge1', createMockEdgeLabel('label1'));
+
+        expect(filteredInitState.initializedPorts.size).toBe(1);
+        expect(filteredInitState.initializedLabels.size).toBe(1);
+        expect(filteredInitState.portsToMeasure.size).toBe(0);
+        expect(filteredInitState.labelsToMeasure.size).toBe(0);
+      });
+
+      it('should prune expectations when the filter starts excluding entities', () => {
+        let hiddenNodeIds = new Set<string>();
+        const filteredInitState = new InitState({
+          isNodeMeasurable: (nodeId) => !hiddenNodeIds.has(nodeId),
+          isPortMeasurable: (nodeId) => !hiddenNodeIds.has(nodeId),
+          isLabelMeasurable: () => true,
+        });
+
+        const node: Node = {
+          ...createMockNode('node1'),
+          size: undefined,
+          measuredPorts: [{ ...createMockPort('port1', 'node1'), size: undefined, position: undefined }],
+        };
+        filteredInitState.collectAlreadyMeasuredItems([node], []);
+
+        expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(false);
+
+        hiddenNodeIds = new Set(['node1']);
+        filteredInitState.pruneUnmeasurableExpectations();
+
+        expect(filteredInitState.nodesToMeasure.size).toBe(0);
+        expect(filteredInitState.portsToMeasure.size).toBe(0);
+        expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(true);
+      });
+
+      it('should not overwrite label size with a collected invalid measurement', () => {
+        const existingLabel = createMockEdgeLabel('label1');
+        const edge: Edge = { ...createMockEdge('edge1'), measuredLabels: [existingLabel] };
+        mockFlowCore.getState.mockReturnValue({
+          nodes: [],
+          edges: [edge],
+        });
+
+        initState.trackLabelMeasurement('edge1', 'label1', createInvalidSize());
+        initState.applyToDiagramState(mockFlowCore);
+
+        const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+        expect(setStateCall.edges[0].measuredLabels[0].size).toEqual(existingLabel.size);
+      });
+    });
   });
 });

@@ -1,6 +1,6 @@
-import type { EdgeDrawCancelReason, GestureCancelReason } from '../event-manager/event-types';
+import type { EdgeDrawCancelReason, EdgeRelinkCancelReason, GestureCancelReason } from '../event-manager/event-types';
 import type { InputModifiers } from '../input-events/input-events.interface';
-import type { Edge } from './edge.interface';
+import type { Edge, EdgeEnd } from './edge.interface';
 import type { Node } from './node.interface';
 import type { Point } from './utils';
 
@@ -48,6 +48,38 @@ export interface LinkingActionState {
   dropPosition?: Point;
   /** Reason the linking gesture was cancelled (set by finishLinking on failure paths). */
   cancelReason?: EdgeDrawCancelReason;
+  /**
+   * Present while an endpoint of an existing edge is being relinked. Until the
+   * gesture ends, the original edge is not rendered and the temporary edge
+   * represents it. `relink.end` is the end of the temporary edge that follows
+   * the pointer (a normal draw always drags the target end).
+   *
+   * @since 1.4.0
+   */
+  relink?: LinkingRelinkContext;
+  /**
+   * Reason the relink gesture ended without changing the edge (set by
+   * `finishRelinking` when the relink fails).
+   *
+   * @since 1.4.0
+   */
+  relinkCancelReason?: EdgeRelinkCancelReason;
+}
+
+/**
+ * Context of an edge relink gesture carried inside the linking action state.
+ *
+ * @public
+ * @since 1.4.0
+ * @category Internals
+ */
+export interface LinkingRelinkContext {
+  /** ID of the edge whose endpoint is being dragged. */
+  edgeId: string;
+  /** Which endpoint of the edge is being dragged. */
+  end: EdgeEnd;
+  /** Snapshot of the edge as it was when the gesture started. */
+  originalEdge: Edge;
 }
 
 /**

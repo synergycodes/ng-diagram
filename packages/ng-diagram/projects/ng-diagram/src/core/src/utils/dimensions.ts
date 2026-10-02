@@ -1,19 +1,31 @@
 import { Edge, Node, Rect } from '../types';
+import type { TemplateVisibilityRegistry } from '../visibility/template-visibility-registry';
 import { boundingRectOfPoints, getRect, getRotatedBoundingRect, unionRect } from './rects-points-sizes';
 
-const calculateNodeBounds = (nodes: Node[]): Rect => {
-  return unionRect(nodes.map((node) => node.measuredBounds).filter((rect): rect is Rect => rect !== undefined));
+const calculateNodeBounds = (nodes: Node[]): Rect | null => {
+  return unionRect(
+    nodes
+      .filter((node) => !node.computedHidden)
+      .map((node) => node.measuredBounds)
+      .filter((rect): rect is Rect => rect !== undefined)
+  );
 };
 
-const calculateEdgeBounds = (edges: Edge[]): Rect => {
-  return unionRect(edges.map(getEdgeMeasuredBounds));
+const calculateEdgeBounds = (edges: Edge[]): Rect | null => {
+  return unionRect(edges.filter((edge) => !edge.computedHidden && edge.points?.length).map(getEdgeMeasuredBounds));
 };
 
-export const calculatePartsBounds = (nodes: Node[], edges: Edge[]): Rect => {
-  const nodeBounds = calculateNodeBounds(nodes);
-  const edgeBounds = calculateEdgeBounds(edges);
+/**
+ * Bounds of the given nodes and edges together. Effectively hidden elements
+ * are excluded — their stale measuredBounds must not inflate zoomToFit or
+ * minimap bounds. Returns null when nothing measurable remains.
+ */
+export const calculatePartsBounds = (nodes: Node[], edges: Edge[]): Rect | null => {
+  const partsBounds = [calculateNodeBounds(nodes), calculateEdgeBounds(edges)].filter(
+    (rect): rect is Rect => rect !== null
+  );
 
-  return unionRect([nodeBounds, edgeBounds]);
+  return unionRect(partsBounds);
 };
 
 export const getEdgeMeasuredBounds = (edge: Edge): Rect => {
@@ -37,21 +49,23 @@ export const getEdgeMeasuredBounds = (edge: Edge): Rect => {
   return unionRect([pointsBounds, ...labelRects]);
 };
 
-export const getNodeMeasuredBounds = (node: Node): Rect => {
-  const ports = node.measuredPorts || [];
+export const getNodeMeasuredBounds = (node: Node, templateVisibilityRegistry?: TemplateVisibilityRegistry): Rect => {
+  // Template-hidden ports are invisible — they must not extend the visual
+  // frame, including ports measured earlier and hidden afterwards.
+  const ports = (node.measuredPorts || []).filter(
+    (port) => !templateVisibilityRegistry?.isPortHidden(node.id, port.id)
+  );
   const { x, y, width, height } = getRect(node);
 
   const localNodeRect = { x: 0, y: 0, width, height };
   const rotatedLocalRect = getRotatedBoundingRect(localNodeRect, node.angle || 0);
 
-  const allRects: Rect[] = [rotatedLocalRect];
-
-  for (const port of ports) {
+  const portRects = ports.map((port) => {
     const { x: px, y: py, width: pw, height: ph } = getRect(port);
-    allRects.push({ x: px, y: py, width: pw, height: ph });
-  }
+    return { x: px, y: py, width: pw, height: ph };
+  });
 
-  const localBounds = unionRect(allRects);
+  const localBounds = unionRect([rotatedLocalRect, ...portRects]);
 
   return {
     x: x + localBounds.x,

@@ -1,4 +1,4 @@
-import { ElementRef, inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { MeasuredPortProperty, Port } from '../../../core/src';
 import { findParentWithClass } from '../../utils/find-parent-with-class';
 import { FlowCoreProviderService } from '../flow-core-provider/flow-core-provider.service';
@@ -11,16 +11,6 @@ Port ID: ${portId}
 This may occur during DOM updates or node removal.
 
 Documentation: https://www.ngdiagram.dev/docs/guides/nodes/ports/
-`;
-
-const NODE_ELEMENT_NOT_FOUND_ERROR = (nodeId: string) =>
-  `[ngDiagram] Node measurement failed: Node element not found.
-
-Node ID: ${nodeId}
-
-This may occur during DOM updates or node removal.
-
-Documentation: https://www.ngdiagram.dev/docs/guides/nodes/nodes/
 `;
 
 const PORT_ID_MISSING_ERROR = (portElementId: string, nodeId: string) =>
@@ -41,7 +31,6 @@ Documentation: https://www.ngdiagram.dev/docs/guides/nodes/ports/
 @Injectable()
 export class UpdatePortsService {
   private readonly flowCoreProvider = inject(FlowCoreProviderService);
-  private readonly diagramElement = inject(ElementRef<HTMLElement>);
 
   getPortData(port: HTMLElement): Required<Pick<Port, MeasuredPortProperty>> | null {
     const nodeElement = findParentWithClass(port, 'ng-diagram-node');
@@ -53,18 +42,10 @@ export class UpdatePortsService {
     return this.measurePort(port, nodeElement.getBoundingClientRect(), this.getScale());
   }
 
-  getNodePortsData(nodeId: string): Required<Pick<Port, 'id' | MeasuredPortProperty>>[] {
-    const node = this.diagramElement.nativeElement.querySelector(
-      `.ng-diagram-node[data-node-id="${nodeId}"]`
-    ) as HTMLElement;
-    if (!node) {
-      console.error(NODE_ELEMENT_NOT_FOUND_ERROR(nodeId));
-      return [];
-    }
-
-    const ports = node.querySelectorAll('[data-port-id]') as NodeListOf<HTMLElement>;
+  getNodePortsData(nodeElement: HTMLElement, nodeId: string): Required<Pick<Port, 'id' | MeasuredPortProperty>>[] {
+    const ports = nodeElement.querySelectorAll('[data-port-id]') as NodeListOf<HTMLElement>;
     const portsData: Required<Pick<Port, 'id' | MeasuredPortProperty>>[] = [];
-    const nodeRect = node.getBoundingClientRect();
+    const nodeRect = nodeElement.getBoundingClientRect();
     const scale = this.getScale();
 
     ports.forEach((port) => {

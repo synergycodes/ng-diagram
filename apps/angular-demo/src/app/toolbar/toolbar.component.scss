@@ -25,5 +25,16 @@
       color: #666;
       white-space: nowrap;
     }
+
+    .demo-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #444;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
   }
 }
