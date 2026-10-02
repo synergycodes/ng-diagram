@@ -128,7 +128,7 @@ importers:
     dependencies:
       '@analogjs/astro-angular':
         specifier: ^1.19.4
-        version: 1.21.1(8340524aa471727c3a62c90fd01bfc19)
+        version: 1.21.1(d10bac4c502ba31afc77bb7ab1032627)
       '@angular-devkit/build-angular':
         specifier: ^19.2.7
         version: 19.2.17(3cf9bc6a7ac3c58cbd9aecf92abcce28)
@@ -151,8 +151,8 @@ importers:
         specifier: 19.2.14
         version: 19.2.14(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
       '@angular/language-service':
-        specifier: ^19.2.7
-        version: 19.2.15
+        specifier: ^22.1.1
+        version: 22.1.1
       '@angular/material':
         specifier: 19.2.19
         version: 19.2.19(4f82dcdbbbbde9debd2fe86bdd1de638)
@@ -745,9 +745,9 @@ packages:
       '@angular/platform-browser': 19.2.14
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/language-service@19.2.15':
-    resolution: {integrity: sha512-ONMNoTnMoS3YiAm6fbWYp1SRDwIBieR/yxGTe9JEij8rq9WtOnAm/KhyQkFojXzS2n+Ntf0nE/yJwtLJKUedgw==}
-    engines: {node: ^18.19.1 || ^20.11.1 || >=22.0.0}
+  '@angular/language-service@22.1.1':
+    resolution: {integrity: sha512-Q90BG9RS2PjVBmyFOVb1iY476LXOKGM/aSs+v7RW1Hh4yKl0TwzfNiBud5DywWMeSUreXRpp91Ep0k4VlJ3Dhw==}
+    engines: {node: ^22.22.3 || ^24.15.0 || >=26.0.0}
 
   '@angular/material@19.2.19':
     resolution: {integrity: sha512-auIE6JUzTIA3LyYklh9J/T7u64crmphxUBgAa0zcOMDog6SYfwbNe9YeLQqua5ek4OUAOdK/BHHfVl5W5iaUoQ==}
@@ -9089,7 +9089,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@analogjs/astro-angular@1.21.1(8340524aa471727c3a62c90fd01bfc19)':
+  '@analogjs/astro-angular@1.21.1(d10bac4c502ba31afc77bb7ab1032627)':
     dependencies:
       '@analogjs/vite-plugin-angular': 1.21.1(0f5bcb90d62e89bf2bf9cb779b4e25d3)
       '@angular-devkit/build-angular': 19.2.17(3cf9bc6a7ac3c58cbd9aecf92abcce28)
@@ -9098,7 +9098,7 @@ snapshots:
       '@angular/compiler': 19.2.15
       '@angular/compiler-cli': 19.2.15(@angular/compiler@19.2.15)(typescript@5.8.3)
       '@angular/core': 19.2.15(rxjs@7.8.2)(zone.js@0.15.1)
-      '@angular/language-service': 19.2.15
+      '@angular/language-service': 22.1.1
       '@angular/platform-browser': 19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))
       '@angular/platform-browser-dynamic': 19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))
       '@angular/platform-server': 19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/compiler@19.2.15)(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(@angular/platform-browser@19.2.15(@angular/animations@19.2.15(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@19.2.15(rxjs@7.8.2)(zone.js@0.15.1)))(rxjs@7.8.2)
@@ -9885,7 +9885,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/language-service@19.2.15': {}
+  '@angular/language-service@22.1.1': {}
 
   '@angular/material@19.2.19(4f82dcdbbbbde9debd2fe86bdd1de638)':
     dependencies:
