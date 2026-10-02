@@ -199,7 +199,7 @@ export class NgDiagramComponent implements OnInit, OnDestroy {
    * `tabbable="false"` means `false`. Binding `undefined` or `null` keeps the default.
    *
    * @default true
-   * @since 1.3.1
+   * @since 1.4.0
    */
   readonly tabbable = input(true, {
     // Angular's booleanAttribute maps null/undefined to false, which would flip the

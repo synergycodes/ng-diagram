@@ -188,6 +188,8 @@ export class NgDiagramBaseEdgeComponent {
    * Whether the edge has at least one free (unconnected) endpoint. Temporary
    * edges are excluded: a draw preview always has a free end, but it must not
    * get the dangling styling.
+   *
+   * @since 1.4.0
    */
   readonly dangling = computed(() => {
     const edge = this.edge();
