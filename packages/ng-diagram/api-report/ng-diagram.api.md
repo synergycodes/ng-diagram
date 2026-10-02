@@ -1640,20 +1640,6 @@ export interface Rect {
 }
 
 // @public
-export class RelinkHandleDirective {
-    // (undocumented)
-    edge: InputSignal<Edge<object>>;
-    // (undocumented)
-    end: InputSignal<EdgeEnd>;
-    // (undocumented)
-    onPointerDown($event: PointerInputEvent): void;
-    // (undocumented)
-    static ɵdir: i0.ɵɵDirectiveDeclaration<RelinkHandleDirective, "[ngDiagramRelinkHandle]", never, { "edge": { "alias": "edge"; "required": true; "isSignal": true; }; "end": { "alias": "end"; "required": true; "isSignal": true; }; }, {}, never, never, true, never>;
-    // (undocumented)
-    static ɵfac: i0.ɵɵFactoryDeclaration<RelinkHandleDirective, never>;
-}
-
-// @public
 export interface ResizeActionState {
     cancelReason?: GestureCancelReason;
     resizingNode: Node_2;
