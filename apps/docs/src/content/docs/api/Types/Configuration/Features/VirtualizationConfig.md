@@ -29,7 +29,7 @@ false
 
 ### idleDelay?
 
-> `optional` **idleDelay**: `number`
+> `optional` **idleDelay?**: `number`
 
 Delay in milliseconds after panning stops before re-rendering visible nodes.
 

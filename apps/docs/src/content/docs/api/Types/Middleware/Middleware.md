@@ -67,7 +67,7 @@ The middleware name type (string literal for type safety)
 
 ## Properties
 
-### execute()
+### execute
 
 > **execute**: (`context`, `next`, `cancel`) => `void` \| `Promise`\<`void`\>
 

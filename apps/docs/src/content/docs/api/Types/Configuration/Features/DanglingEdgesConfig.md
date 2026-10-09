@@ -65,9 +65,9 @@ false
 
 ***
 
-### shouldDetachOnNodeDelete()?
+### shouldDetachOnNodeDelete?
 
-> `optional` **shouldDetachOnNodeDelete**: (`edge`, `deletedNode`, `end`) => `boolean`
+> `optional` **shouldDetachOnNodeDelete?**: (`edge`, `deletedNode`, `end`) => `boolean`
 
 Decides per endpoint whether it is detached (kept as a free endpoint) or
 deleted together with the node. Called only when `enabled` and
@@ -108,9 +108,9 @@ undefined (detach every edge, except edges losing both ends)
 
 ***
 
-### shouldKeepOnDrop()?
+### shouldKeepOnDrop?
 
-> `optional` **shouldKeepOnDrop**: (`edge`, `dropPosition`) => `boolean`
+> `optional` **shouldKeepOnDrop?**: (`edge`, `dropPosition`) => `boolean`
 
 Decides per edge whether a draw or relink dropped on empty canvas keeps
 the edge as a dangling edge. Called only when `enabled` is true. For a

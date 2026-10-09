@@ -46,19 +46,19 @@ A promise that resolves once the change has been applied to the model. Inside a 
 
 ### deselect()
 
-> **deselect**(`nodeIds`, `edgeIds`): `Promise`\<`void`\>
+> **deselect**(`nodeIds?`, `edgeIds?`): `Promise`\<`void`\>
 
 Deselects nodes and edges by their IDs.
 
 #### Parameters
 
-##### nodeIds
+##### nodeIds?
 
 `string`[] = `[]`
 
 Array of node IDs to deselect.
 
-##### edgeIds
+##### edgeIds?
 
 `string`[] = `[]`
 
@@ -88,19 +88,19 @@ A promise that resolves once the change has been applied to the model. Inside a 
 
 ### select()
 
-> **select**(`nodeIds`, `edgeIds`): `Promise`\<`void`\>
+> **select**(`nodeIds?`, `edgeIds?`): `Promise`\<`void`\>
 
 Selects nodes and edges by their IDs.
 
 #### Parameters
 
-##### nodeIds
+##### nodeIds?
 
 `string`[] = `[]`
 
 Array of node IDs to select.
 
-##### edgeIds
+##### edgeIds?
 
 `string`[] = `[]`
 

@@ -82,7 +82,7 @@ If the mouse pointer is within this distance from the edge of the viewport, pann
 
 ***
 
-### finalEdgeDataBuilder()
+### finalEdgeDataBuilder
 
 > **finalEdgeDataBuilder**: (`defaultFinalEdgeData`) => [`Edge`](/docs/api/types/model/edge/)
 
@@ -146,7 +146,7 @@ true
 
 ***
 
-### temporaryEdgeDataBuilder()
+### temporaryEdgeDataBuilder
 
 > **temporaryEdgeDataBuilder**: (`defaultTemporaryEdgeData`) => [`Edge`](/docs/api/types/model/edge/)
 
@@ -176,7 +176,7 @@ The Edge object to use for the temporary edge.
 
 ***
 
-### validateConnection()
+### validateConnection
 
 > **validateConnection**: (`source`, `sourcePort`, `target`, `targetPort`, `context?`) => `boolean`
 
@@ -194,27 +194,27 @@ free (dangling); the `source` or `target` for that end is then `null`.
 
 ##### source
 
-The source node, or `null` when the source end is free.
+[`Node`](/docs/api/types/model/node/) \| `null`
 
-`null` | [`Node`](/docs/api/types/model/node/)
+The source node, or `null` when the source end is free.
 
 ##### sourcePort
 
-The source port.
+[`Port`](/docs/api/types/model/port/) \| `null`
 
-`null` | [`Port`](/docs/api/types/model/port/)
+The source port.
 
 ##### target
 
-The target node, or `null` when the target end is free.
+[`Node`](/docs/api/types/model/node/) \| `null`
 
-`null` | [`Node`](/docs/api/types/model/node/)
+The target node, or `null` when the target end is free.
 
 ##### targetPort
 
-The target port.
+[`Port`](/docs/api/types/model/port/) \| `null`
 
-`null` | [`Port`](/docs/api/types/model/port/)
+The target port.
 
 ##### context?
 

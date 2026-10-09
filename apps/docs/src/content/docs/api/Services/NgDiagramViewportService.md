@@ -95,9 +95,9 @@ Centers the Node within the current viewport bounds.
 
 ##### nodeOrId
 
-The ID of the node or the node object to center on.
+`string` \| [`Node`](/docs/api/types/model/node/)
 
-`string` | [`Node`](/docs/api/types/model/node/)
+The ID of the node or the node object to center on.
 
 #### Returns
 

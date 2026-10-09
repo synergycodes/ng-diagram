@@ -12,7 +12,7 @@ State tracking an edge creation operation in progress.
 
 ### cancelReason?
 
-> `optional` **cancelReason**: [`EdgeDrawCancelReason`](/docs/api/types/events/edgedrawcancelreason/)
+> `optional` **cancelReason?**: [`EdgeDrawCancelReason`](/docs/api/types/events/edgedrawcancelreason/)
 
 Reason the linking gesture was cancelled (set by finishLinking on failure paths).
 
@@ -20,7 +20,7 @@ Reason the linking gesture was cancelled (set by finishLinking on failure paths)
 
 ### dropPosition?
 
-> `optional` **dropPosition**: [`Point`](/docs/api/types/geometry/point/)
+> `optional` **dropPosition?**: [`Point`](/docs/api/types/geometry/point/)
 
 Position where the pointer was released.
 
@@ -28,7 +28,7 @@ Position where the pointer was released.
 
 ### relink?
 
-> `optional` **relink**: [`LinkingRelinkContext`](/docs/api/internals/linkingrelinkcontext/)
+> `optional` **relink?**: [`LinkingRelinkContext`](/docs/api/internals/linkingrelinkcontext/)
 
 Present while an endpoint of an existing edge is being relinked. Until the
 gesture ends, the original edge is not rendered and the temporary edge
@@ -43,7 +43,7 @@ the pointer (a normal draw always drags the target end).
 
 ### relinkCancelReason?
 
-> `optional` **relinkCancelReason**: [`EdgeRelinkCancelReason`](/docs/api/types/events/edgerelinkcancelreason/)
+> `optional` **relinkCancelReason?**: [`EdgeRelinkCancelReason`](/docs/api/types/events/edgerelinkcancelreason/)
 
 Reason the relink gesture ended without changing the edge (set by
 `finishRelinking` when the relink fails).
@@ -72,6 +72,6 @@ ID of the port where the edge starts.
 
 ### temporaryEdge
 
-> **temporaryEdge**: `null` \| [`Edge`](/docs/api/types/model/edge/)\<`object`\>
+> **temporaryEdge**: [`Edge`](/docs/api/types/model/edge/)\<`object`\> \| `null`
 
 Temporary edge displayed while creating the connection.

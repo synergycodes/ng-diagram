@@ -22,7 +22,7 @@ Interface representing the most basic node in the diagram
 
 ### angle?
 
-> `optional` **angle**: `number`
+> `optional` **angle?**: `number`
 
 The angle of the node from 0 to 360.
 
@@ -30,7 +30,7 @@ The angle of the node from 0 to 360.
 
 ### autoSize?
 
-> `optional` **autoSize**: `boolean`
+> `optional` **autoSize?**: `boolean`
 
 Whether the size of the node is automatically resized based on the content.
 
@@ -38,7 +38,7 @@ Whether the size of the node is automatically resized based on the content.
 
 ### computedHidden?
 
-> `readonly` `optional` **computedHidden**: `boolean`
+> `readonly` `optional` **computedHidden?**: `boolean`
 
 #### Remarks
 
@@ -55,7 +55,7 @@ hidden.
 
 ### computedZIndex?
 
-> `readonly` `optional` **computedZIndex**: `number`
+> `readonly` `optional` **computedZIndex?**: `number`
 
 #### Remarks
 
@@ -76,7 +76,7 @@ The data associated with the node.
 
 ### draggable?
 
-> `optional` **draggable**: `boolean`
+> `optional` **draggable?**: `boolean`
 
 Whether the node is draggable.
 
@@ -84,7 +84,7 @@ Whether the node is draggable.
 
 ### groupId?
 
-> `optional` **groupId**: `string`
+> `optional` **groupId?**: `string`
 
 The id of the parent node.
 
@@ -92,7 +92,7 @@ The id of the parent node.
 
 ### hidden?
 
-> `optional` **hidden**: `boolean`
+> `optional` **hidden?**: `boolean`
 
 Whether the node is hidden. When not set, the node is visible.
 
@@ -131,7 +131,7 @@ The unique identifier for the node.
 
 ### measuredBounds?
 
-> `readonly` `optional` **measuredBounds**: [`Rect`](/docs/api/types/geometry/rect/)
+> `readonly` `optional` **measuredBounds?**: [`Rect`](/docs/api/types/geometry/rect/)
 
 #### Remarks
 
@@ -142,7 +142,7 @@ Bounding box that encompasses the node including its ports, accounting for rotat
 
 ### measuredPorts?
 
-> `readonly` `optional` **measuredPorts**: [`Port`](/docs/api/types/model/port/)[]
+> `readonly` `optional` **measuredPorts?**: [`Port`](/docs/api/types/model/port/)[]
 
 #### Remarks
 
@@ -161,7 +161,7 @@ The position of the node in the diagram.
 
 ### resizable?
 
-> `optional` **resizable**: `boolean`
+> `optional` **resizable?**: `boolean`
 
 Whether the node is resizable.
 
@@ -169,7 +169,7 @@ Whether the node is resizable.
 
 ### rotatable?
 
-> `optional` **rotatable**: `boolean`
+> `optional` **rotatable?**: `boolean`
 
 Whether the node is rotatable.
 
@@ -177,7 +177,7 @@ Whether the node is rotatable.
 
 ### selected?
 
-> `optional` **selected**: `boolean`
+> `optional` **selected?**: `boolean`
 
 Whether the node is selected.
 
@@ -185,7 +185,7 @@ Whether the node is selected.
 
 ### size?
 
-> `optional` **size**: [`Size`](/docs/api/types/geometry/size/)
+> `optional` **size?**: [`Size`](/docs/api/types/geometry/size/)
 
 The size of the node.
 
@@ -193,7 +193,7 @@ The size of the node.
 
 ### type?
 
-> `optional` **type**: `string`
+> `optional` **type?**: `string`
 
 The type of the node declared in nodeTemplateMap.
 
@@ -201,7 +201,7 @@ The type of the node declared in nodeTemplateMap.
 
 ### zOrder?
 
-> `optional` **zOrder**: `number`
+> `optional` **zOrder?**: `number`
 
 The z-order of the node. Controls relative ordering among nodes on the same hierarchy level.
 With proper values, it can also influence ordering across different hierarchy levels,

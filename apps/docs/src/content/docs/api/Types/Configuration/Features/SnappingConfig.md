@@ -10,9 +10,9 @@ Configuration for node dragging behavior.
 
 ## Properties
 
-### computeSnapForNodeDrag()
+### computeSnapForNodeDrag
 
-> **computeSnapForNodeDrag**: (`node`) => `null` \| [`Size`](/docs/api/types/geometry/size/)
+> **computeSnapForNodeDrag**: (`node`) => [`Size`](/docs/api/types/geometry/size/) \| `null`
 
 Computes the snap size for a node while dragging. If null is returned, a default snap size will be used.
 If computeSnapForNodeDrag is used, it takes precedence over defaultDragSnap.
@@ -27,7 +27,7 @@ The node to compute the snap size for dragging.
 
 #### Returns
 
-`null` \| [`Size`](/docs/api/types/geometry/size/)
+[`Size`](/docs/api/types/geometry/size/) \| `null`
 
 The snap size for the node while dragging, or null.
 
@@ -39,9 +39,9 @@ The snap size for the node while dragging, or null.
 
 ***
 
-### computeSnapForNodeSize()
+### computeSnapForNodeSize
 
-> **computeSnapForNodeSize**: (`node`) => `null` \| [`Size`](/docs/api/types/geometry/size/)
+> **computeSnapForNodeSize**: (`node`) => [`Size`](/docs/api/types/geometry/size/) \| `null`
 
 Computes the snap size for a node while resizing. If null is returned, a default snap size will be used.
 
@@ -55,7 +55,7 @@ The node to compute the snap size for resizing.
 
 #### Returns
 
-`null` \| [`Size`](/docs/api/types/geometry/size/)
+[`Size`](/docs/api/types/geometry/size/) \| `null`
 
 The snap size for the node while resizing, or null.
 
@@ -67,9 +67,9 @@ The snap size for the node while resizing, or null.
 
 ***
 
-### computeSnapOffsetForNodeSize()
+### computeSnapOffsetForNodeSize
 
-> **computeSnapOffsetForNodeSize**: (`node`) => `null` \| [`Size`](/docs/api/types/geometry/size/)
+> **computeSnapOffsetForNodeSize**: (`node`) => [`Size`](/docs/api/types/geometry/size/) \| `null`
 
 Computes the snap offset for a node while resizing. The snapped size follows the
 sequence `offset + n * snap` per axis, so a node with a 60px header snapping every
@@ -87,7 +87,7 @@ The node to compute the snap offset for resizing.
 
 #### Returns
 
-`null` \| [`Size`](/docs/api/types/geometry/size/)
+[`Size`](/docs/api/types/geometry/size/) \| `null`
 
 The snap offset for the node while resizing, or null.
 
@@ -152,7 +152,7 @@ If computeSnapOffsetForNodeSize is used, it takes precedence over this value.
 
 ***
 
-### shouldSnapDragForNode()
+### shouldSnapDragForNode
 
 > **shouldSnapDragForNode**: (`node`) => `boolean`
 
@@ -180,7 +180,7 @@ True if the node should snap to grid, false otherwise.
 
 ***
 
-### shouldSnapResizeForNode()
+### shouldSnapResizeForNode
 
 > **shouldSnapResizeForNode**: (`node`) => `boolean`
 

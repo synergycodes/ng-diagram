@@ -18,7 +18,7 @@ Interface representing the metadata of the diagram.
 
 ### data?
 
-> `optional` **data**: `T`
+> `optional` **data?**: `T`
 
 Custom user data associated with the diagram
 

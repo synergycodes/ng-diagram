@@ -346,11 +346,7 @@ Middleware to register.
 
 Function to unregister the middleware.
 
-> (): `void`
-
-##### Returns
-
-`void`
+() => `void`
 
 ***
 

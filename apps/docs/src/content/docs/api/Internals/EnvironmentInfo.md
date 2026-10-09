@@ -12,13 +12,13 @@ Interface representing environment information
 
 ### browser
 
-> **browser**: `null` \| `LooseAutocomplete`\<`"Chrome"` \| `"Firefox"` \| `"Safari"` \| `"Edge"` \| `"Opera"` \| `"IE"` \| `"Other"`\>
+> **browser**: `LooseAutocomplete`\<`"Chrome"` \| `"Firefox"` \| `"Safari"` \| `"Edge"` \| `"Opera"` \| `"IE"` \| `"Other"`\> \| `null`
 
 User Browser name (when applicable)
 
 ***
 
-### generateId()
+### generateId
 
 > **generateId**: () => `string`
 
@@ -30,7 +30,7 @@ Generates a unique ID
 
 ***
 
-### now()
+### now
 
 > **now**: () => `number`
 
@@ -44,7 +44,7 @@ Current timestamp in ms
 
 ### os
 
-> **os**: `null` \| `LooseAutocomplete`\<`"MacOS"` \| `"Windows"` \| `"Linux"` \| `"iOS"` \| `"Android"` \| `"Unknown"`\>
+> **os**: `LooseAutocomplete`\<`"MacOS"` \| `"Windows"` \| `"Linux"` \| `"iOS"` \| `"Android"` \| `"Unknown"`\> \| `null`
 
 User Operating system name
 
@@ -52,6 +52,6 @@ User Operating system name
 
 ### runtime
 
-> **runtime**: `null` \| `LooseAutocomplete`\<`"node"` \| `"web"` \| `"other"`\>
+> **runtime**: `LooseAutocomplete`\<`"node"` \| `"web"` \| `"other"`\> \| `null`
 
 Platform identity for high-level adapter routing

@@ -12,7 +12,7 @@ Options for [initializeModel](/docs/api/utilities/initializemodel/) and [initial
 
 ### stripEdgeRuntimeProperties?
 
-> `optional` **stripEdgeRuntimeProperties**: [`StripEdgeRuntimePropertiesFn`](/docs/api/types/model/stripedgeruntimepropertiesfn/)
+> `optional` **stripEdgeRuntimeProperties?**: [`StripEdgeRuntimePropertiesFn`](/docs/api/types/model/stripedgeruntimepropertiesfn/)
 
 Replaces the function that strips runtime-computed properties from edges
 during initialization (and, for the default model created by
@@ -33,7 +33,7 @@ you know you need.
 
 ### stripNodeRuntimeProperties?
 
-> `optional` **stripNodeRuntimeProperties**: [`StripNodeRuntimePropertiesFn`](/docs/api/types/model/stripnoderuntimepropertiesfn/)
+> `optional` **stripNodeRuntimeProperties?**: [`StripNodeRuntimePropertiesFn`](/docs/api/types/model/stripnoderuntimepropertiesfn/)
 
 Replaces the function that strips runtime-computed properties from nodes
 during initialization (and, for the default model created by

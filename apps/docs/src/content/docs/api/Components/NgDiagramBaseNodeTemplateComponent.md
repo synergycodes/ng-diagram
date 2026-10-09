@@ -42,7 +42,7 @@ Input signal containing the node data and properties.
 
 ### removeDefaultPorts
 
-> **removeDefaultPorts**: `InputSignal`\<`undefined` \| `boolean`\>
+> **removeDefaultPorts**: `InputSignal`\<`boolean` \| `undefined`\>
 
 When explicitly set to `true` this will remove the default ports in the template.
 

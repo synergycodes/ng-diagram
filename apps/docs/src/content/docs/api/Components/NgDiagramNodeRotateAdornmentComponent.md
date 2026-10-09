@@ -22,7 +22,7 @@ The `NgDiagramNodeRotateAdornmentComponent` displays a rotation handle for a sel
 
 ### defaultRotatable
 
-> **defaultRotatable**: `InputSignal`\<`undefined` \| `boolean`\>
+> **defaultRotatable**: `InputSignal`\<`boolean` \| `undefined`\>
 
 Whether the node is rotatable.
 

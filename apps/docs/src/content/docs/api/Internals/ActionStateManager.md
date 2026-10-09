@@ -37,13 +37,13 @@ const middleware: Middleware = {
 
 #### Get Signature
 
-> **get** **copyPaste**(): `undefined` \| [`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/)
+> **get** **copyPaste**(): [`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/) \| `undefined`
 
 Gets the current copy/paste action state.
 
 ##### Returns
 
-`undefined` \| [`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/)
+[`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/) \| `undefined`
 
 The copy/paste state if a copy/paste operation is in progress, undefined otherwise
 
@@ -57,9 +57,9 @@ Sets the copy/paste action state.
 
 ###### value
 
-The copy/paste state to set, or undefined to clear
+[`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/) \| `undefined`
 
-`undefined` | [`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/)
+The copy/paste state to set, or undefined to clear
 
 ##### Returns
 
@@ -71,13 +71,13 @@ The copy/paste state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **dragging**(): `undefined` \| [`DraggingActionState`](/docs/api/internals/draggingactionstate/)
+> **get** **dragging**(): [`DraggingActionState`](/docs/api/internals/draggingactionstate/) \| `undefined`
 
 Gets the current dragging action state.
 
 ##### Returns
 
-`undefined` \| [`DraggingActionState`](/docs/api/internals/draggingactionstate/)
+[`DraggingActionState`](/docs/api/internals/draggingactionstate/) \| `undefined`
 
 The dragging state if nodes are being dragged, undefined otherwise
 
@@ -91,9 +91,9 @@ Sets the dragging action state.
 
 ###### value
 
-The dragging state to set, or undefined to clear
+[`DraggingActionState`](/docs/api/internals/draggingactionstate/) \| `undefined`
 
-`undefined` | [`DraggingActionState`](/docs/api/internals/draggingactionstate/)
+The dragging state to set, or undefined to clear
 
 ##### Returns
 
@@ -105,13 +105,13 @@ The dragging state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **highlightGroup**(): `undefined` \| [`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/)
+> **get** **highlightGroup**(): [`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/) \| `undefined`
 
 Gets the current highlight group action state.
 
 ##### Returns
 
-`undefined` \| [`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/)
+[`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/) \| `undefined`
 
 The highlight group state if a group is being highlighted, undefined otherwise
 
@@ -125,9 +125,9 @@ Sets the highlight group action state.
 
 ###### value
 
-The highlight group state to set, or undefined to clear
+[`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/) \| `undefined`
 
-`undefined` | [`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/)
+The highlight group state to set, or undefined to clear
 
 ##### Returns
 
@@ -139,13 +139,13 @@ The highlight group state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **linking**(): `undefined` \| [`LinkingActionState`](/docs/api/internals/linkingactionstate/)
+> **get** **linking**(): [`LinkingActionState`](/docs/api/internals/linkingactionstate/) \| `undefined`
 
 Gets the current linking action state.
 
 ##### Returns
 
-`undefined` \| [`LinkingActionState`](/docs/api/internals/linkingactionstate/)
+[`LinkingActionState`](/docs/api/internals/linkingactionstate/) \| `undefined`
 
 The linking state if a link is being created, undefined otherwise
 
@@ -159,9 +159,9 @@ Sets the linking action state.
 
 ###### value
 
-The linking state to set, or undefined to clear
+[`LinkingActionState`](/docs/api/internals/linkingactionstate/) \| `undefined`
 
-`undefined` | [`LinkingActionState`](/docs/api/internals/linkingactionstate/)
+The linking state to set, or undefined to clear
 
 ##### Returns
 
@@ -173,13 +173,13 @@ The linking state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **panning**(): `undefined` \| [`PanningActionState`](/docs/api/internals/panningactionstate/)
+> **get** **panning**(): [`PanningActionState`](/docs/api/internals/panningactionstate/) \| `undefined`
 
 Gets the current panning action state.
 
 ##### Returns
 
-`undefined` \| [`PanningActionState`](/docs/api/internals/panningactionstate/)
+[`PanningActionState`](/docs/api/internals/panningactionstate/) \| `undefined`
 
 The panning state if viewport is being panned, undefined otherwise
 
@@ -193,9 +193,9 @@ Sets the panning action state.
 
 ###### value
 
-The panning state to set, or undefined to clear
+[`PanningActionState`](/docs/api/internals/panningactionstate/) \| `undefined`
 
-`undefined` | [`PanningActionState`](/docs/api/internals/panningactionstate/)
+The panning state to set, or undefined to clear
 
 ##### Returns
 
@@ -207,13 +207,13 @@ The panning state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **resize**(): `undefined` \| [`ResizeActionState`](/docs/api/internals/resizeactionstate/)
+> **get** **resize**(): [`ResizeActionState`](/docs/api/internals/resizeactionstate/) \| `undefined`
 
 Gets the current resize action state.
 
 ##### Returns
 
-`undefined` \| [`ResizeActionState`](/docs/api/internals/resizeactionstate/)
+[`ResizeActionState`](/docs/api/internals/resizeactionstate/) \| `undefined`
 
 The resize state if a resize is in progress, undefined otherwise
 
@@ -227,9 +227,9 @@ Sets the resize action state.
 
 ###### value
 
-The resize state to set, or undefined to clear
+[`ResizeActionState`](/docs/api/internals/resizeactionstate/) \| `undefined`
 
-`undefined` | [`ResizeActionState`](/docs/api/internals/resizeactionstate/)
+The resize state to set, or undefined to clear
 
 ##### Returns
 
@@ -241,13 +241,13 @@ The resize state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **rotation**(): `undefined` \| [`RotationActionState`](/docs/api/internals/rotationactionstate/)
+> **get** **rotation**(): [`RotationActionState`](/docs/api/internals/rotationactionstate/) \| `undefined`
 
 Gets the current rotation action state.
 
 ##### Returns
 
-`undefined` \| [`RotationActionState`](/docs/api/internals/rotationactionstate/)
+[`RotationActionState`](/docs/api/internals/rotationactionstate/) \| `undefined`
 
 The rotation state if a rotation is in progress, undefined otherwise
 
@@ -261,9 +261,9 @@ Sets the rotation action state.
 
 ###### value
 
-The rotation state to set, or undefined to clear
+[`RotationActionState`](/docs/api/internals/rotationactionstate/) \| `undefined`
 
-`undefined` | [`RotationActionState`](/docs/api/internals/rotationactionstate/)
+The rotation state to set, or undefined to clear
 
 ##### Returns
 
@@ -275,13 +275,13 @@ The rotation state to set, or undefined to clear
 
 #### Get Signature
 
-> **get** **selection**(): `undefined` \| [`SelectionActionState`](/docs/api/internals/selectionactionstate/)
+> **get** **selection**(): [`SelectionActionState`](/docs/api/internals/selectionactionstate/) \| `undefined`
 
 Gets the current selection action state.
 
 ##### Returns
 
-`undefined` \| [`SelectionActionState`](/docs/api/internals/selectionactionstate/)
+[`SelectionActionState`](/docs/api/internals/selectionactionstate/) \| `undefined`
 
 The selection state if set, undefined otherwise
 
@@ -295,9 +295,9 @@ Sets the selection action state.
 
 ###### value
 
-The selection state to set, or undefined to clear
+[`SelectionActionState`](/docs/api/internals/selectionactionstate/) \| `undefined`
 
-`undefined` | [`SelectionActionState`](/docs/api/internals/selectionactionstate/)
+The selection state to set, or undefined to clear
 
 ##### Returns
 

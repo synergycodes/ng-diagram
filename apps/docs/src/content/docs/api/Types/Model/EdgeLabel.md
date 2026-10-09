@@ -20,7 +20,7 @@ The id of the label.
 
 ### position?
 
-> `optional` **position**: [`Point`](/docs/api/types/geometry/point/)
+> `optional` **position?**: [`Point`](/docs/api/types/geometry/point/)
 
 The position of the label on flow.
 
@@ -47,6 +47,6 @@ positionOnEdge: '-20px'  // 20px from target (absolute)
 
 ### size?
 
-> `optional` **size**: [`Size`](/docs/api/types/geometry/size/)
+> `optional` **size?**: [`Size`](/docs/api/types/geometry/size/)
 
 The size of the label.

@@ -40,7 +40,7 @@ true
 
 ***
 
-### getMinNodeSize()
+### getMinNodeSize
 
 > **getMinNodeSize**: (`node`) => [`Size`](/docs/api/types/geometry/size/)
 
