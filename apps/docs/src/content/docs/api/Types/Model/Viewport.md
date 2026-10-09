@@ -12,7 +12,7 @@ Interface representing the viewport of the diagram.
 
 ### height?
 
-> `optional` **height**: `number`
+> `optional` **height?**: `number`
 
 Height of the viewport
 
@@ -28,7 +28,7 @@ Scale factor of the viewport
 
 ### width?
 
-> `optional` **width**: `number`
+> `optional` **width?**: `number`
 
 Width of the viewport
 

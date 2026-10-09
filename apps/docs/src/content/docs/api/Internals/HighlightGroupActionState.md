@@ -12,6 +12,6 @@ State tracking which group is currently highlighted.
 
 ### highlightedGroupId
 
-> **highlightedGroupId**: `null` \| `string`
+> **highlightedGroupId**: `string` \| `null`
 
 ID of the highlighted group, or null if no group is highlighted.

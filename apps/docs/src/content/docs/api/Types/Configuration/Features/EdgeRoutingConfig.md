@@ -10,7 +10,7 @@ Configuration for edge routing behavior.
 
 ## Indexable
 
-\[`edgeRoutingName`: `string`\]: `undefined` \| `Record`\<`string`, `unknown`\> \| [`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/)
+> \[`edgeRoutingName`: `string`\]: `Record`\<`string`, `unknown`\> \| [`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/) \| `undefined`
 
 Allow custom edge routing configurations.
 
@@ -18,13 +18,13 @@ Allow custom edge routing configurations.
 
 ### bezier?
 
-> `optional` **bezier**: `object`
+> `optional` **bezier?**: `object`
 
 configuration options for bezier routing
 
 #### bezierControlOffset?
 
-> `optional` **bezierControlOffset**: `number`
+> `optional` **bezierControlOffset?**: `number`
 
 bezier control point offset
 
@@ -57,13 +57,13 @@ EdgeRoutingName
 
 ### orthogonal?
 
-> `optional` **orthogonal**: `object`
+> `optional` **orthogonal?**: `object`
 
 configuration options for orthogonal routing
 
 #### firstLastSegmentLength?
 
-> `optional` **firstLastSegmentLength**: `number`
+> `optional` **firstLastSegmentLength?**: `number`
 
 first/last segment length
 
@@ -75,7 +75,7 @@ first/last segment length
 
 #### maxCornerRadius?
 
-> `optional` **maxCornerRadius**: `number`
+> `optional` **maxCornerRadius?**: `number`
 
 maximum corner radius
 

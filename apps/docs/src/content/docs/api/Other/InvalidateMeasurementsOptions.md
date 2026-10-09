@@ -14,7 +14,7 @@ are re-measured. When omitted, all elements are re-measured.
 
 ### edges?
 
-> `optional` **edges**: `object`[]
+> `optional` **edges?**: `object`[]
 
 Edges whose labels should be re-measured.
 
@@ -26,7 +26,7 @@ Edges whose labels should be re-measured.
 
 ### nodes?
 
-> `optional` **nodes**: `object`[]
+> `optional` **nodes?**: `object`[]
 
 Nodes to re-measure. Invalidating a node also re-measures all its ports.
 

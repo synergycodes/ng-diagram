@@ -443,7 +443,7 @@ The free endpoints with their edge, end and anchor position.
 
 ### getEdgeById()
 
-> **getEdgeById**\<`T`\>(`edgeId`): `null` \| [`Edge`](/docs/api/types/model/edge/)\<`T`\>
+> **getEdgeById**\<`T`\>(`edgeId`): [`Edge`](/docs/api/types/model/edge/)\<`T`\> \| `null`
 
 Gets an edge by id.
 
@@ -465,7 +465,7 @@ Edge id.
 
 #### Returns
 
-`null` \| [`Edge`](/docs/api/types/model/edge/)\<`T`\>
+[`Edge`](/docs/api/types/model/edge/)\<`T`\> \| `null`
 
 Edge or null if not found.
 
@@ -486,7 +486,7 @@ Returns null if flowCore is not initialized.
 
 ### getNearestDanglingEndpointInRange()
 
-> **getNearestDanglingEndpointInRange**(`point`, `range`): `null` \| [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)
+> **getNearestDanglingEndpointInRange**(`point`, `range`): [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/) \| `null`
 
 Finds the free edge endpoint nearest to a point within a range. It works
 like [getNearestPortInRange](/docs/api/services/ngdiagrammodelservice/#getnearestportinrange), but for the free endpoints of dangling
@@ -508,7 +508,7 @@ Range to check in.
 
 #### Returns
 
-`null` \| [`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/)
+[`DanglingEndpoint`](/docs/api/types/model/danglingendpoint/) \| `null`
 
 Nearest free endpoint in range, or null.
 
@@ -520,7 +520,7 @@ Nearest free endpoint in range, or null.
 
 ### getNearestNodeInRange()
 
-> **getNearestNodeInRange**\<`T`\>(`point`, `range`): `null` \| [`Node`](/docs/api/types/model/node/)\<`T`\>
+> **getNearestNodeInRange**\<`T`\>(`point`, `range`): [`Node`](/docs/api/types/model/node/)\<`T`\> \| `null`
 
 Gets the nearest node in a range from a point.
 
@@ -548,7 +548,7 @@ Range to check in.
 
 #### Returns
 
-`null` \| [`Node`](/docs/api/types/model/node/)\<`T`\>
+[`Node`](/docs/api/types/model/node/)\<`T`\> \| `null`
 
 Nearest node in range or null.
 
@@ -556,7 +556,7 @@ Nearest node in range or null.
 
 ### getNearestPortInRange()
 
-> **getNearestPortInRange**(`point`, `range`): `null` \| [`Port`](/docs/api/types/model/port/)
+> **getNearestPortInRange**(`point`, `range`): [`Port`](/docs/api/types/model/port/) \| `null`
 
 Gets the nearest port in a range from a point.
 
@@ -576,7 +576,7 @@ Range to check in.
 
 #### Returns
 
-`null` \| [`Port`](/docs/api/types/model/port/)
+[`Port`](/docs/api/types/model/port/) \| `null`
 
 Nearest port in range or null.
 
@@ -584,7 +584,7 @@ Nearest port in range or null.
 
 ### getNodeById()
 
-> **getNodeById**\<`T`\>(`nodeId`): `null` \| [`Node`](/docs/api/types/model/node/)\<`T`\>
+> **getNodeById**\<`T`\>(`nodeId`): [`Node`](/docs/api/types/model/node/)\<`T`\> \| `null`
 
 Gets a node by id.
 
@@ -606,7 +606,7 @@ Node id.
 
 #### Returns
 
-`null` \| [`Node`](/docs/api/types/model/node/)\<`T`\>
+[`Node`](/docs/api/types/model/node/)\<`T`\> \| `null`
 
 Node or null if not found.
 
@@ -614,7 +614,7 @@ Node or null if not found.
 
 ### getNodeEnds()
 
-> **getNodeEnds**\<`S`, `T`\>(`edgeId`): `null` \| \{ `source`: [`Node`](/docs/api/types/model/node/)\<`S`\>; `target`: [`Node`](/docs/api/types/model/node/)\<`T`\>; \}
+> **getNodeEnds**\<`S`, `T`\>(`edgeId`): \{ `source`: [`Node`](/docs/api/types/model/node/)\<`S`\>; `target`: [`Node`](/docs/api/types/model/node/)\<`T`\>; \} \| `null`
 
 Gets the source and target nodes of an edge
 
@@ -642,7 +642,7 @@ Edge id
 
 #### Returns
 
-`null` \| \{ `source`: [`Node`](/docs/api/types/model/node/)\<`S`\>; `target`: [`Node`](/docs/api/types/model/node/)\<`T`\>; \}
+\{ `source`: [`Node`](/docs/api/types/model/node/)\<`S`\>; `target`: [`Node`](/docs/api/types/model/node/)\<`T`\>; \} \| `null`
 
 Object containing source and target nodes, or null if edge doesn't exist
 

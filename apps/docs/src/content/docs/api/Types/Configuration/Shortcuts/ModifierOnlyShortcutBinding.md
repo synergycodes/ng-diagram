@@ -12,7 +12,7 @@ Defines a modifier-only shortcut binding (for pointer events)
 
 ### key?
 
-> `optional` **key**: `undefined`
+> `optional` **key?**: `undefined`
 
 Key must not be present for modifier-only bindings
 

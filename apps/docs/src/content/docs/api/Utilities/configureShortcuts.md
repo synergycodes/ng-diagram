@@ -6,7 +6,7 @@ prev: false
 title: "configureShortcuts"
 ---
 
-> **configureShortcuts**(`userShortcuts`, `baseShortcuts`): [`ShortcutDefinition`](/docs/api/types/configuration/shortcuts/shortcutdefinition/)[]
+> **configureShortcuts**(`userShortcuts`, `baseShortcuts?`): [`ShortcutDefinition`](/docs/api/types/configuration/shortcuts/shortcutdefinition/)[]
 
 Merges user shortcuts with base shortcuts, user shortcuts override by actionName
 
@@ -18,7 +18,7 @@ Merges user shortcuts with base shortcuts, user shortcuts override by actionName
 
 User-provided shortcuts that will override matching base shortcuts
 
-### baseShortcuts
+### baseShortcuts?
 
 [`ShortcutDefinition`](/docs/api/types/configuration/shortcuts/shortcutdefinition/)[] = `DEFAULT_SHORTCUTS`
 

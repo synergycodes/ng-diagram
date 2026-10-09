@@ -12,7 +12,7 @@ Configuration for box selection behavior.
 
 ### partialInclusion?
 
-> `optional` **partialInclusion**: `boolean`
+> `optional` **partialInclusion?**: `boolean`
 
 Whether to select nodes that are only partially within the selection box.
 
@@ -26,7 +26,7 @@ true
 
 ### realtime?
 
-> `optional` **realtime**: `boolean`
+> `optional` **realtime?**: `boolean`
 
 Whether to select nodes in real-time as the selection box is being drawn.
 If false, nodes will only be selected when the box selection ends.

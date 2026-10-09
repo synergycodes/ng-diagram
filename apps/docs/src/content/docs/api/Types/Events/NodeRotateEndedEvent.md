@@ -15,7 +15,7 @@ The node will have its final angle when this event is received.
 
 ### cancelReason?
 
-> `optional` **cancelReason**: `"cancelled"`
+> `optional` **cancelReason?**: `"cancelled"`
 
 Present when the rotation ended without a normal pointer release
 

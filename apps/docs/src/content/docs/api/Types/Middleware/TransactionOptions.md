@@ -12,7 +12,7 @@ Options for configuring transaction behavior.
 
 ### waitForMeasurements?
 
-> `optional` **waitForMeasurements**: `boolean`
+> `optional` **waitForMeasurements?**: `boolean`
 
 When true, the transaction promise will not resolve until all measurements
 (node sizes, port positions, etc.) triggered by the transaction are complete.

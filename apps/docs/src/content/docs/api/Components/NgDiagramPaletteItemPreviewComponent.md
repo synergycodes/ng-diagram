@@ -20,7 +20,7 @@ dragged onto the canvas.
 
 ### preview
 
-> `readonly` **preview**: `Signal`\<`undefined` \| `ElementRef`\<`HTMLElement`\>\>
+> `readonly` **preview**: `Signal`\<`ElementRef`\<`HTMLElement`\> \| `undefined`\>
 
 The element holding the preview content. It is not rendered in the page flow, so read the
 preview's natural size or content from it — its position is meaningless.

@@ -13,7 +13,7 @@ All properties are optional - unset properties use CSS defaults.
 
 ### cssClass?
 
-> `optional` **cssClass**: `string`
+> `optional` **cssClass?**: `string`
 
 CSS class to apply to the node
 
@@ -21,7 +21,7 @@ CSS class to apply to the node
 
 ### fill?
 
-> `optional` **fill**: `string`
+> `optional` **fill?**: `string`
 
 Fill color for the node
 
@@ -29,7 +29,7 @@ Fill color for the node
 
 ### opacity?
 
-> `optional` **opacity**: `number`
+> `optional` **opacity?**: `number`
 
 Opacity from 0 to 1
 
@@ -37,7 +37,7 @@ Opacity from 0 to 1
 
 ### shape?
 
-> `optional` **shape**: [`MinimapNodeShape`](/docs/api/types/minimap/minimapnodeshape/)
+> `optional` **shape?**: [`MinimapNodeShape`](/docs/api/types/minimap/minimapnodeshape/)
 
 Shape of the node in the minimap. Defaults to 'rect'.
 
@@ -45,7 +45,7 @@ Shape of the node in the minimap. Defaults to 'rect'.
 
 ### stroke?
 
-> `optional` **stroke**: `string`
+> `optional` **stroke?**: `string`
 
 Stroke color for the node
 
@@ -53,6 +53,6 @@ Stroke color for the node
 
 ### strokeWidth?
 
-> `optional` **strokeWidth**: `number`
+> `optional` **strokeWidth?**: `number`
 
 Stroke width in pixels

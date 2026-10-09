@@ -56,7 +56,7 @@ Pass an empty array to keep the selection frame without allowing any interactive
 
 ### defaultResizable
 
-> **defaultResizable**: `InputSignal`\<`undefined` \| `boolean`\>
+> **defaultResizable**: `InputSignal`\<`boolean` \| `undefined`\>
 
 Whether the node is resizable.
 

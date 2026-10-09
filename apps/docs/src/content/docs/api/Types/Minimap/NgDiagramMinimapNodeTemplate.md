@@ -44,6 +44,6 @@ Input signal containing the original Node object for accessing node data, type, 
 
 ### nodeStyle
 
-> **nodeStyle**: `InputSignal`\<`undefined` \| [`MinimapNodeStyle`](/docs/api/types/minimap/minimapnodestyle/)\>
+> **nodeStyle**: `InputSignal`\<[`MinimapNodeStyle`](/docs/api/types/minimap/minimapnodestyle/) \| `undefined`\>
 
 Input signal for style overrides computed by nodeStyle callback. Can be ignored if not needed.

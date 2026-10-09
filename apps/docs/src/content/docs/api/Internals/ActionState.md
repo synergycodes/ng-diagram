@@ -16,7 +16,7 @@ user interactions. Use this to observe the current state, not to modify it.
 
 ### copyPaste?
 
-> `optional` **copyPaste**: [`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/)
+> `optional` **copyPaste?**: [`CopyPasteActionState`](/docs/api/internals/copypasteactionstate/)
 
 State related to copy-paste actions
 
@@ -24,7 +24,7 @@ State related to copy-paste actions
 
 ### dragging?
 
-> `optional` **dragging**: [`DraggingActionState`](/docs/api/internals/draggingactionstate/)
+> `optional` **dragging?**: [`DraggingActionState`](/docs/api/internals/draggingactionstate/)
 
 State related to dragging elements
 
@@ -32,7 +32,7 @@ State related to dragging elements
 
 ### highlightGroup?
 
-> `optional` **highlightGroup**: [`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/)
+> `optional` **highlightGroup?**: [`HighlightGroupActionState`](/docs/api/internals/highlightgroupactionstate/)
 
 State related to highlighting groups
 
@@ -40,7 +40,7 @@ State related to highlighting groups
 
 ### linking?
 
-> `optional` **linking**: [`LinkingActionState`](/docs/api/internals/linkingactionstate/)
+> `optional` **linking?**: [`LinkingActionState`](/docs/api/internals/linkingactionstate/)
 
 State related to linking nodes
 
@@ -48,7 +48,7 @@ State related to linking nodes
 
 ### panning?
 
-> `optional` **panning**: [`PanningActionState`](/docs/api/internals/panningactionstate/)
+> `optional` **panning?**: [`PanningActionState`](/docs/api/internals/panningactionstate/)
 
 State related to panning the viewport
 
@@ -56,7 +56,7 @@ State related to panning the viewport
 
 ### resize?
 
-> `optional` **resize**: [`ResizeActionState`](/docs/api/internals/resizeactionstate/)
+> `optional` **resize?**: [`ResizeActionState`](/docs/api/internals/resizeactionstate/)
 
 State related to node resizing action
 
@@ -64,7 +64,7 @@ State related to node resizing action
 
 ### rotation?
 
-> `optional` **rotation**: [`RotationActionState`](/docs/api/internals/rotationactionstate/)
+> `optional` **rotation?**: [`RotationActionState`](/docs/api/internals/rotationactionstate/)
 
 State related to node rotation
 
@@ -72,6 +72,6 @@ State related to node rotation
 
 ### selection?
 
-> `optional` **selection**: [`SelectionActionState`](/docs/api/internals/selectionactionstate/)
+> `optional` **selection?**: [`SelectionActionState`](/docs/api/internals/selectionactionstate/)
 
 State related to selection gestures

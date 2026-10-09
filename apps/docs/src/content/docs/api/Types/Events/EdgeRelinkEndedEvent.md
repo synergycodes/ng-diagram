@@ -40,7 +40,7 @@ Which endpoint was dragged.
 
 ### previousNode?
 
-> `optional` **previousNode**: [`Node`](/docs/api/types/model/node/)
+> `optional` **previousNode?**: [`Node`](/docs/api/types/model/node/)
 
 The node the endpoint was connected to before the relink, if any.
 
@@ -48,7 +48,7 @@ The node the endpoint was connected to before the relink, if any.
 
 ### previousPort?
 
-> `optional` **previousPort**: `string`
+> `optional` **previousPort?**: `string`
 
 The port the endpoint was connected to before the relink, if any.
 
@@ -56,7 +56,7 @@ The port the endpoint was connected to before the relink, if any.
 
 ### previousPosition?
 
-> `optional` **previousPosition**: [`Point`](/docs/api/types/geometry/point/)
+> `optional` **previousPosition?**: [`Point`](/docs/api/types/geometry/point/)
 
 The anchor position of the endpoint before the relink, present only when the endpoint was free (dangling).
 
@@ -64,7 +64,7 @@ The anchor position of the endpoint before the relink, present only when the end
 
 ### reason?
 
-> `optional` **reason**: [`EdgeRelinkCancelReason`](/docs/api/types/events/edgerelinkcancelreason/)
+> `optional` **reason?**: [`EdgeRelinkCancelReason`](/docs/api/types/events/edgerelinkcancelreason/)
 
 The reason the relink was reverted (only present on failure).
 
@@ -80,7 +80,7 @@ Whether the edge was changed (reconnected or left dangling).
 
 ### target?
 
-> `optional` **target**: [`Node`](/docs/api/types/model/node/)
+> `optional` **target?**: [`Node`](/docs/api/types/model/node/)
 
 The node the endpoint was reconnected to (only present on reconnect).
 
@@ -88,6 +88,6 @@ The node the endpoint was reconnected to (only present on reconnect).
 
 ### targetPort?
 
-> `optional` **targetPort**: `string`
+> `optional` **targetPort?**: `string`
 
 The port the endpoint was reconnected to (only present on reconnect).

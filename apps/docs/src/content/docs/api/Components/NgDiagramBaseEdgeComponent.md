@@ -106,7 +106,7 @@ Same as [relinkSourceHandleVisible](/docs/api/components/ngdiagrambaseedgecompon
 
 ### routing
 
-> **routing**: `InputSignal`\<`undefined` \| `string`\>
+> **routing**: `InputSignal`\<`string` \| `undefined`\>
 
 Edge routing mode
 
@@ -114,7 +114,7 @@ Edge routing mode
 
 ### sourceArrowhead
 
-> **sourceArrowhead**: `InputSignal`\<`undefined` \| `string`\>
+> **sourceArrowhead**: `InputSignal`\<`string` \| `undefined`\>
 
 ID of a source <marker> element in the SVG document. Edge model data has precedence over this property.
 
@@ -122,7 +122,7 @@ ID of a source <marker> element in the SVG document. Edge model data has precede
 
 ### stroke
 
-> **stroke**: `InputSignal`\<`undefined` \| `string`\>
+> **stroke**: `InputSignal`\<`string` \| `undefined`\>
 
 Stroke color of the edge. Edge model data has precedence over this property.
 
@@ -130,7 +130,7 @@ Stroke color of the edge. Edge model data has precedence over this property.
 
 ### strokeDasharray
 
-> **strokeDasharray**: `InputSignal`\<`undefined` \| `string`\>
+> **strokeDasharray**: `InputSignal`\<`string` \| `undefined`\>
 
 Stroke dash array of the edge (e.g., '5 5' for dashed line, '10 5 2 5' for dash-dot pattern).
 
@@ -138,7 +138,7 @@ Stroke dash array of the edge (e.g., '5 5' for dashed line, '10 5 2 5' for dash-
 
 ### strokeOpacity
 
-> **strokeOpacity**: `InputSignal`\<`undefined` \| `number`\>
+> **strokeOpacity**: `InputSignal`\<`number` \| `undefined`\>
 
 Stroke opacity of the edge
 
@@ -146,7 +146,7 @@ Stroke opacity of the edge
 
 ### strokeWidth
 
-> **strokeWidth**: `InputSignal`\<`undefined` \| `number`\>
+> **strokeWidth**: `InputSignal`\<`number` \| `undefined`\>
 
 Stroke width of the edge
 
@@ -154,7 +154,7 @@ Stroke width of the edge
 
 ### targetArrowhead
 
-> **targetArrowhead**: `InputSignal`\<`undefined` \| `string`\>
+> **targetArrowhead**: `InputSignal`\<`string` \| `undefined`\>
 
 ID of a target <marker> element in the SVG document. Edge model data has precedence over this property.
 

@@ -12,7 +12,7 @@ State tracking a node resize operation in progress.
 
 ### cancelReason?
 
-> `optional` **cancelReason**: `"cancelled"`
+> `optional` **cancelReason?**: `"cancelled"`
 
 Set when the resize is aborted; carried into `nodeResizeEnded`.
 

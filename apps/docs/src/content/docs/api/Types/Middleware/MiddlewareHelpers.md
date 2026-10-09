@@ -11,7 +11,7 @@ These helpers track all cumulative changes from the initial state update and all
 
 ## Properties
 
-### anyEdgesAdded()
+### anyEdgesAdded
 
 > **anyEdgesAdded**: () => `boolean`
 
@@ -25,7 +25,7 @@ true if at least one edge was added by the initial state update or any previous 
 
 ***
 
-### anyEdgesRemoved()
+### anyEdgesRemoved
 
 > **anyEdgesRemoved**: () => `boolean`
 
@@ -39,7 +39,7 @@ true if at least one edge was removed by the initial state update or any previou
 
 ***
 
-### anyNodesAdded()
+### anyNodesAdded
 
 > **anyNodesAdded**: () => `boolean`
 
@@ -53,7 +53,7 @@ true if at least one node was added by the initial state update or any previous 
 
 ***
 
-### anyNodesRemoved()
+### anyNodesRemoved
 
 > **anyNodesRemoved**: () => `boolean`
 
@@ -67,7 +67,7 @@ true if at least one node was removed by the initial state update or any previou
 
 ***
 
-### checkIfAnyEdgePropsChanged()
+### checkIfAnyEdgePropsChanged
 
 > **checkIfAnyEdgePropsChanged**: (`props`) => `boolean`
 
@@ -89,7 +89,7 @@ true if any edge has any of these properties modified by the initial state updat
 
 ***
 
-### checkIfAnyNodePropsChanged()
+### checkIfAnyNodePropsChanged
 
 > **checkIfAnyNodePropsChanged**: (`props`) => `boolean`
 
@@ -111,7 +111,7 @@ true if any node has any of these properties modified by the initial state updat
 
 ***
 
-### checkIfEdgeAdded()
+### checkIfEdgeAdded
 
 > **checkIfEdgeAdded**: (`id`) => `boolean`
 
@@ -133,7 +133,7 @@ true if the edge was added by the initial state update or any previous middlewar
 
 ***
 
-### checkIfEdgeChanged()
+### checkIfEdgeChanged
 
 > **checkIfEdgeChanged**: (`id`) => `boolean`
 
@@ -155,7 +155,7 @@ true if the edge was modified (any property changed) by the initial state update
 
 ***
 
-### checkIfEdgeRemoved()
+### checkIfEdgeRemoved
 
 > **checkIfEdgeRemoved**: (`id`) => `boolean`
 
@@ -177,7 +177,7 @@ true if the edge was removed by the initial state update or any previous middlew
 
 ***
 
-### checkIfNodeAdded()
+### checkIfNodeAdded
 
 > **checkIfNodeAdded**: (`id`) => `boolean`
 
@@ -199,7 +199,7 @@ true if the node was added by the initial state update or any previous middlewar
 
 ***
 
-### checkIfNodeChanged()
+### checkIfNodeChanged
 
 > **checkIfNodeChanged**: (`id`) => `boolean`
 
@@ -221,7 +221,7 @@ true if the node was modified (any property changed) by the initial state update
 
 ***
 
-### checkIfNodeRemoved()
+### checkIfNodeRemoved
 
 > **checkIfNodeRemoved**: (`id`) => `boolean`
 
@@ -243,7 +243,7 @@ true if the node was removed by the initial state update or any previous middlew
 
 ***
 
-### getAddedEdges()
+### getAddedEdges
 
 > **getAddedEdges**: () => [`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
 
@@ -257,7 +257,7 @@ Array of edge instances that were added by the initial state update or any previ
 
 ***
 
-### getAddedNodes()
+### getAddedNodes
 
 > **getAddedNodes**: () => [`Node`](/docs/api/types/model/node/)[]
 
@@ -271,7 +271,7 @@ Array of node instances that were added by the initial state update or any previ
 
 ***
 
-### getAffectedEdgeIds()
+### getAffectedEdgeIds
 
 > **getAffectedEdgeIds**: (`props`) => `string`[]
 
@@ -293,7 +293,7 @@ Array of edge IDs that have any of these properties modified by the initial stat
 
 ***
 
-### getAffectedNodeIds()
+### getAffectedNodeIds
 
 > **getAffectedNodeIds**: (`props`) => `string`[]
 
@@ -315,7 +315,7 @@ Array of node IDs that have any of these properties modified by the initial stat
 
 ***
 
-### getChangedEdgeIds()
+### getChangedEdgeIds
 
 > **getChangedEdgeIds**: () => `string`[]
 
@@ -333,7 +333,7 @@ Array of edge IDs that were modified by the initial state update or any previous
 
 ***
 
-### getChangedNodeIds()
+### getChangedNodeIds
 
 > **getChangedNodeIds**: () => `string`[]
 
@@ -351,7 +351,7 @@ Array of node IDs that were modified by the initial state update or any previous
 
 ***
 
-### getRemovedEdges()
+### getRemovedEdges
 
 > **getRemovedEdges**: () => [`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
 
@@ -366,7 +366,7 @@ Array of edge instances that were removed by the initial state update or any pre
 
 ***
 
-### getRemovedNodes()
+### getRemovedNodes
 
 > **getRemovedNodes**: () => [`Node`](/docs/api/types/model/node/)[]
 

@@ -12,7 +12,7 @@ Configuration for the diagram background.
 
 ### cellSize?
 
-> `optional` **cellSize**: [`Size`](/docs/api/types/geometry/size/)
+> `optional` **cellSize?**: [`Size`](/docs/api/types/geometry/size/)
 
 The size of the smallest grid cell (minor grid spacing).
 Supports rectangular grids by specifying different width and height values.
@@ -27,7 +27,7 @@ Supports rectangular grids by specifying different width and height values.
 
 ### dotSpacing?
 
-> `optional` **dotSpacing**: `number`
+> `optional` **dotSpacing?**: `number`
 
 Distance in pixels between consecutive dots in the background pattern.
 
@@ -41,7 +41,7 @@ Distance in pixels between consecutive dots in the background pattern.
 
 ### majorLinesFrequency?
 
-> `optional` **majorLinesFrequency**: `object`
+> `optional` **majorLinesFrequency?**: `object`
 
 Specifies how often major grid lines occur, measured in counts of minor grid cells.
 E.g., { x: 5, y: 5 } draws a major vertical line every 5 minor columns and

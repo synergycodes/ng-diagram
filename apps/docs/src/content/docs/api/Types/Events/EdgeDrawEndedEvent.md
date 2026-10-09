@@ -24,7 +24,7 @@ The position where the pointer was released
 
 ### edge?
 
-> `optional` **edge**: [`Edge`](/docs/api/types/model/edge/)\<`object`\>
+> `optional` **edge?**: [`Edge`](/docs/api/types/model/edge/)\<`object`\>
 
 The created edge (only present on success)
 
@@ -32,7 +32,7 @@ The created edge (only present on success)
 
 ### reason?
 
-> `optional` **reason**: [`EdgeDrawCancelReason`](/docs/api/types/events/edgedrawcancelreason/)
+> `optional` **reason?**: [`EdgeDrawCancelReason`](/docs/api/types/events/edgedrawcancelreason/)
 
 The reason the draw was cancelled (only present on cancel)
 
@@ -40,7 +40,7 @@ The reason the draw was cancelled (only present on cancel)
 
 ### source?
 
-> `optional` **source**: [`Node`](/docs/api/types/model/node/)
+> `optional` **source?**: [`Node`](/docs/api/types/model/node/)
 
 The source node from which the edge was drawn.
 Undefined for draws started from empty canvas
@@ -50,7 +50,7 @@ Undefined for draws started from empty canvas
 
 ### sourcePort?
 
-> `optional` **sourcePort**: `string`
+> `optional` **sourcePort?**: `string`
 
 Source port identifier if connected to a specific port
 
@@ -66,7 +66,7 @@ Whether the edge was successfully created
 
 ### target?
 
-> `optional` **target**: [`Node`](/docs/api/types/model/node/)
+> `optional` **target?**: [`Node`](/docs/api/types/model/node/)
 
 The target node (only present on success)
 
@@ -74,6 +74,6 @@ The target node (only present on success)
 
 ### targetPort?
 
-> `optional` **targetPort**: `string`
+> `optional` **targetPort?**: `string`
 
 Target port identifier (only present on success)

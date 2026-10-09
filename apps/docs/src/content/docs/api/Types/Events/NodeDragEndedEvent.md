@@ -15,7 +15,7 @@ Nodes will have their final positions when this event is received.
 
 ### cancelReason?
 
-> `optional` **cancelReason**: `"cancelled"`
+> `optional` **cancelReason?**: `"cancelled"`
 
 Present when the drag ended without a normal pointer release
 

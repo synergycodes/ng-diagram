@@ -21,7 +21,7 @@ Key is node ID, value is the accumulated delta that hasn't been applied due to s
 
 ### cancelReason?
 
-> `optional` **cancelReason**: `"cancelled"`
+> `optional` **cancelReason?**: `"cancelled"`
 
 Set when the drag is aborted; carried into `nodeDragEnded`.
 

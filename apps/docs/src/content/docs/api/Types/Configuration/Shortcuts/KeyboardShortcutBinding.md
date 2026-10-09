@@ -24,6 +24,6 @@ https://developer.mozilla.org/en-US/docs/Web/API/UI_Events/Keyboard_event_key_va
 
 ### modifiers?
 
-> `optional` **modifiers**: `Partial`\<[`InputModifiers`](/docs/api/types/configuration/shortcuts/inputmodifiers/)\>
+> `optional` **modifiers?**: `Partial`\<[`InputModifiers`](/docs/api/types/configuration/shortcuts/inputmodifiers/)\>
 
 Required modifier keys (all are optional - omitted means no modifiers required)

@@ -28,7 +28,7 @@ The id of the node that the port belongs to.
 
 ### position?
 
-> `optional` **position**: [`Point`](/docs/api/types/geometry/point/)
+> `optional` **position?**: [`Point`](/docs/api/types/geometry/point/)
 
 The position of the port in the node.
 
@@ -44,7 +44,7 @@ The side of the node that the port is on.
 
 ### size?
 
-> `optional` **size**: [`Size`](/docs/api/types/geometry/size/)
+> `optional` **size?**: [`Size`](/docs/api/types/geometry/size/)
 
 The size of the port.
 

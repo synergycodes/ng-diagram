@@ -43,9 +43,9 @@ Computes an SVG path string for the given points using the specified routing.
 
 ##### routingName
 
-The routing to use. If omitted or undefined, the default routing is used.
+[`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/) \| `undefined`
 
-`undefined` | [`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/)
+The routing to use. If omitted or undefined, the default routing is used.
 
 ##### points
 
@@ -79,9 +79,9 @@ Computes a point along the path at a given pixel distance from the start.
 
 ##### routingName
 
-The routing to use. If omitted, the default routing is used.
+[`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/) \| `undefined`
 
-`undefined` | [`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/)
+The routing to use. If omitted, the default routing is used.
 
 ##### points
 
@@ -119,9 +119,9 @@ Computes a point along the path at a given percentage.
 
 ##### routingName
 
-The routing to use. If omitted or undefined, the default routing is used.
+[`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/) \| `undefined`
 
-`undefined` | [`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/)
+The routing to use. If omitted or undefined, the default routing is used.
 
 ##### points
 
@@ -168,9 +168,9 @@ Computes the routed points for an edge using the specified routing algorithm.
 
 ##### routingName
 
-The routing to use. If omitted or undefined, the default routing is used.
+[`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/) \| `undefined`
 
-`undefined` | [`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/)
+The routing to use. If omitted or undefined, the default routing is used.
 
 ##### context
 
@@ -228,7 +228,7 @@ An array of registered routing names (built-in and custom)
 
 ### getRouting()
 
-> **getRouting**(`name`): `undefined` \| [`EdgeRouting`](/docs/api/types/routing/edgerouting/)
+> **getRouting**(`name`): [`EdgeRouting`](/docs/api/types/routing/edgerouting/) \| `undefined`
 
 Gets a routing implementation by name.
 
@@ -242,7 +242,7 @@ The routing name to look up
 
 #### Returns
 
-`undefined` \| [`EdgeRouting`](/docs/api/types/routing/edgerouting/)
+[`EdgeRouting`](/docs/api/types/routing/edgerouting/) \| `undefined`
 
 The routing implementation or `undefined` if not registered
 

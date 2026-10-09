@@ -30,7 +30,7 @@ Configuration for box selection behavior.
 
 ***
 
-### computeEdgeId()
+### computeEdgeId
 
 > **computeEdgeId**: () => `string`
 
@@ -44,7 +44,7 @@ The edge's unique ID.
 
 ***
 
-### computeNodeId()
+### computeNodeId
 
 > **computeNodeId**: () => `string`
 
@@ -87,7 +87,7 @@ false
 
 ### defaultNode?
 
-> `optional` **defaultNode**: [`DefaultNodeTemplateConfig`](/docs/api/types/configuration/features/defaultnodetemplateconfig/)
+> `optional` **defaultNode?**: [`DefaultNodeTemplateConfig`](/docs/api/types/configuration/features/defaultnodetemplateconfig/)
 
 #### Since
 
@@ -114,7 +114,7 @@ Configuration for node grouping.
 
 ### hideWatermark?
 
-> `optional` **hideWatermark**: `boolean`
+> `optional` **hideWatermark?**: `boolean`
 
 #### Since
 
@@ -227,7 +227,7 @@ Improves performance for large diagrams by only rendering visible elements.
 
 ### watermarkPosition?
 
-> `optional` **watermarkPosition**: [`NgDiagramPanelPosition`](/docs/api/types/ngdiagrampanelposition/)
+> `optional` **watermarkPosition?**: [`NgDiagramPanelPosition`](/docs/api/types/ngdiagrampanelposition/)
 
 #### Since
 

@@ -18,7 +18,7 @@ operation that is being validated.
 
 ### edge?
 
-> `optional` **edge**: [`Edge`](/docs/api/types/model/edge/)\<`object`\>
+> `optional` **edge?**: [`Edge`](/docs/api/types/model/edge/)\<`object`\>
 
 The existing edge whose endpoint is being connected (relink and attach only).
 
@@ -26,7 +26,7 @@ The existing edge whose endpoint is being connected (relink and attach only).
 
 ### end?
 
-> `optional` **end**: [`EdgeEnd`](/docs/api/types/model/edgeend/)
+> `optional` **end?**: [`EdgeEnd`](/docs/api/types/model/edgeend/)
 
 Which endpoint of `edge` is being connected (relink and attach only).
 

@@ -6,7 +6,7 @@ prev: false
 title: "computeDetachAnchor"
 ---
 
-> **computeDetachAnchor**(`edge`, `end`, `node`): `null` \| [`Point`](/docs/api/types/geometry/point/)
+> **computeDetachAnchor**(`edge`, `end`, `node`): [`Point`](/docs/api/types/geometry/point/) \| `null`
 
 Computes the position where a detached endpoint stays: the current position
 of the port when the edge was connected to a port, otherwise the routed
@@ -29,12 +29,12 @@ The endpoint to detach.
 
 ### node
 
-The node the endpoint is connected to, if it still exists.
+[`Node`](/docs/api/types/model/node/) \| `null` \| `undefined`
 
-`undefined` | `null` | [`Node`](/docs/api/types/model/node/)
+The node the endpoint is connected to, if it still exists.
 
 ## Returns
 
-`null` \| [`Point`](/docs/api/types/geometry/point/)
+[`Point`](/docs/api/types/geometry/point/) \| `null`
 
 The anchor position, or `null` when none can be computed.

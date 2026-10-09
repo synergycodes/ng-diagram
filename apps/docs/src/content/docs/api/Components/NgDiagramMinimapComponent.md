@@ -73,7 +73,7 @@ const minimapTemplateMap = new NgDiagramMinimapNodeTemplateMap([
 
 ### nodeStyle
 
-> **nodeStyle**: `InputSignal`\<`undefined` \| [`MinimapNodeStyleFn`](/docs/api/types/minimap/minimapnodestylefn/)\>
+> **nodeStyle**: `InputSignal`\<[`MinimapNodeStyleFn`](/docs/api/types/minimap/minimapnodestylefn/) \| `undefined`\>
 
 Optional callback function to customize node styling.
 Return style properties to override defaults, or null/undefined to use CSS defaults.

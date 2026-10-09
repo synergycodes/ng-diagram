@@ -10,9 +10,9 @@ Configuration for node rotation behavior.
 
 ## Properties
 
-### computeSnapAngleForNode()
+### computeSnapAngleForNode
 
-> **computeSnapAngleForNode**: (`node`) => `null` \| `number`
+> **computeSnapAngleForNode**: (`node`) => `number` \| `null`
 
 Computes the snap angle for a node's rotation.
 
@@ -26,7 +26,7 @@ The node to compute the snap angle for.
 
 #### Returns
 
-`null` \| `number`
+`number` \| `null`
 
 The angle in degrees to snap to, or null if default snapping should be used.
 
@@ -66,7 +66,7 @@ The default snap angle in degrees. Used if computeSnapAngleForNode returns null.
 
 ***
 
-### shouldSnapForNode()
+### shouldSnapForNode
 
 > **shouldSnapForNode**: (`node`) => `boolean`
 

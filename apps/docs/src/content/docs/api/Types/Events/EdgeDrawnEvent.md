@@ -35,7 +35,7 @@ The source node from which the edge originates
 
 ### ~~sourcePort?~~
 
-> `optional` **sourcePort**: `string`
+> `optional` **sourcePort?**: `string`
 
 Source port identifier if connected to a specific port
 
@@ -51,6 +51,6 @@ The target node to which the edge connects
 
 ### ~~targetPort?~~
 
-> `optional` **targetPort**: `string`
+> `optional` **targetPort?**: `string`
 
 Target port identifier if connected to a specific port

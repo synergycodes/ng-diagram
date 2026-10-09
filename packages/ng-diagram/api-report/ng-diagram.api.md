@@ -765,11 +765,11 @@ export interface ModelAdapter {
     getEdges(): Edge[];
     getMetadata(): Metadata;
     getNodes(): Node_2[];
-    onChange(callback: ({ nodes, edges, metadata }: ModelChanges) => void): void;
+    onChange(callback: (input: ModelChanges) => void): void;
     redo(): void;
     toJSON(): string;
     undo(): void;
-    unregisterOnChange(callback: ({ nodes, edges, metadata }: ModelChanges) => void): void;
+    unregisterOnChange(callback: (input: ModelChanges) => void): void;
     updateEdges(edges: Edge[]): void;
     // (undocumented)
     updateEdges(edgesFn: (edges: Edge[]) => Edge[]): void;
@@ -1055,7 +1055,7 @@ export class NgDiagramMarkerComponent implements AfterViewInit {
 export const NgDiagramMath: {
     angleBetweenPoints: typeof angleBetweenPoints;
     angleToSide: (angleDegrees: number, inverse?: boolean) => PortSide;
-    clamp: ({ min, value, max }: {
+    clamp: (input: {
         min: number;
         value: number;
         max: number;

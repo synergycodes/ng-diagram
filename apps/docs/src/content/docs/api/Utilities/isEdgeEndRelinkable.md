@@ -29,9 +29,9 @@ The endpoint to check.
 
 ### defaultRelinkable
 
-The `linking.defaultRelinkable` config value.
+`boolean` \| [`EdgeEnd`](/docs/api/types/model/edgeend/)
 
-`boolean` | [`EdgeEnd`](/docs/api/types/model/edgeend/)
+The `linking.defaultRelinkable` config value.
 
 ## Returns
 

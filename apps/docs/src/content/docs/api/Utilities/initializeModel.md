@@ -6,7 +6,7 @@ prev: false
 title: "initializeModel"
 ---
 
-> **initializeModel**(`model`, `injector?`, `options?`): [`ModelAdapter`](/docs/api/types/model/modeladapter/)
+> **initializeModel**(`model?`, `injector?`, `options?`): [`ModelAdapter`](/docs/api/types/model/modeladapter/)
 
 Creates a model adapter with initial nodes, edges, and metadata.
 
@@ -18,7 +18,7 @@ access to current data should be done via [NgDiagramModelService](/docs/api/serv
 
 ## Parameters
 
-### model
+### model?
 
 `Partial`\<[`Model`](/docs/api/types/model/model/)\> = `{}`
 

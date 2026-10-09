@@ -28,7 +28,7 @@ either through keyboard shortcuts or programmatic paste commands.
 
 ### config
 
-> **config**: `InputSignal`\<`undefined` \| `DeepPartial`\<[`FlowConfig`](/docs/api/types/configuration/flowconfig/)\>\>
+> **config**: `InputSignal`\<`DeepPartial`\<[`FlowConfig`](/docs/api/types/configuration/flowconfig/)\> \| `undefined`\>
 
 Global configuration options for the diagram.
 
@@ -346,7 +346,7 @@ Whether panning is enabled in the diagram.
 
 ### getNodeTemplate()
 
-> **getNodeTemplate**(`nodeType`): `null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/docs/api/types/templates/ngdiagramnodetemplate/)\<`any`, [`SimpleNode`](/docs/api/types/model/simplenode/)\<`any`\>\>\> \| `Type$1`\<[`NgDiagramGroupNodeTemplate`](/docs/api/types/templates/ngdiagramgroupnodetemplate/)\<`any`\>\>
+> **getNodeTemplate**(`nodeType`): `Type$1`\<[`NgDiagramNodeTemplate`](/docs/api/types/templates/ngdiagramnodetemplate/)\<`any`, [`SimpleNode`](/docs/api/types/model/simplenode/)\<`any`\>\>\> \| `Type$1`\<[`NgDiagramGroupNodeTemplate`](/docs/api/types/templates/ngdiagramgroupnodetemplate/)\<`any`\>\> \| `null`
 
 Retrieves the custom Angular component template for rendering a specific node type.
 
@@ -358,13 +358,13 @@ which will cause the diagram to fall back to the default node template.
 
 ##### nodeType
 
-The type identifier of the node to get a template for.
+`string` \| `undefined`
 
-`undefined` | `string`
+The type identifier of the node to get a template for.
 
 #### Returns
 
-`null` \| `Type$1`\<[`NgDiagramNodeTemplate`](/docs/api/types/templates/ngdiagramnodetemplate/)\<`any`, [`SimpleNode`](/docs/api/types/model/simplenode/)\<`any`\>\>\> \| `Type$1`\<[`NgDiagramGroupNodeTemplate`](/docs/api/types/templates/ngdiagramgroupnodetemplate/)\<`any`\>\>
+`Type$1`\<[`NgDiagramNodeTemplate`](/docs/api/types/templates/ngdiagramnodetemplate/)\<`any`, [`SimpleNode`](/docs/api/types/model/simplenode/)\<`any`\>\>\> \| `Type$1`\<[`NgDiagramGroupNodeTemplate`](/docs/api/types/templates/ngdiagramgroupnodetemplate/)\<`any`\>\> \| `null`
 
 The Angular component class registered for the node type, or
 null if no custom template is registered for this type

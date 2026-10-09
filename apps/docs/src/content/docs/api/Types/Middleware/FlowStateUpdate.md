@@ -33,7 +33,7 @@ const middleware: Middleware = {
 
 ### edgesToAdd?
 
-> `optional` **edgesToAdd**: [`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
+> `optional` **edgesToAdd?**: [`Edge`](/docs/api/types/model/edge/)\<`object`\>[]
 
 Edges to add to the diagram
 
@@ -41,7 +41,7 @@ Edges to add to the diagram
 
 ### edgesToRemove?
 
-> `optional` **edgesToRemove**: `string`[]
+> `optional` **edgesToRemove?**: `string`[]
 
 IDs of edges to remove from the diagram
 
@@ -49,7 +49,7 @@ IDs of edges to remove from the diagram
 
 ### edgesToUpdate?
 
-> `optional` **edgesToUpdate**: `Partial`\<[`Edge`](/docs/api/types/model/edge/)\<`object`\>\> & `object`[]
+> `optional` **edgesToUpdate?**: `Partial`\<[`Edge`](/docs/api/types/model/edge/)\<`object`\>\> & `object`[]
 
 Partial edge updates (only changed properties need to be specified)
 
@@ -57,7 +57,7 @@ Partial edge updates (only changed properties need to be specified)
 
 ### metadataUpdate?
 
-> `optional` **metadataUpdate**: `Partial`\<[`Metadata`](/docs/api/types/model/metadata/)\<`object`\>\>
+> `optional` **metadataUpdate?**: `Partial`\<[`Metadata`](/docs/api/types/model/metadata/)\<`object`\>\>
 
 Partial metadata update (viewport, selection, etc.)
 
@@ -65,7 +65,7 @@ Partial metadata update (viewport, selection, etc.)
 
 ### nodesToAdd?
 
-> `optional` **nodesToAdd**: [`Node`](/docs/api/types/model/node/)[]
+> `optional` **nodesToAdd?**: [`Node`](/docs/api/types/model/node/)[]
 
 Nodes to add to the diagram
 
@@ -73,7 +73,7 @@ Nodes to add to the diagram
 
 ### nodesToRemove?
 
-> `optional` **nodesToRemove**: `string`[]
+> `optional` **nodesToRemove?**: `string`[]
 
 IDs of nodes to remove from the diagram
 
@@ -81,6 +81,6 @@ IDs of nodes to remove from the diagram
 
 ### nodesToUpdate?
 
-> `optional` **nodesToUpdate**: `Partial`\<[`Node`](/docs/api/types/model/node/)\> & `object`[]
+> `optional` **nodesToUpdate?**: `Partial`\<[`Node`](/docs/api/types/model/node/)\> & `object`[]
 
 Partial node updates (only changed properties need to be specified)

@@ -15,7 +15,7 @@ The node will have its final size when this event is received.
 
 ### cancelReason?
 
-> `optional` **cancelReason**: `"cancelled"`
+> `optional` **cancelReason?**: `"cancelled"`
 
 Present when the resize ended without a normal pointer release
 

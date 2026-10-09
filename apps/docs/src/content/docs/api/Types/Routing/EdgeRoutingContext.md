@@ -20,7 +20,7 @@ The edge being routed
 
 ### sourceNode?
 
-> `optional` **sourceNode**: [`Node`](/docs/api/types/model/node/)
+> `optional` **sourceNode?**: [`Node`](/docs/api/types/model/node/)
 
 Source node
 
@@ -36,7 +36,7 @@ Source port location
 
 ### sourcePort?
 
-> `optional` **sourcePort**: [`Port`](/docs/api/types/model/port/)
+> `optional` **sourcePort?**: [`Port`](/docs/api/types/model/port/)
 
 Source port (if edge is connected to a specific port)
 
@@ -44,7 +44,7 @@ Source port (if edge is connected to a specific port)
 
 ### targetNode?
 
-> `optional` **targetNode**: [`Node`](/docs/api/types/model/node/)
+> `optional` **targetNode?**: [`Node`](/docs/api/types/model/node/)
 
 Target node
 
@@ -60,6 +60,6 @@ Target port location
 
 ### targetPort?
 
-> `optional` **targetPort**: [`Port`](/docs/api/types/model/port/)
+> `optional` **targetPort?**: [`Port`](/docs/api/types/model/port/)
 
 Target port (if edge is connected to a specific port)

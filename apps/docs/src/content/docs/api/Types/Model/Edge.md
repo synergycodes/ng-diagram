@@ -18,7 +18,7 @@ Interface representing an edge (connection) between nodes in the flow diagram
 
 ### computedHidden?
 
-> `readonly` `optional` **computedHidden**: `boolean`
+> `readonly` `optional` **computedHidden?**: `boolean`
 
 #### Remarks
 
@@ -35,7 +35,7 @@ hidden.
 
 ### computedZIndex?
 
-> `readonly` `optional` **computedZIndex**: `number`
+> `readonly` `optional` **computedZIndex?**: `number`
 
 #### Remarks
 
@@ -56,7 +56,7 @@ The data associated with the edge.
 
 ### hidden?
 
-> `optional` **hidden**: `boolean`
+> `optional` **hidden?**: `boolean`
 
 Whether the edge is hidden. When not set, the edge is visible.
 
@@ -93,7 +93,7 @@ The unique identifier for the edge.
 
 ### measuredLabels?
 
-> `readonly` `optional` **measuredLabels**: [`EdgeLabel`](/docs/api/types/model/edgelabel/)[]
+> `readonly` `optional` **measuredLabels?**: [`EdgeLabel`](/docs/api/types/model/edgelabel/)[]
 
 #### Remarks
 
@@ -104,7 +104,7 @@ The labels of the edge with computed position and size.
 
 ### points?
 
-> `optional` **points**: [`Point`](/docs/api/types/geometry/point/)[]
+> `optional` **points?**: [`Point`](/docs/api/types/geometry/point/)[]
 
 The points of the edge defining the path.
 
@@ -112,7 +112,7 @@ The points of the edge defining the path.
 
 ### relinkable?
 
-> `optional` **relinkable**: `boolean` \| [`EdgeEnd`](/docs/api/types/model/edgeend/)
+> `optional` **relinkable?**: `boolean` \| [`EdgeEnd`](/docs/api/types/model/edgeend/)
 
 Whether the user can relink the ends of this edge. `true` allows both
 ends, `'source'` or `'target'` allows only that end, and `false` allows
@@ -128,7 +128,7 @@ Set by the user; the library only reads it.
 
 ### routing?
 
-> `optional` **routing**: [`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/)
+> `optional` **routing?**: [`EdgeRoutingName`](/docs/api/types/routing/edgeroutingname/)
 
 The routing of the edge.
 
@@ -136,7 +136,7 @@ The routing of the edge.
 
 ### routingMode?
 
-> `optional` **routingMode**: [`RoutingMode`](/docs/api/types/routing/routingmode/)
+> `optional` **routingMode?**: [`RoutingMode`](/docs/api/types/routing/routingmode/)
 
 The routing mode of the edge.
 'auto' (default): Points are computed automatically based on routing algorithm
@@ -146,7 +146,7 @@ The routing mode of the edge.
 
 ### selected?
 
-> `optional` **selected**: `boolean`
+> `optional` **selected?**: `boolean`
 
 Whether the edge is selected
 
@@ -162,7 +162,7 @@ The source node of the edge. If empty string it will use sourcePosition.
 
 ### sourceArrowhead?
 
-> `optional` **sourceArrowhead**: `string`
+> `optional` **sourceArrowhead?**: `string`
 
 The id of the source arrowhead of the edge.
 
@@ -170,7 +170,7 @@ The id of the source arrowhead of the edge.
 
 ### sourcePort?
 
-> `optional` **sourcePort**: `string`
+> `optional` **sourcePort?**: `string`
 
 The port of the source node.
 
@@ -178,7 +178,7 @@ The port of the source node.
 
 ### sourcePosition?
 
-> `optional` **sourcePosition**: [`Point`](/docs/api/types/geometry/point/)
+> `optional` **sourcePosition?**: [`Point`](/docs/api/types/geometry/point/)
 
 The position of the edge start.
 
@@ -194,7 +194,7 @@ The target node of the edge. If empty string it will use targetPosition.
 
 ### targetArrowhead?
 
-> `optional` **targetArrowhead**: `string`
+> `optional` **targetArrowhead?**: `string`
 
 The id of the target arrowhead of the edge.
 
@@ -202,7 +202,7 @@ The id of the target arrowhead of the edge.
 
 ### targetPort?
 
-> `optional` **targetPort**: `string`
+> `optional` **targetPort?**: `string`
 
 The port of the target node.
 
@@ -210,7 +210,7 @@ The port of the target node.
 
 ### targetPosition?
 
-> `optional` **targetPosition**: [`Point`](/docs/api/types/geometry/point/)
+> `optional` **targetPosition?**: [`Point`](/docs/api/types/geometry/point/)
 
 The position of the edge end.
 
@@ -218,7 +218,7 @@ The position of the edge end.
 
 ### temporary?
 
-> `optional` **temporary**: `boolean`
+> `optional` **temporary?**: `boolean`
 
 Whether the edge is temporary.
 
@@ -226,7 +226,7 @@ Whether the edge is temporary.
 
 ### type?
 
-> `optional` **type**: `string`
+> `optional` **type?**: `string`
 
 The type of the edge declared in edgeTemplateMap.
 
@@ -234,7 +234,7 @@ The type of the edge declared in edgeTemplateMap.
 
 ### zOrder?
 
-> `optional` **zOrder**: `number`
+> `optional` **zOrder?**: `number`
 
 The z-order of the edge. When set, overrides the default edge z-index
 (which is derived from connected nodes). When a connected node is selected,
