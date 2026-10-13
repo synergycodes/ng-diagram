@@ -118,4 +118,11 @@ export const examples: ContentTile[] = [
     image: '/docs/assets/examples/landing-page-diagram.png',
     imageAlt: 'Screenshot of Landing Page Diagram example',
   },
+  {
+    title: 'Line Jumps',
+    description: 'Draw line jumps where orthogonal edges cross, with a custom routing that updates as edges move.',
+    href: '/docs/examples/line-jumps',
+    image: '/docs/assets/examples/line-jumps.png',
+    imageAlt: 'Screenshot of Line Jumps example',
+  },
 ];

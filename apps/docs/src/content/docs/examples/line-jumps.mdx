@@ -1,0 +1,51 @@
+---
+title: Line Jumps Example
+description: Example of how to draw line jumps where orthogonal edges cross in ngDiagram
+sidebar:
+  order: 17
+  label: Line Jumps
+---
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
+import LineJumps from '@examples/line-jumps/line-jumps.astro';
+
+This example shows line jumps: where two orthogonal edges cross, the horizontal edge jumps over the vertical one. This makes it clear which lines are connected and which only cross.
+
+Move the nodes or draw new edges - the jumps follow the edges.
+
+<br />
+
+<LineJumps />
+<CodeViewer dirName="examples/line-jumps" />
+
+## Additional Explanation
+
+The jumps come from a custom routing, `LineJumpsRouting`:
+
+- `computePoints` returns simple orthogonal points between the ports. The points have no jumps, so labels, relink handles and the crossing search work on clean lines.
+- `computeSvgPath` draws the path from these points. For each horizontal segment it finds the vertical segments of all edges that cross it, and adds a small arc at each crossing.
+- The routing gets the `edges` signal from [`NgDiagramModelService`](/docs/api/services/ngdiagrammodelservice/). The edge reads this signal while it draws its path, so the jumps update when any edge moves.
+
+### Options
+
+Set the options in the config under the routing name:
+
+```typescript
+edgeRouting: {
+  'line-jumps': { size: 16, style: 'arc' },
+},
+```
+
+- `size` - the width of a jump in pixels.
+- `style` - `'arc'` draws an arc over the other line, `'gap'` breaks the line instead.
+
+### Key Concepts
+
+- Implementing the [`EdgeRouting`](/docs/api/types/routing/edgerouting/) interface
+- Registering the routing with [`NgDiagramService.registerRouting()`](/docs/api/services/ngdiagramservice/#registerrouting) in the `diagramInit` handler, and making it the default with [`setDefaultRouting()`](/docs/api/services/ngdiagramservice/#setdefaultrouting)
+- Adding the edges after the routing is registered, so they use it from the first render
+- Passing routing options through the [`edgeRouting`](/docs/api/types/configuration/flowconfig/#edgerouting) config
+
+The points in this example are kept simple and do not go around nodes. To use jumps with your own paths, keep the `computeSvgPath` part and compute the points in your own way.
+
+**Learn more:** [Routing guide →](/docs/guides/edges/routing/)
