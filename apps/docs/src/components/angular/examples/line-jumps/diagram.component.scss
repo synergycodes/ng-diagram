@@ -1,5 +1,32 @@
 .diagram {
+  position: relative;
   display: flex;
   height: var(--ng-diagram-height);
   border: var(--ng-diagram-border);
+}
+
+.controls {
+  position: absolute;
+  z-index: 1;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: var(--ngd-node-bg-primary-default);
+  border: var(--ng-diagram-border);
+
+  button {
+    padding: 0.25rem 0.75rem;
+    border: none;
+    border-radius: 0.25rem;
+    background: transparent;
+    color: var(--sl-color-text);
+    cursor: pointer;
+
+    &.active {
+      background: var(--sl-color-accent);
+      color: white;
+    }
+  }
 }

@@ -1,21 +1,25 @@
-import type { Signal } from '@angular/core';
+import { computed, type Signal } from '@angular/core';
 import type {
   Edge,
   EdgeRouting,
-  EdgeRoutingConfig,
   EdgeRoutingContext,
+  NgDiagramConfig,
   Point,
   PortSide,
 } from 'ng-diagram';
 
-type JumpStyle = 'arc' | 'gap';
+export type LineJumpStyle = 'arc' | 'gap';
 
-interface Segment {
-  start: Point;
-  end: Point;
+interface LineJumpsOptions {
+  size?: number;
+  style?: LineJumpStyle;
 }
 
-const DEFAULT_JUMP_SIZE = 16;
+interface VerticalSegment {
+  x: number;
+  top: number;
+  bottom: number;
+}
 
 /**
  * Orthogonal routing that draws a jump where a horizontal segment crosses
@@ -25,9 +29,22 @@ const DEFAULT_JUMP_SIZE = 16;
 export class LineJumpsRouting implements EdgeRouting {
   name = 'line-jumps';
 
-  // computeSvgPath reads this signal inside the edge's path computed,
-  // so every edge redraws its jumps when any edge changes.
-  constructor(private readonly edges: Signal<Edge[]>) {}
+  // The vertical segments of all edges, sorted by x. All edges share this list,
+  // and it is built once per model change, not once per edge.
+  // `equal` stops the update when the segments stay the same (pan, zoom, selection),
+  // so the edges do not redraw their paths.
+  private readonly verticals: Signal<VerticalSegment[]>;
+
+  // computeSvgPath reads these signals inside the edge's path computed,
+  // so the edges redraw when the segments or the options change.
+  constructor(
+    edges: Signal<Edge[]>,
+    private readonly config: Signal<NgDiagramConfig>
+  ) {
+    this.verticals = computed(() => collectVerticals(edges()), {
+      equal: sameSegments,
+    });
+  }
 
   computePoints({ sourcePoint, targetPoint }: EdgeRoutingContext): Point[] {
     const source = { x: sourcePoint.x, y: sourcePoint.y };
@@ -57,35 +74,44 @@ export class LineJumpsRouting implements EdgeRouting {
     return removeCollinearPoints([source, ...corners, target]);
   }
 
-  computeSvgPath(points: Point[], config?: EdgeRoutingConfig): string {
+  computeSvgPath(points: Point[]): string {
     if (points.length === 0) return '';
 
-    const { size, style } = readOptions(config);
+    // The options come from the config signal, not from the `config` parameter,
+    // so a change with updateConfig() redraws the edges
+    const { size = 16, style = 'arc' } = (this.config().edgeRouting?.[
+      'line-jumps'
+    ] ?? {}) as LineJumpsOptions;
     const radius = size / 2;
-    const verticals = this.verticalSegments();
+    const verticals = this.verticals();
 
     let path = `M ${points[0].x},${points[0].y}`;
     for (let i = 1; i < points.length; i++) {
       const start = points[i - 1];
       const end = points[i];
 
-      if (start.y === end.y && start.x !== end.x) {
+      if (start.y === end.y) {
         const direction = Math.sign(end.x - start.x);
-        // A jump closer than its own size to the previous one would overlap it
-        let previousX: number | undefined;
+        const jumps: { from: number; to: number }[] = [];
         for (const x of findCrossings(start, end, verticals, radius)) {
-          if (previousX !== undefined && Math.abs(x - previousX) < size) {
-            continue;
+          const from = x - direction * radius;
+          const to = x + direction * radius;
+          const last = jumps.at(-1);
+          // Jumps that would overlap become one wider jump over all their crossings
+          if (last && (from - last.to) * direction < 0) {
+            last.to = to;
+          } else {
+            jumps.push({ from, to });
           }
-          const before = x - direction * radius;
-          const after = x + direction * radius;
-          path += ` L ${before},${start.y}`;
+        }
+        for (const { from, to } of jumps) {
+          path += ` L ${from},${start.y}`;
+          // The arc keeps its height on a wider jump: only the x radius grows.
           // Sweep 1 turns clockwise: when moving right the arc goes up
           path +=
             style === 'gap'
-              ? ` M ${after},${start.y}`
-              : ` A ${radius},${radius} 0 0 ${direction > 0 ? 1 : 0} ${after},${start.y}`;
-          previousX = x;
+              ? ` M ${to},${start.y}`
+              : ` A ${Math.abs(to - from) / 2},${radius} 0 0 ${direction > 0 ? 1 : 0} ${to},${start.y}`;
         }
       }
 
@@ -95,51 +121,99 @@ export class LineJumpsRouting implements EdgeRouting {
     return path;
   }
 
-  private verticalSegments(): Segment[] {
-    const segments: Segment[] = [];
-    for (const edge of this.edges()) {
-      const points = edge.points ?? [];
-      if (edge.computedHidden) continue;
-      for (let i = 1; i < points.length; i++) {
-        const start = points[i - 1];
-        const end = points[i];
-        if (start.x === end.x && start.y !== end.y) {
-          segments.push({ start, end });
-        }
+  // Places labels along the segments, not on a straight line between the ends
+  computePointOnPath(points: Point[], percentage: number): Point {
+    // The segments are horizontal or vertical, so dx + dy is their length
+    const lengths = points
+      .slice(1)
+      .map((p, i) => Math.abs(p.x - points[i].x) + Math.abs(p.y - points[i].y));
+    const total = lengths.reduce((sum, length) => sum + length, 0);
+    let distance = total * Math.min(Math.max(percentage, 0), 1);
+
+    for (let i = 0; i < lengths.length; i++) {
+      if (distance <= lengths[i]) {
+        const t = lengths[i] === 0 ? 0 : distance / lengths[i];
+        return {
+          x: points[i].x + (points[i + 1].x - points[i].x) * t,
+          y: points[i].y + (points[i + 1].y - points[i].y) * t,
+        };
+      }
+      distance -= lengths[i];
+    }
+    return points.at(-1) ?? { x: 0, y: 0 };
+  }
+}
+
+function collectVerticals(edges: Edge[]): VerticalSegment[] {
+  const segments: VerticalSegment[] = [];
+  for (const { points, computedHidden } of edges) {
+    if (computedHidden || !points) continue;
+    for (let i = 1; i < points.length; i++) {
+      const start = points[i - 1];
+      const end = points[i];
+      if (start.x === end.x) {
+        segments.push({
+          x: start.x,
+          top: Math.min(start.y, end.y),
+          bottom: Math.max(start.y, end.y),
+        });
       }
     }
-    return segments;
   }
+  return segments.sort(
+    (a, b) => a.x - b.x || a.top - b.top || a.bottom - b.bottom
+  );
+}
+
+function sameSegments(a: VerticalSegment[], b: VerticalSegment[]): boolean {
+  return (
+    a.length === b.length &&
+    a.every(
+      (s, i) => s.x === b[i].x && s.top === b[i].top && s.bottom === b[i].bottom
+    )
+  );
 }
 
 /** X positions where the horizontal segment crosses the verticals, in the direction of the segment. */
 function findCrossings(
   start: Point,
   end: Point,
-  verticals: Segment[],
+  verticals: VerticalSegment[],
   radius: number
 ): number[] {
-  const minX = Math.min(start.x, end.x);
-  const maxX = Math.max(start.x, end.x);
+  // The margin keeps jumps off corners and line ends of both edges
+  const minX = Math.min(start.x, end.x) + radius;
+  const maxX = Math.max(start.x, end.x) - radius;
   const y = start.y;
 
-  // The margin keeps jumps off corners and line ends of both edges
-  const crossings = verticals
-    .filter(({ start: a, end: b }) => {
-      const minY = Math.min(a.y, b.y);
-      const maxY = Math.max(a.y, b.y);
-      return (
-        a.x > minX + radius &&
-        a.x < maxX - radius &&
-        y > minY + radius &&
-        y < maxY - radius
-      );
-    })
-    .map(({ start: a }) => a.x);
+  // The list is sorted by x, so only the segments between minX and maxX are checked
+  const crossings: number[] = [];
+  for (
+    let i = firstIndexAfter(verticals, minX);
+    i < verticals.length && verticals[i].x < maxX;
+    i++
+  ) {
+    const { x, top, bottom } = verticals[i];
+    if (y > top + radius && y < bottom - radius) {
+      crossings.push(x);
+    }
+  }
+  return end.x > start.x ? crossings : crossings.reverse();
+}
 
-  return [...new Set(crossings)].sort((a, b) =>
-    end.x > start.x ? a - b : b - a
-  );
+/** Binary search: the index of the first segment with x greater than the given x. */
+function firstIndexAfter(verticals: VerticalSegment[], x: number): number {
+  let low = 0;
+  let high = verticals.length;
+  while (low < high) {
+    const middle = (low + high) >> 1;
+    if (verticals[middle].x > x) {
+      high = middle;
+    } else {
+      low = middle + 1;
+    }
+  }
+  return low;
 }
 
 function removeCollinearPoints(points: Point[]): Point[] {
@@ -161,19 +235,4 @@ function removeCollinearPoints(points: Point[]): Point[] {
 
 function isHorizontal(side: PortSide): boolean {
   return side === 'left' || side === 'right';
-}
-
-function readOptions(config?: EdgeRoutingConfig): {
-  size: number;
-  style: JumpStyle;
-} {
-  const options = config?.['line-jumps'];
-  if (typeof options !== 'object') {
-    return { size: DEFAULT_JUMP_SIZE, style: 'arc' };
-  }
-  return {
-    size:
-      typeof options['size'] === 'number' ? options['size'] : DEFAULT_JUMP_SIZE,
-    style: options['style'] === 'gap' ? 'gap' : 'arc',
-  };
 }

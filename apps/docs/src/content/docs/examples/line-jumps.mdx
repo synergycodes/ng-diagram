@@ -11,7 +11,7 @@ import LineJumps from '@examples/line-jumps/line-jumps.astro';
 
 This example shows line jumps: where two orthogonal edges cross, the horizontal edge jumps over the vertical one. This makes it clear which lines are connected and which only cross.
 
-Move the nodes or draw new edges - the jumps follow the edges.
+Move the nodes or draw new edges - the jumps follow the edges. Use the **Arc** and **Gap** buttons to switch between a bridge over the crossed line and a simple break in the line.
 
 <br />
 
@@ -23,8 +23,9 @@ Move the nodes or draw new edges - the jumps follow the edges.
 The jumps come from a custom routing, `LineJumpsRouting`:
 
 - `computePoints` returns simple orthogonal points between the ports. The points have no jumps, so labels, relink handles and the crossing search work on clean lines.
-- `computeSvgPath` draws the path from these points. For each horizontal segment it finds the vertical segments of all edges that cross it, and adds a small arc at each crossing.
-- The routing gets the `edges` signal from [`NgDiagramModelService`](/docs/api/services/ngdiagrammodelservice/). The edge reads this signal while it draws its path, so the jumps update when any edge moves.
+- `computeSvgPath` draws the path from these points. For each horizontal segment it finds the vertical segments of all edges that cross it, and adds a jump at each crossing. Crossings that are too close for separate jumps share one wider jump.
+- `computePointOnPath` places labels along the segments of the path.
+- The routing gets the `edges` signal from [`NgDiagramModelService`](/docs/api/services/ngdiagrammodelservice/) and the `config` signal from [`NgDiagramService`](/docs/api/services/ngdiagramservice/). The edge reads these signals while it draws its path, so the jumps update when any edge moves or when the options change.
 
 ### Options
 
@@ -39,12 +40,22 @@ edgeRouting: {
 - `size` - the width of a jump in pixels.
 - `style` - `'arc'` draws an arc over the other line, `'gap'` breaks the line instead.
 
+To change the options at runtime, call [`updateConfig()`](/docs/api/services/ngdiagramservice/#updateconfig), as the buttons in this example do. The routing reads the options from the `config` signal, so all edges redraw right away.
+
+### Large Diagrams
+
+The routing is fast also with thousands of edges:
+
+- All edges share one list of vertical segments, sorted by `x`. The list is built once per model change, not once per edge.
+- Each horizontal segment uses a binary search to check only the vertical segments in its own `x` range.
+- When the segments do not change, for example on pan, zoom or selection, the edges do not redraw their paths.
+
 ### Key Concepts
 
 - Implementing the [`EdgeRouting`](/docs/api/types/routing/edgerouting/) interface
 - Registering the routing with [`NgDiagramService.registerRouting()`](/docs/api/services/ngdiagramservice/#registerrouting) in the `diagramInit` handler, and making it the default with [`setDefaultRouting()`](/docs/api/services/ngdiagramservice/#setdefaultrouting)
 - Adding the edges after the routing is registered, so they use it from the first render
-- Passing routing options through the [`edgeRouting`](/docs/api/types/configuration/flowconfig/#edgerouting) config
+- Passing routing options through the [`edgeRouting`](/docs/api/types/configuration/flowconfig/#edgerouting) config and changing them with `updateConfig()`
 
 The points in this example are kept simple and do not go around nodes. To use jumps with your own paths, keep the `computeSvgPath` part and compute the points in your own way.
 

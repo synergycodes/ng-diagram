@@ -1,6 +1,6 @@
 import '@angular/compiler';
 
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   initializeModel,
   NgDiagramBackgroundComponent,
@@ -13,7 +13,7 @@ import {
   type Node,
   type NgDiagramConfig,
 } from 'ng-diagram';
-import { LineJumpsRouting } from './line-jumps-routing';
+import { LineJumpsRouting, type LineJumpStyle } from './line-jumps-routing';
 import { NodeComponent } from './node.component';
 
 @Component({
@@ -21,6 +21,20 @@ import { NodeComponent } from './node.component';
   providers: [provideNgDiagram()],
   template: `
     <div class="not-content diagram">
+      <div class="controls">
+        <button
+          [class.active]="jumpStyle() === 'arc'"
+          (click)="setJumpStyle('arc')"
+        >
+          Arc
+        </button>
+        <button
+          [class.active]="jumpStyle() === 'gap'"
+          (click)="setJumpStyle('gap')"
+        >
+          Gap
+        </button>
+      </div>
       <ng-diagram
         [model]="model"
         [config]="config"
@@ -37,6 +51,8 @@ export class DiagramComponent {
   private readonly diagramService = inject(NgDiagramService);
   private readonly modelService = inject(NgDiagramModelService);
 
+  readonly jumpStyle = signal<LineJumpStyle>('arc');
+
   nodeTemplateMap = new NgDiagramNodeTemplateMap([['device', NodeComponent]]);
 
   config = {
@@ -47,8 +63,6 @@ export class DiagramComponent {
       },
     },
     edgeRouting: {
-      defaultRouting: 'orthogonal',
-      // 'gap' breaks the line instead of drawing an arc
       'line-jumps': { size: 16, style: 'arc' },
     },
   } satisfies NgDiagramConfig;
@@ -67,13 +81,21 @@ export class DiagramComponent {
 
   // The routing must be registered before the edges are routed,
   // so the edges are added after diagramInit.
-  async onDiagramInit() {
+  onDiagramInit() {
     this.diagramService.registerRouting(
-      new LineJumpsRouting(this.modelService.edges)
+      new LineJumpsRouting(this.modelService.edges, this.diagramService.config)
     );
     // Edges without `routing`, also the ones drawn by the user, use the jumps
     this.diagramService.setDefaultRouting('line-jumps');
-    await this.modelService.addEdges(edges);
+    this.modelService.addEdges(edges);
+  }
+
+  // 'arc' draws a bridge over the crossed line, 'gap' only breaks the line
+  setJumpStyle(style: LineJumpStyle) {
+    this.jumpStyle.set(style);
+    this.diagramService.updateConfig({
+      edgeRouting: { 'line-jumps': { style } },
+    });
   }
 }
 
