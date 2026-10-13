@@ -29,21 +29,30 @@ interface VerticalSegment {
 export class LineJumpsRouting implements EdgeRouting {
   name = 'line-jumps';
 
-  // The vertical segments of all edges, sorted by x. All edges share this list,
-  // and it is built once per model change, not once per edge.
-  // `equal` stops the update when the segments stay the same (pan, zoom, selection),
-  // so the edges do not redraw their paths.
+  // The vertical segments of all edges, sorted by x, built once per model change.
+  // `equal` skips the update when they stay the same (pan, zoom, selection).
   private readonly verticals: Signal<VerticalSegment[]>;
 
-  // computeSvgPath reads these signals inside the edge's path computed,
-  // so the edges redraw when the segments or the options change.
-  constructor(
-    edges: Signal<Edge[]>,
-    private readonly config: Signal<NgDiagramConfig>
-  ) {
+  // The jump options from the config, with defaults.
+  // `equal` skips the update when another part of the config changes.
+  readonly options: Signal<Required<LineJumpsOptions>>;
+
+  // computeSvgPath reads verticals and options, so the edges redraw when they change.
+  // The `config` parameter of computeSvgPath does not cause a redraw,
+  // so the options come from the config signal.
+  constructor(edges: Signal<Edge[]>, config: Signal<NgDiagramConfig>) {
     this.verticals = computed(() => collectVerticals(edges()), {
       equal: sameSegments,
     });
+    this.options = computed(
+      () => {
+        const { size = 16, style = 'arc' } = (config().edgeRouting?.[
+          'line-jumps'
+        ] ?? {}) as LineJumpsOptions;
+        return { size, style };
+      },
+      { equal: (a, b) => a.size === b.size && a.style === b.style }
+    );
   }
 
   computePoints({ sourcePoint, targetPoint }: EdgeRoutingContext): Point[] {
@@ -77,11 +86,7 @@ export class LineJumpsRouting implements EdgeRouting {
   computeSvgPath(points: Point[]): string {
     if (points.length === 0) return '';
 
-    // The options come from the config signal, not from the `config` parameter,
-    // so a change with updateConfig() redraws the edges
-    const { size = 16, style = 'arc' } = (this.config().edgeRouting?.[
-      'line-jumps'
-    ] ?? {}) as LineJumpsOptions;
+    const { size, style } = this.options();
     const radius = size / 2;
     const verticals = this.verticals();
 
@@ -188,15 +193,10 @@ function findCrossings(
 
   // The list is sorted by x, so only the segments between minX and maxX are checked
   const crossings: number[] = [];
-  for (
-    let i = firstIndexAfter(verticals, minX);
-    i < verticals.length && verticals[i].x < maxX;
-    i++
-  ) {
+  for (let i = firstIndexAfter(verticals, minX); i < verticals.length; i++) {
     const { x, top, bottom } = verticals[i];
-    if (y > top + radius && y < bottom - radius) {
-      crossings.push(x);
-    }
+    if (x >= maxX) break;
+    if (y > top + radius && y < bottom - radius) crossings.push(x);
   }
   return end.x > start.x ? crossings : crossings.reverse();
 }
@@ -206,7 +206,7 @@ function firstIndexAfter(verticals: VerticalSegment[], x: number): number {
   let low = 0;
   let high = verticals.length;
   while (low < high) {
-    const middle = (low + high) >> 1;
+    const middle = Math.floor((low + high) / 2);
     if (verticals[middle].x > x) {
       high = middle;
     } else {

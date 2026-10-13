@@ -25,7 +25,7 @@ The jumps come from a custom routing, `LineJumpsRouting`:
 - `computePoints` returns simple orthogonal points between the ports. The points have no jumps, so labels, relink handles and the crossing search work on clean lines.
 - `computeSvgPath` draws the path from these points. For each horizontal segment it finds the vertical segments of all edges that cross it, and adds a jump at each crossing. Crossings that are too close for separate jumps share one wider jump.
 - `computePointOnPath` places labels along the segments of the path.
-- The routing gets the `edges` signal from [`NgDiagramModelService`](/docs/api/services/ngdiagrammodelservice/) and the `config` signal from [`NgDiagramService`](/docs/api/services/ngdiagramservice/). The edge reads these signals while it draws its path, so the jumps update when any edge moves or when the options change.
+- The routing gets the `edges` signal from [`NgDiagramModelService`](/docs/api/services/ngdiagrammodelservice/) and the `config` signal from [`NgDiagramService`](/docs/api/services/ngdiagramservice/). In this example the edge reads these signals while it draws its path, so the jumps update when any edge moves or when the options change.
 
 ### Options
 
@@ -40,15 +40,15 @@ edgeRouting: {
 - `size` - the width of a jump in pixels.
 - `style` - `'arc'` draws an arc over the other line, `'gap'` breaks the line instead.
 
-To change the options at runtime, call [`updateConfig()`](/docs/api/services/ngdiagramservice/#updateconfig), as the buttons in this example do. The routing reads the options from the `config` signal, so all edges redraw right away.
+To change the options at runtime, call [`updateConfig()`](/docs/api/services/ngdiagramservice/#updateconfig), as the buttons in this example do. The `config` argument of `computeSvgPath` does not cause a redraw, so the routing reads the options from the `config` signal.
 
 ### Large Diagrams
 
-The routing is fast also with thousands of edges:
+The routing stays fast even with thousands of edges:
 
 - All edges share one list of vertical segments, sorted by `x`. The list is built once per model change, not once per edge.
 - Each horizontal segment uses a binary search to check only the vertical segments in its own `x` range.
-- When the segments do not change, for example on pan, zoom or selection, the edges do not redraw their paths.
+- When the segments and the jump options do not change, for example on pan, zoom or selection, the edges do not redraw their paths.
 
 ### Key Concepts
 
@@ -57,6 +57,6 @@ The routing is fast also with thousands of edges:
 - Adding the edges after the routing is registered, so they use it from the first render
 - Passing routing options through the [`edgeRouting`](/docs/api/types/configuration/flowconfig/#edgerouting) config and changing them with `updateConfig()`
 
-The points in this example are kept simple and do not go around nodes. To use jumps with your own paths, keep the `computeSvgPath` part and compute the points in your own way.
+The points in this example are kept simple and do not go around nodes. To use jumps with your own paths, keep the `computeSvgPath` part and compute your own orthogonal points.
 
 **Learn more:** [Routing guide →](/docs/guides/edges/routing/)
