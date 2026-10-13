@@ -28,5 +28,10 @@
       background: var(--sl-color-accent);
       color: white;
     }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
   }
 }

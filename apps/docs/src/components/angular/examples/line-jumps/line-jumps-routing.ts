@@ -5,7 +5,7 @@ import type {
   EdgeRoutingContext,
   NgDiagramConfig,
   Point,
-  PortSide,
+  PortLocation,
 } from 'ng-diagram';
 
 export type LineJumpStyle = 'arc' | 'gap';
@@ -21,10 +21,15 @@ interface VerticalSegment {
   bottom: number;
 }
 
+// The length of the first and last segment, out of the port
+const STUB_LENGTH = 20;
+// The vertical segments are split into columns of this width
+const COLUMN_WIDTH = 400;
+
 /**
  * Orthogonal routing that draws a jump where a horizontal segment crosses
- * a vertical segment of any edge. Only the SVG path has the jumps:
- * the edge points stay orthogonal.
+ * a vertical segment of another edge with this routing. Only the SVG path
+ * has the jumps: the edge points stay orthogonal.
  */
 export class LineJumpsRouting implements EdgeRouting {
   name = 'line-jumps';
@@ -33,15 +38,19 @@ export class LineJumpsRouting implements EdgeRouting {
   // `equal` skips the update when they stay the same (pan, zoom, selection).
   private readonly verticals: Signal<VerticalSegment[]>;
 
+  // One signal per column of the diagram. An edge reads only the columns
+  // under its horizontal segments, so it redraws only when they change.
+  private readonly columns = new Map<number, Signal<VerticalSegment[]>>();
+
   // The jump options from the config, with defaults.
   // `equal` skips the update when another part of the config changes.
   readonly options: Signal<Required<LineJumpsOptions>>;
 
-  // computeSvgPath reads verticals and options, so the edges redraw when they change.
+  // computeSvgPath reads the columns and options, so the edges redraw when they change.
   // The `config` parameter of computeSvgPath does not cause a redraw,
   // so the options come from the config signal.
   constructor(edges: Signal<Edge[]>, config: Signal<NgDiagramConfig>) {
-    this.verticals = computed(() => collectVerticals(edges()), {
+    this.verticals = computed(() => collectVerticals(edges(), this.name), {
       equal: sameSegments,
     });
     this.options = computed(
@@ -58,29 +67,32 @@ export class LineJumpsRouting implements EdgeRouting {
   computePoints({ sourcePoint, targetPoint }: EdgeRoutingContext): Point[] {
     const source = { x: sourcePoint.x, y: sourcePoint.y };
     const target = { x: targetPoint.x, y: targetPoint.y };
-    const sourceHorizontal = isHorizontal(sourcePoint.side);
-    const targetHorizontal = isHorizontal(targetPoint.side);
+    const sourceStub = moveOut(sourcePoint);
+    const targetStub = moveOut(targetPoint);
+    const midX = (sourceStub.x + targetStub.x) / 2;
+    const midY = (sourceStub.y + targetStub.y) / 2;
 
-    let corners: Point[];
-    if (sourceHorizontal && targetHorizontal) {
-      const midX = (source.x + target.x) / 2;
-      corners = [
-        { x: midX, y: source.y },
-        { x: midX, y: target.y },
-      ];
-    } else if (!sourceHorizontal && !targetHorizontal) {
-      const midY = (source.y + target.y) / 2;
-      corners = [
-        { x: source.x, y: midY },
-        { x: target.x, y: midY },
-      ];
-    } else if (sourceHorizontal) {
-      corners = [{ x: target.x, y: source.y }];
-    } else {
-      corners = [{ x: source.x, y: target.y }];
-    }
+    const routes = [
+      [
+        { x: midX, y: sourceStub.y },
+        { x: midX, y: targetStub.y },
+      ],
+      [
+        { x: sourceStub.x, y: midY },
+        { x: targetStub.x, y: midY },
+      ],
+      [{ x: targetStub.x, y: sourceStub.y }],
+      [{ x: sourceStub.x, y: targetStub.y }],
+    ].map((corners) => [source, sourceStub, ...corners, targetStub, target]);
 
-    return removeCollinearPoints([source, ...corners, target]);
+    // The route with the fewest corners that does not turn back into its own node
+    const valid = routes
+      .filter((route) => !turnsBack(route))
+      .map(removeCollinearPoints);
+    if (valid.length === 0) return removeCollinearPoints(routes[0]);
+    return valid.reduce((best, route) =>
+      route.length < best.length ? route : best
+    );
   }
 
   computeSvgPath(points: Point[]): string {
@@ -88,7 +100,6 @@ export class LineJumpsRouting implements EdgeRouting {
 
     const { size, style } = this.options();
     const radius = size / 2;
-    const verticals = this.verticals();
 
     let path = `M ${points[0].x},${points[0].y}`;
     for (let i = 1; i < points.length; i++) {
@@ -98,7 +109,7 @@ export class LineJumpsRouting implements EdgeRouting {
       if (start.y === end.y) {
         const direction = Math.sign(end.x - start.x);
         const jumps: { from: number; to: number }[] = [];
-        for (const x of findCrossings(start, end, verticals, radius)) {
+        for (const x of this.findCrossings(start, end, radius)) {
           const from = x - direction * radius;
           const to = x + direction * radius;
           const last = jumps.at(-1);
@@ -147,12 +158,63 @@ export class LineJumpsRouting implements EdgeRouting {
     }
     return points.at(-1) ?? { x: 0, y: 0 };
   }
+
+  /** X positions where the horizontal segment crosses vertical segments, in the direction of the segment. */
+  private findCrossings(start: Point, end: Point, radius: number): number[] {
+    // The margin keeps jumps off corners and line ends of both edges
+    const minX = Math.min(start.x, end.x) + radius;
+    const maxX = Math.max(start.x, end.x) - radius;
+    if (minX >= maxX) return [];
+
+    // The columns are in x order and each column is sorted by x
+    const crossings: number[] = [];
+    const last = Math.floor(maxX / COLUMN_WIDTH);
+    for (
+      let column = Math.floor(minX / COLUMN_WIDTH);
+      column <= last;
+      column++
+    ) {
+      for (const { x, top, bottom } of this.column(column)()) {
+        if (x <= minX || x >= maxX) continue;
+        if (start.y > top + radius && start.y < bottom - radius) {
+          crossings.push(x);
+        }
+      }
+    }
+    return end.x > start.x ? crossings : crossings.reverse();
+  }
+
+  // Creates the column signal on first use. The map keeps one entry
+  // per column the diagram has used, which is small for any diagram size.
+  private column(index: number): Signal<VerticalSegment[]> {
+    let column = this.columns.get(index);
+    if (!column) {
+      const left = index * COLUMN_WIDTH;
+      column = computed(
+        () => {
+          const verticals = this.verticals();
+          return verticals.slice(
+            firstIndexFrom(verticals, left),
+            firstIndexFrom(verticals, left + COLUMN_WIDTH)
+          );
+        },
+        { equal: sameSegments }
+      );
+      this.columns.set(index, column);
+    }
+    return column;
+  }
 }
 
-function collectVerticals(edges: Edge[]): VerticalSegment[] {
+// Edges with another routing are skipped: their points can be off the drawn line
+function collectVerticals(edges: Edge[], routing: string): VerticalSegment[] {
   const segments: VerticalSegment[] = [];
-  for (const { points, computedHidden } of edges) {
-    if (computedHidden || !points) continue;
+  for (const edge of edges) {
+    const { points, computedHidden } = edge;
+    // Edges without `routing` use the default routing, which is this one in the example
+    if (computedHidden || !points || (edge.routing ?? routing) !== routing) {
+      continue;
+    }
     for (let i = 1; i < points.length; i++) {
       const start = points[i - 1];
       const end = points[i];
@@ -179,41 +241,54 @@ function sameSegments(a: VerticalSegment[], b: VerticalSegment[]): boolean {
   );
 }
 
-/** X positions where the horizontal segment crosses the verticals, in the direction of the segment. */
-function findCrossings(
-  start: Point,
-  end: Point,
-  verticals: VerticalSegment[],
-  radius: number
-): number[] {
-  // The margin keeps jumps off corners and line ends of both edges
-  const minX = Math.min(start.x, end.x) + radius;
-  const maxX = Math.max(start.x, end.x) - radius;
-  const y = start.y;
-
-  // The list is sorted by x, so only the segments between minX and maxX are checked
-  const crossings: number[] = [];
-  for (let i = firstIndexAfter(verticals, minX); i < verticals.length; i++) {
-    const { x, top, bottom } = verticals[i];
-    if (x >= maxX) break;
-    if (y > top + radius && y < bottom - radius) crossings.push(x);
-  }
-  return end.x > start.x ? crossings : crossings.reverse();
-}
-
-/** Binary search: the index of the first segment with x greater than the given x. */
-function firstIndexAfter(verticals: VerticalSegment[], x: number): number {
+/** Binary search: the index of the first segment with x greater than or equal to the given x. */
+function firstIndexFrom(verticals: VerticalSegment[], x: number): number {
   let low = 0;
   let high = verticals.length;
   while (low < high) {
     const middle = Math.floor((low + high) / 2);
-    if (verticals[middle].x > x) {
+    if (verticals[middle].x >= x) {
       high = middle;
     } else {
       low = middle + 1;
     }
   }
   return low;
+}
+
+/** The point a short distance out of the port, in the direction of its side. */
+function moveOut({ x, y, side }: PortLocation): Point {
+  switch (side) {
+    case 'left':
+      return { x: x - STUB_LENGTH, y };
+    case 'right':
+      return { x: x + STUB_LENGTH, y };
+    case 'top':
+      return { x, y: y - STUB_LENGTH };
+    case 'bottom':
+      return { x, y: y + STUB_LENGTH };
+  }
+}
+
+/** True when the line goes straight back the way it came, for example into its own node. */
+function turnsBack(points: Point[]): boolean {
+  let previous: Point | undefined;
+  for (let i = 1; i < points.length; i++) {
+    const direction = {
+      x: Math.sign(points[i].x - points[i - 1].x),
+      y: Math.sign(points[i].y - points[i - 1].y),
+    };
+    if (direction.x === 0 && direction.y === 0) continue;
+    if (
+      previous &&
+      direction.x === -previous.x &&
+      direction.y === -previous.y
+    ) {
+      return true;
+    }
+    previous = direction;
+  }
+  return false;
 }
 
 function removeCollinearPoints(points: Point[]): Point[] {
@@ -231,8 +306,4 @@ function removeCollinearPoints(points: Point[]): Point[] {
   }
   result.push(points[points.length - 1]);
   return result;
-}
-
-function isHorizontal(side: PortSide): boolean {
-  return side === 'left' || side === 'right';
 }

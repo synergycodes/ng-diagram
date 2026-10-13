@@ -23,13 +23,19 @@ import { NodeComponent } from './node.component';
     <div class="not-content diagram">
       <div class="controls">
         <button
+          type="button"
           [class.active]="jumpStyle() === 'arc'"
+          [attr.aria-pressed]="jumpStyle() === 'arc'"
+          [disabled]="!isInitialized()"
           (click)="setJumpStyle('arc')"
         >
           Arc
         </button>
         <button
+          type="button"
           [class.active]="jumpStyle() === 'gap'"
+          [attr.aria-pressed]="jumpStyle() === 'gap'"
+          [disabled]="!isInitialized()"
           (click)="setJumpStyle('gap')"
         >
           Gap
@@ -58,6 +64,8 @@ export class DiagramComponent {
 
   // The buttons show the style from the config, so there is one source of truth
   readonly jumpStyle = computed(() => this.routing.options().style);
+  // updateConfig() needs the diagram, so the buttons wait for it
+  readonly isInitialized = this.diagramService.isInitialized;
 
   nodeTemplateMap = new NgDiagramNodeTemplateMap([['device', NodeComponent]]);
 
