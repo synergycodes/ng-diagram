@@ -1,0 +1,44 @@
+name: Agent skill feedback
+description: An ng-diagram agent skill (in /skills) led your AI agent to wrong or unhelpful code or advice.
+title: '[skill] '
+labels: ['documentation']
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for testing the ng-diagram agent skills. One problem per issue helps us most.
+  - type: input
+    id: skill
+    attributes:
+      label: Skill
+      description: The skill the agent used, for example `ng-diagram-linking`. Leave it empty if you do not know.
+  - type: textarea
+    id: prompt
+    attributes:
+      label: Your prompt
+      description: What you asked the agent.
+    validations:
+      required: true
+  - type: input
+    id: agent
+    attributes:
+      label: Agent and model
+      description: For example Claude Code, Codex, Cursor or GitHub Copilot, and the model if you know it.
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+      description: The wrong code or advice, and any error messages.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+  - type: input
+    id: version
+    attributes:
+      label: ng-diagram version
+      description: From your package.json or lockfile.
+      placeholder: 1.4.0
