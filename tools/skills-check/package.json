@@ -1,0 +1,26 @@
+{
+  "name": "@ng-diagram-package/skills-check",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Checks the agent skills in /skills: structure, and TypeScript and template snippets against the library build",
+  "scripts": {
+    "lint:check": "node src/validate-skills.mjs ../../skills",
+    "check-types": "node src/check-snippets.mjs ../../skills"
+  },
+  "devDependencies": {
+    "@angular/common": "^19.2.25",
+    "@angular/compiler": "^19.2.25",
+    "@angular/compiler-cli": "^19.2.25",
+    "@angular/core": "^19.2.25",
+    "@angular/forms": "^19.2.25",
+    "@angular/material": "19.2.19",
+    "elkjs": "^0.10.2",
+    "html-to-image": "1.11.11",
+    "ng-diagram": "workspace:*",
+    "rxjs": "~7.8.2",
+    "tslib": "^2.8.1",
+    "typescript": "~5.8.3",
+    "zone.js": "~0.15.1"
+  }
+}

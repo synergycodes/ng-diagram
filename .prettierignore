@@ -17,3 +17,6 @@ pnpm-lock.yaml
 
 **/src/content/docs/api/**/*.md
 **/api-report/*.md
+
+# Agent skills are loaded into an AI agent's context: padded tables would add about 30% more text
+/skills
