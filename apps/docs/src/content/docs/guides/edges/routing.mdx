@@ -121,6 +121,8 @@ This approach is ideal when you want the path to update automatically based on n
 
 For more control and reusability across different edge types, you can create a custom routing algorithm by implementing the [`EdgeRouting`](/docs/api/types/routing/edgerouting/) interface and registering it via [`NgDiagramService.registerRouting()`](/docs/api/services/ngdiagramservice/#registerrouting). Once registered, the routing becomes available globally across all edges in your diagram.
 
+`registerRouting()` works only after the diagram is initialized, so call it in the [`diagramInit`](/docs/api/components/ngdiagramcomponent/#diagraminit) handler. Edges in the initial model are routed before that event: an edge with a custom routing uses the default routing until one of its nodes moves. Add such edges in the `diagramInit` handler, after `registerRouting()`, as the example below does.
+
 Here's a complete example of an arc routing that uses SVG elliptical arcs to create curved connections:
 
 <br />
