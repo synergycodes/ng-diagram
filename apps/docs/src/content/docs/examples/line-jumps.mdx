@@ -1,9 +1,11 @@
 ---
 title: Line Jumps Example
 description: Example of how to draw line jumps where orthogonal edges cross in ngDiagram
+version: 'since v1.4.0'
 sidebar:
-  order: 17
+  order: 3
   label: Line Jumps
+  badge: New
 ---
 
 import CodeViewer from '@components/code-viewer/code-viewer.astro';
@@ -26,6 +28,8 @@ The jumps come from a custom routing, `LineJumpsRouting`:
 - `computeSvgPath` draws the path from these points. For each horizontal segment it finds the vertical segments of other edges with this routing that cross it, and adds a jump at each crossing. Edges with another routing are skipped, so a crossing with them has no jump. Crossings that are too close for separate jumps share one wider jump.
 - `computePointOnPath` places labels along the segments of the path.
 - The routing gets the `edges` signal from [`NgDiagramModelService`](/docs/api/services/ngdiagrammodelservice/) and the `config` signal from [`NgDiagramService`](/docs/api/services/ngdiagramservice/). In this example the edge reads these signals while it draws its path, so the jumps update when any edge moves or when the options change.
+
+The points in this example are kept simple and do not go around other nodes. To use jumps with your own paths, keep the `computeSvgPath` part and compute your own orthogonal points.
 
 ### Options
 
@@ -56,7 +60,5 @@ The routing stays fast even with thousands of edges:
 - Registering the routing with [`NgDiagramService.registerRouting()`](/docs/api/services/ngdiagramservice/#registerrouting) in the `diagramInit` handler, and making it the default with [`setDefaultRouting()`](/docs/api/services/ngdiagramservice/#setdefaultrouting)
 - Adding the edges after the routing is registered, so they use it from the first render
 - Passing routing options through the [`edgeRouting`](/docs/api/types/configuration/flowconfig/#edgerouting) config and changing them with `updateConfig()`
-
-The points in this example are kept simple and do not go around other nodes. To use jumps with your own paths, keep the `computeSvgPath` part and compute your own orthogonal points.
 
 **Learn more:** [Routing guide →](/docs/guides/edges/routing/)

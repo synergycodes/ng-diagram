@@ -14,7 +14,7 @@ import {
   type NgDiagramConfig,
 } from 'ng-diagram';
 import { LineJumpsRouting, type LineJumpStyle } from './line-jumps-routing';
-import { NodeComponent } from './node.component';
+import { NodeComponent } from './node/node.component';
 
 @Component({
   imports: [NgDiagramComponent, NgDiagramBackgroundComponent],

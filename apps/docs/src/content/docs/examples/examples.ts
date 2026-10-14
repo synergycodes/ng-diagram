@@ -17,6 +17,13 @@ export const examples: ContentTile[] = [
     imageAlt: 'Screenshot of Custom Edge example',
   },
   {
+    title: 'Line Jumps',
+    description: 'Draw line jumps where orthogonal edges cross, with a custom routing that updates as edges move.',
+    href: '/docs/examples/line-jumps',
+    image: '/docs/assets/examples/line-jumps.png',
+    imageAlt: 'Screenshot of Line Jumps example',
+  },
+  {
     title: 'Custom Model',
     description: 'Implement a custom model that persists data directly to localStorage with automatic synchronization.',
     href: '/docs/examples/custom-model',
@@ -117,12 +124,5 @@ export const examples: ContentTile[] = [
     href: '/docs/examples/landing-page-diagram',
     image: '/docs/assets/examples/landing-page-diagram.png',
     imageAlt: 'Screenshot of Landing Page Diagram example',
-  },
-  {
-    title: 'Line Jumps',
-    description: 'Draw line jumps where orthogonal edges cross, with a custom routing that updates as edges move.',
-    href: '/docs/examples/line-jumps',
-    image: '/docs/assets/examples/line-jumps.png',
-    imageAlt: 'Screenshot of Line Jumps example',
   },
 ];
