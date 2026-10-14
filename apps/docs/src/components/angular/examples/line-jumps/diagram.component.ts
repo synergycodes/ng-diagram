@@ -6,7 +6,6 @@ import {
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
   NgDiagramModelService,
-  NgDiagramNodeTemplateMap,
   NgDiagramService,
   provideNgDiagram,
   type Edge,
@@ -14,7 +13,6 @@ import {
   type NgDiagramConfig,
 } from 'ng-diagram';
 import { LineJumpsRouting, type LineJumpStyle } from './line-jumps-routing';
-import { NodeComponent } from './node/node.component';
 
 @Component({
   imports: [NgDiagramComponent, NgDiagramBackgroundComponent],
@@ -44,7 +42,6 @@ import { NodeComponent } from './node/node.component';
       <ng-diagram
         [model]="model"
         [config]="config"
-        [nodeTemplateMap]="nodeTemplateMap"
         (diagramInit)="onDiagramInit()"
       >
         <ng-diagram-background />
@@ -67,8 +64,6 @@ export class DiagramComponent {
   // updateConfig() needs the diagram, so the buttons wait for it
   readonly isInitialized = this.diagramService.isInitialized;
 
-  nodeTemplateMap = new NgDiagramNodeTemplateMap([['device', NodeComponent]]);
-
   config = {
     zoom: {
       zoomToFit: {
@@ -83,13 +78,14 @@ export class DiagramComponent {
 
   model = initializeModel({
     nodes: [
-      device('sensor-a', 'Sensor A', 200, 0),
-      device('sensor-b', 'Sensor B', 450, 0),
-      device('gateway', 'Gateway', 0, 140),
-      device('cloud', 'Cloud', 700, 140),
-      device('backup', 'Backup', 700, 240),
-      device('panel-a', 'Panel A', 200, 340),
-      device('panel-b', 'Panel B', 450, 340),
+      device('sensor-a', 'Sensor A', 100, 0),
+      device('sensor-b', 'Sensor B', 440, 0),
+      device('gateway', 'Gateway', 0, 150),
+      device('router', 'Router', 0, 260),
+      device('cloud', 'Cloud', 840, 150),
+      device('backup', 'Backup', 840, 260),
+      device('panel-a', 'Panel A', 400, 410),
+      device('panel-b', 'Panel B', 740, 410),
     ],
   });
 
@@ -111,28 +107,23 @@ export class DiagramComponent {
 }
 
 const edges: Edge[] = [
-  connect('sensor-a', 'port-bottom', 'panel-a', 'port-top'),
-  connect('sensor-b', 'port-bottom', 'panel-b', 'port-top'),
-  connect('gateway', 'port-right', 'cloud', 'port-left'),
-  connect('gateway', 'port-bottom', 'backup', 'port-left'),
+  connect('sensor-a', 'panel-a'),
+  connect('sensor-b', 'panel-b'),
+  connect('gateway', 'cloud'),
+  connect('router', 'backup'),
 ];
 
 function device(id: string, label: string, x: number, y: number): Node {
-  return { id, type: 'device', position: { x, y }, data: { label } };
+  return { id, position: { x, y }, data: { label } };
 }
 
-function connect(
-  source: string,
-  sourcePort: string,
-  target: string,
-  targetPort: string
-): Edge {
+function connect(source: string, target: string): Edge {
   return {
     id: `${source}-${target}`,
     source,
-    sourcePort,
+    sourcePort: 'port-right',
     target,
-    targetPort,
+    targetPort: 'port-left',
     targetArrowhead: 'ng-diagram-arrow',
     data: {},
   };

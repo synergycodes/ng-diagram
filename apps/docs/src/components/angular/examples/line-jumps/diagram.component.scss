@@ -11,26 +11,32 @@
   top: 1rem;
   right: 1rem;
   display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem;
+  gap: 0.25rem;
+  padding: 0.25rem;
   background-color: var(--ngd-node-bg-primary-default);
   border: var(--ng-diagram-border);
 
+  // Same colors as the zoom buttons of the library; the active button uses its accent
   button {
     padding: 0.25rem 0.75rem;
     border: none;
-    border-radius: 0.25rem;
+    border-radius: var(--ngd-nav-button-border-radius);
     background: transparent;
-    color: var(--sl-color-text);
+    color: var(--ngd-nav-button-primary-default);
+    font-weight: 500;
     cursor: pointer;
 
+    &:hover:not(:disabled, .active) {
+      background-color: var(--ngd-ui-bg-tertiary-default);
+    }
+
     &.active {
-      background: var(--sl-color-accent);
-      color: white;
+      background-color: var(--ngd-nav-button-primary-pressed);
+      color: var(--ngd-colors-gray-100);
     }
 
     &:disabled {
-      opacity: 0.5;
+      color: var(--ngd-nav-button-primary-disabled);
       cursor: default;
     }
   }

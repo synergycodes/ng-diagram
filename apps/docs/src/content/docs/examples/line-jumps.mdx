@@ -24,10 +24,12 @@ Move the nodes or draw new edges - the jumps follow the edges. A new edge gets i
 
 The jumps come from a custom routing, `LineJumpsRouting`:
 
-- `computePoints` returns simple orthogonal points between the ports. The line leaves and enters each port with a short straight segment. It does not turn back into its own node, except when both nodes are in one row and their ports face away from each other. The points have no jumps, so labels, relink handles and the crossing search work on clean lines.
+- `computePoints` returns simple orthogonal points between the ports. The line leaves and enters each port with a short straight segment. The points have no jumps, so labels, relink handles and the crossing search work on clean lines.
 - `computeSvgPath` draws the path from these points. For each horizontal segment it finds the vertical segments of other edges with this routing that cross it, and adds a jump at each crossing. Edges with another routing are skipped, so a crossing with them has no jump. Crossings that are too close for separate jumps share one wider jump.
 - `computePointOnPath` places labels along the segments of the path.
 - The routing gets the `edges` signal from [`NgDiagramModelService`](/docs/api/services/ngdiagrammodelservice/) and the `config` signal from [`NgDiagramService`](/docs/api/services/ngdiagramservice/). In this example the edge reads these signals while it draws its path, so the jumps update when any edge moves or when the options change.
+
+The implementation supports large diagrams and scales well: the vertical segments of all edges are sorted once per model change, and each edge checks only the segments close to its horizontal segments.
 
 The points in this example are kept simple and do not go around other nodes. To use jumps with your own paths, keep the `computeSvgPath` part and compute your own orthogonal points.
 
@@ -45,14 +47,6 @@ edgeRouting: {
 - `style` - `'arc'` draws an arc over the other line, `'gap'` breaks the line instead.
 
 To change the options at runtime, call [`updateConfig()`](/docs/api/services/ngdiagramservice/#updateconfig), as the buttons in this example do. The `config` argument of `computeSvgPath` does not cause a redraw, so the routing reads the options from the `config` signal.
-
-### Large Diagrams
-
-The routing stays fast even with thousands of edges:
-
-- All edges share one list of vertical segments, sorted by `x`. The list is built once per model change, not once per edge.
-- The list is split into columns, 400 pixels wide. Each edge reads only the columns under its horizontal segments.
-- When you move a node, only the edges over the changed columns redraw. On pan, zoom or selection the other edges do not redraw.
 
 ### Key Concepts
 
