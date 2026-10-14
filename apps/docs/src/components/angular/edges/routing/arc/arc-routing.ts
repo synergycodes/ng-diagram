@@ -1,4 +1,9 @@
-import type { EdgeRouting, EdgeRoutingContext, Point } from 'ng-diagram';
+import type {
+  EdgeRouting,
+  EdgeRoutingConfig,
+  EdgeRoutingContext,
+  Point,
+} from 'ng-diagram';
 
 /**
  * Arc routing implementation using SVG elliptical arcs.
@@ -26,7 +31,7 @@ export class ArcRouting implements EdgeRouting {
    * The arc command (A) creates a curved path between source and target.
    * Format: A rx ry x-axis-rotation large-arc-flag sweep-flag x y
    */
-  computeSvgPath(points: Point[]): string {
+  computeSvgPath(points: Point[], config?: EdgeRoutingConfig): string {
     if (points.length < 2) return '';
 
     const start = points[0];
@@ -37,7 +42,10 @@ export class ArcRouting implements EdgeRouting {
     const dy = end.y - start.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    const radiusMultiplier = 0.5;
+    // Options of a custom routing are stored in the config under its name
+    const options = config?.[this.name] as
+      { radiusMultiplier?: number } | undefined;
+    const radiusMultiplier = options?.radiusMultiplier ?? 0.5;
     const radius = distance * radiusMultiplier;
 
     // Create arc: sweep-flag=1 creates a clockwise arc (curves downward/rightward)

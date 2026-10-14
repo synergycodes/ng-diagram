@@ -5,6 +5,7 @@ import {
   initializeModel,
   NgDiagramBackgroundComponent,
   NgDiagramComponent,
+  NgDiagramModelService,
   NgDiagramService,
   provideNgDiagram,
   type DiagramInitEvent,
@@ -38,6 +39,7 @@ import { ArcRouting } from './arc-routing';
 })
 export class DiagramComponent {
   private diagramService = inject(NgDiagramService);
+  private modelService = inject(NgDiagramModelService);
 
   config = {
     zoom: {
@@ -57,6 +59,18 @@ export class DiagramComponent {
   // @mark-start
   onDiagramInit(_: DiagramInitEvent) {
     this.diagramService.registerRouting(new ArcRouting());
+    // An edge is routed when it is added, so it is added after the routing is registered
+    this.modelService.addEdges([
+      {
+        id: 'edge1',
+        source: 'node1',
+        target: 'node2',
+        sourcePort: 'port-right',
+        targetPort: 'port-left',
+        data: {},
+        routing: 'arc',
+      },
+    ]);
   }
   // @mark-end
 
@@ -71,19 +85,6 @@ export class DiagramComponent {
         id: 'node2',
         position: { x: 400, y: 50 },
         data: { label: 'Node 2' },
-      },
-    ],
-    edges: [
-      {
-        id: 'edge1',
-        source: 'node1',
-        target: 'node2',
-        sourcePort: 'port-right',
-        targetPort: 'port-left',
-        data: {},
-        // @mark-start
-        routing: 'arc',
-        // @mark-end
       },
     ],
   });
