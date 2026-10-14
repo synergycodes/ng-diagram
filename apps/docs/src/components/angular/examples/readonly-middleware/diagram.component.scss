@@ -30,7 +30,7 @@
 }
 
 .readonly-toggle {
-  background: var(--sl-color-accent);
+  background: var(--ngd-nav-button-primary-pressed);
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -41,7 +41,11 @@
   transition: all 0.2s ease;
 
   &:hover {
-    background: var(--sl-color-accent-high);
+    background: color-mix(
+      in srgb,
+      var(--ngd-nav-button-primary-pressed),
+      black 15%
+    );
   }
 
   &.active {
@@ -55,7 +59,7 @@
 
 .status {
   font-size: 0.875rem;
-  color: var(--sl-color-text-accent);
+  color: var(--ngd-txt-primary-default);
 
   .readonly {
     color: var(--sl-color-red);
