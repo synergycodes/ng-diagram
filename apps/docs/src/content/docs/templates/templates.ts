@@ -20,16 +20,6 @@ export type Template = RegularTemplate | ComingSoonTemplate;
 export const templates: Template[] = [
   {
     type: 'regular',
-    title: 'Org Chart',
-    description:
-      'Interactive organizational chart. A starter kit for tree-based diagrams with drag-and-drop reordering, expand/collapse subtrees, sidebar node editing, horizontal/vertical layouts, dark/light theme, minimap, and automatic tree layout powered by ELK.js.',
-    href: 'https://www.ngdiagram.dev/templates/org-chart/',
-    codeHref: 'https://github.com/synergycodes/ng-diagram-orgchart',
-    image: '/docs/assets/templates/org-chart.png',
-    imageAlt: 'Screenshot of the Org Chart starter kit showing a tree of person cards with expand/collapse controls',
-  },
-  {
-    type: 'regular',
     title: 'Electric Circuit',
     description:
       'Interactive circuit / schematic editor. A starter kit for building your own schematic capture or node-based editor. Drag real components from a searchable SVG library, wire them port-to-port with smart junctions, and export to SVG, JPEG, or JSON.',
@@ -52,6 +42,17 @@ export const templates: Template[] = [
   },
   {
     type: 'regular',
+    title: 'Assembly Line',
+    description:
+      'Interactive production-line monitor for manufacturing plants. A starter kit for building your own live monitoring dashboard: drag-and-drop line editing, Edit/Monitor modes with a real-time data feed, threshold-colored KPIs and sparklines, and export to PNG, SVG, or DXF for AutoCAD.',
+    href: 'https://www.ngdiagram.dev/templates/assembly-line/',
+    codeHref: 'https://github.com/synergycodes/ng-diagram-assembly-line',
+    image: '/docs/assets/templates/assembly-line.png',
+    imageAlt:
+      'Screenshot of the Assembly Line monitor: production modules connected by conveyor flows on a canvas, with the module palette on the left, live status badges and KPI grids on the nodes, and a threshold editor in the properties panel.',
+  },
+  {
+    type: 'regular',
     title: 'AV Schematic',
     description:
       'Interactive AV (audio/video) schematic editor. A starter kit for building your own signal-flow or device-wiring diagram. Drag devices from a searchable library, wire them port-to-port with typed connectors (XLR, HDMI, Speakon), and export to PNG or DXF for AutoCAD.',
@@ -63,13 +64,12 @@ export const templates: Template[] = [
   },
   {
     type: 'regular',
-    title: 'Assembly Line',
+    title: 'Org Chart',
     description:
-      'Interactive production-line monitor for manufacturing plants. A starter kit for building your own live monitoring dashboard: drag-and-drop line editing, Edit/Monitor modes with a real-time data feed, threshold-colored KPIs and sparklines, and export to PNG, SVG, or DXF for AutoCAD.',
-    href: 'https://www.ngdiagram.dev/templates/assembly-line/',
-    codeHref: 'https://github.com/synergycodes/ng-diagram-assembly-line',
-    image: '/docs/assets/templates/assembly-line.png',
-    imageAlt:
-      'Screenshot of the Assembly Line monitor: production modules connected by conveyor flows on a canvas, with the module palette on the left, live status badges and KPI grids on the nodes, and a threshold editor in the properties panel.',
+      'Interactive organizational chart. A starter kit for tree-based diagrams with drag-and-drop reordering, expand/collapse subtrees, sidebar node editing, horizontal/vertical layouts, dark/light theme, minimap, and automatic tree layout powered by ELK.js.',
+    href: 'https://www.ngdiagram.dev/templates/org-chart/',
+    codeHref: 'https://github.com/synergycodes/ng-diagram-orgchart',
+    image: '/docs/assets/templates/org-chart.png',
+    imageAlt: 'Screenshot of the Org Chart starter kit showing a tree of person cards with expand/collapse controls',
   },
 ];
