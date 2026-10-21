@@ -5,19 +5,27 @@ sidebar:
   order: 6
 ---
 
+Ask your AI coding assistant to set up everything on this page for you:
+
+```text
+Read https://www.ngdiagram.dev/docs/intro/ai/ and set up the ngDiagram agent skills and MCP server for this project.
+```
+
+Or follow the steps below yourself.
+
 ngDiagram has two tools for your AI coding assistant, such as Claude Code, Cursor, GitHub Copilot, Codex, Gemini CLI and others. **Agent skills** teach it how to build with ngDiagram. The **MCP server** lets it search the docs and the API reference. We recommend using both.
 
 ## Agent skills
 
 ### Install
 
-In your project folder (Node.js 22.20 or newer):
+In your project folder (the `skills` CLI needs Node.js 22.20 or newer):
 
 ```bash
 npx skills add https://github.com/synergycodes/ng-diagram/tree/release/skills
 ```
 
-The CLI asks which agents to install the skills for. Update later with `npx skills update`. The CLI sends anonymous usage data. Set `DISABLE_TELEMETRY=1` to turn it off.
+The CLI asks which agents to install the skills for. When an AI agent runs the command, add `-a <agent> -y` (for example `-a claude-code -y`) to choose the agent and skip the questions. Update later with `npx skills update`. The `skills` CLI sends anonymous usage data to skills.sh. Set `DISABLE_TELEMETRY=1` to turn it off.
 
 For other options (all projects, one skill, manual copy), see the [install section of the skills README](https://github.com/synergycodes/ng-diagram/tree/release/skills#install).
 
