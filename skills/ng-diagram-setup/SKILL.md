@@ -180,7 +180,7 @@ args = ["-y", "@ng-diagram/mcp"]
 
 If the server does not start on Windows, run `npx` through `cmd`: command `cmd`, args `["/c", "npx", "-y", "@ng-diagram/mcp"]`.
 
-Restart the agent, then test it with a request like "Search the ng-diagram docs for palette". The docs and API data are bundled in the npm package (no network calls at query time), so they can describe a newer ng-diagram than the installed one: check `@since` tags. More: https://www.ngdiagram.dev/docs/intro/mcp/
+Restart the agent, then test it with a request like "Search the ng-diagram docs for palette". The docs and API data are bundled in the npm package (no network calls at query time), so they can describe a newer ng-diagram than the installed one: check `@since` tags. More: https://www.ngdiagram.dev/docs/intro/ai/
 
 ## Symptom → fix
 

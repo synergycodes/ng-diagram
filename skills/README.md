@@ -25,7 +25,7 @@ Update later with `npx skills update`. The CLI sends anonymous usage data; set `
 
 Or copy the skill folders yourself to the folder your agent reads: `.claude/skills/` for Claude Code, `.agents/skills/` for Codex. The `skills` CLI uses `.agents/skills/` for Cursor, GitHub Copilot, Gemini CLI and OpenCode too.
 
-**Recommended:** also add the ng-diagram docs MCP server, so the agent can search the documentation and the API reference. Setup for each agent: [ngdiagram.dev/docs/intro/mcp](https://www.ngdiagram.dev/docs/intro/mcp/) and the `ng-diagram-setup` skill.
+**Recommended:** also add the ng-diagram docs MCP server, so the agent can search the documentation and the API reference. Setup for each agent: [ngdiagram.dev/docs/intro/ai](https://www.ngdiagram.dev/docs/intro/ai/) and the `ng-diagram-setup` skill.
 
 ## How the agent uses the skills
 
