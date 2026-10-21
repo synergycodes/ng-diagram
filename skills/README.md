@@ -1,10 +1,10 @@
-# ng-diagram agent skills (preview)
+# ngDiagram agent skills (preview)
 
-Skills that help AI coding agents build applications with the [ng-diagram](https://www.ngdiagram.dev/docs) Angular library: diagram editors, org charts, workflow builders, schematics. They cover the common use cases, the edge cases that cause most bugs, and troubleshooting from a symptom or a console message.
+Skills that help AI coding agents build applications with the [ngDiagram](https://www.ngdiagram.dev/docs) Angular library: diagram editors, org charts, workflow builders, schematics. They cover the common use cases, the edge cases that cause most bugs, and troubleshooting from a symptom or a console message.
 
 The skills use the open [Agent Skills](https://agentskills.io) format, so they work in Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI and other agents that read `SKILL.md` files. They are for people who build applications with the library, not for work on the library itself.
 
-> **Preview.** The skills are written for ng-diagram **1.4.0**. Features added after 1.0.0 are marked "since vX.Y", and every skill tells the agent to check the installed version and to confirm API names in `node_modules/ng-diagram/ng-diagram.d.ts` before it writes code. If a skill gives wrong advice, please [tell us](#report-wrong-advice).
+> **Preview.** The skills are written for ngDiagram **1.4.0**. Features added after 1.0.0 are marked "since vX.Y", and every skill tells the agent to check the installed version and to confirm API names in `node_modules/ng-diagram/ng-diagram.d.ts` before it writes code. If a skill gives wrong advice, please [tell us](#report-wrong-advice).
 
 ## Install
 
@@ -25,7 +25,7 @@ Update later with `npx skills update`. The CLI sends anonymous usage data; set `
 
 Or copy the skill folders yourself to the folder your agent reads: `.claude/skills/` for Claude Code, `.agents/skills/` for Codex. The `skills` CLI uses `.agents/skills/` for Cursor, GitHub Copilot, Gemini CLI and OpenCode too.
 
-**Recommended:** also add the ng-diagram docs MCP server, so the agent can search the documentation and the API reference. Setup for each agent: [ngdiagram.dev/docs/intro/ai](https://www.ngdiagram.dev/docs/intro/ai/) and the `ng-diagram-setup` skill.
+**Recommended:** also add the ngDiagram docs MCP server, so the agent can search the documentation and the API reference. Setup for each agent: [ngdiagram.dev/docs/intro/ai](https://www.ngdiagram.dev/docs/intro/ai/) and the `ng-diagram-setup` skill.
 
 ## How the agent uses the skills
 
@@ -71,8 +71,8 @@ Agents show all skill descriptions in a list with limited space: Claude Code use
 
 ## Report wrong advice
 
-Open an issue with the [agent skill feedback form](https://github.com/synergycodes/ng-diagram/issues/new?template=skill-feedback.yml). It asks for the skill, your prompt, the agent, what happened, what you expected and your ng-diagram version.
+Open an issue with the [agent skill feedback form](https://github.com/synergycodes/ng-diagram/issues/new?template=skill-feedback.yml). It asks for the skill, your prompt, the agent, what happened, what you expected and your ngDiagram version.
 
 ## License
 
-Apache-2.0, the same as ng-diagram.
+Apache-2.0, the same as ngDiagram.
