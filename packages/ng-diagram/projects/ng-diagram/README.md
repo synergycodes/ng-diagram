@@ -23,7 +23,7 @@ Unlike generic diagramming libraries, **ngDiagram** is Angular-first - built on 
 - **🖱️ Embedded Palette**: Built-in drag-and-drop palette system for adding nodes to diagrams
 - **⚡ Performance**: Signal-based reactivity, spatial hashing, and viewport virtualization for large diagrams
 - **🔌 Extensible Architecture**: Middleware pipeline for custom behaviors and business logic
-- **🤖 AI-Ready Docs**: Official [MCP server](https://www.npmjs.com/package/@ng-diagram/mcp) lets AI assistants search the docs and API from your editor
+- **🤖 Build with AI**: [Agent skills](https://www.ngdiagram.dev/docs/intro/ai/) teach AI coding assistants how to build with ngDiagram, and the official [MCP server](https://www.npmjs.com/package/@ng-diagram/mcp) lets them search the docs and API
 
 ## 📚 What You Can Build
 
@@ -205,9 +205,23 @@ The documentation includes:
 - Best practices
 - Advanced use cases
 
-## 🤖 MCP Server
+## 🤖 Build with AI
 
-Use AI assistants like Claude, Cursor, or Windsurf to search ngDiagram docs and API directly from your editor. No browser needed.
+Ask your AI coding assistant to set it up for you:
+
+```text
+Read https://www.ngdiagram.dev/docs/intro/ai/ and set up the ngDiagram agent skills and MCP server for this project.
+```
+
+Or do it yourself:
+
+**Agent skills (preview)** teach your assistant how to build with ngDiagram: the common use cases, the edge cases that cause most bugs, and troubleshooting. They work in Claude Code, Codex, Cursor, GitHub Copilot, Gemini CLI and other agents. In your project folder (the `skills` CLI needs Node.js 22.20 or newer):
+
+```bash
+npx skills add https://github.com/synergycodes/ng-diagram/tree/release/skills
+```
+
+**MCP server** lets your assistant search the ngDiagram docs and API reference from your editor:
 
 ```json
 {
@@ -220,7 +234,7 @@ Use AI assistants like Claude, Cursor, or Windsurf to search ngDiagram docs and 
 }
 ```
 
-See [@ng-diagram/mcp](https://www.npmjs.com/package/@ng-diagram/mcp) for setup details and Windows configuration.
+Setup for each agent, the Windows configuration and the list of skills: **[Build with AI](https://www.ngdiagram.dev/docs/intro/ai/)**.
 
 ## 🔧 Requirements
 
@@ -237,7 +251,7 @@ This project is licensed under the Apache 2.0 License - see the [LICENSE](https:
 - **Documentation**: [https://www.ngdiagram.dev/docs](https://www.ngdiagram.dev/docs)
 - **GitHub**: [https://github.com/synergycodes/ng-diagram](https://github.com/synergycodes/ng-diagram)
 - **NPM**: [https://www.npmjs.com/package/ng-diagram](https://www.npmjs.com/package/ng-diagram)
-- **MCP Server**: [@ng-diagram/mcp](https://www.npmjs.com/package/@ng-diagram/mcp) - let AI assistants search ngDiagram docs and API
+- **Build with AI**: [Agent skills and MCP server](https://www.ngdiagram.dev/docs/intro/ai/) for AI coding assistants
 - **Website**: [https://www.ngdiagram.dev](https://www.ngdiagram.dev)
 
 ## 🆘 Support
