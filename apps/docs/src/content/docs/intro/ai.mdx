@@ -1,11 +1,11 @@
 ---
 title: Build with AI
-description: Agent skills and the MCP server help AI coding assistants write correct ng-diagram code.
+description: Agent skills and the MCP server help AI coding assistants write correct ngDiagram code.
 sidebar:
   order: 6
 ---
 
-ng-diagram has two tools for your AI coding assistant, such as Claude Code, Cursor, GitHub Copilot, Codex, Gemini CLI and others. **Agent skills** teach it how to build with ng-diagram. The **MCP server** lets it search the docs and the API reference. We recommend using both.
+ngDiagram has two tools for your AI coding assistant, such as Claude Code, Cursor, GitHub Copilot, Codex, Gemini CLI and others. **Agent skills** teach it how to build with ngDiagram. The **MCP server** lets it search the docs and the API reference. We recommend using both.
 
 ## Agent skills
 
@@ -22,7 +22,7 @@ The CLI asks which agents to install the skills for. Update later with `npx skil
 For other options (all projects, one skill, manual copy), see the [install section of the skills README](https://github.com/synergycodes/ng-diagram/tree/release/skills#install).
 
 :::note[Preview]
-The skills are written for ng-diagram 1.4.0. If a skill gives wrong advice, tell us with the [agent skill feedback form](https://github.com/synergycodes/ng-diagram/issues/new?template=skill-feedback.yml).
+The skills are written for ngDiagram 1.4.0. If a skill gives wrong advice, tell us with the [agent skill feedback form](https://github.com/synergycodes/ng-diagram/issues/new?template=skill-feedback.yml).
 :::
 
 ### Use
@@ -35,7 +35,7 @@ The agent loads a skill when your request matches its description. You can also 
 
 ## MCP server
 
-The [ng-diagram MCP server](https://www.npmjs.com/package/@ng-diagram/mcp) connects AI assistants to ng-diagram's documentation and public API. Instead of switching to a browser to look things up, you can ask your AI assistant directly:
+The [ngDiagram MCP server](https://www.npmjs.com/package/@ng-diagram/mcp) connects AI assistants to ngDiagram's documentation and public API. Instead of switching to a browser to look things up, you can ask your AI assistant directly:
 
 - _"How do I create custom nodes?"_
 - _"What's the signature of `DiagramComponent`?"_
@@ -45,7 +45,7 @@ The AI searches the docs and API reference behind the scenes and answers with ac
 
 ### What is MCP?
 
-[MCP](https://modelcontextprotocol.io) is an open standard that lets AI assistants access external data sources. The ng-diagram MCP server exposes four tools:
+[MCP](https://modelcontextprotocol.io) is an open standard that lets AI assistants access external data sources. The ngDiagram MCP server exposes four tools:
 
 - **`search_docs`** - search documentation sections by keyword
 - **`get_doc`** - retrieve a full documentation page
@@ -82,7 +82,7 @@ Add the server to your MCP client config - no installation required:
 }
 ```
 
-Restart your AI assistant after updating the config, then verify by asking, for example: _"Search the ng-diagram docs for palette"_.
+Restart your AI assistant after updating the config, then verify by asking, for example: _"Search the ngDiagram docs for palette"_.
 
 #### Config file locations
 
