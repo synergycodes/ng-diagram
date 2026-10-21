@@ -15,6 +15,7 @@ export default defineConfig({
   base: '/docs',
   redirects: {
     '/': '/docs/intro/quick-start/',
+    '/intro/mcp': '/docs/intro/ai/',
   },
   vite: {
     plugins: [tailwindcss()],

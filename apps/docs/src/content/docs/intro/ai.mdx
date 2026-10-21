@@ -1,9 +1,39 @@
 ---
-title: MCP Server
-description: Connect AI assistants to ng-diagram documentation and API reference using the Model Context Protocol
+title: Build with AI
+description: Agent skills and the MCP server help AI coding assistants write correct ng-diagram code.
 sidebar:
   order: 6
 ---
+
+ng-diagram has two tools for your AI coding assistant, such as Claude Code, Cursor, GitHub Copilot, Codex, Gemini CLI and others. **Agent skills** teach it how to build with ng-diagram. The **MCP server** lets it search the docs and the API reference. We recommend using both.
+
+## Agent skills
+
+### Install
+
+In your project folder (Node.js 22.20 or newer):
+
+```bash
+npx skills add https://github.com/synergycodes/ng-diagram/tree/release/skills
+```
+
+The CLI asks which agents to install the skills for. Update later with `npx skills update`. The CLI sends anonymous usage data. Set `DISABLE_TELEMETRY=1` to turn it off.
+
+For other options (all projects, one skill, manual copy), see the [install section of the skills README](https://github.com/synergycodes/ng-diagram/tree/release/skills#install).
+
+:::note[Preview]
+The skills are written for ng-diagram 1.4.0. If a skill gives wrong advice, tell us with the [agent skill feedback form](https://github.com/synergycodes/ng-diagram/issues/new?template=skill-feedback.yml).
+:::
+
+### Use
+
+Skills use the open [Agent Skills](https://agentskills.io) format (`SKILL.md` files). They cover the common use cases, the edge cases that cause most bugs, and troubleshooting from a symptom or a console message. They are for people who build applications with the library.
+
+The agent loads a skill when your request matches its description. You can also ask for a skill by name, for example "use the ng-diagram-visibility skill".
+
+`ng-diagram-fundamentals` is the starting point. `ng-diagram-troubleshooting` is the starting point for problems. See the [full list of skills](https://github.com/synergycodes/ng-diagram/tree/release/skills#skill-map).
+
+## MCP server
 
 The [ng-diagram MCP server](https://www.npmjs.com/package/@ng-diagram/mcp) connects AI assistants to ng-diagram's documentation and public API. Instead of switching to a browser to look things up, you can ask your AI assistant directly:
 
@@ -13,7 +43,7 @@ The [ng-diagram MCP server](https://www.npmjs.com/package/@ng-diagram/mcp) conne
 
 The AI searches the docs and API reference behind the scenes and answers with actual documentation content.
 
-## What is MCP?
+### What is MCP?
 
 [MCP](https://modelcontextprotocol.io) is an open standard that lets AI assistants access external data sources. The ng-diagram MCP server exposes four tools:
 
@@ -22,7 +52,7 @@ The AI searches the docs and API reference behind the scenes and answers with ac
 - **`search_symbols`** - search public API symbols (classes, interfaces, functions, types)
 - **`get_symbol`** - get full details for a specific API symbol
 
-## Setup
+### Setup
 
 Add the server to your MCP client config - no installation required:
 
@@ -52,9 +82,9 @@ Add the server to your MCP client config - no installation required:
 }
 ```
 
-Restart your AI assistant after updating the config, then verify by asking i.e.: _"Search the ng-diagram docs for palette"_.
+Restart your AI assistant after updating the config, then verify by asking, for example: _"Search the ng-diagram docs for palette"_.
 
-### Config file locations
+#### Config file locations
 
 | Client         | Config file                                                                                                                                                                                               |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -63,7 +93,7 @@ Restart your AI assistant after updating the config, then verify by asking i.e.:
 | Cursor         | `.cursor/mcp.json` in project root (project) or `~/.cursor/mcp.json` (global)                                                                                                                             |
 | Windsurf       | `~/.codeium/windsurf/mcp_config.json`                                                                                                                                                                     |
 
-## How It Works
+### How It Works
 
 The AI assistant uses a two-step pattern - **search**, then **retrieve**:
 
@@ -73,7 +103,7 @@ The AI assistant uses a two-step pattern - **search**, then **retrieve**:
 
 All documentation and API data is bundled into the npm package - no network calls are made at query time.
 
-## Learn More
+### Learn More
 
 - [**@ng-diagram/mcp** on npm](https://www.npmjs.com/package/@ng-diagram/mcp) - full API reference and setup details
 - [**Source code**](https://github.com/synergycodes/ng-diagram/tree/main/tools/mcp-server) - implementation and developer guide
