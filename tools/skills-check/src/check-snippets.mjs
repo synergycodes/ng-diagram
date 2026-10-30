@@ -222,7 +222,7 @@ process.exitCode = errors.length || problems.length ? 1 : 0;
 function collectBlocks() {
   const result = [];
   const skills = readdirSync(skillsDir)
-    .filter((d) => statSync(join(skillsDir, d)).isDirectory())
+    .filter((d) => !d.startsWith('.') && statSync(join(skillsDir, d)).isDirectory())
     .sort();
   for (const skill of skills) {
     const docs = ['SKILL.md'];

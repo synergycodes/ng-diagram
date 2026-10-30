@@ -1,0 +1,13 @@
+{
+  "name": "ng-diagram",
+  "displayName": "ngDiagram",
+  "description": "Skills for building diagram editors, workflow builders and node-based UIs with the ngDiagram Angular library.",
+  "author": { "name": "Synergy Codes", "url": "https://www.synergycodes.com" },
+  "homepage": "https://www.ngdiagram.dev/docs/intro/ai/",
+  "repository": "https://github.com/synergycodes/ng-diagram",
+  "license": "Apache-2.0",
+  "keywords": ["angular", "diagram", "flowchart", "node-editor", "workflow-builder"],
+  "documentationUrl": "https://www.ngdiagram.dev/docs",
+  "supportUrl": "https://github.com/synergycodes/ng-diagram/issues",
+  "skills": "./"
+}
