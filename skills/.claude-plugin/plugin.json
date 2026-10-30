@@ -16,6 +16,7 @@
     "workflow-editor",
     "visual-programming"
   ],
+  "icon": "./.claude-plugin/icon.png",
   "documentationUrl": "https://www.ngdiagram.dev/docs/intro/ai/",
   "supportUrl": "https://github.com/synergycodes/ng-diagram/issues",
   "skills": "./"
