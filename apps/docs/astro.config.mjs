@@ -42,6 +42,9 @@ export default defineConfig({
       },
       customCss: ['./src/styles/custom.css'],
       head: [
+        // PNG fallbacks for browsers without SVG favicons (Safari) and for iOS home screens.
+        { tag: 'link', attrs: { rel: 'icon', href: '/docs/favicon.png', sizes: '32x32' } },
+        { tag: 'link', attrs: { rel: 'apple-touch-icon', href: '/docs/apple-touch-icon.png' } },
         {
           tag: 'script',
           attrs: { type: 'application/ld+json' },
