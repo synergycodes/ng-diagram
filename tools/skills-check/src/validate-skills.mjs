@@ -27,8 +27,9 @@ const FORBIDDEN = [
 const LIBRARY_NAMES =
   /^ng-diagram-(canvas|port|marker|palette-item|palette-item-preview|base-edge|base-edge-label|default-edge-label|background|minimap|node-resize-adornment|node-rotate-adornment|base-node-template|edge--temporary|edge--dangling|node-wrapper|node-selected|group-highlight|port-hoverable|port-hoverable-over-node|docs)$/;
 
+// Dot folders (`.claude-plugin`) hold plugin metadata, not skills.
 const skills = readdirSync(root)
-  .filter((d) => statSync(join(root, d)).isDirectory())
+  .filter((d) => !d.startsWith('.') && statSync(join(root, d)).isDirectory())
   .sort();
 const names = new Set(skills);
 let problems = 0;
