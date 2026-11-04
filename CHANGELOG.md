@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Ports and edge labels keep their measured size and position after the diagram initializes, even when a node, edge, port or label id contains `->`. ([#840](https://github.com/synergycodes/ng-diagram/pull/840))
+
 ## [1.4.0] - 2026-10-02
 
 ### Deprecated
