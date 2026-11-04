@@ -685,5 +685,108 @@ describe('InitState', () => {
         expect(setStateCall.edges[0].measuredLabels[0].size).toEqual(existingLabel.size);
       });
     });
+
+    describe('ids containing the separator', () => {
+      it('should apply new ports and measurements to a node whose id contains the separator', () => {
+        const node = createMockNode('group->node1', true);
+        mockFlowCore.getState.mockReturnValue({
+          nodes: [node],
+          edges: [],
+        });
+
+        const newSize = { width: 30, height: 15 };
+        const newPosition = { x: 5, y: 7 };
+        initState.addPort('group->node1', createMockPort('port1', 'group->node1'));
+        initState.trackPortMeasurement('group->node1', 'port1', newSize, newPosition);
+        initState.applyToDiagramState(mockFlowCore);
+
+        const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+        expect(setStateCall.nodes[0].measuredPorts).toHaveLength(1);
+        expect(setStateCall.nodes[0].measuredPorts[0].id).toBe('port1');
+        expect(setStateCall.nodes[0].measuredPorts[0].size).toEqual(newSize);
+        expect(setStateCall.nodes[0].measuredPorts[0].position).toEqual(newPosition);
+      });
+
+      it('should apply new labels and measurements to an edge whose id contains the separator', () => {
+        const edge = createMockEdge('a->b');
+        mockFlowCore.getState.mockReturnValue({
+          nodes: [],
+          edges: [edge],
+        });
+
+        const newSize = { width: 70, height: 20 };
+        initState.addLabel('a->b', createMockEdgeLabel('label1'));
+        initState.trackLabelMeasurement('a->b', 'label1', newSize);
+        initState.applyToDiagramState(mockFlowCore);
+
+        const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+        expect(setStateCall.edges[0].measuredLabels).toHaveLength(1);
+        expect(setStateCall.edges[0].measuredLabels[0].id).toBe('label1');
+        expect(setStateCall.edges[0].measuredLabels[0].size).toEqual(newSize);
+      });
+
+      it('should keep ports apart when node and port ids containing the separator form the same joined string', () => {
+        const nodeAB = createMockNode('a->b', true);
+        const nodeA = createMockNode('a', true);
+        mockFlowCore.getState.mockReturnValue({
+          nodes: [nodeAB, nodeA],
+          edges: [],
+        });
+
+        const sizeC = { width: 11, height: 12 };
+        const sizeBC = { width: 21, height: 22 };
+        const position = createValidPosition();
+        initState.addPort('a->b', createMockPort('c', 'a->b'));
+        initState.addPort('a', createMockPort('b->c', 'a'));
+        initState.trackPortMeasurement('a->b', 'c', sizeC, position);
+        initState.trackPortMeasurement('a', 'b->c', sizeBC, position);
+
+        expect(initState.portsToMeasure.size).toBe(2);
+
+        initState.applyToDiagramState(mockFlowCore);
+
+        const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+        expect(setStateCall.nodes[0].measuredPorts).toHaveLength(1);
+        expect(setStateCall.nodes[0].measuredPorts[0].id).toBe('c');
+        expect(setStateCall.nodes[0].measuredPorts[0].size).toEqual(sizeC);
+        expect(setStateCall.nodes[1].measuredPorts).toHaveLength(1);
+        expect(setStateCall.nodes[1].measuredPorts[0].id).toBe('b->c');
+        expect(setStateCall.nodes[1].measuredPorts[0].size).toEqual(sizeBC);
+      });
+
+      it('should pass the full port id containing the separator to the measurement filter when pruning', () => {
+        let excludeSeparatorPort = false;
+        const filteredInitState = new InitState({
+          isNodeMeasurable: () => true,
+          isPortMeasurable: (_nodeId, portId) => !(excludeSeparatorPort && portId === 'in->out'),
+          isLabelMeasurable: () => true,
+        });
+
+        filteredInitState.addPort('node1', createMockPort('in->out', 'node1'));
+        expect(filteredInitState.portsToMeasure.size).toBe(1);
+
+        excludeSeparatorPort = true;
+        filteredInitState.pruneUnmeasurableExpectations();
+
+        expect(filteredInitState.portsToMeasure.size).toBe(0);
+      });
+
+      it('should pass the full label id containing the separator to the measurement filter when pruning', () => {
+        let excludeSeparatorLabel = false;
+        const filteredInitState = new InitState({
+          isNodeMeasurable: () => true,
+          isPortMeasurable: () => true,
+          isLabelMeasurable: (_edgeId, labelId) => !(excludeSeparatorLabel && labelId === 'start->end'),
+        });
+
+        filteredInitState.addLabel('edge1', createMockEdgeLabel('start->end'));
+        expect(filteredInitState.labelsToMeasure.size).toBe(1);
+
+        excludeSeparatorLabel = true;
+        filteredInitState.pruneUnmeasurableExpectations();
+
+        expect(filteredInitState.labelsToMeasure.size).toBe(0);
+      });
+    });
   });
 });

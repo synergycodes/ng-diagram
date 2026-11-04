@@ -6,6 +6,12 @@ import { isValidPosition, isValidSize } from '../../utils/measurement-validation
 const ID_SEPARATOR = '->';
 
 /**
+ * Escapes `\` and `>` in one part of a compound ID, so the separator's `>` is the
+ * only unescaped `>` in the key and different id pairs never produce the same key.
+ */
+const escapeIdPart = (id: string): string => id.replace(/[\\>]/g, '\\$&');
+
+/**
  * Decides which entities create measurement expectations during initialization.
  * Effectively hidden elements render as `display: none` and never deliver valid
  * measurements — expecting them would block init until the safety timeout.
@@ -35,6 +41,9 @@ const MEASURE_EVERYTHING: InitMeasurementFilter = {
  */
 export class InitState {
   constructor(private readonly measurementFilter: InitMeasurementFilter = MEASURE_EVERYTHING) {}
+
+  /** Original entity and item IDs of every compound ID created by getCompoundId */
+  private readonly compoundIdParts = new Map<string, { entityId: string; itemId: string }>();
 
   /** Ports added during initialization, keyed by compound ID (nodeId->portId) */
   readonly initializedPorts = new Map<string, Port>();
@@ -229,7 +238,7 @@ export class InitState {
     }
 
     for (const key of [...this.portsToMeasure]) {
-      const { entityId, itemId } = this.splitCompoundId(key);
+      const { entityId, itemId } = this.getCompoundIdParts(key);
       if (
         !this.measurementFilter.isNodeMeasurable(entityId) ||
         !this.measurementFilter.isPortMeasurable(entityId, itemId)
@@ -239,7 +248,7 @@ export class InitState {
     }
 
     for (const key of [...this.labelsToMeasure]) {
-      const { entityId, itemId } = this.splitCompoundId(key);
+      const { entityId, itemId } = this.getCompoundIdParts(key);
       if (!this.measurementFilter.isLabelMeasurable(entityId, itemId)) {
         this.labelsToMeasure.delete(key);
       }
@@ -271,24 +280,34 @@ export class InitState {
   /**
    * Creates a compound ID from entity and item IDs.
    * Used to uniquely identify ports (nodeId->portId) and labels (edgeId->labelId).
+   * Each part escapes `\` and `>`, so ids that contain the separator cannot
+   * produce the same key; ids without them keep the plain "entityId->itemId" form.
+   * The original ids are stored so they never have to be parsed back from the key.
    *
    * @param entityId - The parent entity ID (nodeId or edgeId)
    * @param itemId - The item ID (portId or labelId)
    * @returns Compound ID string (e.g., "node1->port1")
    */
   private getCompoundId(entityId: string, itemId: string): string {
-    return `${entityId}${ID_SEPARATOR}${itemId}`;
+    const key = `${escapeIdPart(entityId)}${ID_SEPARATOR}${escapeIdPart(itemId)}`;
+    if (!this.compoundIdParts.has(key)) {
+      this.compoundIdParts.set(key, { entityId, itemId });
+    }
+    return key;
   }
 
   /**
-   * Splits a compound ID back into entity and item IDs.
+   * Returns the entity and item IDs a compound ID was created from.
    *
-   * @param id - The compound ID to split (e.g., "node1->port1")
+   * @param id - A compound ID returned by getCompoundId
    * @returns Object with entityId and itemId
    */
-  private splitCompoundId(id: string): { entityId: string; itemId: string } {
-    const [entityId, itemId] = id.split(ID_SEPARATOR);
-    return { entityId, itemId };
+  private getCompoundIdParts(id: string): { entityId: string; itemId: string } {
+    const parts = this.compoundIdParts.get(id);
+    if (!parts) {
+      throw new Error(`Unknown compound id: ${id}`);
+    }
+    return parts;
   }
 
   /**
@@ -324,7 +343,7 @@ export class InitState {
     const nodePortsMap = new Map<string, Port[]>();
 
     for (const [key, port] of this.initializedPorts.entries()) {
-      const { entityId: nodeId } = this.splitCompoundId(key);
+      const { entityId: nodeId } = this.getCompoundIdParts(key);
       const nodePorts = nodePortsMap.get(nodeId) || [];
       nodePorts.push(port);
       nodePortsMap.set(nodeId, nodePorts);
@@ -342,7 +361,7 @@ export class InitState {
     const edgeLabelsMap = new Map<string, EdgeLabel[]>();
 
     for (const [key, label] of this.initializedLabels.entries()) {
-      const { entityId: edgeId } = this.splitCompoundId(key);
+      const { entityId: edgeId } = this.getCompoundIdParts(key);
       const edgeLabels = edgeLabelsMap.get(edgeId) || [];
       edgeLabels.push(label);
       edgeLabelsMap.set(edgeId, edgeLabels);
