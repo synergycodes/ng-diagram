@@ -194,7 +194,7 @@ export class FlowCore {
   }
 
   /**
-   * Sets initial viewport size from element dimensions.
+   * Sets the initial viewport size from the element dimensions.
    *
    * This must be called BEFORE renderStrategy.init() for two reasons:
    * 1. The viewport size is needed for features like zoomToFit on init
