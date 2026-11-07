@@ -92,7 +92,14 @@ export class NgDiagramService extends NgDiagramBaseService {
     effect((onCleanup) => {
       if (!this.isInitialized()) return;
 
-      const unsubscribe = this.flowCore.eventManager.on('actionStateChanged', (event) => {
+      const flowCore = this.flowCore;
+
+      // Angular 18 backward compatibility
+      untracked(() => {
+        this.actionState$.set({ ...flowCore.actionStateManager.getState() });
+      });
+
+      const unsubscribe = flowCore.eventManager.on('actionStateChanged', (event) => {
         // Angular 18 backward compatibility
         untracked(() => {
           this.actionState$.set(event.actionState);
