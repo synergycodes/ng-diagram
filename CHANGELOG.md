@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The paste state of a previous model no longer survives a model switch: `NgDiagramService.actionState()` shows the new model's state as soon as the new model is initialized, so a Paste action bound to `copyPaste` stays disabled until something is copied again ([#847](https://github.com/synergycodes/ng-diagram/pull/847))
+
 ## [1.4.0] - 2026-10-02
 
 ### Deprecated
