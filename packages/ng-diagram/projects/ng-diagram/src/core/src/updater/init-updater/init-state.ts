@@ -2,8 +2,53 @@ import { FlowCore } from '../../flow-core';
 import { Edge, EdgeLabel, Node, Point, Port, Size } from '../../types';
 import { isValidPosition, isValidSize } from '../../utils/measurement-validation';
 
-/** Separator used to create compound IDs (e.g., "nodeId->portId") */
+/**
+ * Separator of the lookup keys built by `itemKey` (e.g., "nodeId->portId").
+ * Keys are only compared for equality and are never split back into ids.
+ */
 const ID_SEPARATOR = '->';
+
+/**
+ * Escapes `\` and `>` in an id, so the separator never appears unescaped inside a key part.
+ * The id is converted with `String()` first, so ids that are not strings at runtime (e.g. numbers) do not throw.
+ */
+const escapeKeyPart = (id: string): string => String(id).replace(/[\\>]/g, '\\$&');
+
+/**
+ * Builds the lookup key of an item (port or label) of a parent entity (node or edge).
+ * Both parts are escaped, so two different (parent, item) pairs never share a key.
+ * Ids without `\` or `>` keep the plain form, e.g. "node1->port1".
+ *
+ * @param entityId - The parent entity ID (nodeId or edgeId)
+ * @param itemId - The item ID (portId or labelId)
+ * @returns The lookup key, compared for equality only
+ */
+const itemKey = (entityId: string, itemId: string): string =>
+  `${escapeKeyPart(entityId)}${ID_SEPARATOR}${escapeKeyPart(itemId)}`;
+
+/** A port added during initialization, together with the id of its node. */
+export interface InitializedPortEntry {
+  nodeId: string;
+  port: Port;
+}
+
+/** An edge label added during initialization, together with the id of its edge. */
+export interface InitializedLabelEntry {
+  edgeId: string;
+  label: EdgeLabel;
+}
+
+/** Identifies a port that must be measured during initialization. */
+export interface PortRef {
+  nodeId: string;
+  portId: string;
+}
+
+/** Identifies an edge label that must be measured during initialization. */
+export interface LabelRef {
+  edgeId: string;
+  labelId: string;
+}
 
 /**
  * Decides which entities create measurement expectations during initialization.
@@ -36,26 +81,26 @@ const MEASURE_EVERYTHING: InitMeasurementFilter = {
 export class InitState {
   constructor(private readonly measurementFilter: InitMeasurementFilter = MEASURE_EVERYTHING) {}
 
-  /** Ports added during initialization, keyed by compound ID (nodeId->portId) */
-  readonly initializedPorts = new Map<string, Port>();
+  /** Ports added during initialization with the id of their node, keyed by item key (nodeId->portId) */
+  readonly initializedPorts = new Map<string, InitializedPortEntry>();
 
-  /** Edge labels added during initialization, keyed by compound ID (edgeId->labelId) */
-  readonly initializedLabels = new Map<string, EdgeLabel>();
+  /** Edge labels added during initialization with the id of their edge, keyed by item key (edgeId->labelId) */
+  readonly initializedLabels = new Map<string, InitializedLabelEntry>();
 
   /** Node sizes collected during measurement, keyed by nodeId */
   readonly nodeSizes = new Map<string, Size>();
 
-  /** Port measurements (size + position), keyed by compound ID (nodeId->portId) */
+  /** Port measurements (size + position), keyed by item key (nodeId->portId) */
   readonly portRects = new Map<string, { size: Size; position: Point }>();
 
-  /** Edge label sizes collected during measurement, keyed by compound ID (edgeId->labelId) */
+  /** Edge label sizes collected during measurement, keyed by item key (edgeId->labelId) */
   readonly edgeLabelSizes = new Map<string, Size>();
 
-  /** All ports that need measurement (both pre-existing and newly added), keyed by compound ID */
-  readonly portsToMeasure = new Set<string>();
+  /** All ports that need measurement (both pre-existing and newly added): item key (nodeId->portId) to the port ref */
+  readonly portsToMeasure = new Map<string, PortRef>();
 
-  /** All labels that need measurement (both pre-existing and newly added), keyed by compound ID */
-  readonly labelsToMeasure = new Set<string>();
+  /** All labels that need measurement (both pre-existing and newly added): item key (edgeId->labelId) to the label ref */
+  readonly labelsToMeasure = new Map<string, LabelRef>();
 
   /** All nodes that need measurement (rendered nodes at init time), keyed by nodeId */
   readonly nodesToMeasure = new Set<string>();
@@ -63,10 +108,10 @@ export class InitState {
   /** Nodes that have valid measurements, keyed by nodeId */
   readonly measuredNodes = new Set<string>();
 
-  /** Ports that have valid measurements, keyed by compound ID (nodeId->portId) */
+  /** Ports that have valid measurements, keyed by item key (nodeId->portId) */
   readonly measuredPorts = new Set<string>();
 
-  /** Labels that have valid measurements, keyed by compound ID (edgeId->labelId) */
+  /** Labels that have valid measurements, keyed by item key (edgeId->labelId) */
   readonly measuredLabels = new Set<string>();
 
   /**
@@ -92,7 +137,7 @@ export class InitState {
    * @param position - The measured position
    */
   trackPortMeasurement(nodeId: string, portId: string, size: Size, position: Point): void {
-    const key = this.getCompoundId(nodeId, portId);
+    const key = itemKey(nodeId, portId);
     this.portRects.set(key, { size, position });
 
     if (isValidSize(size) && isValidPosition(position)) {
@@ -108,7 +153,7 @@ export class InitState {
    * @param size - The measured size
    */
   trackLabelMeasurement(edgeId: string, labelId: string, size: Size): void {
-    const key = this.getCompoundId(edgeId, labelId);
+    const key = itemKey(edgeId, labelId);
     this.edgeLabelSizes.set(key, size);
 
     if (isValidSize(size)) {
@@ -124,13 +169,13 @@ export class InitState {
    * @param port - The port object to add
    */
   addPort(nodeId: string, port: Port): void {
-    const key = this.getCompoundId(nodeId, port.id);
-    this.initializedPorts.set(key, port);
+    const key = itemKey(nodeId, port.id);
+    this.initializedPorts.set(key, { nodeId, port });
 
     // Hidden ports still land in the model (edges may reference them) but
     // create no measurement expectation — they cannot deliver a valid size.
     if (this.measurementFilter.isPortMeasurable(nodeId, port.id)) {
-      this.portsToMeasure.add(key);
+      this.portsToMeasure.set(key, { nodeId, portId: port.id });
     }
   }
 
@@ -142,12 +187,12 @@ export class InitState {
    * @param label - The label object to add
    */
   addLabel(edgeId: string, label: EdgeLabel): void {
-    const key = this.getCompoundId(edgeId, label.id);
-    this.initializedLabels.set(key, label);
+    const key = itemKey(edgeId, label.id);
+    this.initializedLabels.set(key, { edgeId, label });
 
     // See addPort — hidden labels create no measurement expectation.
     if (this.measurementFilter.isLabelMeasurable(edgeId, label.id)) {
-      this.labelsToMeasure.add(key);
+      this.labelsToMeasure.set(key, { edgeId, labelId: label.id });
     }
   }
 
@@ -177,7 +222,7 @@ export class InitState {
         }
 
         if (isValidSize(port.size) && isValidPosition(port.position)) {
-          const key = this.getCompoundId(node.id, port.id);
+          const key = itemKey(node.id, port.id);
           this.measuredPorts.add(key);
         }
       }
@@ -190,7 +235,7 @@ export class InitState {
         }
 
         if (isValidSize(label.size)) {
-          const key = this.getCompoundId(edge.id, label.id);
+          const key = itemKey(edge.id, label.id);
           this.measuredLabels.add(key);
         }
       }
@@ -208,8 +253,8 @@ export class InitState {
     // pre-loaded measurements (counted in measured*) without being expected
     // (absent from *ToMeasure).
     const allNodesMeasured = [...this.nodesToMeasure].every((id) => this.measuredNodes.has(id));
-    const allPortsMeasured = [...this.portsToMeasure].every((id) => this.measuredPorts.has(id));
-    const allLabelsMeasured = [...this.labelsToMeasure].every((id) => this.measuredLabels.has(id));
+    const allPortsMeasured = [...this.portsToMeasure.keys()].every((key) => this.measuredPorts.has(key));
+    const allLabelsMeasured = [...this.labelsToMeasure.keys()].every((key) => this.measuredLabels.has(key));
 
     return allNodesMeasured && allPortsMeasured && allLabelsMeasured;
   }
@@ -228,19 +273,17 @@ export class InitState {
       }
     }
 
-    for (const key of [...this.portsToMeasure]) {
-      const { entityId, itemId } = this.splitCompoundId(key);
+    for (const [key, { nodeId, portId }] of [...this.portsToMeasure]) {
       if (
-        !this.measurementFilter.isNodeMeasurable(entityId) ||
-        !this.measurementFilter.isPortMeasurable(entityId, itemId)
+        !this.measurementFilter.isNodeMeasurable(nodeId) ||
+        !this.measurementFilter.isPortMeasurable(nodeId, portId)
       ) {
         this.portsToMeasure.delete(key);
       }
     }
 
-    for (const key of [...this.labelsToMeasure]) {
-      const { entityId, itemId } = this.splitCompoundId(key);
-      if (!this.measurementFilter.isLabelMeasurable(entityId, itemId)) {
+    for (const [key, { edgeId, labelId }] of [...this.labelsToMeasure]) {
+      if (!this.measurementFilter.isLabelMeasurable(edgeId, labelId)) {
         this.labelsToMeasure.delete(key);
       }
     }
@@ -269,29 +312,6 @@ export class InitState {
   }
 
   /**
-   * Creates a compound ID from entity and item IDs.
-   * Used to uniquely identify ports (nodeId->portId) and labels (edgeId->labelId).
-   *
-   * @param entityId - The parent entity ID (nodeId or edgeId)
-   * @param itemId - The item ID (portId or labelId)
-   * @returns Compound ID string (e.g., "node1->port1")
-   */
-  private getCompoundId(entityId: string, itemId: string): string {
-    return `${entityId}${ID_SEPARATOR}${itemId}`;
-  }
-
-  /**
-   * Splits a compound ID back into entity and item IDs.
-   *
-   * @param id - The compound ID to split (e.g., "node1->port1")
-   * @returns Object with entityId and itemId
-   */
-  private splitCompoundId(id: string): { entityId: string; itemId: string } {
-    const [entityId, itemId] = id.split(ID_SEPARATOR);
-    return { entityId, itemId };
-  }
-
-  /**
    * Records that a port exists and should be counted in the expected measurements.
    * Used to track pre-existing ports so we can verify all ports have measurements.
    *
@@ -299,8 +319,8 @@ export class InitState {
    * @param portId - The port ID
    */
   private trackPreExistingPort(nodeId: string, portId: string): void {
-    const key = this.getCompoundId(nodeId, portId);
-    this.portsToMeasure.add(key);
+    const key = itemKey(nodeId, portId);
+    this.portsToMeasure.set(key, { nodeId, portId });
   }
 
   /**
@@ -311,8 +331,8 @@ export class InitState {
    * @param labelId - The label ID
    */
   private trackPreExistingLabel(edgeId: string, labelId: string): void {
-    const key = this.getCompoundId(edgeId, labelId);
-    this.labelsToMeasure.add(key);
+    const key = itemKey(edgeId, labelId);
+    this.labelsToMeasure.set(key, { edgeId, labelId });
   }
 
   /**
@@ -323,8 +343,7 @@ export class InitState {
   private groupPortsByNode(): Map<string, Port[]> {
     const nodePortsMap = new Map<string, Port[]>();
 
-    for (const [key, port] of this.initializedPorts.entries()) {
-      const { entityId: nodeId } = this.splitCompoundId(key);
+    for (const { nodeId, port } of this.initializedPorts.values()) {
       const nodePorts = nodePortsMap.get(nodeId) || [];
       nodePorts.push(port);
       nodePortsMap.set(nodeId, nodePorts);
@@ -341,8 +360,7 @@ export class InitState {
   private groupLabelsByEdge(): Map<string, EdgeLabel[]> {
     const edgeLabelsMap = new Map<string, EdgeLabel[]>();
 
-    for (const [key, label] of this.initializedLabels.entries()) {
-      const { entityId: edgeId } = this.splitCompoundId(key);
+    for (const { edgeId, label } of this.initializedLabels.values()) {
       const edgeLabels = edgeLabelsMap.get(edgeId) || [];
       edgeLabels.push(label);
       edgeLabelsMap.set(edgeId, edgeLabels);
@@ -386,7 +404,7 @@ export class InitState {
 
       if (measuredPorts) {
         measuredPorts = measuredPorts.map((port) => {
-          const key = this.getCompoundId(node.id, port.id);
+          const key = itemKey(node.id, port.id);
           const rect = this.portRects.get(key);
 
           // Same force-finish guard as node sizes: keep the port's existing
@@ -440,7 +458,7 @@ export class InitState {
 
       if (measuredLabels) {
         measuredLabels = measuredLabels.map((label) => {
-          const key = this.getCompoundId(edge.id, label.id);
+          const key = itemKey(edge.id, label.id);
           const size = this.edgeLabelSizes.get(key);
 
           // Same force-finish guard as node sizes: keep the label's existing

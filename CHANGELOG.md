@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Edge labels and ports from the initial model now show up correctly when node, edge, port or label ids contain `->` ([#844](https://github.com/synergycodes/ng-diagram/pull/844))
+
 ## [1.4.0] - 2026-10-02
 
 ### Deprecated
