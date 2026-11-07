@@ -186,7 +186,7 @@ onPasted({ nodes }: ClipboardPastedEvent) {
 
 - Ctrl/Cmd+V pastes at the last mouse position if the mouse moved in the last 5 seconds, even when the mouse was outside the diagram. Otherwise it pastes 20 px right and down from the copied elements, so repeated pastes stack on the same spot.
 - The clipboard holds the snapshot from copy time: later edits to the originals are not pasted, and deleted originals can still be pasted. `copy()` with nothing selected empties it.
-- `initializeModel()` and `toJSON()` drop `selected` from nodes, so a saved node selection does not come back. Call `select()` after `diagramInit`.
+- `initializeModel()` and `toJSON()` drop `selected` from nodes and edges, so a saved selection does not come back. Call `select()` after `diagramInit`.
 - Pressing a port also selects its node, unless `linking.selectNodeOnPortPress` is `false` (since 1.2.0).
 
 ## Symptom → fix

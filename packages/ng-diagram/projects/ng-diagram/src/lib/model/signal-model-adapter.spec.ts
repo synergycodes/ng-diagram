@@ -98,6 +98,17 @@ describe('SignalModelAdapter', () => {
       expect(edges[0].hidden).toBe(true);
     });
 
+    it('should strip selected from edges by default', () => {
+      service.updateEdges([{ ...mockEdges[0], selected: true }]);
+
+      const { edges } = JSON.parse(service.toJSON());
+
+      expect(edges).toHaveLength(1);
+      expect(edges[0].id).toBe('e1-2');
+      expect(edges[0].selected).toBeUndefined();
+      expect(service.getEdges()[0].selected).toBe(true);
+    });
+
     it('should keep the authored free-endpoint position of a dangling edge', () => {
       service.updateEdges([{ id: 'dangling', source: '1', target: '', data: {}, targetPosition: { x: 300, y: 150 } }]);
 

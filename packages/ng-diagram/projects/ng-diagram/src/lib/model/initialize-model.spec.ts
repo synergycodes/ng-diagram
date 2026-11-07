@@ -52,6 +52,7 @@ function createEdgesWithComputedProperties(): Edge[] {
   return [
     {
       ...mockEdges[0],
+      selected: true,
       sourcePosition: { x: 10, y: 20 },
       targetPosition: { x: 200, y: 100 },
       points: [
@@ -303,6 +304,31 @@ describe('initializeModel', () => {
     }
   });
 
+  it('should strip selected from edges', () => {
+    const edgesWithComputed = createEdgesWithComputedProperties();
+    expect(edgesWithComputed[0].selected).toBe(true);
+
+    const adapter = TestBed.runInInjectionContext(() => initializeModel({ edges: edgesWithComputed }));
+
+    const edges = adapter.getEdges();
+    expect(edges).toHaveLength(1);
+    for (const edge of edges) {
+      expect(edge).not.toHaveProperty('selected');
+    }
+  });
+
+  it('should leave out selected on edges in toJSON of the default model', () => {
+    const adapter = TestBed.runInInjectionContext(() => initializeModel({ nodes: mockNodes, edges: mockEdges }));
+    adapter.updateEdges((edges) => edges.map((edge) => ({ ...edge, selected: true })));
+
+    const { edges } = JSON.parse(adapter.toJSON());
+
+    expect(edges).toHaveLength(1);
+    expect(edges[0].id).toBe('edge1');
+    expect(edges[0].selected).toBeUndefined();
+    expect(adapter.getEdges()[0].selected).toBe(true);
+  });
+
   it('should preserve points on edges', () => {
     const edgesWithComputed = createEdgesWithComputedProperties();
     const adapter = TestBed.runInInjectionContext(() => initializeModel({ edges: edgesWithComputed }));
@@ -360,6 +386,18 @@ describe('initializeModel', () => {
       expect(result.targetPosition).toEqual({ x: 300, y: 150 });
       expect(result.measuredLabels).toBeUndefined();
       expect(result.computedZIndex).toBeUndefined();
+    });
+
+    it('should strip selected from a dangling edge but keep its free-end position', () => {
+      const selectedDangling: Edge = { ...danglingEdge, selected: true };
+      const adapter = TestBed.runInInjectionContext(() =>
+        initializeModel({ nodes: mockNodes, edges: [selectedDangling] })
+      );
+
+      const [result] = adapter.getEdges();
+      expect(result.id).toBe('dangling');
+      expect(result).not.toHaveProperty('selected');
+      expect(result.targetPosition).toEqual({ x: 300, y: 150 });
     });
 
     it('should survive a toJSON → initializeModel round trip without options', () => {
@@ -456,6 +494,25 @@ describe('initializeModel', () => {
 
       const { edges } = JSON.parse(adapter.toJSON());
       expect(edges[0].sourcePosition).toEqual({ x: 10, y: 20 });
+      expect(edges[0].measuredLabels).toBeUndefined();
+    });
+
+    it('should keep edge selected when a custom strip function wraps stripEdgeRuntimeProperties', () => {
+      const edgesWithComputed = createEdgesWithComputedProperties();
+      expect(edgesWithComputed[0].selected).toBe(true);
+
+      const adapter = TestBed.runInInjectionContext(() =>
+        initializeModel({ edges: edgesWithComputed }, undefined, {
+          stripEdgeRuntimeProperties: (edge) => ({ ...stripEdgeRuntimeProperties(edge), selected: edge.selected }),
+        })
+      );
+
+      const [edge] = adapter.getEdges();
+      expect(edge.selected).toBe(true);
+      expect(edge.measuredLabels).toBeUndefined();
+
+      const { edges } = JSON.parse(adapter.toJSON());
+      expect(edges[0].selected).toBe(true);
       expect(edges[0].measuredLabels).toBeUndefined();
     });
 
@@ -593,6 +650,20 @@ describe('initializeModelAdapter', () => {
     const edges = customAdapter.getEdges();
     for (const edge of edges) {
       expect(edge.measuredLabels).toBeUndefined();
+    }
+  });
+
+  it('should strip selected from adapter edges', () => {
+    const edgesWithComputed = createEdgesWithComputedProperties();
+    expect(edgesWithComputed[0].selected).toBe(true);
+    const customAdapter = createMockModelAdapter(mockNodes, edgesWithComputed);
+
+    TestBed.runInInjectionContext(() => initializeModelAdapter(customAdapter));
+
+    const edges = customAdapter.getEdges();
+    expect(edges).toHaveLength(1);
+    for (const edge of edges) {
+      expect(edge).not.toHaveProperty('selected');
     }
   });
 

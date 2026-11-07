@@ -46,7 +46,7 @@ export function stripNodeRuntimeProperties(node: Node): Node {
 
 /**
  * Strips runtime-computed properties from an edge
- * (`sourcePosition`, `targetPosition`, `measuredLabels`, `computedZIndex`, `computedHidden`, `_internalId`).
+ * (`selected`, `sourcePosition`, `targetPosition`, `measuredLabels`, `computedZIndex`, `computedHidden`, `_internalId`).
  *
  * These properties are recomputed during initialization and stale values
  * from persistence cause the measurement system to skip fresh DOM measurement.
@@ -64,11 +64,20 @@ export function stripNodeRuntimeProperties(node: Node): Node {
  * @category Utilities
  */
 export function stripEdgeRuntimeProperties(edge: Edge): Edge {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { sourcePosition, targetPosition, measuredLabels, computedZIndex, computedHidden, _internalId, ...rest } =
-    edge as Edge & {
-      _internalId?: unknown;
-    };
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  const {
+    selected,
+    sourcePosition,
+    targetPosition,
+    measuredLabels,
+    computedZIndex,
+    computedHidden,
+    _internalId,
+    ...rest
+  } = edge as Edge & {
+    _internalId?: unknown;
+  };
+  /* eslint-enable @typescript-eslint/no-unused-vars */
   return {
     ...rest,
     ...(!edge.source && sourcePosition ? { sourcePosition } : {}),

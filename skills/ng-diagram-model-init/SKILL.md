@@ -180,7 +180,7 @@ The three ways to wait:
 
 ## Keep runtime fields from saved data (since 1.3.0)
 
-`initializeModel()` removes runtime fields from every element: on nodes `selected`, `measuredPorts`, `measuredBounds`, `computedZIndex`, `computedHidden`; on edges `measuredLabels`, `computedZIndex`, `computedHidden` and `sourcePosition`/`targetPosition` of connected ends. `InitializeModelOptions` replaces these strip functions, at your own risk: wrap the default and add back only what you need.
+`initializeModel()` removes runtime fields from every element: on nodes `selected`, `measuredPorts`, `measuredBounds`, `computedZIndex`, `computedHidden`; on edges `selected`, `measuredLabels`, `computedZIndex`, `computedHidden` and `sourcePosition`/`targetPosition` of connected ends. `InitializeModelOptions` replaces these strip functions, at your own risk: wrap the default and add back only what you need.
 
 ```typescript
 // At your own risk: keep node selection from saved data (stripped by default)

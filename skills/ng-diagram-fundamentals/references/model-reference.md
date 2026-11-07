@@ -86,7 +86,7 @@ Upgrade note: `hidden` is a library property since 1.4.0. Data that already stor
 | `routingMode` | `'auto' \| 'manual'` | You | `'auto'` | | Who owns `points`. |
 | `sourcePosition` | `Point` | Library / You (free end) | | | Start point in flow coordinates. Computed for a connected end. You set it only when `source` is `''`. |
 | `targetPosition` | `Point` | Library / You (free end) | | | Same for the target end. |
-| `selected` | `boolean` | You + UI | unset | | Selection state. Change it with `NgDiagramSelectionService`. Kept by `toJSON()`. |
+| `selected` | `boolean` | You + UI | unset | | Selection state. Change it with `NgDiagramSelectionService`. Removed from edges by `initializeModel()` and `toJSON()`. |
 | `hidden` | `boolean` | You | unset (visible) | 1.4.0 | Hides the edge. |
 | `computedHidden` | `boolean` (readonly) | Library | | 1.4.0 | Effective visibility: own `hidden`, a template binding, or a hidden endpoint node. |
 | `relinkable` | `boolean \| 'source' \| 'target'` | You | `linking.defaultRelinkable` (`false`) | 1.4.0 | Which ends the user may drag to another port. See `ng-diagram-edge-relinking`. |
@@ -142,7 +142,7 @@ You do not create `EdgeLabel` objects. Each `<ng-diagram-base-edge-label id posi
 The default strip functions (`stripNodeRuntimeProperties`, `stripEdgeRuntimeProperties`, public since 1.3.0) run on every element passed to `initializeModel()`/`initializeModelAdapter()` and in `toJSON()` of the default model:
 
 - Nodes: `selected`, `measuredPorts`, `measuredBounds`, `computedZIndex`, `computedHidden`, `_internalId`.
-- Edges: `sourcePosition`, `targetPosition` (kept for a free end, where `source`/`target` is `''`), `measuredLabels`, `computedZIndex`, `computedHidden`, `_internalId`.
-- Kept: everything else, including node `size`, edge `points`, edge `selected`, `hidden` and `metadata`.
+- Edges: `selected`, `sourcePosition`, `targetPosition` (kept for a free end, where `source`/`target` is `''`), `measuredLabels`, `computedZIndex`, `computedHidden`, `_internalId`.
+- Kept: everything else, including node `size`, edge `points`, `hidden` and `metadata`.
 
 Replace the strip functions with `InitializeModelOptions` (since 1.3.0, at your own risk): see `ng-diagram-model-init`. Persistence details: `ng-diagram-persistence`.
