@@ -352,6 +352,49 @@ describe('PointerMoveSelectionEventHandler', () => {
           nodes: [parentNode, draggableChild],
         });
       });
+
+      it('should not move the visible or hidden children of a selected non-draggable group', async () => {
+        const lockedGroup = { ...mockNode, id: 'locked-group', selected: true, isGroup: true, draggable: false };
+        const visibleChild = { ...mockNode, id: 'visible-child', selected: false, groupId: 'locked-group' };
+        const hiddenChild = {
+          ...mockNode,
+          id: 'hidden-child',
+          selected: false,
+          groupId: 'locked-group',
+          computedHidden: true,
+        };
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([lockedGroup, visibleChild, hiddenChild]);
+
+        await handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'continue',
+            lastInputPoint: lastInputPointOverThreshold,
+          })
+        );
+
+        expect(mockEmit.mock.calls.some((call) => call[0] === 'moveNodesStart')).toBe(false);
+        expect(mockEmit).not.toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+      });
+
+      it('should move only the other selected nodes when a non-draggable group is selected with them', async () => {
+        const lockedGroup = { ...mockNode, id: 'locked-group', selected: true, isGroup: true, draggable: false };
+        const visibleChild = { ...mockNode, id: 'visible-child', selected: false, groupId: 'locked-group' };
+        const freeNode = { ...mockNode, id: 'free', selected: true };
+        mockModelLookup.getSelectedNodesWithChildren.mockReturnValue([lockedGroup, visibleChild, freeNode]);
+
+        await handler.handle(
+          getSamplePointerMoveSelectionEvent({
+            phase: 'continue',
+            lastInputPoint: lastInputPointOverThreshold,
+          })
+        );
+
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesStart', { nodeIds: ['free'] });
+        expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
+          delta: { x: MOVE_THRESHOLD + 5, y: MOVE_THRESHOLD + 5 },
+          nodes: [freeNode],
+        });
+      });
     });
 
     describe('separate node lists', () => {

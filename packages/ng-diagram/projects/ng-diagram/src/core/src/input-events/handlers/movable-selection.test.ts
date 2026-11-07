@@ -102,4 +102,48 @@ describe('getMovableSelection', () => {
 
     expect(getMovableSelection(createFlow([group, hiddenSelectedChild]))).toEqual([group, hiddenSelectedChild]);
   });
+
+  it('should exclude visible and hidden descendants of a selected non-draggable group', () => {
+    const group = createNode('group', { selected: true, isGroup: true, draggable: false } as Partial<Node>);
+    const visibleChild = createNode('visible-child', { groupId: 'group' });
+    const hiddenChild = createNode('hidden-child', { groupId: 'group', computedHidden: true });
+
+    expect(getMovableSelection(createFlow([group, visibleChild, hiddenChild]))).toEqual([]);
+  });
+
+  it('should exclude visible descendants of a selected non-draggable group when nothing is hidden', () => {
+    const group = createNode('group', { selected: true, isGroup: true, draggable: false } as Partial<Node>);
+    const child = createNode('child', { groupId: 'group' });
+    const grandchild = createNode('grandchild', { groupId: 'child' });
+
+    expect(getMovableSelection(createFlow([group, child, grandchild]))).toEqual([]);
+  });
+
+  it('should keep the whole subtree of a non-draggable child group in place when its draggable parent moves', () => {
+    const outer = createNode('outer', { selected: true, isGroup: true } as Partial<Node>);
+    const inner = createNode('inner', { groupId: 'outer', isGroup: true, draggable: false } as Partial<Node>);
+    const innerVisible = createNode('inner-visible', { groupId: 'inner' });
+    const innerHidden = createNode('inner-hidden', { groupId: 'inner', computedHidden: true });
+    const sibling = createNode('sibling', { groupId: 'outer' });
+
+    expect(getMovableSelection(createFlow([outer, inner, innerVisible, innerHidden, sibling]))).toEqual([
+      outer,
+      sibling,
+    ]);
+  });
+
+  it('should exclude selected descendants of a selected non-draggable group', () => {
+    // Box selection and select all also select the children of the group.
+    const group = createNode('group', { selected: true, isGroup: true, draggable: false } as Partial<Node>);
+    const child = createNode('child', { selected: true, groupId: 'group' });
+
+    expect(getMovableSelection(createFlow([group, child]))).toEqual([]);
+  });
+
+  // The freeze applies only when the non-draggable group takes part in the move: content inside a locked group stays draggable on its own.
+  it('should include a selected child of a non-draggable group that is not part of the selection', () => {
+    const child = createNode('child', { selected: true, groupId: 'locked-group' });
+
+    expect(getMovableSelection(createFlow([child]))).toEqual([child]);
+  });
 });

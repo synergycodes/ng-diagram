@@ -19,6 +19,33 @@ const arena: Partial<Model> = {
   ],
 };
 
+/** A non-draggable group with a visible and a hidden child, and a free node away from it. */
+const lockedGroupArena: Partial<Model> = {
+  nodes: [
+    {
+      id: 'locked-group',
+      isGroup: true,
+      draggable: false,
+      position: { x: 100, y: 100 },
+      size: { width: 300, height: 200 },
+      autoSize: false,
+      data: {},
+    },
+    { id: 'visible-child', groupId: 'locked-group', position: { x: 120, y: 120 }, data: { label: 'visible child' } },
+    {
+      id: 'hidden-child',
+      groupId: 'locked-group',
+      hidden: true,
+      position: { x: 260, y: 220 },
+      data: { label: 'hidden child' },
+    },
+    { id: 'free', position: { x: 550, y: 120 }, data: { label: 'free' } },
+  ],
+  edges: [],
+};
+
+const lockedGroupNodeIds = ['locked-group', 'visible-child', 'hidden-child'];
+
 test.describe('hidden elements', () => {
   test('initializes without the measurement timeout when the model contains hidden content', async ({ diagram }) => {
     const warnings: string[] = [];
@@ -301,6 +328,63 @@ test.describe('hidden elements', () => {
     // And the hidden node did not move.
     const hidden = await diagram.model.getNodeById('hidden-b');
     expect(hidden?.position).toEqual({ x: 320, y: 80 });
+  });
+
+  test('a non-draggable group keeps its visible and hidden children in place when the selection is dragged', async ({
+    diagram,
+  }) => {
+    await diagram.load({ model: lockedGroupArena });
+
+    const before = new Map<string, { x: number; y: number }>();
+    for (const id of lockedGroupNodeIds) {
+      before.set(id, await diagram.nodePosition(id));
+    }
+    const freeBefore = await diagram.nodePosition('free');
+
+    // A press on a draggable: false node never starts a drag, so the drag
+    // starts on the other selected node.
+    await diagram.selection.select(['locked-group', 'free']);
+    await diagram.dragNode('free', { x: 120, y: 80 });
+
+    await expect
+      .poll(async () => {
+        const free = await diagram.nodePosition('free');
+        return { x: Math.round(free.x - freeBefore.x), y: Math.round(free.y - freeBefore.y) };
+      })
+      .toEqual({ x: 120, y: 80 });
+
+    // The group and its whole subtree, visible and hidden, stayed in place.
+    for (const id of lockedGroupNodeIds) {
+      expect(await diagram.nodePosition(id), id).toEqual(before.get(id));
+    }
+  });
+
+  test('arrow keys pan instead of moving the children of a selected non-draggable group', async ({ diagram }) => {
+    await diagram.load({ model: lockedGroupArena });
+
+    const before = new Map<string, { x: number; y: number }>();
+    for (const id of lockedGroupNodeIds) {
+      before.set(id, await diagram.nodePosition(id));
+    }
+
+    await diagram.selection.select(['locked-group']);
+    await diagram.clickCanvas();
+    await diagram.selection.select(['locked-group']);
+
+    const viewportBefore = await diagram.viewport.viewport();
+    await diagram.page.keyboard.press('ArrowRight');
+
+    // Nothing in the selection can move, so panning takes over.
+    await expect
+      .poll(async () => {
+        const viewport = await diagram.viewport.viewport();
+        return viewport.x !== viewportBefore.x || viewport.y !== viewportBefore.y;
+      })
+      .toBe(true);
+
+    for (const id of lockedGroupNodeIds) {
+      expect(await diagram.nodePosition(id), id).toEqual(before.get(id));
+    }
   });
 
   test('unhiding renders immediately under virtualization, without panning', async ({ diagram }) => {

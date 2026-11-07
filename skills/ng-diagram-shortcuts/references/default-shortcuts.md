@@ -46,7 +46,7 @@ Contents: default actions · modifiers per OS · matching rules · arrow keys, s
 
 ## Arrow keys, steps and zoom
 
-- The selection moves when `nodeDraggingEnabled` is `true` and at least one selected node is visible and not `draggable: false` (since 1.4.0; before, arrow keys did nothing when the selection could not move). Otherwise the arrow keys pan, if `viewportPanningEnabled` is `true`.
+- The selection moves when `nodeDraggingEnabled` is `true` and at least one selected node can move: it is visible, it is not `draggable: false`, and no selected group that contains it at any depth has `draggable: false` (since 1.4.0; before, arrow keys did nothing when the selection could not move). Otherwise the arrow keys pan, if `viewportPanningEnabled` is `true`.
 - Move step: for each moved root node, `snapping.computeSnapForNodeDrag(node) ?? snapping.defaultDragSnap`; the largest value wins (10 × 10 px by default). The step is used even when drag snapping is off.
 - When a moved node would leave the visible area (minus `selectionMoving.edgePanningThreshold`), the viewport follows it (if `viewportPanningEnabled`).
 - Keyboard move fires `selectionMoved`, not `nodeDragStarted` / `nodeDragEnded`.

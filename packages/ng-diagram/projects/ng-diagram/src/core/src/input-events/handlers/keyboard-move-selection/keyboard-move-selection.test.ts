@@ -425,6 +425,28 @@ describe('KeyboardMoveSelectionEventHandler', () => {
           delta: { x: 10, y: 0 },
         });
       });
+
+      it('should not move the visible or hidden children of a selected non-draggable group', () => {
+        const lockedGroup = { ...mockNode, id: 'locked-group', selected: true, isGroup: true, draggable: false };
+        const visibleChild = { ...mockNode, id: 'visible-child', selected: false, groupId: 'locked-group' };
+        const hiddenChild = {
+          ...mockNode,
+          id: 'hidden-child',
+          selected: false,
+          groupId: 'locked-group',
+          computedHidden: true,
+        };
+        (mockFlowCore.modelLookup.getSelectedNodesWithChildren as ReturnType<typeof vi.fn>).mockReturnValue([
+          lockedGroup,
+          visibleChild,
+          hiddenChild,
+        ]);
+
+        const event = getSampleKeyboardMoveEvent({ direction: 'right' });
+        instance.handle(event);
+
+        expect(mockCommandHandler.emit).not.toHaveBeenCalledWith('moveNodesBy', expect.any(Object));
+      });
     });
 
     describe('hidden nodes filtering', () => {
