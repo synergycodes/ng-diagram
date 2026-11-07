@@ -884,6 +884,33 @@ describe('InitUpdater', () => {
       const stateUpdate = mockFlowCore.setState.mock.calls[0][0];
       expect(stateUpdate.edges[0].measuredLabels).toHaveLength(2);
     });
+
+    it('should apply initial labels to an edge whose id contains -> on finish', async () => {
+      const edgeId = 'node-a:out->node-b';
+      const edge = createMockEdge(edgeId);
+      mockRenderedModel = { nodes: [], edges: [edge] };
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [edge],
+        metadata: { viewport: { position: { x: 0, y: 0 }, zoom: 1 } },
+      });
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+      initUpdater.addEdgeLabel(edgeId, createMockEdgeLabel('edge-label'));
+
+      await vi.advanceTimersByTimeAsync(STABILITY_DELAY);
+
+      const size = { width: 64, height: 24 };
+      initUpdater.applyEdgeLabelChanges(edgeId, [{ labelId: 'edge-label', labelChanges: { size } }]);
+
+      await Promise.resolve();
+
+      expect(mockFlowCore.setState).toHaveBeenCalledTimes(1);
+      const stateUpdate = mockFlowCore.setState.mock.calls[0][0];
+      expect(stateUpdate.edges[0].id).toBe(edgeId);
+      expect(stateUpdate.edges[0].measuredLabels).toEqual([{ id: 'edge-label', positionOnEdge: 0.5, size }]);
+    });
   });
 
   describe('safety timeout', () => {
@@ -1154,6 +1181,28 @@ describe('InitUpdater', () => {
 
       // The template declares the node hidden after expectations were collected.
       mockFlowCore.templateVisibilityRegistry.setNodeHidden('node1', true);
+      initUpdater.refreshHiddenEntities();
+      await Promise.resolve();
+
+      expect(initUpdater.isInitialized).toBe(true);
+    });
+
+    it('should stop waiting for a label of an edge whose id contains -> once it becomes hidden', async () => {
+      const edge = createMockEdge('a->b');
+      mockRenderedModel = { nodes: [], edges: [edge] };
+      setStateFromModel();
+      initUpdater = new InitUpdater(mockFlowCore as unknown as FlowCore);
+
+      initUpdater.start(mockRenderedModel.nodes, mockRenderedModel.edges);
+      initUpdater.addEdgeLabel('a->b', createMockEdgeLabel('l'));
+
+      await vi.advanceTimersByTimeAsync(STABILITY_DELAY);
+
+      // The label is visible and unmeasured, so it blocks initialization.
+      expect(initUpdater.isInitialized).toBe(false);
+
+      // The template declares the label hidden after expectations were collected.
+      mockFlowCore.templateVisibilityRegistry.setLabelHidden('a->b', 'l', true);
       initUpdater.refreshHiddenEntities();
       await Promise.resolve();
 
