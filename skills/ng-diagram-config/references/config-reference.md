@@ -70,7 +70,7 @@ Merging: objects merge key by key; arrays and functions replace the old value; `
 
 | Key | Default | Meaning |
 | --- | --- | --- |
-| `portSnapDistance` | `10` | Distance in flow units (pixels at zoom 1) at which the drawn edge snaps to a port. The TSDoc says "pixels", but the check runs on flow positions. |
+| `portSnapDistance` | `10` | Distance in flow units (pixels at zoom 1) at which the drawn edge snaps to a port. The on-screen distance changes with zoom. |
 | `validateConnection(source, sourcePort, target, targetPort, context?)` | `() => true` | Allows or rejects a connection. Since 1.4.0 `source`/`target` can be `null` (free end) and `context.reason` is `'draw'`, `'relink'` or `'attach'`. |
 | `temporaryEdgeDataBuilder(edge)` | returns a copy | Shapes the preview edge shown while drawing or relinking. |
 | `finalEdgeDataBuilder(edge)` | returns a copy | Shapes the edge added when a draw ends; it receives the edge with its new id. |

@@ -116,7 +116,10 @@ The Edge object to use for the finalized edge.
 
 > **portSnapDistance**: `number`
 
-The maximum distance (in pixels) at temporary edge will snap to target port.
+The temporary edge can snap to a port only when the pointer is at most
+this distance away from the port. The distance is in flow coordinates
+(diagram units), not in screen pixels. On the screen, the snap distance
+changes with the zoom level: at zoom 2 it is twice this value.
 
 #### Default
 

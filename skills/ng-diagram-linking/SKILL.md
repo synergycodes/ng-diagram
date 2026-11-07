@@ -65,7 +65,7 @@ export class DiagramComponent {
 
 | `linking` option | Default | Effect |
 | --- | --- | --- |
-| `portSnapDistance` | `10` | Distance from the port's box at which the preview snaps. Flow units, so the on-screen distance changes with zoom (the TSDoc says pixels). |
+| `portSnapDistance` | `10` | Distance from the port's box at which the preview snaps. Flow units, so the on-screen distance changes with zoom. |
 | `selectNodeOnPortPress` | `true` | Pressing a port also selects its node (since 1.2.0). |
 | `edgePanningEnabled` / `edgePanningThreshold` / `edgePanningForce` | `true` / `30` / `10` | Pan the viewport while the pointer is within the threshold (px) of the diagram edge. Needs `viewportPanningEnabled`. |
 | `validateConnection` | allows all | See Rules. |
