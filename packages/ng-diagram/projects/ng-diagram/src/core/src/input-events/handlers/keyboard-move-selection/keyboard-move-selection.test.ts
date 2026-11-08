@@ -407,7 +407,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
         });
       });
 
-      it('should filter out non-draggable child in a group', () => {
+      it('should move a non-draggable child with its moving group', () => {
         const parentNode = { ...mockNode, id: 'parent', draggable: true };
         const draggableChild = { ...mockNode, id: 'child1', groupId: 'parent', draggable: true };
         const nonDraggableChild = { ...mockNode, id: 'child2', groupId: 'parent', draggable: false };
@@ -421,7 +421,7 @@ describe('KeyboardMoveSelectionEventHandler', () => {
         instance.handle(event);
 
         expect(mockCommandHandler.emit).toHaveBeenCalledWith('moveNodesBy', {
-          nodes: [parentNode, draggableChild],
+          nodes: [parentNode, draggableChild, nonDraggableChild],
           delta: { x: 10, y: 0 },
         });
       });
