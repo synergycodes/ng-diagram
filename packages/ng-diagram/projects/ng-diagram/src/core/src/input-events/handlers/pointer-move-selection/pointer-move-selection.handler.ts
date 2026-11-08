@@ -51,7 +51,6 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       }
       case 'continue': {
         const selectedNodesWithChildren = this.draggableSelection();
-        const selectedNodes = this.visibleSelection();
         // Un-awaited handle() calls interleave at every await (see EventHandler.handle)
         // — snapshot values before the first suspension and re-validate the gesture
         // after it, or moves get double-applied.
@@ -78,6 +77,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           };
         }
 
+        const movedSelection = this.movedSelection(this.flow.actionStateManager.dragging?.nodeIds ?? []);
         const delta = NgDiagramMath.subtractPoints(pointer, lastPointerPosition);
         const shouldMove = gesture.hasMoved;
 
@@ -103,7 +103,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
               nodes: selectedNodesWithChildren,
             });
 
-            this.updateGroupHighlightOnDrag(tx, pointer, selectedNodes);
+            this.updateGroupHighlightOnDrag(tx, pointer, movedSelection);
           });
           this.panDiagramOnScreenEdge(event.panningForce);
         }
@@ -136,7 +136,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
                   nodes: this.draggableSelection(),
                 });
               }
-              await this.handleDrop(pointer);
+              await this.handleDrop(pointer, draggedNodeIds);
             } finally {
               // moveNodesStop must fire even when the drop rejects (a user config
               // callback can throw inside addToGroup) — app code pairs the
@@ -255,18 +255,21 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
   }
 
   /**
-   * The visible selected nodes — the set group interactions act on.
-   * A still-selected but effectively hidden node did not take part in the
-   * gesture and must not be re-parented (addToGroup/removeFromGroup) or
-   * influence the group highlight.
+   * The visible selected nodes that move in this drag — the set group
+   * interactions act on. A selected node that stays in place (hidden, or
+   * frozen by a non-draggable group) did not take part in the gesture and
+   * must not be re-parented (addToGroup/removeFromGroup) or influence the
+   * group highlight.
    */
-  private visibleSelection(): Node[] {
-    return this.flow.modelLookup.getSelectedNodes().filter((node) => !node.computedHidden);
+  private movedSelection(movedNodeIds: string[]): Node[] {
+    return this.flow.modelLookup
+      .getSelectedNodes()
+      .filter((node) => !node.computedHidden && movedNodeIds.includes(node.id));
   }
 
-  private async handleDrop(point: Point) {
+  private async handleDrop(point: Point, movedNodeIds: string[]) {
     const topLevelGroupNode = this.getTopGroupAtPoint(point);
-    const selectedNodes = this.visibleSelection();
+    const selectedNodes = this.movedSelection(movedNodeIds);
 
     if (!topLevelGroupNode) {
       for (const node of selectedNodes) {

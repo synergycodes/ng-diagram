@@ -26,8 +26,8 @@ All start/end pairs always come together and report the nodes of their own gestu
 
 | Event | Payload | Fires |
 | --- | --- | --- |
-| `nodeDragStarted` (since 1.1.0) | `NodeDragStartedEvent { nodes: Node[] }` | Once the pointer has moved a few pixels with nodes pressed. `nodes` = selected draggable nodes plus descendants of dragged groups. A click without movement fires no drag events. |
-| `nodeDragEnded` (since 1.1.0) | `NodeDragEndedEvent { nodes: Node[]; cancelReason?: 'cancelled' }` | On release (after the final move and any group drop) or on cancel. Final positions. |
+| `nodeDragStarted` (since 1.1.0) | `NodeDragStartedEvent { nodes: Node[] }` | Once the pointer has moved a few pixels with nodes pressed. `nodes` = the nodes that move: each selected node whose outermost selected group (or the node itself, when no selected group contains it) is visible and not `draggable: false`, plus all descendants of moving groups, `draggable: false` ones included. A click without movement fires no drag events. |
+| `nodeDragEnded` (since 1.1.0) | `NodeDragEndedEvent { nodes: Node[]; cancelReason?: 'cancelled' }` | On release (after the final move and any group drop) or on cancel. `nodes` = the same nodes as `nodeDragStarted`, with final positions. |
 | `nodeResizeStarted` (since 1.1.0) | `NodeResizeStartedEvent { node: Node }` | pointerdown on a resize handle. |
 | `nodeResized` | `NodeResizedEvent { node: Node; previousSize: Size }` | Each size change of a resize gesture and each `NgDiagramNodeService.resizeNode()` call that changes the size. |
 | `nodeResizeEnded` (since 1.1.0) | `NodeResizeEndedEvent { node: Node; cancelReason?: 'cancelled' }` | On release or on cancel. Final size. |

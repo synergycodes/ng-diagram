@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Dragging the selection or moving it with the arrow keys no longer moves the children of a `draggable: false` group that is selected or inside a selected group, so the group's visible and hidden content stays in place together ([#846](https://github.com/synergycodes/ng-diagram/pull/846))
+- `draggable: false` now only blocks a move that starts from that node: dragging the selection or moving it with the arrow keys no longer moves the children of a selected `draggable: false` group, so its visible and hidden content stays in place together, also the selected children, while a `draggable: false` node inside a moving group now moves with that group, together with its subtree ([#846](https://github.com/synergycodes/ng-diagram/pull/846))
 
 ## [1.4.0] - 2026-10-02
 

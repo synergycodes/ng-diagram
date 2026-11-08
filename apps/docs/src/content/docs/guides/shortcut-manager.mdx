@@ -45,10 +45,11 @@ above). Exactly one of them handles each key press:
 
 - **The selection moves** when node dragging is enabled
   ([`nodeDraggingEnabled`](/docs/api/types/configuration/flowconfig#nodedraggingenabled)) and at least one selected
-  node can move: it is visible, it is not `draggable: false`, and no selected group that contains it at any depth has
-  `draggable: false`.
-- **The viewport pans** in every other case: nothing is selected, `nodeDraggingEnabled` is `false`, or every selected
-  node is hidden, is `draggable: false`, or sits inside a selected `draggable: false` group. Panning requires
+  node can move. A selected node moves with the outermost selected group that contains it, or on its own when no
+  selected group contains it. That group or node must be visible and not `draggable: false`; a `draggable: false`
+  node inside a moving group still moves with that group.
+- **The viewport pans** in every other case: nothing is selected, `nodeDraggingEnabled` is `false`, or no selected
+  node can move. Panning requires
   [`viewportPanningEnabled`](/docs/api/types/configuration/flowconfig#viewportpanningenabled).
 
 A selection that cannot move never blocks the arrow keys.

@@ -134,7 +134,7 @@ While a transaction runs, it logs `[ngDiagram] cancelActiveInteraction() called 
 
 Each arrow key is bound to a move action and a pan action, and only one of them runs:
 
-- The selection moves when `nodeDraggingEnabled` is `true` and at least one selected node can move: it is visible, it is not `draggable: false`, and no selected group that contains it at any depth has `draggable: false`. A press moves by the drag snap step (`snapping.defaultDragSnap`, 10 px by default, or `computeSnapForNodeDrag`), even when drag snapping is off.
+- The selection moves when `nodeDraggingEnabled` is `true` and at least one selected node can move. A selected node moves with the outermost selected group that contains it, or on its own when no selected group contains it; that group or node must be visible and not `draggable: false`. A `draggable: false` node inside a moving group moves with it. A press moves by the drag snap step (`snapping.defaultDragSnap`, 10 px by default, or `computeSnapForNodeDrag`), even when drag snapping is off.
 - Otherwise the viewport pans 10 px per press, if `viewportPanningEnabled` is `true`. Since 1.4.0; before, the arrow keys did nothing while the selected nodes could not move.
 - Keyboard moves fire `selectionMoved`, not `nodeDragStarted` / `nodeDragEnded`.
 - If you add letter keys for moving (WASD), add them to the `keyboardPan*` actions too, or they do nothing when nothing can move.

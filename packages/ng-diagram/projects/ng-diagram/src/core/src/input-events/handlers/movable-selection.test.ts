@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { FlowCore } from '../../flow-core';
 import type { Node } from '../../types';
-import { getMovableSelection } from './movable-selection';
+import { getMovableSelection, movesOnPress } from './movable-selection';
 
 describe('getMovableSelection', () => {
   const createNode = (id: string, overrides: Partial<Node> = {}): Node => ({
@@ -119,17 +119,22 @@ describe('getMovableSelection', () => {
     expect(getMovableSelection(createFlow([group, child, grandchild]))).toEqual([]);
   });
 
-  it('should keep the whole subtree of a non-draggable child group in place when its draggable parent moves', () => {
+  it('should move a non-draggable child group with its whole subtree when its draggable parent moves', () => {
     const outer = createNode('outer', { selected: true, isGroup: true } as Partial<Node>);
     const inner = createNode('inner', { groupId: 'outer', isGroup: true, draggable: false } as Partial<Node>);
     const innerVisible = createNode('inner-visible', { groupId: 'inner' });
     const innerHidden = createNode('inner-hidden', { groupId: 'inner', computedHidden: true });
     const sibling = createNode('sibling', { groupId: 'outer' });
+    const nodes = [outer, inner, innerVisible, innerHidden, sibling];
 
-    expect(getMovableSelection(createFlow([outer, inner, innerVisible, innerHidden, sibling]))).toEqual([
-      outer,
-      sibling,
-    ]);
+    expect(getMovableSelection(createFlow(nodes))).toEqual(nodes);
+  });
+
+  it('should move a selected non-draggable child with its moving parent group', () => {
+    const group = createNode('group', { selected: true, isGroup: true } as Partial<Node>);
+    const lockedChild = createNode('locked-child', { selected: true, groupId: 'group', draggable: false });
+
+    expect(getMovableSelection(createFlow([group, lockedChild]))).toEqual([group, lockedChild]);
   });
 
   it('should exclude selected descendants of a selected non-draggable group', () => {
@@ -145,5 +150,28 @@ describe('getMovableSelection', () => {
     const child = createNode('child', { selected: true, groupId: 'locked-group' });
 
     expect(getMovableSelection(createFlow([child]))).toEqual([child]);
+  });
+
+  describe('movesOnPress', () => {
+    it('should reject a press on a selected child of a selected non-draggable group', () => {
+      const group = createNode('group', { selected: true, isGroup: true, draggable: false } as Partial<Node>);
+      const child = createNode('child', { selected: true, groupId: 'group' });
+
+      expect(movesOnPress(createFlow([group, child]), child)).toBe(false);
+    });
+
+    it('should accept a press on a selected non-draggable child of a selected draggable group', () => {
+      const group = createNode('group', { selected: true, isGroup: true } as Partial<Node>);
+      const child = createNode('child', { selected: true, groupId: 'group', draggable: false });
+
+      expect(movesOnPress(createFlow([group, child]), child)).toBe(true);
+    });
+
+    it('should judge an unselected node by its own draggable flag', () => {
+      const flow = createFlow([]);
+
+      expect(movesOnPress(flow, createNode('a'))).toBe(true);
+      expect(movesOnPress(flow, createNode('b', { draggable: false }))).toBe(false);
+    });
   });
 });

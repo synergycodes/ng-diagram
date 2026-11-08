@@ -111,7 +111,8 @@ Groups can be visually selected with built-in functionality.
 
 All group and child node positions are defined in the **global coordinate system**.
 Adding a node to a group does **not** change its coordinates.
-When a group moves, all its children move by the same delta, preserving their relative positions.
+When a group moves, all its children move by the same delta, preserving their relative positions, also the children with `draggable: false`.
+A selected group with `draggable: false` does not move when the selection is dragged or moved with the arrow keys, and neither does any node inside it, also when it is selected.
 
 ---
 

@@ -11,7 +11,7 @@ Group nodes and their children: model wiring, custom group templates, membership
 ## Rules
 
 - **A group is a node with `isGroup: true`; children point to it with `groupId`.** A custom template alone gives no group behavior — `type` only picks the template.
-- **All positions are global** (diagram coordinates), for groups and children alike. Joining or leaving a group never changes a position. Dragging a group moves all its descendants, but moving from code moves only what you pass: `updateNode(groupId, { position })` and `moveNodesBy([group], …)` leave the children in place.
+- **All positions are global** (diagram coordinates), for groups and children alike. Joining or leaving a group never changes a position. Dragging a group moves all its descendants, `draggable: false` ones included; a selected group with `draggable: false` stays in place with its whole subtree, selected descendants included. Moving from code moves only what you pass: `updateNode(groupId, { position })` and `moveNodesBy([group], …)` leave the children in place.
 - **Give groups `size` and `autoSize: false`.** Otherwise the default group template is a fixed 9.0625rem square (145 × 145 px at the default font size), and a custom group template takes the size of its content.
 - **Change membership through `NgDiagramGroupsService`.** It applies `grouping.canGroup`, prevents cycles and fires `groupMembershipChanged`. Writing `groupId` yourself skips the first two.
 - **Deleting a group deletes its whole subtree** — with `deleteSelection` always, with `NgDiagramModelService.deleteNodes` since 1.4.0. To keep the children, remove them from the group first, in a separate awaited call.
@@ -90,7 +90,7 @@ export const config = { grouping, resize } satisfies NgDiagramConfig;
 
 ## Membership by drag and drop
 
-- On drop, the topmost unselected group under the **pointer** receives the dragged (visible, selected) nodes. When no group is under the pointer, the dropped nodes leave their group, unless their group is part of the drag. How much the node overlaps the group does not matter.
+- On drop, the topmost unselected group under the **pointer** receives the dragged nodes (the visible selected nodes that move; a selected node that stays in place keeps its group). When no group is under the pointer, the dropped nodes leave their group, unless their group is part of the drag. How much the node overlaps the group does not matter.
 - While dragging, the group under the pointer gets `highlighted: true` when `canGroup` accepts at least one dragged node.
 - `grouping.canGroup(node, group)` gets the candidate node first, then the group (default `() => true`). A node rejected on drop keeps its old `groupId`.
 - A palette drop never joins a group by itself — see the `onPaletteDrop` recipe below.
