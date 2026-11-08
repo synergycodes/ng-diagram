@@ -1,5 +1,6 @@
 import type { FlowCore } from '../../flow-core';
 import type { Node } from '../../types';
+import type { InputModifiers } from '../input-events.interface';
 
 /**
  * Selected nodes (with their descendants) eligible for interactive movement —
@@ -56,8 +57,20 @@ export const hasMovableSelection = (flow: FlowCore): boolean =>
   flow.config.nodeDraggingEnabled && getMovableSelection(flow).length > 0;
 
 /**
- * Whether a drag that starts from the pressed node would move it. A selected node follows the rule of
- * `getMovableSelection`. An unselected node becomes the selection on press, so it moves when it is draggable.
+ * Whether a drag that starts from the pressed node would move it. A press on a non-draggable node never starts
+ * a drag. A node that is or joins the selection set follows the rule of `getMovableSelection`: a selected node,
+ * or an unselected descendant of a selected node that the multi-selection modifier adds to the selection.
+ * Any other unselected node becomes the selection or tops its own chain, so it moves.
  */
-export const movesOnPress = (flow: FlowCore, node: Node): boolean =>
-  node.selected ? getMovableSelection(flow).some(({ id }) => id === node.id) : node.draggable !== false;
+export const movesOnPress = (flow: FlowCore, node: Node, modifiers: InputModifiers): boolean => {
+  if (node.draggable === false) return false;
+
+  const inSelection = flow.modelLookup
+    .getSelectedNodesWithChildren({ directOnly: false })
+    .some(({ id }) => id === node.id);
+  if (!inSelection || (!node.selected && !flow.shortcutManager.matchesAction('multiSelection', { modifiers }))) {
+    return true;
+  }
+
+  return getMovableSelection(flow).some(({ id }) => id === node.id);
+};

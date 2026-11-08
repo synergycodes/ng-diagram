@@ -104,7 +104,7 @@ The position also updates automatically when a user **moves the node** by draggi
 
 Node dragging is enabled by default. You can disable it per node with [`draggable: false`](/docs/api/types/model/simplenode#draggable) or globally with [`nodeDraggingEnabled: false`](/docs/api/types/configuration/flowconfig#nodedraggingenabled) in the diagram configuration. The per-node [`draggable`](/docs/api/types/model/simplenode#draggable) property takes priority over the global setting.
 
-`draggable: false` only blocks a move that starts from that node. A selected group with `draggable: false` keeps its whole subtree in place, visible and hidden children included, also the selected ones, when the selection is dragged or moved with the arrow keys. Inside a group that moves, a node with `draggable: false` still moves with that group, together with its subtree. A child selected without its non-draggable group can still be dragged.
+`draggable: false` only blocks a move that starts from that node: a press on it does not start a drag. A selected group with `draggable: false` keeps its whole subtree in place, visible and hidden children included, also the selected ones, when the selection is dragged or moved with the arrow keys. Inside a group that moves, a node with `draggable: false` still moves with that group, together with its subtree. A child selected without its non-draggable group can still be dragged.
 
 ## Size
 

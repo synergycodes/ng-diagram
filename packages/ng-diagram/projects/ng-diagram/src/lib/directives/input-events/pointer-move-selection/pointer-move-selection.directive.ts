@@ -204,7 +204,9 @@ export class PointerMoveSelectionDirective implements OnDestroy {
     const flowCore = this.flowCoreProvider.provide();
     const targetData = this.targetData();
     // A press on a node that would not move falls through to panning.
-    const isDraggable = flowCore.config.nodeDraggingEnabled && (!targetData || movesOnPress(flowCore, targetData));
+    const isDraggable =
+      flowCore.config.nodeDraggingEnabled &&
+      (!targetData || movesOnPress(flowCore, targetData, this.inputEventsRouter.getBaseEvent(event).modifiers));
     if (!isDraggable || shouldDiscardEvent(event, 'drag')) {
       return false;
     }

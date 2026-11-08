@@ -132,7 +132,8 @@ export interface SimpleNode<T extends DataObject = DataObject> {
   /**
    * Whether a move can start from the node, by a pointer drag or by the arrow keys. Defaults to `true`.
    *
-   * When `false`, the node stays in place when it is selected, and a press on it does not start a drag.
+   * When `false`, the node stays in place when it is selected, unless a selected group that contains it moves,
+   * and a press on it does not start a drag.
    * For a group, its whole subtree stays in place too, visible and hidden, also the descendants that are selected.
    * A node with `draggable: false` inside a group that moves still moves with that group, together with its subtree.
    * A node inside a non-draggable group still moves when it is selected without that group.
