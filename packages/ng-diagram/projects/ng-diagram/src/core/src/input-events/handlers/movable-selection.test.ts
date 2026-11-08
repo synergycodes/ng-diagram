@@ -159,53 +159,25 @@ describe('getMovableSelection', () => {
   });
 
   describe('movesOnPress', () => {
-    const modifiers = { primary: false, secondary: false, shift: false, meta: false };
-    const createPressFlow = (selectedWithChildren: Node[], multiSelection = false): FlowCore =>
-      ({
-        ...createFlow(selectedWithChildren),
-        shortcutManager: { matchesAction: (action: string) => multiSelection && action === 'multiSelection' },
-      }) as unknown as FlowCore;
-
     it('should reject a press on a selected child of a selected non-draggable group', () => {
       const group = createNode('group', { selected: true, isGroup: true, draggable: false } as Partial<Node>);
       const child = createNode('child', { selected: true, groupId: 'group' });
 
-      expect(movesOnPress(createPressFlow([group, child]), child, modifiers)).toBe(false);
+      expect(movesOnPress(createFlow([group, child]), child)).toBe(false);
     });
 
-    it('should reject a press on a selected non-draggable child of a selected draggable group', () => {
+    it('should accept a press on a selected non-draggable child of a selected draggable group', () => {
       const group = createNode('group', { selected: true, isGroup: true } as Partial<Node>);
       const child = createNode('child', { selected: true, groupId: 'group', draggable: false });
 
-      expect(movesOnPress(createPressFlow([group, child]), child, modifiers)).toBe(false);
+      expect(movesOnPress(createFlow([group, child]), child)).toBe(true);
     });
 
     it('should judge an unselected node by its own draggable flag', () => {
-      const flow = createPressFlow([]);
+      const flow = createFlow([]);
 
-      expect(movesOnPress(flow, createNode('a'), modifiers)).toBe(true);
-      expect(movesOnPress(flow, createNode('b', { draggable: false }), modifiers)).toBe(false);
-    });
-
-    it('should accept a press on an unselected child of a selected non-draggable group without the multi-selection modifier', () => {
-      const group = createNode('group', { selected: true, isGroup: true, draggable: false } as Partial<Node>);
-      const child = createNode('child', { groupId: 'group' });
-
-      expect(movesOnPress(createPressFlow([group, child]), child, modifiers)).toBe(true);
-    });
-
-    it('should reject a multi-selection press on an unselected child of a selected non-draggable group', () => {
-      const group = createNode('group', { selected: true, isGroup: true, draggable: false } as Partial<Node>);
-      const child = createNode('child', { groupId: 'group' });
-
-      expect(movesOnPress(createPressFlow([group, child], true), child, modifiers)).toBe(false);
-    });
-
-    it('should accept a multi-selection press on an unselected child of a selected draggable group', () => {
-      const group = createNode('group', { selected: true, isGroup: true } as Partial<Node>);
-      const child = createNode('child', { groupId: 'group' });
-
-      expect(movesOnPress(createPressFlow([group, child], true), child, modifiers)).toBe(true);
+      expect(movesOnPress(flow, createNode('a'))).toBe(true);
+      expect(movesOnPress(flow, createNode('b', { draggable: false }))).toBe(false);
     });
   });
 });
