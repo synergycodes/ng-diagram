@@ -119,15 +119,17 @@ describe('getMovableSelection', () => {
     expect(getMovableSelection(createFlow([group, child, grandchild]))).toEqual([]);
   });
 
-  it('should move a non-draggable child group with its whole subtree when its draggable parent moves', () => {
+  it('should keep the whole subtree of a non-draggable child group in place when its draggable parent moves', () => {
     const outer = createNode('outer', { selected: true, isGroup: true } as Partial<Node>);
     const inner = createNode('inner', { groupId: 'outer', isGroup: true, draggable: false } as Partial<Node>);
     const innerVisible = createNode('inner-visible', { groupId: 'inner' });
     const innerHidden = createNode('inner-hidden', { groupId: 'inner', computedHidden: true });
     const sibling = createNode('sibling', { groupId: 'outer' });
-    const nodes = [outer, inner, innerVisible, innerHidden, sibling];
 
-    expect(getMovableSelection(createFlow(nodes))).toEqual(nodes);
+    expect(getMovableSelection(createFlow([outer, inner, innerVisible, innerHidden, sibling]))).toEqual([
+      outer,
+      sibling,
+    ]);
   });
 
   it('should move a selected non-draggable child with its moving parent group', () => {
