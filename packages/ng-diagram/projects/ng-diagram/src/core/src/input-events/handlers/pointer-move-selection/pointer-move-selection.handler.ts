@@ -51,6 +51,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
       }
       case 'continue': {
         const selectedNodesWithChildren = this.draggableSelection();
+        const movedSelection = this.movedSelection(selectedNodesWithChildren);
         // Un-awaited handle() calls interleave at every await (see EventHandler.handle)
         // — snapshot values before the first suspension and re-validate the gesture
         // after it, or moves get double-applied.
@@ -77,7 +78,6 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
           };
         }
 
-        const movedSelection = this.movedSelection(this.flow.actionStateManager.dragging?.nodeIds ?? []);
         const delta = NgDiagramMath.subtractPoints(pointer, lastPointerPosition);
         const shouldMove = gesture.hasMoved;
 
@@ -136,7 +136,7 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
                   nodes: this.draggableSelection(),
                 });
               }
-              await this.handleDrop(pointer, draggedNodeIds);
+              await this.handleDrop(pointer);
             } finally {
               // moveNodesStop must fire even when the drop rejects (a user config
               // callback can throw inside addToGroup) — app code pairs the
@@ -261,15 +261,20 @@ export class PointerMoveSelectionEventHandler extends EventHandler<PointerMoveSe
    * must not be re-parented (addToGroup/removeFromGroup) or influence the
    * group highlight.
    */
-  private movedSelection(movedNodeIds: string[]): Node[] {
-    return this.flow.modelLookup
-      .getSelectedNodes()
-      .filter((node) => !node.computedHidden && movedNodeIds.includes(node.id));
+  private movedSelection(movable: Node[]): Node[] {
+    const movableIds = new Set(movable.map(({ id }) => id));
+    const stayingIds = new Set(
+      this.flow.modelLookup
+        .getSelectedNodesWithChildren({ directOnly: false })
+        .filter(({ id }) => !movableIds.has(id))
+        .map(({ id }) => id)
+    );
+    return this.flow.modelLookup.getSelectedNodes().filter((node) => !node.computedHidden && !stayingIds.has(node.id));
   }
 
-  private async handleDrop(point: Point, movedNodeIds: string[]) {
+  private async handleDrop(point: Point) {
     const topLevelGroupNode = this.getTopGroupAtPoint(point);
-    const selectedNodes = this.movedSelection(movedNodeIds);
+    const selectedNodes = this.movedSelection(this.draggableSelection());
 
     if (!topLevelGroupNode) {
       for (const node of selectedNodes) {
