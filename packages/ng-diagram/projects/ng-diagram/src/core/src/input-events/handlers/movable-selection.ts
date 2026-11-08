@@ -60,15 +60,19 @@ export const hasMovableSelection = (flow: FlowCore): boolean =>
  * Whether a drag that starts from the pressed node would move it. A press on a non-draggable node never starts
  * a drag. A node that is or joins the selection set follows the rule of `getMovableSelection`: a selected node,
  * or an unselected descendant of a selected node that the multi-selection modifier adds to the selection.
- * Any other unselected node becomes the selection or tops its own chain, so it moves.
+ * Any other unselected node becomes the selection or tops its own chain, so it moves. Without `modifiers`, the
+ * press is judged as a press without the multi-selection modifier.
  */
-export const movesOnPress = (flow: FlowCore, node: Node, modifiers: InputModifiers): boolean => {
+export const movesOnPress = (flow: FlowCore, node: Node, modifiers?: InputModifiers): boolean => {
   if (node.draggable === false) return false;
 
   const inSelection = flow.modelLookup
     .getSelectedNodesWithChildren({ directOnly: false })
     .some(({ id }) => id === node.id);
-  if (!inSelection || (!node.selected && !flow.shortcutManager.matchesAction('multiSelection', { modifiers }))) {
+  if (
+    !inSelection ||
+    (!node.selected && !(modifiers && flow.shortcutManager.matchesAction('multiSelection', { modifiers })))
+  ) {
     return true;
   }
 
