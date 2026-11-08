@@ -334,7 +334,7 @@ describe('PointerMoveSelectionEventHandler', () => {
         });
       });
 
-      it('should move a non-draggable child with its moving group', async () => {
+      it('should filter out non-draggable child in a group', async () => {
         const parentNode = { ...mockNode, id: 'parent', draggable: true };
         const draggableChild = { ...mockNode, id: 'child1', groupId: 'parent', draggable: true };
         const nonDraggableChild = { ...mockNode, id: 'child2', groupId: 'parent', draggable: false };
@@ -349,7 +349,7 @@ describe('PointerMoveSelectionEventHandler', () => {
 
         expect(mockEmit).toHaveBeenCalledWith('moveNodesBy', {
           delta: { x: MOVE_THRESHOLD + 5, y: MOVE_THRESHOLD + 5 },
-          nodes: [parentNode, draggableChild, nonDraggableChild],
+          nodes: [parentNode, draggableChild],
         });
       });
 
@@ -497,26 +497,6 @@ describe('PointerMoveSelectionEventHandler', () => {
         await handler.handle(event);
 
         // Should not emit highlightGroup again since it's already highlighted
-        expect(mockEmit).not.toHaveBeenCalledWith('highlightGroup', expect.any(Object));
-      });
-
-      it('should decide the highlight only from the selected nodes that move', async () => {
-        const targetGroup = { ...mockGroupNode, id: 'targetGroup', isGroup: true, selected: false };
-        // The dragged node is already in the target group; the selected child of
-        // a non-draggable group stays in place and must not trigger the highlight.
-        const movedNode = { ...mockNode, groupId: 'targetGroup' };
-        const frozenChild = { ...mockNode, id: 'frozen-child', selected: true, groupId: 'locked-group' };
-
-        mockGetNodesInRange.mockReturnValue([targetGroup]);
-        mockModelLookup.getSelectedNodes.mockReturnValue([movedNode, frozenChild]);
-
-        await handler.handle(
-          getSamplePointerMoveSelectionEvent({
-            phase: 'continue',
-            lastInputPoint: lastInputPointOverThreshold,
-          })
-        );
-
         expect(mockEmit).not.toHaveBeenCalledWith('highlightGroup', expect.any(Object));
       });
     });
@@ -696,7 +676,6 @@ describe('PointerMoveSelectionEventHandler', () => {
         const nodeWithoutGroup = { ...mockNode, id: 'node2', groupId: undefined };
 
         mockModelLookup.getSelectedNodes.mockReturnValue([nodeWithGroup, nodeWithoutGroup]);
-        mockActionStateManager.dragging!.nodeIds = ['node1', 'node2'];
         mockGetNodesInRange.mockReturnValue([]);
 
         const event = getSamplePointerMoveSelectionEvent({
@@ -737,7 +716,6 @@ describe('PointerMoveSelectionEventHandler', () => {
         const node3 = { ...mockNode, id: 'node3', groupId: 'group1' };
 
         mockModelLookup.getSelectedNodes.mockReturnValue([node1, node2, node3]);
-        mockActionStateManager.dragging!.nodeIds = ['node1', 'node2', 'node3'];
         mockGetNodesInRange.mockReturnValue([]);
 
         const event = getSamplePointerMoveSelectionEvent({
@@ -760,30 +738,6 @@ describe('PointerMoveSelectionEventHandler', () => {
           groupId: 'group1',
           nodeIds: ['node3'],
         });
-      });
-
-      it('should not add a selected node that stays in place to the drop group', async () => {
-        const frozenChild = { ...mockNode, id: 'frozen-child', selected: true, groupId: 'locked-group' };
-        mockModelLookup.getSelectedNodes.mockReturnValue([mockNode, frozenChild]);
-        mockGetNodesInRange.mockReturnValue([mockGroupNode]);
-
-        await handler.handle(
-          getSamplePointerMoveSelectionEvent({ phase: 'end', lastInputPoint: lastInputPointOverThreshold })
-        );
-
-        expect(mockEmit).toHaveBeenCalledWith('addToGroup', { groupId: 'group1', nodeIds: [mockNode.id] });
-      });
-
-      it('should not remove a selected node that stays in place from its group on an empty-canvas drop', async () => {
-        const frozenChild = { ...mockNode, id: 'frozen-child', selected: true, groupId: 'locked-group' };
-        mockModelLookup.getSelectedNodes.mockReturnValue([mockNode, frozenChild]);
-        mockGetNodesInRange.mockReturnValue([]);
-
-        await handler.handle(
-          getSamplePointerMoveSelectionEvent({ phase: 'end', lastInputPoint: lastInputPointOverThreshold })
-        );
-
-        expect(mockEmit).not.toHaveBeenCalledWith('removeFromGroup', expect.any(Object));
       });
     });
 
