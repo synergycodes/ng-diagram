@@ -151,7 +151,10 @@ export interface RotationActionState {
  * @category Internals
  */
 export interface DraggingActionState {
-  /** IDs of all nodes participating in the drag (selected + children, filtered by draggable). */
+  /**
+   * IDs of all nodes that move in this drag: the selected nodes whose top selected group (or the node itself,
+   * when no selected group contains it) is visible and draggable, plus every descendant of a moving node.
+   */
   nodeIds: string[];
   /** Input modifiers (e.g., Ctrl, Shift) active during the drag. */
   modifiers: InputModifiers;
