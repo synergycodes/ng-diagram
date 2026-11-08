@@ -166,11 +166,15 @@ describe('getMovableSelection', () => {
       expect(movesOnPress(createFlow([group, child]), child)).toBe(false);
     });
 
-    it('should accept a press on a selected non-draggable child of a selected draggable group', () => {
+    it('should reject a press on a non-draggable child even when its selected group can move', () => {
+      // draggable: false only blocks a drag that starts from the node itself; the
+      // child still moves when the drag starts from its group.
       const group = createNode('group', { selected: true, isGroup: true } as Partial<Node>);
       const child = createNode('child', { selected: true, groupId: 'group', draggable: false });
+      const flow = createFlow([group, child]);
 
-      expect(movesOnPress(createFlow([group, child]), child)).toBe(true);
+      expect(movesOnPress(flow, child)).toBe(false);
+      expect(getMovableSelection(flow)).toEqual([group, child]);
     });
 
     it('should judge an unselected node by its own draggable flag', () => {
