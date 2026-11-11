@@ -1,0 +1,51 @@
+---
+/**
+ * Loads the consent manager, Google Tag Manager and the Leadfeeder tracker
+ * (config/analytics.ts). `Layout` renders it in <head> only when the build has
+ * LANDING_ANALYTICS=true.
+ */
+import { GTM_ID, LEADFEEDER_ID, PIWIK_PRO } from '../config/analytics';
+---
+
+<script
+  is:inline
+  define:vars={{
+    piwikHost: PIWIK_PRO.host,
+    piwikContainer: PIWIK_PRO.containerId,
+    gtmId: GTM_ID,
+    leadfeederId: LEADFEEDER_ID,
+  }}
+>
+  /** Starts loading a script without blocking the page. */
+  const load = (src) => {
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = src;
+    document.head.append(script);
+  };
+  // The consent manager starts loading first, then the tag manager; both read `dataLayer`.
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ start: new Date().getTime(), event: 'stg.start' });
+  load(`${piwikHost}/${piwikContainer}.js`);
+  // Calls to ppms.tm.api and ppms.cm.api wait in `dataLayer` until the container loads.
+  window.ppms = window.ppms || {};
+  for (const name of ['tm', 'cm']) {
+    const stub = (window.ppms[name] = window.ppms[name] || {});
+    stub.api =
+      stub.api ||
+      function (...args) {
+        if (typeof args[0] === 'string') {
+          window.dataLayer.push({ event: `ppms.${name}:${args[0]}`, parameters: args.slice(1) });
+        }
+      };
+  }
+  window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+  load(`https://www.googletagmanager.com/gtm.js?id=${gtmId}`);
+  // Calls to ldfdr wait in its queue until the tracker loads.
+  window.ldfdr =
+    window.ldfdr ||
+    function (...args) {
+      (window.ldfdr._q = window.ldfdr._q || []).push(args);
+    };
+  load(`https://sc.lfeeder.com/lftracker_v1_${leadfeederId}.js`);
+</script>

@@ -1,8 +1,11 @@
 ---
 import { Font } from 'astro:assets';
+import { LANDING_ANALYTICS } from 'astro:env/server';
 import appleTouchIcon from '../../../docs/public/apple-touch-icon.png?url';
 import favicon from '../../../docs/public/favicon.svg?url';
+import Analytics from '../components/Analytics.astro';
 import Sprite from '../components/Sprite.astro';
+import { GTM_ID } from '../config/analytics';
 import { LINKS, SITE } from '../config/landing';
 import '../styles/global.css';
 
@@ -68,6 +71,7 @@ const structuredData = {
     }
     <Font cssVariable="--font-roboto" preload={[{ weight: 400 }, { weight: 700 }]} />
     <Font cssVariable="--font-roboto-mono" />
+    {LANDING_ANALYTICS && <Analytics />}
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>
@@ -129,6 +133,19 @@ const structuredData = {
     <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   </head>
   <body>
+    {
+      LANDING_ANALYTICS && (
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            title="Google Tag Manager"
+            height="0"
+            width="0"
+            style="display: none; visibility: hidden"
+          />
+        </noscript>
+      )
+    }
     <a class="skip-main" href="#main">Skip to main content</a>
     <Sprite />
     <slot />

@@ -1,7 +1,7 @@
 // @ts-check
 import { fileURLToPath } from 'node:url';
 import angular from '@analogjs/vite-plugin-angular';
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig, envField, fontProviders } from 'astro/config';
 
 /**
  * The hero diagram is a small Angular application compiled ahead of time by the Analog Vite
@@ -19,6 +19,13 @@ const isAngularSource = (/** @type {string} */ id) => ANGULAR_SOURCES.some((patt
 export default defineConfig({
   site: 'https://www.ngdiagram.dev',
   output: 'static',
+  env: {
+    schema: {
+      // `true` only in the production build: the pages then load the consent manager and Google
+      // Tag Manager (config/analytics.ts). Every other build loads neither and sends nothing.
+      LANDING_ANALYTICS: envField.boolean({ context: 'server', access: 'public', default: false }),
+    },
+  },
   // Self-hosted Roboto and Roboto Mono (latin), the faces the mockup loads from Google Fonts.
   fonts: [
     {

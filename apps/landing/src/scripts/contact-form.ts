@@ -9,9 +9,12 @@
  * - The endpoint is read from `data-endpoint` at the moment of sending. Without it the form
  *   shows the general error and logs why. HubSpot's own messages and redirects are ignored.
  * - A filled honeypot field ends in the success state without a request.
+ * - A message HubSpot accepted, and only that, pushes `CONTACT_SENT_EVENT` to `dataLayer` for the
+ *   tag manager (config/analytics.ts).
  * - Once sent, the confirmation (ContactSent) replaces the intro, the form and the community
  *   block, the page goes back to the top and focus moves to the confirmation's heading.
  */
+import { CONTACT_SENT_EVENT } from '../config/analytics';
 import { CONTACT_TIMEOUT_MS, HUBSPOT_FIELDS } from '../config/contact';
 import { FIELD_MESSAGES, MESSAGE_COUNTER_FROM } from '../data/contact';
 import { FIELD_NAMES, fieldError, type FieldName } from './contact-validation';
@@ -213,6 +216,13 @@ export function initContactForm(): void {
     setAlert(kind);
   };
 
+  /** Tells the tag manager, where the page loads one, that HubSpot accepted the message. */
+  const reportSent = (): void => {
+    const page = window as Window & { dataLayer?: object[] };
+    page.dataLayer = page.dataLayer ?? [];
+    page.dataLayer.push({ event: CONTACT_SENT_EVENT });
+  };
+
   /** Shows HubSpot's field errors on their fields. Returns whether every error found a field. */
   const showServerErrors = (errors: HubSpotError[]): boolean => {
     let allPlaced = errors.length > 0;
@@ -297,6 +307,7 @@ export function initContactForm(): void {
     }
 
     if (response.ok) {
+      reportSent();
       succeed(values.email);
       return;
     }

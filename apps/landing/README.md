@@ -198,6 +198,27 @@ page has an `h1` (production has only `h2`s).
 - **Serving.** `/contact` is served from `contact/index.html` without a redirect to
   `/contact/`, since the canonical URL has no trailing slash.
 
+## Analytics
+
+Off unless the build sets `LANDING_ANALYTICS=true` (an `astro:env` boolean, declared as an env
+input of the Turbo build task). Only the production build sets it. Local builds, previews, CI and
+the tests load nothing from another host, and the budgets of `scripts/perf.mjs` measure the page
+without third-party tags.
+
+```sh
+LANDING_ANALYTICS=true pnpm run landing:build
+```
+
+- **On:** `Layout` renders `components/Analytics.astro` in `<head>`. It starts loading the
+  consent manager (Piwik PRO), then Google Tag Manager (both use `window.dataLayer`), then the
+  Leadfeeder tracker; all three load asynchronously. The tag manager's `<noscript>` frame opens
+  `<body>`. The IDs are in `config/analytics.ts`. Consent is handled by the consent manager and
+  the container; the page adds no consent defaults of its own.
+- **Contact form:** once HubSpot accepted a message, `scripts/contact-form.ts` pushes
+  `{ event: 'contact_form_submit' }` (`CONTACT_SENT_EVENT`) to `window.dataLayer`. A failed send
+  or the hidden field pushes nothing. The form sends by `fetch`, so the tag manager's own form
+  triggers never see it; a tag that counts sent messages listens for this event.
+
 ## Tests
 
 Playwright against `astro preview` (build first). Chromium only.
@@ -237,7 +258,8 @@ LANDING_URL=http://localhost:4329/contact pnpm --filter landing perf   # the con
   `data-endpoint`. Validation (empty form, re-check on input, blur only after a change, free
   providers, format, length limits, counter, the rail's done steps), sending (the request body:
   the form's fields, the marketing box checked and not, context, no consent options; the
-  confirmation; the hidden field; 400 field and general
+  confirmation; the `dataLayer` event, once per accepted message and never for a failure or the
+  hidden field; 400 field and general
   errors; 429; network error and retry; busy state and no second request; no endpoint), axe in
   the error, general error and success states, keyboard (Tab order, Enter sends, Space checks,
   "Talk to the team" leads to the form), the page without JavaScript, no external request on
@@ -299,7 +321,8 @@ Differences from the mockup (V7), on purpose. `parity.spec.ts` allows exactly th
   button still has a new tab and an arrow; it follows the rule here. Repeated link texts get the
   card name as hidden context; footer links are at least 24px tall.
 - **O11 Performance:** no render-blocking scripts and no external hosts: fonts, avatars, the
-  `.voices` ground, the resource thumbnails and the team photo are self-hosted. The team photo
+  `.voices` ground, the resource thumbnails and the team photo are self-hosted. The production
+  build's analytics (see Analytics) are the one exception, loaded asynchronously. The team photo
   is a lazily loaded `<img>` in the photo cell (the mockup: the cell's background, which loads
   with the page); the hero still is preloaded where it shows.
 - **O12** (retired with V7: the examples lead has no count and the Discord invite is the

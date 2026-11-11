@@ -3,6 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
+      "env": ["LANDING_ANALYTICS"],
       "inputs": [
         "$TURBO_EXTENDS$",
         "$TURBO_ROOT$/apps/docs/src/components/angular/examples/landing-page-diagram/**",

@@ -1,4 +1,5 @@
 import { expect, test, type Page, type Request, type Route } from '@playwright/test';
+import { CONTACT_SENT_EVENT } from '../src/config/analytics';
 import { HUBSPOT_FIELDS } from '../src/config/contact';
 import { FIELD_MESSAGES } from '../src/data/contact';
 import { axeViolations, measureOverflow, openLanding, PAGES } from './support';
@@ -47,6 +48,11 @@ const send = (page: Page) => page.click('[data-contact-submit]');
 const errorOf = (page: Page, id: string) => page.locator(`#${id}-error`);
 const alertBox = (page: Page) => page.locator('[data-contact-alert]');
 const doneTitle = (page: Page) => page.locator('[data-done-title]');
+/** Events in `dataLayer`. Test builds load no tag manager, so only the form pushes any. */
+const dataLayerEvents = (page: Page) =>
+  page.evaluate(() =>
+    ((window as Window & { dataLayer?: { event?: string }[] }).dataLayer ?? []).map((item) => item.event)
+  );
 
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -179,6 +185,8 @@ test.describe('sending', () => {
     await expect(page.locator('[data-contact-form]')).toHaveAttribute('aria-hidden', 'true');
     await expect(page.locator('[data-contact]')).toHaveAttribute('data-state', 'sent');
     expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    // One conversion event for the tag manager.
+    expect(await dataLayerEvents(page)).toEqual([CONTACT_SENT_EVENT]);
   });
 
   test('an unchecked marketing box is sent as false', async ({ page }) => {
@@ -199,6 +207,7 @@ test.describe('sending', () => {
     await send(page);
     await expect(doneTitle(page)).toBeVisible();
     expect(requests).toHaveLength(0);
+    expect(await dataLayerEvents(page)).toEqual([]);
   });
 
   test('400 BLOCKED_EMAIL: the error goes to the email field and the data stays', async ({ page }) => {
@@ -221,6 +230,7 @@ test.describe('sending', () => {
     await expect(alertBox(page)).toContainText('Oops! Something went wrong while submitting the form.');
     await expect(page.locator('[data-contact]')).toHaveAttribute('data-state', 'failed');
     expect(errors.join(' ')).toContain('FIELD_NOT_IN_FORM_DEFINITION');
+    expect(await dataLayerEvents(page)).toEqual([]);
   });
 
   test('429: the rate limit message', async ({ page }) => {
@@ -239,11 +249,13 @@ test.describe('sending', () => {
     await send(page);
     await expect(alertBox(page)).toContainText('Your message is still here.');
     await expect(page.locator('#cf-name')).toHaveValue('Anna Maria Nowak');
+    expect(await dataLayerEvents(page)).toEqual([]);
     online = true;
     await send(page);
     await expect(doneTitle(page)).toBeFocused();
     await expect(alertBox(page)).toBeEmpty();
     expect(requests).toHaveLength(2);
+    expect(await dataLayerEvents(page)).toEqual([CONTACT_SENT_EVENT]);
   });
 
   test('while sending: busy, read-only, and a second click sends nothing', async ({ page }) => {
