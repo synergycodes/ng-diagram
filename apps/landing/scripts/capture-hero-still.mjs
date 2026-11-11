@@ -1,8 +1,8 @@
 // Captures the live hero diagram as its still image (slot `heroStill`, O7): writes
 // src/assets/hero-still.png, the diagram at its natural size, 2x, on a transparent background.
 //
-//   pnpm --filter landing build && pnpm --filter landing preview   # in one terminal
-//   pnpm --filter landing still:capture                             # in another
+//   pnpm --filter landing build && pnpm --filter landing preview --port 4329   # in one terminal
+//   pnpm --filter landing still:capture                                        # in another
 //
 // Run it after every change of the docs example "Landing Page Diagram", together with
 // sketch:capture. LANDING_URL defaults to http://localhost:4329/.
@@ -45,7 +45,7 @@ const ONLY_THE_DIAGRAM = `
 try {
   await fetch(url);
 } catch {
-  console.error(`No server at ${url}. Start it with: pnpm --filter landing preview`);
+  console.error(`No server at ${url}. Start it with: pnpm --filter landing preview --port 4329`);
   process.exit(2);
 }
 

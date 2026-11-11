@@ -1,11 +1,11 @@
 // Lighthouse budgets of the landing page (plan, section 6), against a running `astro preview`.
 //
-//   pnpm --filter landing build && pnpm --filter landing preview   # in one terminal
-//   pnpm --filter landing perf                                      # in another
+//   pnpm --filter landing build && pnpm --filter landing preview --port 4329   # in one terminal
+//   pnpm --filter landing perf                                                 # in another
 //
 // LANDING_URL (default http://localhost:4329/) and RUNS (default 3, the median run counts).
-// Reports go to apps/landing/reports/lighthouse-<preset>.json. `astro preview` does not
-// compress responses, so byte budgets are checked as gzip sizes of the built files.
+// Reports go to apps/landing/reports/lighthouse-<preset>.json. Byte budgets are checked as
+// gzip sizes of the built files, so they do not depend on how the server compresses responses.
 
 import { chromium } from '@playwright/test';
 import { execSync } from 'node:child_process';
@@ -43,7 +43,7 @@ const ISLAND = /\/_landing\/bootstrap\.[^/]*\.js$/;
 try {
   await fetch(url);
 } catch {
-  console.error(`No server at ${url}. Start it with: pnpm --filter landing preview`);
+  console.error(`No server at ${url}. Start it with: pnpm --filter landing preview --port 4329`);
   process.exit(2);
 }
 

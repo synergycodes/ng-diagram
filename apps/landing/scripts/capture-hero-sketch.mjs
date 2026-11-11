@@ -1,7 +1,7 @@
 // Captures the live hero diagram as its loading sketch (O13): writes src/data/hero-sketch.ts.
 //
-//   pnpm --filter landing build && pnpm --filter landing preview   # in one terminal
-//   pnpm --filter landing sketch:capture                            # in another
+//   pnpm --filter landing build && pnpm --filter landing preview --port 4329   # in one terminal
+//   pnpm --filter landing sketch:capture                                       # in another
 //
 // Run it after every change of the docs example "Landing Page Diagram": hero.spec.ts fails while
 // the sketch and the live diagram differ. LANDING_URL defaults to http://localhost:4329/.
@@ -203,7 +203,7 @@ function shapesOf(node) {
 try {
   await fetch(url);
 } catch {
-  console.error(`No server at ${url}. Start it with: pnpm --filter landing preview`);
+  console.error(`No server at ${url}. Start it with: pnpm --filter landing preview --port 4329`);
   process.exit(2);
 }
 

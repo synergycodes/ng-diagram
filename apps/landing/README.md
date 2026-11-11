@@ -274,8 +274,8 @@ LANDING_URL=http://localhost:4329/contact pnpm --filter landing perf   # the con
   item. Reports and section screenshots go to `reports/parity/`.
 - `scripts/perf.mjs`: Lighthouse 13.6.0, mobile and desktop presets, budgets of the plan:
   scores, LCP, CLS, TBT, no external hosts, page JS ≤ 15 KB gzip and no island on mobile, the
-  island ≤ 250 KB gzip, page CSS ≤ 20 KB gzip. `astro preview` does not compress, so byte
-  budgets use the gzip size of the built files.
+  island ≤ 250 KB gzip, page CSS ≤ 20 KB gzip. Byte budgets use the gzip size of the built
+  files, so they do not depend on how the server compresses responses.
 
 Known limit: at 390px with a 200% default font (an effective 195px, below the WCAG reflow
 width) the longest tab name ("Engineering") is clipped.
