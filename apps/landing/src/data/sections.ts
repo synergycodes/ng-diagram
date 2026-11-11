@@ -71,6 +71,8 @@ export interface Quote {
   name: string;
   role: string;
   avatar: ImageMetadata;
+  /** The author's LinkedIn profile: the structured data links the author to it (schema.org `sameAs`). */
+  linkedin: string;
 }
 
 export const quotes: Quote[] = [
@@ -79,18 +81,21 @@ export const quotes: Quote[] = [
     name: 'Adam Kowalski',
     role: 'Senior Angular Architect',
     avatar: adamKowalski,
+    linkedin: 'https://www.linkedin.com/in/adam-kowalski-861a98252/',
   },
   {
     text: "The best thing is it's truly Angular-native. Nodes are just regular Angular components with HTML and CSS, so you stick to what you know – no weird context switching. Makes onboarding way easier and maintenance less painful.",
     name: 'Emil Małańczak',
     role: 'Senior Frontend Developer',
     avatar: emilMalanczak,
+    linkedin: 'https://www.linkedin.com/in/emil-malanczak/',
   },
   {
     text: "ngDiagram gives you more control than other libraries. The middleware lets you override basically anything – try doing that with closed-source tools where you can't even peek under the hood.",
     name: 'Wojciech Krzesaj',
     role: 'Software Engineer',
     avatar: wojciechKrzesaj,
+    linkedin: 'https://www.linkedin.com/in/wojciech-krzesaj/',
   },
 ];
 
@@ -124,9 +129,9 @@ export interface FaqItem {
 
 /**
  * Questions people ask AI assistants about ngDiagram, each answered so it can be quoted on its
- * own. The FAQPage structured data (Layout) repeats this text word for word. Every claim is
- * backed by the repository: LICENSE, the package's peer dependencies, README and the docs
- * (checked 2026-11-10).
+ * own. The FAQPage structured data (data/structured-data.ts) repeats this text word for word.
+ * Every claim is backed by the repository: LICENSE, the package's peer dependencies, README and
+ * the docs (checked 2026-11-10).
  */
 export const faq: FaqItem[] = [
   {

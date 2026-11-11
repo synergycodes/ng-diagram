@@ -19,27 +19,17 @@ import Voices from '../components/Voices.astro';
 import WhatIs from '../components/WhatIs.astro';
 import { HERO_STILL_MEDIA } from '../config/hero';
 import { getHeroStill } from '../data/hero-still';
-import { faq, faqAnswerText } from '../data/sections';
+import { faqPage, quotations } from '../data/structured-data';
 import Layout from '../layouts/Layout.astro';
 
 // On phones the hero still is the largest element of the first screen: fetch it with the page.
 const still = await getHeroStill();
-
-/** The FAQ as FAQPage structured data, word for word as on the page. */
-const faqPage = {
-  '@type': 'FAQPage',
-  mainEntity: faq.map((item) => ({
-    '@type': 'Question',
-    name: item.question,
-    acceptedAnswer: { '@type': 'Answer', text: faqAnswerText(item.answer) },
-  })),
-};
 ---
 
 <Layout
   title="ngDiagram – open-source Angular diagram library"
   description="ngDiagram is an open-source Angular diagram library. Build interactive diagrams, node-based editors, and workflow editors with your Angular components."
-  structuredData={[faqPage]}
+  structuredData={[faqPage, ...quotations]}
   preloadImages={still ? [{ href: still.avif, type: 'image/avif', media: HERO_STILL_MEDIA }] : []}
 >
   <SiteHeader />

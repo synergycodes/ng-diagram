@@ -6,7 +6,8 @@ import favicon from '../../../docs/public/favicon.svg?url';
 import Analytics from '../components/Analytics.astro';
 import Sprite from '../components/Sprite.astro';
 import { GTM_ID } from '../config/analytics';
-import { LINKS, SITE } from '../config/landing';
+import { SITE } from '../config/landing';
+import { type GraphNode, type PageNode, siteEntities, webPage } from '../data/structured-data';
 import '../styles/global.css';
 
 interface Props {
@@ -14,8 +15,10 @@ interface Props {
   description: string;
   /** Absolute canonical URL; by default the site URL of the current path. */
   canonical?: string;
-  /** Structured data of the page itself (schema.org nodes), in the graph after the site's SoftwareSourceCode. */
-  structuredData?: Record<string, unknown>[];
+  /** schema.org type of the page node in the structured data. */
+  pageType?: PageNode['type'];
+  /** Further structured data of the page (schema.org nodes), after the site's entities and the page node. */
+  structuredData?: GraphNode[];
   /** Images to fetch early, each only where its media query matches (the hero still on phones). */
   preloadImages?: { href: string; type: string; media: string }[];
 }
@@ -23,23 +26,11 @@ interface Props {
 const { title, description } = Astro.props;
 const canonical = Astro.props.canonical ?? new URL(Astro.url.pathname, SITE).href;
 
-const synergyCodes = { '@type': 'Organization', name: 'Synergy Codes', url: LINKS.synergyCodes };
 const structuredData = {
   '@context': 'https://schema.org',
   '@graph': [
-    {
-      '@type': 'SoftwareSourceCode',
-      name: 'ngDiagram',
-      description:
-        'ngDiagram is an open-source Angular diagram library for interactive diagrams, node-based editors, and workflow editors.',
-      codeRepository: LINKS.github,
-      programmingLanguage: ['TypeScript', 'Angular'],
-      license: 'https://www.apache.org/licenses/LICENSE-2.0',
-      runtimePlatform: 'Angular',
-      url: SITE,
-      author: synergyCodes,
-      maintainer: synergyCodes,
-    },
+    ...siteEntities,
+    webPage({ type: Astro.props.pageType ?? 'WebPage', url: canonical, name: title, description }),
     ...(Astro.props.structuredData ?? []),
   ],
 };
