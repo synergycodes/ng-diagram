@@ -108,4 +108,14 @@ export const showcaseProjects: ShowcaseProject[] = [
     author: 'Synergy Codes',
     authorUrl: 'https://www.synergycodes.com/',
   },
+  {
+    title: 'Cable Harness Studio',
+    description:
+      'A wire-harness editor for drawing multi-branch harnesses from a connector catalogue and mapping wires cavity to cavity, with rule checks, table import, an ELK.js-generated schematic view, and export of wire lists, cut lists, BOMs, and DXF drawings.',
+    image: 'cable-harness-studio.png',
+    imageAlt: 'Screenshot of the Cable Harness Studio showing a harness topology with connectors and bundle lengths',
+    href: 'https://cable-harness.app.synergy.codes/',
+    author: 'Synergy Codes',
+    authorUrl: 'https://www.synergycodes.com/',
+  },
 ];
