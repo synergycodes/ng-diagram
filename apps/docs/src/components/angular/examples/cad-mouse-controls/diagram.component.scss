@@ -8,6 +8,8 @@
   display: flex;
   height: var(--ng-diagram-height);
   border: var(--ng-diagram-border);
+  // The selection box stays inside the diagram when the pointer leaves it
+  overflow: hidden;
 
   // The box is blue for a window and green for a crossing
   --ngd-box-selection-border-color: var(--cad-window-color);
@@ -18,7 +20,8 @@
     --ngd-box-selection-background: var(--cad-crossing-background);
   }
 
-  // A drag on the background selects, so it shows a crosshair and not the grab cursor of panning
+  // A drag on the background selects, so it shows a crosshair and not the grab cursor of panning.
+  // The crosshair also replaces the grabbing cursor of the diagram while an edge is drawn.
   ng-diagram {
     cursor: crosshair;
   }
@@ -29,9 +32,20 @@
   }
 }
 
-.legend {
+// Uses the variables of the built-in box selection, so it looks the same
+.selection-box {
   position: absolute;
   z-index: 1;
+  border: var(--ngd-box-selection-border-size) solid
+    var(--ngd-box-selection-border-color);
+  background-color: var(--ngd-box-selection-background);
+  pointer-events: none;
+}
+
+.legend {
+  position: absolute;
+  // Above the selection box
+  z-index: 2;
   top: 1rem;
   left: 1rem;
   display: flex;

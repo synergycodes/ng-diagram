@@ -1,7 +1,7 @@
 ---
 title: CAD Mouse Controls Example
 description: Example of CAD-like mouse controls in ngDiagram - middle mouse panning, wheel zooming and directional box selection
-version: 'since v1.1.0'
+version: 'since v1.4.0'
 sidebar:
   order: 7
   label: CAD Mouse Controls
@@ -13,7 +13,7 @@ import CadMouseControls from '@examples/cad-mouse-controls/cad-mouse-controls.as
 
 This example shows mouse controls known from CAD tools: the middle mouse button pans the viewport, the wheel zooms, and a drag on the background draws a selection box.
 
-Drag from left to right to draw a blue **window** box - it selects only the nodes that are fully inside. Drag from right to left to draw a green **crossing** box - it selects every node it touches. In both modes an edge is selected when the nodes at both of its ends are. You can change the direction during the drag. A press on a node or an edge still selects and moves it, and a press on a port still draws an edge.
+Drag from left to right to draw a blue **window** box - it selects only the nodes that are fully inside. Drag from right to left to draw a green **crossing** box - it selects every node it touches. In both modes an edge is selected when the nodes at both of its ends are. You can change the direction during the drag. A press on a node still selects and moves it, a press on an edge selects it, and a press on a port still draws an edge.
 
 <br />
 
@@ -22,13 +22,19 @@ Drag from left to right to draw a blue **window** box - it selects only the node
 
 ## Additional Explanation
 
-The example uses only the public API. Two directives sit on the element that wraps `<ng-diagram>`. Their `pointerdown` listeners use the capture phase, so they run before the listeners of the diagram.
+The new controls are built with the public API. Two directives sit on the element that wraps `<ng-diagram>`. Their `pointerdown` listeners use the capture phase, so they see a press before the diagram does. A directive stops the presses that it handles: the diagram never sees them, and the directive does the whole gesture itself. All other presses reach the diagram as usual.
 
-- `MiddleMousePanDirective` handles a middle button press and stops it, so the diagram does not see it. It captures the pointer and moves the viewport with [`NgDiagramViewportService.moveViewportBy()`](/docs/api/services/ngdiagramviewportservice/#moveviewportby) on every move. It also prevents the browser autoscroll.
-- `DirectionalBoxSelectionDirective` decides on every press if a drag without a modifier starts a box selection. The diagram checks the `boxSelection` shortcut when the press reaches it. The directive adds a binding without a modifier for a left button press on the background, and keeps only the <kbd>Shift</kbd> binding for other presses. Presses on nodes and edges, including ports and resize, rotate and relink handles, keep their default behavior.
-- While a box is drawn, the directive compares the pointer position with the start point and sets [`partialInclusion`](/docs/api/types/configuration/features/boxselectionconfig/#partialinclusion). The selection reads this option on every move, so the mode can change during the drag. The directive exposes the mode as a signal and as the `data-box-selection-mode` attribute. The styles use it to set the `--ngd-box-selection-*` CSS variables, and the legend uses it to highlight the active mode.
+- `MiddleMousePanDirective` handles a press of the middle button, also over nodes. It captures the pointer and moves the viewport with [`moveViewportBy()`](/docs/api/services/ngdiagramviewportservice/#moveviewportby). The move is added to the current viewport, so each call waits for the previous one, and the moves that come in the meantime are sent together. The directive cancels the press, so the browser does not start its middle-click autoscroll.
+- `DirectionalBoxSelectionDirective` handles a left button press on the background without a modifier, and a <kbd>Shift</kbd> press anywhere. It keeps the box in the `box` signal, and the template of the component draws it. The pointer position compared with the start point picks the mode. On every move the directive selects the elements in the box with the same rules as the built-in box selection:
+  - [`getOverlappingNodes()`](/docs/api/services/ngdiagrammodelservice/#getoverlappingnodes) gets a temporary node of the size of the box and returns the visible nodes that it touches. This is the crossing result.
+  - A window keeps only the nodes whose rectangle is fully inside the box.
+  - An edge is selected when both of its ends are in the box.
 
-<kbd>Shift</kbd> + drag still draws a box anywhere, also over nodes, as in the default configuration.
+  [`select()`](/docs/api/services/ngdiagramselectionservice/#select) replaces the selection with the result. Each call waits for the previous one, so the last box always wins.
+
+- The directive exposes the mode as a signal and as the `data-box-selection-mode` attribute. The box uses the `--ngd-box-selection-*` CSS variables of the built-in box, and the styles set them for each mode. The legend highlights the active mode.
+- Both directives give focus to the diagram, as a press on the diagram does. Keyboard shortcuts such as <kbd>Delete</kbd> work right after a selection.
+
 <kbd>Ctrl/Cmd</kbd> + click still adds nodes to the selection.
 
 The wheel zoom needs only the config. The `zoom` shortcut gets a binding without a modifier, and the <kbd>Ctrl/Cmd</kbd> binding is kept:
@@ -42,14 +48,21 @@ shortcuts: configureShortcuts([
 ]),
 ```
 
-With this binding a two-finger scroll on a trackpad also zooms. <kbd>Shift</kbd> + wheel and the arrow keys still pan.
+Each wheel event zooms by one `zoom.step`. A trackpad usually sends many small wheel events for one gesture, so a two-finger scroll zooms faster than a mouse wheel. <kbd>Shift</kbd> + wheel pans. On a laptop without a middle button, <kbd>Alt</kbd> + drag on the background pans. The arrow keys move the selected nodes, or pan when no node is selected.
+
+### Notes
+
+- The built-in box selection does not handle these boxes, so the [`selectionGestureEnded`](/docs/api/types/events/selectiongestureendedevent/) event does not fire for them. [`selectionChanged`](/docs/api/types/events/selectionchangedevent/) fires as usual.
+- On touch devices, the built-in box selection still works with a long press. It selects as a window.
+- The crosshair cursor also replaces the grabbing cursor that the diagram shows while an edge is drawn.
 
 ### Key Concepts
 
-- Changing the bindings of a shortcut with [`configureShortcuts()`](/docs/api/utilities/configureshortcuts/) in the config and at runtime with [`updateConfig()`](/docs/api/services/ngdiagramservice/#updateconfig)
-- Modifier-only bindings for pointer and wheel actions, see [`ShortcutDefinition`](/docs/api/types/configuration/shortcuts/shortcutdefinition/)
-- Switching between window and crossing selection with the [`boxSelection`](/docs/api/types/configuration/features/boxselectionconfig/) config
-- Moving the viewport with [`NgDiagramViewportService`](/docs/api/services/ngdiagramviewportservice/)
-- Styling the selection box with the `--ngd-box-selection-*` CSS variables
+- Handling a gesture before the diagram with a capture listener on the element that wraps `<ng-diagram>`
+- Selecting the elements in a box with [`getOverlappingNodes()`](/docs/api/services/ngdiagrammodelservice/#getoverlappingnodes) and [`select()`](/docs/api/services/ngdiagramselectionservice/#select)
+- Converting pointer positions with [`clientToFlowPosition()`](/docs/api/services/ngdiagramviewportservice/#clienttoflowposition)
+- Moving the viewport with [`moveViewportBy()`](/docs/api/services/ngdiagramviewportservice/#moveviewportby), one call at a time
+- Modifier-only bindings for the wheel with [`configureShortcuts()`](/docs/api/utilities/configureshortcuts/)
+- Styling the box with the `--ngd-box-selection-*` CSS variables
 
-**Learn more:** [Keyboard Shortcuts guide →](/docs/guides/shortcut-manager/) · [Box Selection guide →](/docs/guides/box-selection/)
+**Learn more:** [Box Selection guide →](/docs/guides/box-selection/) | [Keyboard Shortcuts guide →](/docs/guides/shortcut-manager/)

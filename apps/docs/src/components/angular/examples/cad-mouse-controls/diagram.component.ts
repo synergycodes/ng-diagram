@@ -44,6 +44,15 @@ import { MiddleMousePanDirective } from './middle-mouse-pan.directive';
       <ng-diagram [model]="model" [config]="config">
         <ng-diagram-background />
       </ng-diagram>
+      @if (boxSelection.box(); as box) {
+        <div
+          class="selection-box"
+          [style.left.px]="box.x"
+          [style.top.px]="box.y"
+          [style.width.px]="box.width"
+          [style.height.px]="box.height"
+        ></div>
+      }
     </div>
   `,
   styleUrls: ['./diagram.component.scss'],
@@ -51,7 +60,8 @@ import { MiddleMousePanDirective } from './middle-mouse-pan.directive';
 export class DiagramComponent {
   config = {
     zoom: {
-      // A bigger step than the default, so one wheel notch gives a clear zoom
+      // Each wheel event zooms by one step. A mouse wheel sends one event per notch,
+      // so a bigger step than the default gives a clear zoom for each notch.
       step: 0.1,
       zoomToFit: {
         onInit: true,
@@ -65,6 +75,11 @@ export class DiagramComponent {
         bindings: [{ modifiers: {} }, { modifiers: { primary: true } }],
       },
     ]),
+    // The built-in box selection still runs on touch devices (long press).
+    // It selects as a window, to match the blue color of its box.
+    boxSelection: {
+      partialInclusion: false,
+    },
   } satisfies NgDiagramConfig;
 
   model = initializeModel({

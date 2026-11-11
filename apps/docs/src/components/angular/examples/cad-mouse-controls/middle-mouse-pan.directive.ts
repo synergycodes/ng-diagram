@@ -5,7 +5,12 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { NgDiagramService, NgDiagramViewportService } from 'ng-diagram';
+import {
+  NgDiagramService,
+  NgDiagramViewportService,
+  type Point,
+} from 'ng-diagram';
+import { focusDiagram } from './focus-diagram';
 
 const MIDDLE_BUTTON = 1;
 const MIDDLE_BUTTON_MASK = 4;
@@ -17,7 +22,6 @@ const MIDDLE_BUTTON_MASK = 4;
   selector: '[middleMousePan]',
   host: {
     '[class.middle-mouse-panning]': 'isPanning()',
-    '(mousedown)': 'preventAutoscroll($event)',
   },
 })
 export class MiddleMousePanDirective {
@@ -31,6 +35,8 @@ export class MiddleMousePanDirective {
   private pointerId: number | null = null;
   private lastX = 0;
   private lastY = 0;
+  private pendingMove: Point = { x: 0, y: 0 };
+  private isMoving = false;
 
   constructor() {
     this.host.addEventListener('pointerdown', this.onPointerDown, {
@@ -44,24 +50,19 @@ export class MiddleMousePanDirective {
     });
   }
 
-  // Stops the browser's middle-click autoscroll
-  preventAutoscroll(event: MouseEvent) {
-    if (event.button === MIDDLE_BUTTON) {
-      event.preventDefault();
-    }
-  }
-
   private readonly onPointerDown = (event: PointerEvent) => {
     if (event.button !== MIDDLE_BUTTON) {
       return;
     }
-    // Box selection of the diagram does not check the button, so the press must not reach it
+    // The middle press only pans, so it must not start a gesture of the diagram.
+    // preventDefault() also stops the browser's middle-click autoscroll.
     event.preventDefault();
     event.stopPropagation();
 
     if (this.pointerId !== null || !this.diagramService.isInitialized()) {
       return;
     }
+    focusDiagram(this.host);
     // With pointer capture, the moves and the release come to the host even outside of it.
     // The capture is released on pointerup and pointercancel, so one listener ends the pan.
     this.host.setPointerCapture(event.pointerId);
@@ -84,14 +85,13 @@ export class MiddleMousePanDirective {
       this.stopPanning();
       return;
     }
-    const dx = event.clientX - this.lastX;
-    const dy = event.clientY - this.lastY;
+    this.pendingMove = {
+      x: this.pendingMove.x + event.clientX - this.lastX,
+      y: this.pendingMove.y + event.clientY - this.lastY,
+    };
     this.lastX = event.clientX;
     this.lastY = event.clientY;
-
-    if (dx !== 0 || dy !== 0) {
-      this.viewportService.moveViewportBy(dx, dy);
-    }
+    void this.applyPendingMove();
   };
 
   private readonly onLostPointerCapture = (event: PointerEvent) => {
@@ -99,6 +99,24 @@ export class MiddleMousePanDirective {
       this.stopPanning();
     }
   };
+
+  // moveViewportBy() adds to the current viewport, so each call waits for the previous one.
+  // Moves that come in the meantime are added up and sent in the next call.
+  private async applyPendingMove() {
+    if (this.isMoving) {
+      return;
+    }
+    this.isMoving = true;
+    try {
+      while (this.pendingMove.x !== 0 || this.pendingMove.y !== 0) {
+        const { x, y } = this.pendingMove;
+        this.pendingMove = { x: 0, y: 0 };
+        await this.viewportService.moveViewportBy(x, y);
+      }
+    } finally {
+      this.isMoving = false;
+    }
+  }
 
   private stopPanning() {
     this.host.removeEventListener('pointermove', this.onPointerMove);
