@@ -1,0 +1,97 @@
+---
+import { LINKS } from '../config/landing';
+import { SCROLLER_FROM, templateDomains, templatesLead } from '../data/templates';
+import PageLink from './PageLink.astro';
+import RowScroller from './RowScroller.astro';
+import TemplateCard from './TemplateCard.astro';
+
+/** Rendered widths of a card image: in the grid, and in the paging row (3.25 cards, 2.25, 1.15). */
+const GRID_SIZES = '(max-width: 45em) 100vw, (max-width: 64em) 50vw, 376px';
+const ROW_SIZES = '(max-width: 45em) 87vw, (max-width: 64em) 44vw, 336px';
+---
+
+<section class="tpl block block--open" id="templates">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Start from a template built for your domain</h2>
+      <p class="lead">{templatesLead}</p>
+    </div>
+    <div class="tpl-tabs" role="tablist" aria-label="Template domains">
+      {
+        templateDomains.map((domain, index) => (
+          <button
+            class="tpl-tab"
+            type="button"
+            role="tab"
+            id={`tab-${domain.id}`}
+            aria-selected={index === 0 ? 'true' : 'false'}
+            aria-controls={`tpl-${domain.id}`}
+            tabindex={index === 0 ? 0 : -1}
+          >
+            <span class="tpl-name">{domain.name}</span>{' '}
+            <span class="tpl-count">
+              {domain.templates.length}
+              <span class="sr-only"> {domain.templates.length === 1 ? 'template' : 'templates'}</span>
+            </span>
+          </button>
+        ))
+      }
+    </div>
+    {
+      templateDomains.map((domain, index) => {
+        const cards = domain.templates.map((template) => (
+          <TemplateCard
+            title={template.title}
+            description={template.description}
+            image={template.image}
+            imageAlt={template.imageAlt}
+            sizes={domain.templates.length >= SCROLLER_FROM ? ROW_SIZES : GRID_SIZES}
+            links={[
+              { label: 'Live demo', href: template.demoHref, external: true },
+              { label: 'Source', href: template.sourceHref, quiet: true, external: true },
+            ]}
+          />
+        ));
+        return (
+          <div
+            class="tpl-panel"
+            role="tabpanel"
+            id={`tpl-${domain.id}`}
+            aria-labelledby={`tab-${domain.id}`}
+            tabindex="0"
+            hidden={index !== 0}
+          >
+            <p class="tpl-desc">
+              <strong>{domain.lead}</strong> {domain.body}
+            </p>
+            {/* O2: a domain that outgrows one row pages its cards, as the mockup's Engineering tab; the others are a grid. */}
+            {domain.templates.length >= SCROLLER_FROM ? (
+              <RowScroller
+                id={`tpl-scroller-${domain.id}`}
+                label={`${domain.name} templates`}
+                count={domain.templates.length}
+                noun="templates"
+                item="template"
+              >
+                {cards}
+              </RowScroller>
+            ) : (
+              <div class="tpl-grid">{cards}</div>
+            )}
+          </div>
+        );
+      })
+    }
+    <div class="cta-row">
+      <PageLink class="btn btn-secondary" href={LINKS.templates}>All templates in the docs</PageLink>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initScrollers } from '../scripts/scroller';
+  import { initTabs } from '../scripts/tabs';
+
+  initScrollers();
+  initTabs();
+</script>

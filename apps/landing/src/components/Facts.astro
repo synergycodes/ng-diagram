@@ -1,0 +1,17 @@
+---
+import { facts } from '../data/sections';
+---
+
+<div class="facts block">
+  {/* O9: a list with a name instead of aria-label on a div. */}
+  <ul class="wrap" aria-label="Key facts">
+    {
+      facts.map((fact) => (
+        <li>
+          <b>{fact.lead}</b>
+          {fact.rest}
+        </li>
+      ))
+    }
+  </ul>
+</div>

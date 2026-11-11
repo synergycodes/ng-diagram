@@ -1,0 +1,29 @@
+.agent > .wrap {
+  text-align: center;
+}
+.agent h2 {
+  font-size: clamp(2.375rem, 4.6vw, 3.5rem);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  max-width: 18ch;
+  margin-inline: auto;
+}
+.agent .lead {
+  max-width: 56ch;
+  margin-top: 18px;
+  margin-inline: auto;
+}
+@media (forced-colors: active) {
+  .grad,
+  .agent h2 {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
+.qs .cta-row {
+  margin-top: 64px;
+  justify-content: center;
+}

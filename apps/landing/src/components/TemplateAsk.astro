@@ -1,0 +1,16 @@
+---
+import { LINKS } from '../config/landing';
+import PageLink from './PageLink.astro';
+---
+
+{
+  /* The ask for a template built for the visitor's domain, between the templates and the examples: one full-width cell on the hero's dot grid. */
+}
+<section class="tpl-ask block" id="template-ask" aria-labelledby="tpl-ask-title">
+  <span class="field" aria-hidden="true"></span>
+  <div class="wrap">
+    <h2 id="tpl-ask-title" class="grad">Need a template built for your domain?</h2>
+    <p class="lead">Describe the editor you need, and get a tailored version designed and shipped with you.</p>
+    <PageLink class="btn btn-secondary" href={LINKS.contact}>Ask the ngDiagram team</PageLink>
+  </div>
+</section>

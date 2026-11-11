@@ -1,0 +1,38 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+  class?: string;
+  /** Hidden text that tells repeated links apart ("Live demo" of which template). */
+  context?: string;
+  /** Trailing ↗ arrow, which says "another site, new tab". Logo and icon links go without it. */
+  arrow?: boolean;
+  /** Accessible name for icon-only links. */
+  label?: string;
+  title?: string;
+}
+
+const { href, class: className, context, arrow = true, label, title } = Astro.props;
+const NEW_TAB = '(opens in a new tab)';
+---
+
+{
+  /* O10: a link to another site or to a template demo opens in a new tab, carries the ↗ arrow and tells screen readers so. Hidden text goes last: inside a flex button it would otherwise add a gap. */
+}
+<a
+  class={className}
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label={label ? `${label} ${NEW_TAB}` : undefined}
+  title={title}
+  ><slot />{
+    arrow && (
+      <>
+        {' '}
+        <Icon name="i-arrow" />
+      </>
+    )
+  }{context && <span class="sr-only">: {context}</span>}{!label && <span class="sr-only"> {NEW_TAB}</span>}</a
+>

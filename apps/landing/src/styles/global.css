@@ -1,0 +1,42 @@
+/*
+ * Page styles, ported from the approved mockup: V6 (makieta-ngdiagram-landing-redesign.html), updated
+ * to V7, the marketing review of 2026-11-10.
+ *
+ * - tokens: the mockup's custom properties.
+ * - mockup: the mockup's rules without comments, in their original order. The cascade depends on
+ *   that order; keep it when editing.
+ * - deviations: every intentional difference from the mockup. Each block names its entry in the
+ *   register in README.md. Later layers win regardless of selector specificity.
+ * - pages: pages the mockup does not have (pages/*.css, imported by their page).
+ *
+ * Components render the mockup's class names; there are no scoped styles for ported rules.
+ */
+@layer tokens, mockup, deviations, pages;
+
+@import './tokens.css' layer(tokens);
+@import './mockup/base.css' layer(mockup);
+@import './mockup/buttons.css' layer(mockup);
+@import './mockup/header.css' layer(mockup);
+@import './mockup/hero.css' layer(mockup);
+@import './mockup/facts.css' layer(mockup);
+@import './mockup/quick-start.css' layer(mockup);
+@import './mockup/agent.css' layer(mockup);
+@import './mockup/templates.css' layer(mockup);
+@import './mockup/scroller.css' layer(mockup);
+@import './mockup/native.css' layer(mockup);
+@import './mockup/services.css' layer(mockup);
+@import './mockup/examples.css' layer(mockup);
+@import './mockup/voices.css' layer(mockup);
+@import './mockup/community.css' layer(mockup);
+@import './mockup/footer.css' layer(mockup);
+@import './mockup/motion.css' layer(mockup);
+@import './mockup/below-64em.css' layer(mockup);
+@import './mockup/below-45em.css' layer(mockup);
+@import './mockup/frame.css' layer(mockup);
+@import './mockup/nav-base.css' layer(mockup);
+@import './mockup/below-45em-late.css' layer(mockup);
+@import './mockup/sections-v7.css' layer(mockup);
+@import './deviations/nav.css' layer(deviations);
+@import './deviations/hero.css' layer(deviations);
+@import './deviations/sections.css' layer(deviations);
+@import './deviations/a11y.css' layer(deviations);

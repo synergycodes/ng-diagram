@@ -1,0 +1,20 @@
+---
+import { LINKS } from '../config/landing';
+import ExtLink from './ExtLink.astro';
+---
+
+<section class="block contact-intro" aria-labelledby="contact-title" data-contact-hide>
+  <div class="contact-fx" aria-hidden="true"></div>
+  <div class="wrap">
+    <h1 id="contact-title" class="grad">
+      Consulting for <span class="contact-nowrap">large-scale</span> ngDiagram projects
+    </h1>
+    <p class="lead">
+      If you need support for a larger implementation or want to leverage our team’s experience, fill out the form
+      below. We’ll get back to you <span class="contact-nowrap">within 24 hours.</span>
+    </p>
+    <p class="contact-signpost">
+      Need help using ngDiagram? <ExtLink href={LINKS.discord}>Ask on Discord</ExtLink>.
+    </p>
+  </div>
+</section>

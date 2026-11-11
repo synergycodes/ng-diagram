@@ -1,0 +1,18 @@
+---
+import { LINKS } from '../config/landing';
+import ExtLink from './ExtLink.astro';
+---
+
+<section class="block block--open contact-community" id="contact-community" aria-labelledby="contact-community-title">
+  <div class="wrap">
+    <div class="comm-head">
+      <h2 id="contact-community-title">ngDiagram community</h2>
+      <p class="lead">
+        Library users and the creators of ngDiagram answer questions, help solve problems, and share tips.
+      </p>
+      <div class="cta-row">
+        <ExtLink class="btn btn-secondary" href={LINKS.discord}>Join Discord</ExtLink>
+      </div>
+    </div>
+  </div>
+</section>

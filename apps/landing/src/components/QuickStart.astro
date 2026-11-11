@@ -1,0 +1,125 @@
+---
+import { LINKS, slots } from '../config/landing';
+import { componentCodeHtml, installCommands, type PackageManager, stylesCodeHtml } from '../data/quick-start';
+import CodeBlock from './CodeBlock.astro';
+import ExtLink from './ExtLink.astro';
+import PageLink from './PageLink.astro';
+
+const managers = Object.keys(installCommands) as PackageManager[];
+---
+
+<section class="qs block block--open" id="quick-start">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Your first diagram in 3 steps</h2>
+      <p class="lead">
+        Copy and paste into an existing Angular app – the same code the quick start guide in the docs walks through.
+      </p>
+    </div>
+    <div class="qs-rail">
+      <div class="qs-steps">
+        <div class="step">
+          <span class="num">1</span>
+          <div class="step-body">
+            <h3 id="qs-install">Install</h3>
+            <div class="pm-switch" role="radiogroup" aria-label="Package manager">
+              {
+                managers.map((pm, index) => (
+                  <button
+                    class="pm-seg"
+                    type="button"
+                    role="radio"
+                    aria-checked={index === 0 ? 'true' : 'false'}
+                    tabindex={index === 0 ? 0 : -1}
+                    data-pm={pm}
+                    data-command={installCommands[pm]}
+                  >
+                    {pm}
+                  </button>
+                ))
+              }
+            </div>
+            <CodeBlock
+              id="installCode"
+              labelledBy="qs-install"
+              copyLabel="install command"
+              code={installCommands.npm}
+            />
+          </div>
+        </div>
+        <div class="step">
+          <span class="num">2</span>
+          <div class="step-body">
+            <h3 id="qs-styles">Import the styles once, globally</h3>
+            <p class="trap">
+              <span
+                ><b>In the global stylesheet, not in a component.</b> The library is driven by CSS variables. Without this
+                line the diagram renders unstyled.</span
+              >
+            </p>
+            <CodeBlock id="stylesCode" labelledBy="qs-styles" copyLabel="styles import" html={stylesCodeHtml} />
+          </div>
+        </div>
+        <div class="step step-art">
+          <span class="num">3</span>
+          <div class="step-body">
+            <h3 id="qs-render">Render your first diagram</h3>
+            <p class="trap">
+              <span
+                ><b>Give the host an explicit height.</b> The diagram fills its container; a container with no height is 0px
+                tall and you see nothing.</span
+              >
+            </p>
+            <CodeBlock id="componentCode" labelledBy="qs-render" copyLabel="component code" html={componentCodeHtml} />
+            <div class="qs-art" aria-hidden="true">
+              <svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMid slice" focusable="false">
+                <defs>
+                  <pattern id="qs-dots" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="1.5" cy="1.5" r="1.2" fill="#3a3a44"></circle>
+                  </pattern>
+                </defs>
+                <rect width="600" height="200" fill="url(#qs-dots)"></rect>
+                <path d="M266 110 H334" stroke="#6f7480" stroke-width="2" fill="none"></path>
+                <rect x="130" y="86" width="132" height="48" rx="12" fill="#27282b" stroke="#4d5059" stroke-width="1.5"
+                ></rect>
+                <text x="196" y="116" text-anchor="middle" fill="#ffffff" font-size="16">Node 1</text>
+                <rect x="338" y="86" width="132" height="48" rx="12" fill="#27282b" stroke="#4d5059" stroke-width="1.5"
+                ></rect>
+                <text x="404" y="116" text-anchor="middle" fill="#ffffff" font-size="16">Node 2</text>
+                <circle cx="130" cy="110" r="3" fill="#ffffff" stroke="#6f7480" stroke-width="2"></circle>
+                <circle cx="262" cy="110" r="3" fill="#ffffff" stroke="#6f7480" stroke-width="2"></circle>
+                <circle cx="338" cy="110" r="3" fill="#ffffff" stroke="#6f7480" stroke-width="2"></circle>
+                <circle cx="470" cy="110" r="3" fill="#ffffff" stroke="#6f7480" stroke-width="2"></circle>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="qs-end">
+          <div class="qs-end-mark" aria-hidden="true"><i></i></div>
+          <p class="qs-end-label">
+            You have a working diagram
+            <span>Draggable nodes, a live edge, and a canvas you can pan and zoom.</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="cta-row">
+      <PageLink class="btn btn-primary" href={LINKS.quickStart}>Open the quick start guide</PageLink>
+      {
+        slots.stackblitzUrl && (
+          <ExtLink class="btn btn-secondary" href={slots.stackblitzUrl}>
+            Open in StackBlitz
+          </ExtLink>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initCodeBlocks } from '../scripts/code-blocks';
+  import { initPackageManager } from '../scripts/package-manager';
+
+  initCodeBlocks();
+  initPackageManager();
+</script>

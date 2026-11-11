@@ -1,0 +1,11 @@
+:host {
+  /* The same library token overrides as the docs example. */
+  --ngd-port-background-color: var(--ngdlp-port-bg);
+  --ngd-default-edge-stroke-hover: var(--ngdlp-edge-hover);
+  --ngd-diagram-background-color: var(--ngdlp-diagram-bg);
+
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+}

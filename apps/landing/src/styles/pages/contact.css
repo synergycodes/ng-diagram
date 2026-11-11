@@ -1,0 +1,617 @@
+/*
+ * The contact page (/contact). Not in the landing mockup: it extends the landing's world with the
+ * Quick Start rail as a form (ContactForm.astro reuses the rail's classes; the `contact-*` classes
+ * add the form, its states and the page's sections). Its look follows the contact mockup of the
+ * marketing review of 2026-11-10.
+ */
+@layer tokens, mockup, deviations, pages;
+
+@layer pages {
+  /* The page fills the window, so the footer stays at the bottom of the short confirmation page. */
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  main {
+    flex: 1 0 auto;
+  }
+  footer {
+    margin-top: auto;
+  }
+  /* Sections the confirmation replaces. They have their own `display`, so `hidden` is spelled out. */
+  [data-contact-hide][hidden],
+  .contact-sent[hidden] {
+    display: none;
+  }
+
+  /* Intro and confirmation: the hero's backdrop (two purple glows, the dot grid, the edges fading
+     into the page). Their text stays selectable (O4). */
+  .contact-intro,
+  .contact-sent {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(42% 50% at 70% 48%, rgba(150, 46, 229, 0.22), transparent 70%),
+      radial-gradient(40% 40% at 20% 85%, rgba(150, 46, 229, 0.12), transparent 70%);
+  }
+  .contact-intro::after,
+  .contact-sent::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      var(--bg) 0,
+      rgba(9, 9, 15, 0) 96px,
+      rgba(9, 9, 15, 0) calc(100% - 200px),
+      var(--bg) 100%
+    );
+  }
+  .contact-fx {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.14) 1px, transparent 1.4px);
+    background-size: 24px 24px;
+    background-position: center 12px;
+  }
+  .contact-intro {
+    border-top: 0;
+    text-align: center;
+  }
+  .contact-intro > .wrap {
+    position: relative;
+    z-index: 1;
+    padding-block: 72px 56px;
+  }
+  .contact-intro .lead {
+    max-width: 66ch;
+    margin-inline: auto;
+    text-wrap: pretty;
+  }
+  .contact-intro .lead a,
+  .contact-nowrap {
+    white-space: nowrap;
+  }
+  .contact-community .lead {
+    margin-inline: auto;
+    text-wrap: balance;
+  }
+  .contact-intro h1 + .lead {
+    margin-top: 24px;
+  }
+  .contact-signpost {
+    margin-top: 28px;
+    color: var(--txt-2);
+    font-size: 0.9375rem;
+  }
+
+  /* Links inside running text: white with a soft underline, as in the services lead. */
+  .contact-intro a,
+  .contact-check a,
+  .contact-gdpr a,
+  .contact-alert a,
+  .contact-nojs a,
+  .contact-about a {
+    color: var(--txt);
+    text-decoration-line: underline;
+    text-decoration-color: var(--txt-line);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+  }
+  .contact-intro a:hover,
+  .contact-check a:hover,
+  .contact-gdpr a:hover,
+  .contact-alert a:hover,
+  .contact-nojs a:hover,
+  .contact-about a:hover,
+  .contact-intro a:focus-visible,
+  .contact-check a:focus-visible,
+  .contact-gdpr a:focus-visible,
+  .contact-alert a:focus-visible,
+  .contact-nojs a:focus-visible,
+  .contact-about a:focus-visible {
+    text-decoration-color: var(--txt);
+    text-decoration-thickness: 2px;
+  }
+
+  /* The form section and the rail. */
+  .contact {
+    border-top: 0;
+  }
+  .contact > .wrap {
+    padding-block: 44px 96px;
+  }
+  .contact-rail {
+    position: relative;
+    margin-top: 0;
+  }
+
+  /* A step's square and rail segment are grey until its fields are valid ([data-done]); the
+     square of the step being filled in is the Quick Start's purple outline. */
+  .contact-step::before {
+    background: var(--grid-line);
+  }
+  .contact-step::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--rail-x) - 0.5px);
+    top: 8px;
+    bottom: 0;
+    width: 1px;
+    background: var(--purple-2);
+    transform: scaleY(0);
+    transform-origin: top;
+    pointer-events: none;
+  }
+  .contact-step[data-done]::after {
+    transform: scaleY(1);
+  }
+  .contact-step .num {
+    background: var(--bg);
+    border-color: var(--grid-line);
+    color: var(--txt-2);
+  }
+  .contact-step:focus-within .num {
+    background: var(--num-bg);
+    border-color: var(--purple-2);
+    color: var(--txt);
+  }
+  .contact-step[data-done] .num {
+    background: var(--purple-2);
+    border-color: var(--purple-2);
+    color: var(--txt);
+  }
+  .contact-step .step-body h3 {
+    margin-bottom: 6px;
+  }
+  .contact-stepnote {
+    margin: 0 0 24px;
+    color: var(--txt-2);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  /* The tail: no third number; the rail runs on beside the consent and ends in the end mark,
+     level with the send button. */
+  .contact-step.contact-tail {
+    padding-bottom: 0;
+  }
+  .contact-step.contact-tail::before,
+  .contact-step.contact-tail::after {
+    top: 0;
+    bottom: 23px;
+  }
+  .contact-tail .step-body {
+    grid-column: 2;
+  }
+  .contact-tail-mark {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    margin-bottom: 7px;
+    background: transparent;
+  }
+  .contact-tail-mark i {
+    background: var(--grid-line);
+  }
+
+  /* Fields. */
+  .contact-pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .contact-pair + .field {
+    margin-top: 24px;
+  }
+  .field label {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: var(--txt);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .field-opt {
+    color: var(--txt-3);
+  }
+  .field-hint {
+    margin: -2px 0 10px;
+    color: var(--txt-2);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .field input,
+  .field textarea {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    margin: 0;
+    padding: 12px 14px;
+    background: var(--panel-2);
+    color: var(--txt);
+    border: 1px solid var(--field-line);
+    border-radius: 0;
+    font: 400 1rem/1.5 var(--font);
+    caret-color: var(--lime);
+  }
+  .field input:hover,
+  .field textarea:hover {
+    border-color: var(--field-line-hover);
+  }
+  .field input:focus,
+  .field textarea:focus {
+    border-color: var(--field-line-hover);
+  }
+  .field input[aria-invalid='true'],
+  .field textarea[aria-invalid='true'] {
+    border-color: var(--warn);
+  }
+  .field input[readonly],
+  .field textarea[readonly] {
+    color: var(--txt-2);
+  }
+  .field textarea {
+    min-height: 168px;
+    max-height: 30rem;
+    resize: vertical;
+    field-sizing: content;
+  }
+  /* Where the field grows with its text, the browser's resize grip is not needed. */
+  @supports (field-sizing: content) {
+    .field textarea {
+      resize: none;
+    }
+  }
+  /* Chrome's autofill keeps the dark field and the light text. */
+  .field input:-webkit-autofill {
+    -webkit-text-fill-color: var(--txt);
+    box-shadow: 0 0 0 1000px var(--panel-2) inset;
+    caret-color: var(--lime);
+  }
+  .field-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 8px;
+    color: var(--warn);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .field-error[hidden] {
+    display: none;
+  }
+  .field-error .icon,
+  .contact-alert .icon {
+    width: 1.125em;
+    height: 1.125em;
+    margin-top: 0.2em;
+  }
+  .field-count {
+    margin-top: 8px;
+    color: var(--txt-2);
+    font-size: 0.8125rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Optional marketing consent: a square box in the landing's style; the label is the target. */
+  .contact-check {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 6px 14px;
+    align-items: start;
+  }
+  .contact-check input {
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    margin: 0;
+    background: var(--panel-2) no-repeat center / 16px 16px;
+    border: 1px solid var(--field-line);
+    border-radius: 0;
+    cursor: pointer;
+  }
+  .contact-check input:hover {
+    border-color: var(--field-line-hover);
+  }
+  .contact-check input:checked {
+    background-color: var(--lime);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5 6.5 12 13 4.5' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='square'/%3E%3C/svg%3E");
+    border-color: var(--lime);
+  }
+  .contact-check label {
+    padding-top: 1px;
+    color: var(--txt);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+  .contact-check p {
+    grid-column: 2;
+    color: var(--txt);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .contact-check-copy {
+    padding-top: 1px;
+  }
+  .contact-check-copy label {
+    display: inline;
+  }
+  .contact-gdpr {
+    margin-top: 24px;
+    color: var(--txt-2);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+
+  /* Spam trap, off screen. */
+  .contact-hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  /* The general error stays in the page (empty) so its role="alert" is announced when filled. */
+  .contact-alert:not(:empty) {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 14px 16px;
+    background: rgba(255, 178, 36, 0.06);
+    border: 1px solid var(--warn);
+    color: var(--txt);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+  .contact-alert .icon {
+    color: var(--warn);
+  }
+  .contact-alert b {
+    font-weight: 500;
+  }
+
+  .contact-send {
+    justify-content: flex-end;
+    margin-top: 28px;
+  }
+  .contact-submit[aria-disabled='true'] {
+    cursor: progress;
+    transform: none;
+  }
+  .contact-nojs {
+    display: none;
+    color: var(--txt-2);
+    font-size: 0.9375rem;
+  }
+  /* Without JavaScript the form shows, but it cannot send: no button, a way out instead. */
+  html:not(.js) .contact-submit {
+    display: none;
+  }
+  html:not(.js) .contact-nojs {
+    display: block;
+  }
+  html:not(.js) .contact-send {
+    justify-content: flex-start;
+  }
+
+  /* While sending, the end mark turns purple and a light runs down the rail to it. */
+  .contact-rail[data-state='sending'] .qs-end-mark i {
+    background: var(--purple-2);
+  }
+  .contact-rail::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--rail-x) - 1px);
+    top: 8px;
+    bottom: 16px;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--purple-2) 70%, var(--txt)) no-repeat;
+    background-size: 100% 120px;
+    background-position: 0 -120px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* The confirmation: centred heading and lead, three next steps as cards. */
+  .contact-sent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-top: 0;
+    text-align: center;
+    background: radial-gradient(62% 48% at 50% 24%, rgba(150, 46, 229, 0.3), rgba(9, 9, 15, 0) 70%);
+  }
+  .contact-sent > .wrap {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding-block: 88px;
+  }
+  /* While it shows, the chapter fills the page, so the confirmation sits in the middle of it. */
+  #ch-contact:has(.contact-sent:not([hidden])) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .contact-sent h1 {
+    max-width: 20ch;
+    margin-inline: auto;
+  }
+  .contact-sent h1:focus:not(:focus-visible) {
+    outline: none;
+  }
+  .contact-sent .lead {
+    max-width: 60ch;
+    margin-inline: auto;
+  }
+  .contact-sent-email {
+    color: var(--txt);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .sent-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 48px;
+    text-align: left;
+  }
+  .sent-cards > .tpl-card {
+    grid-column: auto;
+    background: var(--panel);
+  }
+  .sent-cards h2 {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  /* The page ends with the community section's rule; the footer needs less space above it
+     than on the landing (this file loads on /contact only). */
+  footer {
+    padding-top: 96px;
+  }
+
+  /* Community. */
+  .contact-community,
+  .contact-sent {
+    border-bottom: 1px solid var(--grid-line);
+  }
+  .contact-community {
+    background: radial-gradient(
+      64% 110% at 50% 100%,
+      rgba(150, 46, 229, 0.24),
+      rgba(150, 46, 229, 0.06) 55%,
+      transparent 80%
+    );
+  }
+  .contact-community .cta-row {
+    justify-content: center;
+    margin-top: 36px;
+  }
+
+  /* Who develops ngDiagram, after the community block. */
+  .contact-about {
+    max-width: var(--wrap);
+    margin: 0 auto;
+    padding: 48px var(--gutter) 0;
+    color: var(--txt-2);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  @media (min-width: 45.0625em) {
+    .contact-pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 56em) {
+    .sent-cards {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 420px;
+      margin-inline: auto;
+    }
+  }
+
+  @media (max-width: 45em) {
+    .contact-intro > .wrap {
+      padding-block: 44px 40px;
+    }
+    .contact > .wrap {
+      padding-block: 44px 64px;
+    }
+    .contact-step.contact-tail::before,
+    .contact-step.contact-tail::after {
+      bottom: 21px;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .contact-step::after {
+      transition: transform 0.5s var(--ease);
+    }
+    .contact-step .num,
+    .contact-tail-mark i {
+      transition:
+        background-color 0.3s,
+        border-color 0.3s,
+        color 0.3s;
+    }
+    .field input,
+    .field textarea,
+    .contact-check input {
+      transition: border-color 0.15s;
+    }
+    .contact-rail[data-state='sending']::after {
+      opacity: 1;
+      animation: contact-trace 1.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    }
+    .contact-rail[data-state='sending'] .qs-end-mark i {
+      animation: contact-pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes contact-trace {
+      to {
+        background-position: 0 calc(100% + 120px);
+      }
+    }
+    @keyframes contact-pulse {
+      50% {
+        opacity: 0.45;
+      }
+    }
+  }
+
+  @media (forced-colors: active) {
+    .contact-step::before {
+      background: GrayText;
+      forced-color-adjust: none;
+    }
+    .contact-step::after {
+      background: Highlight;
+      forced-color-adjust: none;
+    }
+    .contact-step[data-done] .num {
+      background: Highlight;
+      border-color: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+    .contact-tail-mark i {
+      background: GrayText;
+      forced-color-adjust: none;
+    }
+    .contact-rail[data-state='sending'] .qs-end-mark i {
+      background: Highlight;
+    }
+    .contact-rail::after {
+      content: none;
+    }
+    .contact-check input {
+      appearance: auto;
+      background-image: none;
+    }
+    .field input[aria-invalid='true'],
+    .field textarea[aria-invalid='true'] {
+      border-width: 2px;
+      padding: 11px 13px;
+    }
+  }
+}

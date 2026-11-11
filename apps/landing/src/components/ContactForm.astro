@@ -1,0 +1,187 @@
+---
+import { CONTACT_ENDPOINT } from '../config/contact';
+import { LINKS } from '../config/landing';
+import { GDPR_LINK_TEXT, GDPR_TEXT, MARKETING_TEXT } from '../data/contact';
+import ExtLink from './ExtLink.astro';
+import Icon from './Icon.astro';
+
+const gdprSplit = GDPR_TEXT.lastIndexOf(GDPR_LINK_TEXT);
+const gdprBefore = GDPR_TEXT.slice(0, gdprSplit);
+const gdprAfter = GDPR_TEXT.slice(gdprSplit + GDPR_LINK_TEXT.length);
+---
+
+{
+  /*
+   * The Quick Start rail as a form: two numbered steps, then the end mark beside the consent and
+   * the send button. The rail, the squares and the mark are decoration (aria-hidden); labels,
+   * `required`, `aria-invalid` and the error texts carry the meaning. Once sent, ContactSent
+   * replaces the page. States and sending: scripts/contact-form.ts.
+   */
+}
+<section class="block contact" id="contact-form" aria-labelledby="contact-form-title" data-contact-hide>
+  <div class="wrap">
+    <h2 class="sr-only" id="contact-form-title">Contact details</h2>
+    <div class="qs-rail contact-rail" data-contact data-state="idle">
+      <form
+        class="qs-steps contact-steps"
+        method="post"
+        aria-labelledby="contact-form-title"
+        data-contact-form
+        data-endpoint={CONTACT_ENDPOINT}
+      >
+        <div
+          class="step contact-step"
+          role="group"
+          aria-labelledby="cf-step-1"
+          data-step
+          data-fields="name company email"
+        >
+          <span class="num" aria-hidden="true">1</span>
+          <div class="step-body">
+            <h3 id="cf-step-1">About you</h3>
+            <p class="contact-stepnote">All fields are required.</p>
+            <div class="contact-pair">
+              <div class="field">
+                <label for="cf-name">Full name</label>
+                <input
+                  id="cf-name"
+                  name="name"
+                  type="text"
+                  autocomplete="name"
+                  maxlength="256"
+                  required
+                  data-field="name"
+                />
+                <p class="field-error" id="cf-name-error" hidden>
+                  <Icon name="i-warn" /><span data-error-text></span>
+                </p>
+              </div>
+              <div class="field">
+                <label for="cf-company">Company name</label>
+                <input
+                  id="cf-company"
+                  name="company"
+                  type="text"
+                  autocomplete="organization"
+                  maxlength="256"
+                  required
+                  data-field="company"
+                />
+                <p class="field-error" id="cf-company-error" hidden>
+                  <Icon name="i-warn" /><span data-error-text></span>
+                </p>
+              </div>
+            </div>
+            <div class="field">
+              <label for="cf-email">Work email</label>
+              <p class="field-hint" id="cf-email-hint">Only company domains are supported.</p>
+              <input
+                id="cf-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                spellcheck="false"
+                maxlength="256"
+                required
+                aria-describedby="cf-email-hint"
+                data-hint="cf-email-hint"
+                data-field="email"
+              />
+              <p class="field-error" id="cf-email-error" hidden>
+                <Icon name="i-warn" /><span data-error-text></span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step contact-step" role="group" aria-labelledby="cf-step-2" data-step data-fields="message">
+          <span class="num" aria-hidden="true">2</span>
+          <div class="step-body">
+            <h3 id="cf-step-2">Your project</h3>
+            <p class="contact-stepnote">All fields are required.</p>
+            <div class="field">
+              <label for="cf-message">Tell us about your project</label>
+              <p class="field-hint" id="cf-message-hint">
+                Share a brief description of your project, your goals, and any challenges you’re facing.
+              </p>
+              <textarea
+                id="cf-message"
+                name="message"
+                rows="6"
+                maxlength="5000"
+                required
+                aria-describedby="cf-message-hint"
+                data-hint="cf-message-hint"
+                data-field="message"></textarea>
+              <p class="field-count" id="cf-message-count" hidden data-counter></p>
+              <p class="field-error" id="cf-message-error" hidden>
+                <Icon name="i-warn" /><span data-error-text></span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* The rail ends here: the end mark stands beside the consent and the send button. */}
+        <div class="step contact-step contact-tail" data-step data-fields="">
+          <div class="qs-end-mark contact-tail-mark" aria-hidden="true"><i></i></div>
+          <div class="step-body">
+            <div class="contact-check">
+              <input
+                id="cf-marketing"
+                name="marketing"
+                type="checkbox"
+                aria-describedby="cf-marketing-more"
+                data-marketing
+              />
+              <p class="contact-check-copy">
+                <label for="cf-marketing">{MARKETING_TEXT}</label>{' '}<span id="cf-marketing-more"
+                  >More information can be found in the <ExtLink href={LINKS.privacy}>Privacy policy</ExtLink>. <span
+                    class="field-opt">(Optional)</span
+                  ></span
+                >
+              </p>
+            </div>
+            <p class="contact-gdpr">
+              {gdprBefore}<ExtLink href={LINKS.privacy}>{GDPR_LINK_TEXT}</ExtLink>{gdprAfter}
+            </p>
+            {/* Spam trap: off screen, out of the Tab order and hidden from assistive technology. */}
+            <div class="contact-hp" aria-hidden="true">
+              <label for="cf-website">Website</label>
+              <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off" data-honeypot />
+            </div>
+            <div class="contact-alert" role="alert" data-contact-alert></div>
+            <div class="cta-row contact-send">
+              {/* Disabled until the script runs: without JavaScript, Enter in a field cannot post the form. */}
+              <button class="btn btn-primary contact-submit" type="submit" disabled data-contact-submit
+                ><span data-submit-label>Send message</span> <Icon name="i-arrow" /></button
+              >
+              <p class="contact-nojs">
+                Sending this form needs JavaScript. Turn it on, or <ExtLink href={LINKS.discord}
+                  >ask the team on Discord</ExtLink
+                >.
+              </p>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <template data-alert="general">
+        <Icon name="i-warn" />
+        <p>
+          <b>Oops! Something went wrong while submitting the form.</b> Your message is still here. Try again in a moment,
+          or <ExtLink href={LINKS.discord}>ask the team on Discord</ExtLink>.
+        </p>
+      </template>
+      <template data-alert="rate">
+        <Icon name="i-warn" />
+        <p>Too many messages were sent from here in a short time. Wait a minute and try again.</p>
+      </template>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initContactForm } from '../scripts/contact-form';
+
+  initContactForm();
+</script>

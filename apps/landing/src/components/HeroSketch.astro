@@ -1,0 +1,57 @@
+---
+import { HERO_SKETCH } from '../data/hero-sketch';
+
+/*
+ * O13 Loading sketch of the hero diagram, inside .hero-stage from the first paint. Its viewBox is
+ * the rectangle the island fits into the stage, contained and centred the same way, so the live
+ * diagram fades in exactly on top of it. Styles and motion: styles/deviations/hero.css.
+ */
+const { viewBox, nodes, edges, ports } = HERO_SKETCH;
+// Groups are drawn under the edges, other nodes over them, as in the library.
+const groups = nodes.filter((node) => node.group);
+const others = nodes.filter((node) => !node.group);
+---
+
+<svg
+  class="hero-sketch"
+  viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+  width={viewBox.width}
+  height={viewBox.height}
+  preserveAspectRatio="xMidYMid meet"
+>
+  <defs>
+    <linearGradient id="hero-sketch-group" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" class="sk-stop-1"></stop>
+      <stop offset="0.35" class="sk-stop-2"></stop>
+      <stop offset="0.7" class="sk-stop-3"></stop>
+      <stop offset="1" class="sk-stop-4"></stop>
+    </linearGradient>
+  </defs>
+  {
+    groups.map((node) => (
+      <g data-sketch-node={node.id}>
+        {node.shapes.map(({ tag: Tag, ...attributes }) => (
+          <Tag {...attributes} />
+        ))}
+      </g>
+    ))
+  }
+  <g>
+    {edges.map((edge, index) => <path class="sk-edge" d={edge.d} pathLength="1" style={`--i: ${index}`} />)}
+  </g>
+  {
+    others.map((node) => (
+      <g data-sketch-node={node.id}>
+        {node.shapes.map(({ tag: Tag, ...attributes }) => (
+          <Tag {...attributes} />
+        ))}
+      </g>
+    ))
+  }
+  <g>
+    {ports.map((port) => <circle class="sk-port" cx={port.cx} cy={port.cy} r={port.r} />)}
+  </g>
+  <g>
+    {edges.map((edge, index) => <path class="sk-pulse" d={edge.d} pathLength="1" style={`--i: ${index}`} />)}
+  </g>
+</svg>

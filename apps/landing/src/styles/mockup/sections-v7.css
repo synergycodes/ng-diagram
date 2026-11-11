@@ -1,0 +1,189 @@
+/* Sections added in mockup V7 (the marketing review of 2026-11-10), in the mockup's order. */
+
+/* The project facts band, out of #community: its own block between the quotes and the close. */
+.quad-sec {
+  position: relative;
+  border-top: 0;
+}
+.quad-sec > .wrap {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+#community > .wrap {
+  padding-bottom: 100px;
+}
+
+/* The agent block's link to the Build with AI guide (an inline style in the mockup). */
+.agent .cta-row {
+  justify-content: center;
+  margin-top: 28px;
+}
+
+/* "What is ngDiagram?" */
+.whatis > .wrap {
+  text-align: center;
+}
+.whatis .lead {
+  max-width: 72ch;
+  margin-inline: auto;
+}
+
+/* FAQ */
+.faq-list {
+  max-width: 860px;
+  margin: 0 auto;
+  border-top: 1px solid var(--line);
+}
+.faq-item {
+  border-bottom: 1px solid var(--line);
+}
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 0;
+  font: 500 1.0625rem/1.4 var(--font);
+  color: var(--txt);
+  cursor: pointer;
+  list-style: none;
+}
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.faq-item summary::after {
+  content: '+';
+  flex: none;
+  font: 400 1.25rem/1 var(--mono);
+  color: var(--txt-3);
+}
+.faq-item[open] summary::after {
+  content: '–';
+}
+.faq-item summary:hover {
+  color: var(--lime);
+}
+.faq-item .faq-a {
+  padding: 0 48px 22px 0;
+  color: var(--txt-2);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+.faq-item .faq-a a {
+  color: var(--txt);
+  text-decoration-line: underline;
+  text-decoration-color: var(--txt-line);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+/* The ask for a template built for the visitor's domain: one full-width cell on the canvas dot
+   grid, between two rules (#examples below has no top rule, so the banner closes itself). */
+.tpl-ask {
+  position: relative;
+  isolation: isolate;
+  border-bottom: 1px solid var(--grid-line);
+}
+.tpl-ask .field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.14) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+  background-position: center 12px;
+}
+.tpl-ask > .wrap {
+  position: relative;
+  z-index: 1;
+  padding-block: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+.tpl-ask h2 {
+  font-size: 1.75rem;
+  line-height: 1.2;
+  font-weight: 500;
+  text-wrap: balance;
+}
+.tpl-ask .lead {
+  margin: 0;
+  max-width: 62ch;
+}
+
+/* Resources: videos play in a lightbox; the row pages like the Engineering templates. */
+.res .shot {
+  aspect-ratio: 16 / 9;
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--panel);
+  cursor: pointer;
+}
+.res .shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.res .res-play-ic {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--lime);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition: transform 0.15s;
+}
+.res .shot:hover .res-play-ic,
+.res .shot:focus-visible .res-play-ic {
+  transform: scale(1.08);
+}
+.res .tpl-card .links {
+  min-height: 0;
+}
+.res-lb {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.82);
+}
+.res-lb-box {
+  position: relative;
+  width: min(1100px, 100%);
+}
+.res-lb-frame {
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.res-lb-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.res-lb-close {
+  position: absolute;
+  right: 0;
+  top: -40px;
+  background: none;
+  border: 0;
+  color: #fff;
+  font: 400 1.5rem/1 var(--font);
+  cursor: pointer;
+}

@@ -1,0 +1,37 @@
+---
+import { LINKS } from '../config/landing';
+import { getHeroStill } from '../data/hero-still';
+import ExtLink from './ExtLink.astro';
+import HeroDiagram from './HeroDiagram.astro';
+import HeroSketch from './HeroSketch.astro';
+import PageLink from './PageLink.astro';
+
+// The still (AVIF first, WebP for the rest) and its proportions; the page preloads it (index.astro).
+const still = await getHeroStill();
+const stillStyle = still
+  ? `--hero-shot: image-set(url('${still.avif}') type('image/avif'), url('${still.webp}') type('image/webp')); --hero-shot-ratio: ${still.width} / ${still.height}`
+  : undefined;
+---
+
+<section class:list={['hero', 'block', { 'hero--still': still }]}>
+  <div class="hero-fx" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <h1>Build interactive diagrams – <span class="grad">natively in Angular</span></h1>
+      <p class="lead">
+        Every node is one of your Angular components, styled with CSS. Every change passes through middleware you
+        control.
+      </p>
+      <div class="cta-row">
+        <PageLink class="btn btn-primary" href={LINKS.quickStart}>Quick start</PageLink>
+        <ExtLink class="btn btn-secondary" href={LINKS.liveDemo}>Live demo</ExtLink>
+      </div>
+    </div>
+
+    <div class="hero-stage" aria-hidden="true" style={stillStyle}>
+      {/* Where the live diagram runs, the sketch shows while it loads (O13); elsewhere the still (O7). */}
+      <HeroSketch />
+    </div>
+  </div>
+  <HeroDiagram />
+</section>

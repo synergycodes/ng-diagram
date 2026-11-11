@@ -1,0 +1,116 @@
+---
+import { Picture } from 'astro:assets';
+import { isVideo, resources, resourcesLead } from '../data/resources';
+import ExtLink from './ExtLink.astro';
+import Icon from './Icon.astro';
+import RowScroller from './RowScroller.astro';
+
+const SIZES = '(max-width: 45em) 87vw, (max-width: 64em) 44vw, 336px';
+const watchUrl = (id: string): string => `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`;
+---
+
+<section class="res block" id="resources" aria-labelledby="res-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="res-title">Want to know more about ngDiagram?</h2>
+      <p class="lead">{resourcesLead}</p>
+    </div>
+    <RowScroller
+      id="res-scroller"
+      label="Videos and articles"
+      count={resources.length}
+      noun="videos and articles"
+      item="video and article"
+    >
+      {
+        resources.map((resource) => (
+          <article class="tpl-card res-card">
+            {isVideo(resource) ? (
+              /* The thumbnail is a second way to the same video for the pointer only; "Watch here" is the control. */
+              <a
+                class="shot res-play"
+                href={watchUrl(resource.youtubeId)}
+                data-video={resource.youtubeId}
+                data-video-title={resource.title}
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <Picture
+                  src={resource.image}
+                  alt=""
+                  formats={['avif', 'webp']}
+                  widths={[400, 800]}
+                  sizes={SIZES}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="res-play-ic">
+                  <svg viewBox="0 0 24 24" width="22" height="22" focusable="false">
+                    <path d="M8 5v14l11-7z" fill="currentColor" />
+                  </svg>
+                </span>
+              </a>
+            ) : (
+              <div class="shot">
+                <Picture
+                  src={resource.image}
+                  alt=""
+                  formats={['avif', 'webp']}
+                  widths={[400, 800].filter((w) => w <= resource.image.width)}
+                  sizes={SIZES}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+            )}
+            <div class="body">
+              <h3>{resource.title}</h3>
+              <p>{resource.description}</p>
+              {/* O15: kind, source and length under the description, not as an uppercase label above the title. */}
+              <p class="res-meta">
+                {resource.meta.map((part, index) => (
+                  <>
+                    {index > 0 && ' · '}
+                    <span>{part}</span>
+                  </>
+                ))}
+              </p>
+              <div class="links">
+                {isVideo(resource) ? (
+                  <a
+                    class="text-link res-play"
+                    href={watchUrl(resource.youtubeId)}
+                    data-video={resource.youtubeId}
+                    data-video-title={resource.title}
+                  >
+                    Watch here<span class="sr-only">: {resource.title}</span>
+                  </a>
+                ) : (
+                  <ExtLink class="text-link" href={resource.href} context={resource.title}>
+                    {resource.linkLabel}
+                  </ExtLink>
+                )}
+              </div>
+            </div>
+          </article>
+        ))
+      }
+    </RowScroller>
+  </div>
+  <dialog class="res-lb" data-video-dialog aria-label="Video player">
+    <div class="res-lb-box">
+      <button class="res-lb-close" type="button" data-video-close aria-label="Close the video"
+        ><Icon name="i-close" /></button
+      >
+      <div class="res-lb-frame" data-video-frame></div>
+    </div>
+  </dialog>
+</section>
+
+<script>
+  import { initScrollers } from '../scripts/scroller';
+  import { initVideoLightbox } from '../scripts/video-lightbox';
+
+  initScrollers();
+  initVideoLightbox();
+</script>

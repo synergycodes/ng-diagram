@@ -1,0 +1,43 @@
+---
+import ContactCommunity from '../components/ContactCommunity.astro';
+import ContactForm from '../components/ContactForm.astro';
+import ContactIntro from '../components/ContactIntro.astro';
+import ContactSent from '../components/ContactSent.astro';
+import ExtLink from '../components/ExtLink.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { CONTACT_ENDPOINT } from '../config/contact';
+import { LINKS, SITE } from '../config/landing';
+import Layout from '../layouts/Layout.astro';
+import '../styles/pages/contact.css';
+
+if (!CONTACT_ENDPOINT) {
+  console.warn(
+    '[contact] HUBSPOT_PORTAL_ID and HUBSPOT_FORM_GUID in src/config/contact.ts are empty: the contact form cannot send.'
+  );
+}
+---
+
+<Layout
+  title="Contact the ngDiagram team – consulting and support"
+  description="Talk to Synergy Codes, the team behind ngDiagram, about consulting for large-scale Angular diagram projects – or ask the ngDiagram community on Discord."
+  canonical={`${SITE}/contact`}
+>
+  <SiteHeader current="contact" />
+  <main id="main" tabindex="-1">
+    <div class="chapter" id="ch-contact">
+      <ContactIntro />
+      <ContactSent />
+      <ContactForm />
+    </div>
+    <div class="chapter" id="ch-contact-community" data-contact-hide>
+      <ContactCommunity />
+    </div>
+    {/* Who develops ngDiagram and runs the consulting, after the form and the community block. */}
+    <p class="contact-about" data-contact-hide>
+      ngDiagram is developed and maintained by <ExtLink href={LINKS.synergyCodes}>Synergy Codes</ExtLink> – a team with 15+
+      years of diagramming expertise and 200+ diagram solutions delivered.
+    </p>
+  </main>
+  <SiteFooter current="contact" />
+</Layout>

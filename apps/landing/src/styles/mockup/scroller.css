@@ -1,0 +1,124 @@
+.tpl-rowwrap {
+  position: relative;
+}
+.tpl-scroller {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+.tpl-scroller::-webkit-scrollbar {
+  display: none;
+}
+.tpl-track {
+  display: grid;
+  grid-auto-flow: column;
+
+  grid-auto-columns: calc((100% - 60px) / 3.25);
+  gap: 20px;
+}
+
+.tpl-track .tpl-card {
+  grid-column: auto;
+  scroll-snap-align: start;
+}
+
+.tpl-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.tpl-nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.nav-btn {
+  appearance: none;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  color: var(--txt-2);
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    background 0.15s;
+}
+.nav-btn + .nav-btn {
+  margin-left: -1px;
+}
+.nav-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.nav-btn:hover {
+  color: var(--txt);
+  border-color: var(--line-3);
+  background: var(--panel);
+  z-index: 1;
+}
+
+.nav-btn[aria-disabled='true'] {
+  color: #4a4a52;
+  cursor: default;
+  background: transparent;
+  border-color: var(--line);
+}
+
+.skip-row {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 0.875rem/1 var(--font);
+  color: var(--lime);
+  text-decoration: none;
+  background: var(--panel);
+  border: 1px solid var(--lime-line);
+  padding: 10px 16px;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.skip-row:focus-visible {
+  clip-path: none;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tpl-scroller {
+    scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 64em) {
+  .tpl-track {
+    grid-auto-columns: calc((100% - 40px) / 2.25);
+  }
+}
+
+@media (max-width: 45em) {
+  .tpl-track {
+    grid-auto-columns: calc((100% - 20px) / 1.15);
+  }
+  .tpl-foot,
+  .skip-row {
+    display: none;
+  }
+}

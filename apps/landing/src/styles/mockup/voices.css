@@ -1,0 +1,109 @@
+.voices {
+  position: relative;
+  background: radial-gradient(60% 70% at 50% 100%, rgba(150, 46, 229, 0.14), transparent 72%);
+  background-image: var(--voices-bg);
+  background-position: 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.voices::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(9, 9, 15, 0) calc(100% - 260px), var(--bg) 100%);
+}
+
+.voices .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.quotes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 48px;
+}
+.quotes::before,
+.quotes::after,
+.quotes figure::before {
+  content: '';
+  position: absolute;
+  left: -50vw;
+  right: -50vw;
+  height: 1px;
+  background: var(--grid-line);
+  pointer-events: none;
+}
+.quotes::before {
+  top: 0;
+}
+.quotes::after {
+  bottom: 0;
+}
+.quotes figure {
+  position: relative;
+  margin: 0;
+  padding: 34px 30px;
+  border: 0;
+  border-radius: 0;
+  border-left: 1px solid var(--grid-line);
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+}
+.quotes figure::before {
+  content: none;
+  top: 0;
+}
+.quotes figure:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.quotes figure:last-child {
+  padding-right: 0;
+}
+
+.quotes blockquote {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--txt-code);
+
+  flex: 1;
+}
+.quotes blockquote::before {
+  content: '“';
+  display: block;
+  font-size: 2.5rem;
+  line-height: 0.55;
+  color: var(--txt-3);
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.quotes figcaption {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.quotes figcaption .avatar {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.quotes figcaption b {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.quotes figcaption small {
+  color: var(--txt-2);
+  font-size: 0.8125rem;
+}

@@ -1,0 +1,98 @@
+@media (max-width: 64em) {
+  .quad {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .quad > li {
+    padding: 34px 24px;
+  }
+  .quad > li:nth-child(odd) {
+    border-left: 0;
+  }
+  .quad > li:nth-child(3)::before {
+    content: '';
+  }
+  .hero-grid,
+  .services-grid {
+    grid-template-columns: minmax(0, 1fr);
+
+    row-gap: 48px;
+  }
+
+  .services-photo {
+    border-right: 0;
+    margin-block: 0;
+
+    order: 2;
+    margin-inline: 0;
+    min-height: 0;
+
+    height: 340px;
+
+    background-position: 50% 30%;
+  }
+
+  .talk-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+  .talk-hold {
+    border-right: 0;
+    padding-right: 0;
+    margin-block: 0;
+    padding-block: 0;
+  }
+
+  .talk-act {
+    padding-right: 0;
+  }
+
+  .services-copy {
+    padding-right: 0;
+  }
+
+  .qs-art {
+    height: 150px;
+  }
+  .step-art .code {
+    max-width: none;
+  }
+  .services-grid {
+    gap: 40px;
+  }
+  .hero-grid {
+    gap: 40px;
+  }
+
+  .native {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .native li {
+    padding: 34px 24px;
+    border-left: 1px solid var(--grid-line);
+  }
+  .native li:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .native li:nth-child(even) {
+    padding-right: 0;
+  }
+  .native > li:nth-child(3)::before {
+    content: '';
+  }
+  .tpl-card {
+    grid-column: span 3;
+  }
+
+  .quotes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .quotes figure,
+  .quotes figure:first-child {
+    padding-inline: 0;
+    border-left: 0;
+  }
+  .quotes figure + figure::before {
+    content: '';
+  }
+}

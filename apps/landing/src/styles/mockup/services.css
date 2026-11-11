@@ -1,0 +1,156 @@
+.services {
+  background: radial-gradient(
+    84% 86% at 100% 0%,
+    rgba(150, 46, 229, 0.3) 0%,
+    rgba(150, 46, 229, 0.21) 22%,
+    rgba(150, 46, 229, 0.12) 44%,
+    rgba(150, 46, 229, 0.055) 64%,
+    rgba(150, 46, 229, 0.018) 82%,
+    rgba(150, 46, 229, 0) 100%
+  );
+}
+
+.services {
+  position: relative;
+}
+.services-grid {
+  display: grid;
+
+  grid-template-columns: 50% minmax(0, 1fr);
+  gap: 0 72px;
+  align-items: stretch;
+  position: relative;
+}
+
+.services-photo {
+  border-right: 1px solid var(--line);
+
+  margin-block: -100px;
+
+  margin-left: calc(-1 * var(--gutter));
+
+  min-height: 440px;
+
+  background: var(--team-photo) 50% 25% / cover no-repeat;
+  pointer-events: none;
+}
+
+.services-copy {
+  align-self: center;
+  padding-right: 48px;
+}
+
+.services-title {
+  text-align: left;
+
+  font-size: clamp(1.625rem, 2.6vw, 2.25rem);
+  line-height: 1.15;
+}
+
+.services > .wrap > .services-copy > .lead {
+  margin-top: 14px;
+
+  max-width: none;
+}
+
+.sc-logo-link {
+  display: inline-block;
+  margin-top: 32px;
+  opacity: 0.72;
+  transition: opacity 0.15s;
+}
+.sc-logo-link:hover,
+.sc-logo-link:focus-visible {
+  opacity: 1;
+}
+.sc-logo {
+  display: block;
+  height: 46px;
+  width: auto;
+}
+.services .lead a {
+  color: var(--txt);
+  text-decoration-line: underline;
+  text-decoration-color: var(--txt-line);
+  transition: text-decoration-color 0.15s;
+}
+.services .lead a:hover,
+.services .lead a:focus-visible {
+  text-decoration-color: var(--txt);
+  text-decoration-thickness: 2px;
+}
+
+.creds {
+  list-style: none;
+
+  margin: 44px 0 0;
+  padding: 0;
+}
+
+.creds li {
+  position: relative;
+  margin-top: 14px;
+  padding: 0 0 0 40px;
+  color: var(--txt);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.creds li:first-child {
+  margin-top: 0;
+}
+.creds li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.46em;
+  width: 20px;
+  height: 14px;
+  background: var(--txt-3);
+  -webkit-mask: var(--arrow-right) no-repeat center / 20px 14px;
+  mask: var(--arrow-right) no-repeat center / 20px 14px;
+}
+
+.talk-grid {
+  display: grid;
+  grid-template-columns: 50% minmax(0, 1fr);
+  gap: 72px;
+
+  align-items: stretch;
+}
+.talk-hold {
+  border-right: 1px solid var(--line);
+  padding-right: 72px;
+
+  margin-block: -100px;
+  padding-block: 100px;
+}
+.talk-hold .sc-logo-link {
+  margin-top: 0;
+  margin-bottom: 28px;
+  opacity: 0.86;
+}
+.talk-open {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 1.25rem;
+  color: var(--txt);
+}
+
+.talk-act {
+  padding-right: 48px;
+}
+.talk-act h3 {
+  font-size: 1.375rem;
+}
+.talk-act p {
+  margin-top: 12px;
+  color: var(--txt-2);
+  font-size: 0.9375rem;
+}
+
+.talk-act .btn {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-top: 26px;
+}

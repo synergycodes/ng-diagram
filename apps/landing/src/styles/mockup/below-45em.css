@@ -1,0 +1,163 @@
+@media (max-width: 45em) {
+  .block > .wrap {
+    padding-block: 64px;
+  }
+
+  .quotes figure {
+    padding-block: 28px;
+  }
+
+  .creds li {
+    padding-left: 32px;
+  }
+  .creds li::before {
+    width: 18px;
+    -webkit-mask-size: 18px 13px;
+    mask-size: 18px 13px;
+  }
+
+  .services-photo {
+    height: 240px;
+  }
+  .block--open > .wrap > .sec-head {
+    margin-bottom: 36px;
+  }
+  .facts .wrap > li {
+    padding-block: 20px;
+  }
+
+  .qs-rail {
+    --rail-x: 14px;
+  }
+  .step,
+  .qs-end {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 0 20px;
+  }
+  .num,
+  .qs-end-mark {
+    width: 28px;
+    height: 28px;
+  }
+  .num {
+    font-size: 0.8125rem;
+  }
+
+  .qs .cta-row {
+    padding-left: 0;
+  }
+  .hero > .wrap {
+    padding-block: 44px 40px;
+  }
+  .tpl-card {
+    grid-column: span 6;
+  }
+  .tpl-card .shot {
+    aspect-ratio: 16 / 9;
+  }
+
+  .tpl-tabs {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .tpl-tabs::after {
+    content: none;
+  }
+
+  .tpl-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    padding: 12px 6px 14px;
+    gap: 5px;
+
+    font-size: 0.8125rem;
+    line-height: 1.25;
+    min-height: 44px;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .tpl-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .tpl-count {
+    flex: none;
+    font-size: 0.6875rem;
+    padding: 2px 4px;
+  }
+
+  @media (max-width: 23.75em) {
+    .tpl-tab {
+      font-size: 0.75rem;
+      padding-inline: 4px;
+    }
+  }
+
+  .pm-seg {
+    min-height: 44px;
+  }
+  .native {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .native li,
+  .native li:nth-child(odd) {
+    padding-inline: 0;
+    border-left: 0;
+  }
+  .native li {
+    padding-block: 28px;
+  }
+  .native > li + li::before {
+    content: '';
+  }
+
+  .tpl-desc {
+    margin-bottom: 24px;
+  }
+
+  #community > .wrap {
+    padding-top: 0;
+  }
+  .comm-grid {
+    gap: 64px;
+  }
+
+  .quad {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .quad > li,
+  .quad > li:nth-child(odd) {
+    padding-inline: 0;
+    border-left: 0;
+  }
+  .quad > li {
+    padding-block: 28px;
+  }
+  .quad > li + li::before {
+    content: '';
+  }
+
+  .facts .wrap {
+    display: block;
+    line-height: 1.55;
+    padding-block: 20px;
+  }
+  .facts .wrap > li,
+  .facts .wrap > li + li {
+    display: inline;
+    padding: 0;
+    border-left: 0;
+  }
+  .facts .wrap li + li::before {
+    content: ' · ';
+    color: var(--txt-3);
+  }
+  .code pre {
+    padding-right: 18px;
+    padding-top: 44px;
+  }
+}

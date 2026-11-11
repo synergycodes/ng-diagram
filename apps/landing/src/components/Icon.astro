@@ -1,0 +1,12 @@
+---
+interface Props {
+  /** Symbol id in the sprite, without `#`. */
+  name: string;
+  /** `icon` for stroked icons, `icon-brand` for filled brand marks. */
+  class?: string;
+}
+
+const { name, class: className = 'icon' } = Astro.props;
+---
+
+<svg class={className} aria-hidden="true" focusable="false"><use href={`#${name}`}></use></svg>
