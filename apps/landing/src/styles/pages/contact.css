@@ -96,8 +96,7 @@
   .contact-check a,
   .contact-gdpr a,
   .contact-alert a,
-  .contact-nojs a,
-  .contact-about a {
+  .contact-nojs a {
     color: var(--txt);
     text-decoration-line: underline;
     text-decoration-color: var(--txt-line);
@@ -109,13 +108,11 @@
   .contact-gdpr a:hover,
   .contact-alert a:hover,
   .contact-nojs a:hover,
-  .contact-about a:hover,
   .contact-intro a:focus-visible,
   .contact-check a:focus-visible,
   .contact-gdpr a:focus-visible,
   .contact-alert a:focus-visible,
-  .contact-nojs a:focus-visible,
-  .contact-about a:focus-visible {
+  .contact-nojs a:focus-visible {
     text-decoration-color: var(--txt);
     text-decoration-thickness: 2px;
   }
@@ -506,7 +503,8 @@
     margin-top: 36px;
   }
 
-  /* Who develops ngDiagram, after the community block. */
+  /* Who develops ngDiagram, after the community block. Its link keeps the line's gray and the
+     base underline, as in the mockup, not the white of the links inside running text. */
   .contact-about {
     max-width: var(--wrap);
     margin: 0 auto;
