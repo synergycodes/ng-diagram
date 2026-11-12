@@ -138,7 +138,13 @@ have to be re-derived.
   descendants, see "Resolved open decisions" above.
 - [NGD-321](https://app.clickup.com/t/86cbd99p1) — `draggable: false` on a group should freeze its
   whole subtree. Decision: nothing moves, visible descendants included (the moving visible half is
-  a pre-existing bug surfaced by hidden descendants now correctly staying put).
+  a pre-existing bug surfaced by hidden descendants now correctly staying put). Resolved in
+  [#846](https://github.com/synergycodes/ng-diagram/pull/846): `draggable: false` only blocks a move
+  that starts from that node. A node whose parent is in the moved set follows its parent, whatever
+  its own `draggable`; a node at the top of its chain moves only when it is draggable and visible.
+  So a selected non-draggable group keeps its whole subtree in place, visible and hidden, also the
+  selected descendants, while a non-draggable group nested in a moving group moves with it, together
+  with its subtree. A child selected without its non-draggable group still moves.
 - `NgDiagramService.startLinking` JSDoc: the hidden-source refusal behavior is documented in code
   but the docs guide note was deferred while the linking refusal paths settled — fold into the next
   docs pass.

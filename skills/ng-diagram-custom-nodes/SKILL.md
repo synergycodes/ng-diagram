@@ -157,6 +157,7 @@ setLocked(locked: boolean): void {
 ```
 
 - Both stop pointer drags and arrow-key moves. The node can still be selected, resized and connected. Programmatic moves (`moveNodesBy`, `updateNode`) ignore both flags.
+- `draggable: false` only blocks a move that starts from that node. A selected group with `draggable: false` keeps all descendants, visible or hidden, in place, even descendants that are selected too. A `draggable: false` node inside a moving group moves with it, with its subtree; a child selected without its group still moves.
 - `nodeDraggingEnabled: false` wins: a node with `draggable: true` still cannot be dragged. (Some docs text says the node property has priority; the source requires both.)
 - When the selection cannot move, the arrow keys pan the viewport (since 1.4.0).
 - With dragging off, pressing a node and moving the pointer pans the canvas. To stop that for such nodes, put `data-no-pan="true"` on the template host (this also stops wheel panning over the node); `viewportPanningEnabled: false` stops all panning.

@@ -48,4 +48,5 @@ Whether the pointer has moved beyond the move threshold, indicating an actual dr
 
 > **nodeIds**: `string`[]
 
-IDs of all nodes participating in the drag (selected + children, filtered by draggable).
+IDs of all nodes that move in this drag: the selected nodes whose top selected group (or the node itself,
+when no selected group contains it) is visible and draggable, plus every descendant of a moving node.

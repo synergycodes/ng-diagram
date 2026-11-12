@@ -41,8 +41,10 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
   let unregister: ReturnType<typeof vi.fn>;
   let clearDragging: ReturnType<typeof vi.fn>;
   let cancelActiveInteraction: ReturnType<typeof vi.fn>;
+  let selectedWithChildren: Node[];
 
   beforeEach(() => {
+    selectedWithChildren = [];
     unregister = vi.fn();
     registerInteractionCleanup = vi.fn().mockReturnValue(unregister);
     clearDragging = vi.fn();
@@ -67,6 +69,7 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
           selectionMoving: { edgePanningThreshold: 10, edgePanningEnabled: false, edgePanningForce: 20 },
         },
         actionStateManager: { clearDragging },
+        modelLookup: { getSelectedNodesWithChildren: () => selectedWithChildren },
         cancelActiveInteraction,
         isCancellingInteraction: () => false,
         registerInteractionCleanup,
@@ -176,5 +179,26 @@ describe('PointerMoveSelectionDirective (shared touch marker ownership)', () => 
 
     const end = router.emit.mock.calls.map((call) => call[0]).find((event) => event.phase === 'end');
     expect(end?.lastInputPoint).toEqual({ x: 20, y: 25 });
+  });
+
+  it('lets a press on a selected child of a selected non-draggable group fall through', () => {
+    const lockedGroup = { id: 'locked-group', position: { x: 0, y: 0 }, data: {}, selected: true, draggable: false };
+    const child = {
+      id: 'n1',
+      type: 'node',
+      position: { x: 0, y: 0 },
+      data: {},
+      selected: true,
+      groupId: 'locked-group',
+    };
+    selectedWithChildren = [lockedGroup, child] as Node[];
+    fixture.componentInstance.node = child as Node;
+    fixture.detectChanges();
+    const event = makePointerEvent();
+
+    directive.onPointerDown(event);
+
+    expect(event.moveSelectionHandled).toBeFalsy();
+    expect(touchState.currentEvent()).toBeNull();
   });
 });

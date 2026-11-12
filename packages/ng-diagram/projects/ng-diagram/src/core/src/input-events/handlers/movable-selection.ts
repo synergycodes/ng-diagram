@@ -1,48 +1,52 @@
 import type { FlowCore } from '../../flow-core';
 import type { Node } from '../../types';
+import type { InputModifiers } from '../input-events.interface';
 
 /**
  * Selected nodes (with their descendants) eligible for interactive movement —
  * shared by pointer drag and keyboard move.
  *
- * Effectively hidden elements cannot be moved through their own selection: a
- * still-selected hidden node must not shift while invisible. Hidden
- * descendants of a visible moved ancestor are the exception — they travel
- * with it (e.g. the hidden children of a dragged collapsed group), otherwise
- * unhiding would reveal them left behind outside the group.
+ * A node whose parent is in the set follows its parent, whatever its own
+ * `draggable`. A node at the top of its chain (its parent is not in the set)
+ * moves only when it is draggable and visible:
+ * - `draggable: false` only blocks a move that starts from that node: a
+ *   selected non-draggable group keeps its whole subtree in place, visible
+ *   and hidden, also when some of its descendants are selected, while a
+ *   non-draggable node inside a moving group moves with it.
+ * - Effectively hidden elements cannot be moved through their own selection:
+ *   a still-selected hidden node must not shift while invisible. Hidden
+ *   descendants of a visible moved ancestor travel with it (e.g. the hidden
+ *   children of a dragged collapsed group), otherwise unhiding would reveal
+ *   them left behind outside the group.
+ * - A child selected without its non-draggable group tops its own chain, so
+ *   it still moves.
  *
- * Ancestry is resolved through the same descendants map that builds the
- * selection set (plain `groupId` links, no `isGroup` enforcement) — NOT via
+ * Ancestry is resolved through the raw `groupId` links of the set itself, the
+ * same links that build the selection set (no `isGroup` enforcement) — NOT via
  * `getParentChain`, which enforces `isGroup`, logs model-integrity errors on
  * violations (per pointermove frame during a drag), and would strand hidden
  * children that effective visibility considers covered.
  */
 export const getMovableSelection = (flow: FlowCore): Node[] => {
   const selectedWithChildren = flow.modelLookup.getSelectedNodesWithChildren({ directOnly: false });
+  const nodesById = new Map(selectedWithChildren.map((node) => [node.id, node]));
+  const movesById = new Map<string, boolean>();
 
-  // Roots that actually move: selected, visible and draggable.
-  const movingRoots = selectedWithChildren.filter(
-    (node) => node.selected && !node.computedHidden && (node.draggable ?? true)
-  );
+  const moves = (node: Node): boolean => {
+    const known = movesById.get(node.id);
+    if (known !== undefined) return known;
 
-  const hasHidden = selectedWithChildren.some((node) => node.computedHidden);
-  if (!hasHidden) {
-    return selectedWithChildren.filter((node) => node.draggable ?? true);
-  }
+    // Seeded before recursing, so a groupId cycle or self-link ends without moving.
+    movesById.set(node.id, false);
 
-  // Every descendant of a moving root travels with it, hidden or not.
-  const coveredByMovingRoots = new Set<string>();
-  for (const root of movingRoots) {
-    for (const descendantId of flow.modelLookup.getAllDescendantIds(root.id)) {
-      coveredByMovingRoots.add(descendantId);
-    }
-  }
+    const parent = node.groupId ? nodesById.get(node.groupId) : undefined;
+    const result = parent ? moves(parent) : node.draggable !== false && !node.computedHidden;
 
-  return selectedWithChildren.filter((node) => {
-    if (!(node.draggable ?? true)) return false;
-    if (!node.computedHidden) return true;
-    return coveredByMovingRoots.has(node.id);
-  });
+    movesById.set(node.id, result);
+    return result;
+  };
+
+  return selectedWithChildren.filter(moves);
 };
 
 /**
@@ -51,3 +55,26 @@ export const getMovableSelection = (flow: FlowCore): Node[] => {
  */
 export const hasMovableSelection = (flow: FlowCore): boolean =>
   flow.config.nodeDraggingEnabled && getMovableSelection(flow).length > 0;
+
+/**
+ * Whether a drag that starts from the pressed node would move it. A press on a non-draggable node never starts
+ * a drag. A node that is or joins the selection set follows the rule of `getMovableSelection`: a selected node,
+ * or an unselected descendant of a selected node that the multi-selection modifier adds to the selection.
+ * Any other unselected node becomes the selection or tops its own chain, so it moves. Without `modifiers`, the
+ * press is judged as a press without the multi-selection modifier.
+ */
+export const movesOnPress = (flow: FlowCore, node: Node, modifiers?: InputModifiers): boolean => {
+  if (node.draggable === false) return false;
+
+  const inSelection = flow.modelLookup
+    .getSelectedNodesWithChildren({ directOnly: false })
+    .some(({ id }) => id === node.id);
+  if (
+    !inSelection ||
+    (!node.selected && !(modifiers && flow.shortcutManager.matchesAction('multiSelection', { modifiers })))
+  ) {
+    return true;
+  }
+
+  return getMovableSelection(flow).some(({ id }) => id === node.id);
+};

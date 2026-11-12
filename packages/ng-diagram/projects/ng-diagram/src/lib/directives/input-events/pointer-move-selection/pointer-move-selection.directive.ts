@@ -1,5 +1,6 @@
 import { Directive, inject, input, type OnDestroy } from '@angular/core';
 import { FPS_60, NgDiagramMath, type Node, Point } from '../../../../core/src';
+import { movesOnPress } from '../../../../core/src/input-events/handlers/movable-selection';
 import { NgDiagramComponent } from '../../../components/diagram/ng-diagram.component';
 import { FlowCoreProviderService } from '../../../services';
 import { InputEventsRouterService } from '../../../services/input-events/input-events-router.service';
@@ -200,8 +201,12 @@ export class PointerMoveSelectionDirective implements OnDestroy {
   }
 
   private shouldHandle(event: PointerInputEvent): boolean {
+    const flowCore = this.flowCoreProvider.provide();
+    const targetData = this.targetData();
+    // A press on a node that would not move falls through to panning.
     const isDraggable =
-      this.flowCoreProvider.provide().config.nodeDraggingEnabled && (this.targetData()?.draggable ?? true);
+      flowCore.config.nodeDraggingEnabled &&
+      (!targetData || movesOnPress(flowCore, targetData, this.inputEventsRouter.getBaseEvent(event).modifiers));
     if (!isDraggable || shouldDiscardEvent(event, 'drag')) {
       return false;
     }
