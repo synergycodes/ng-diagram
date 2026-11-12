@@ -140,12 +140,12 @@ describe('InitState', () => {
   });
 
   describe('addPort', () => {
-    it('should store port in initializedPorts', () => {
+    it('should store port with its node id in initializedPorts', () => {
       const port = createMockPort('port1', 'node1');
       initState.addPort('node1', port);
 
       const key = 'node1->port1';
-      expect(initState.initializedPorts.get(key)).toEqual(port);
+      expect(initState.initializedPorts.get(key)).toEqual({ nodeId: 'node1', port });
     });
 
     it('should add port to portsToMeasure', () => {
@@ -167,12 +167,12 @@ describe('InitState', () => {
   });
 
   describe('addLabel', () => {
-    it('should store label in initializedLabels', () => {
+    it('should store label with its edge id in initializedLabels', () => {
       const label = createMockEdgeLabel('label1');
       initState.addLabel('edge1', label);
 
       const key = 'edge1->label1';
-      expect(initState.initializedLabels.get(key)).toEqual(label);
+      expect(initState.initializedLabels.get(key)).toEqual({ edgeId: 'edge1', label });
     });
 
     it('should add label to labelsToMeasure', () => {
@@ -367,6 +367,114 @@ describe('InitState', () => {
     });
   });
 
+  describe('pruneUnmeasurableExpectations with ids that contain ->', () => {
+    const createUnmeasuredPort = (id: string, nodeId: string): Port => ({
+      ...createMockPort(id, nodeId),
+      size: undefined,
+      position: undefined,
+    });
+
+    const createUnmeasuredLabel = (id: string): EdgeLabel => ({
+      ...createMockEdgeLabel(id),
+      size: undefined,
+    });
+
+    it('should prune only the hidden port when port ids contain ->', () => {
+      let hiddenPortIds = new Set<string>();
+      const filteredInitState = new InitState({
+        isNodeMeasurable: () => true,
+        isPortMeasurable: (_nodeId, portId) => !hiddenPortIds.has(portId),
+        isLabelMeasurable: () => true,
+      });
+
+      const node: Node = {
+        ...createMockNode('n1', true),
+        measuredPorts: [createUnmeasuredPort('a', 'n1'), createUnmeasuredPort('a->b', 'n1')],
+      };
+      filteredInitState.collectAlreadyMeasuredItems([node], []);
+
+      hiddenPortIds = new Set(['a']);
+      filteredInitState.pruneUnmeasurableExpectations();
+
+      // Port 'a->b' is still visible and unmeasured, so it must keep blocking init.
+      expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(false);
+
+      filteredInitState.trackPortMeasurement('n1', 'a->b', createValidSize(), createValidPosition());
+
+      expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(true);
+    });
+
+    it('should prune port expectations of a hidden node whose id contains ->', () => {
+      let hiddenNodeIds = new Set<string>();
+      const filteredInitState = new InitState({
+        isNodeMeasurable: (nodeId) => !hiddenNodeIds.has(nodeId),
+        isPortMeasurable: (nodeId) => !hiddenNodeIds.has(nodeId),
+        isLabelMeasurable: () => true,
+      });
+
+      const node: Node = {
+        ...createMockNode('a->b'),
+        size: undefined,
+        measuredPorts: [createUnmeasuredPort('p', 'a->b')],
+      };
+      filteredInitState.collectAlreadyMeasuredItems([node], []);
+
+      expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(false);
+
+      hiddenNodeIds = new Set(['a->b']);
+      filteredInitState.pruneUnmeasurableExpectations();
+
+      expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(true);
+    });
+
+    it('should prune only the hidden label when label ids contain ->', () => {
+      let hiddenLabelIds = new Set<string>();
+      const filteredInitState = new InitState({
+        isNodeMeasurable: () => true,
+        isPortMeasurable: () => true,
+        isLabelMeasurable: (_edgeId, labelId) => !hiddenLabelIds.has(labelId),
+      });
+
+      const edge: Edge = {
+        ...createMockEdge('e1'),
+        measuredLabels: [createUnmeasuredLabel('x'), createUnmeasuredLabel('x->y')],
+      };
+      filteredInitState.collectAlreadyMeasuredItems([], [edge]);
+
+      hiddenLabelIds = new Set(['x->y']);
+      filteredInitState.pruneUnmeasurableExpectations();
+
+      // Label 'x' is still visible and unmeasured, so it must keep blocking init.
+      expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(false);
+
+      filteredInitState.trackLabelMeasurement('e1', 'x', createValidSize());
+
+      expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(true);
+    });
+
+    it('should prune label expectations of a hidden edge whose id contains ->', () => {
+      let hiddenEdgeIds = new Set<string>();
+      const filteredInitState = new InitState({
+        isNodeMeasurable: () => true,
+        isPortMeasurable: () => true,
+        isLabelMeasurable: (edgeId) => !hiddenEdgeIds.has(edgeId),
+      });
+
+      const edge: Edge = {
+        ...createMockEdge('a->b'),
+        measuredLabels: [createUnmeasuredLabel('l')],
+      };
+      filteredInitState.collectAlreadyMeasuredItems([], [edge]);
+
+      expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(false);
+
+      hiddenEdgeIds = new Set(['a->b']);
+      filteredInitState.pruneUnmeasurableExpectations();
+
+      expect(filteredInitState.allEntitiesHaveMeasurements()).toBe(true);
+    });
+  });
+
   describe('applyToDiagramState', () => {
     let mockFlowCore: {
       getState: Mock;
@@ -542,6 +650,78 @@ describe('InitState', () => {
 
       const setStateCall = mockFlowCore.setState.mock.calls[0][0];
       expect(setStateCall.edges[0].measuredLabels[0].size).toEqual(newSize);
+    });
+
+    it('should apply initial labels to the edge whose id contains ->', () => {
+      const edgeId = 'node-a:out->node-b';
+      const edge = createMockEdge(edgeId);
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [],
+        edges: [edge],
+      });
+
+      const labelId = 'node-a:out->node-b-label';
+      const label: EdgeLabel = { id: labelId, positionOnEdge: 0.5 };
+      const measuredSize = { width: 120, height: 30 };
+      initState.addLabel(edgeId, label);
+      initState.trackLabelMeasurement(edgeId, labelId, measuredSize);
+      initState.applyToDiagramState(mockFlowCore);
+
+      const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+      expect(setStateCall.edges).toHaveLength(1);
+      expect(setStateCall.edges[0].id).toBe(edgeId);
+      expect(setStateCall.edges[0].measuredLabels).toEqual([{ ...label, size: measuredSize }]);
+    });
+
+    it('should apply initial ports to the node whose id contains ->', () => {
+      const nodeA = createMockNode('a', true);
+      const nodeAB = createMockNode('a->b', true);
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [nodeA, nodeAB],
+        edges: [],
+      });
+
+      const port = createMockPort('p', 'a->b');
+      const measuredSize = { width: 12, height: 8 };
+      const measuredPosition = { x: 3, y: 4 };
+      initState.addPort('a->b', port);
+      initState.trackPortMeasurement('a->b', 'p', measuredSize, measuredPosition);
+      initState.applyToDiagramState(mockFlowCore);
+
+      const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+      const appliedA = setStateCall.nodes.find((node: Node) => node.id === 'a');
+      const appliedAB = setStateCall.nodes.find((node: Node) => node.id === 'a->b');
+      expect(appliedAB.measuredPorts).toEqual([{ ...port, size: measuredSize, position: measuredPosition }]);
+      expect(appliedA.measuredPorts).toBeUndefined();
+    });
+
+    it('should keep ports apart when parent and port ids join to the same string', () => {
+      const nodeA = createMockNode('a', true);
+      const nodeAB = createMockNode('a->b', true);
+      mockFlowCore.getState.mockReturnValue({
+        nodes: [nodeA, nodeAB],
+        edges: [],
+      });
+
+      // Node 'a' + port 'b->c' and node 'a->b' + port 'c' both read "a->b->c" when joined.
+      const portOnA = createMockPort('b->c', 'a');
+      const portOnAB = createMockPort('c', 'a->b');
+      const sizeOnA = { width: 11, height: 7 };
+      const positionOnA = { x: 1, y: 2 };
+      const sizeOnAB = { width: 22, height: 14 };
+      const positionOnAB = { x: 5, y: 6 };
+
+      initState.addPort('a', portOnA);
+      initState.addPort('a->b', portOnAB);
+      initState.trackPortMeasurement('a', 'b->c', sizeOnA, positionOnA);
+      initState.trackPortMeasurement('a->b', 'c', sizeOnAB, positionOnAB);
+      initState.applyToDiagramState(mockFlowCore);
+
+      const setStateCall = mockFlowCore.setState.mock.calls[0][0];
+      const appliedA = setStateCall.nodes.find((node: Node) => node.id === 'a');
+      const appliedAB = setStateCall.nodes.find((node: Node) => node.id === 'a->b');
+      expect(appliedA.measuredPorts).toEqual([{ ...portOnA, size: sizeOnA, position: positionOnA }]);
+      expect(appliedAB.measuredPorts).toEqual([{ ...portOnAB, size: sizeOnAB, position: positionOnAB }]);
     });
 
     it('should preserve other state properties', () => {
