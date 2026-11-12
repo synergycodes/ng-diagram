@@ -44,7 +44,9 @@ repository. These are its intentional differences. Code comments and the `RULES`
   - Elsewhere, and on Save-Data, without JavaScript or after a failed load, the stage shows a
     still image of the diagram (`heroStill`) instead of the mockup's screenshot.
   - On phones the stage takes the still's proportions instead of 4:3.
-  - The stage is also limited by the window height.
+  - In two columns, in a window too short to centre the copy on the stage with its buttons in the
+    first screen (under about 705px tall), the copy moves up just far enough to keep them there,
+    24px above its edge. The stage keeps the mockup's size at every height.
 - **O8 Forced colours and motion.**
   - The menu lines, mask markers, the selected tab and segment, `.copy.done` and the disabled
     states stay visible in forced colours.
