@@ -15,6 +15,8 @@ interface Props {
   description: string;
   /** Absolute canonical URL; by default the site URL of the current path. */
   canonical?: string;
+  /** Keeps the page out of search results and leaves out its canonical URL (the 404 page). */
+  noindex?: boolean;
   /** schema.org type of the page node in the structured data. */
   pageType?: PageNode['type'];
   /** Further structured data of the page (schema.org nodes), after the site's entities and the page node. */
@@ -45,7 +47,7 @@ const structuredData = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {Astro.props.noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta name="theme-color" content="#09090f" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="ngDiagram" />
