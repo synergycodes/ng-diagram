@@ -16,6 +16,17 @@
 .comm-head .lead {
   margin-inline: auto;
 }
+/* The closing call has every block's padding (base.css, below-45em.css). The mockup gives it 44px
+   above its title, and none below 45em, which only works with the quotes' bottom padding right
+   above the title; the project facts band stands between them. */
+#community > .wrap {
+  padding-block: 100px;
+}
+@media (max-width: 45em) {
+  #community > .wrap {
+    padding-block: 64px;
+  }
+}
 
 /* O2: a domain with up to three templates is a card grid (the mockup had placeholders to page
    through in every domain); a domain with more pages them in the mockup's row (RowScroller). */

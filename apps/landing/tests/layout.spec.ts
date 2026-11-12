@@ -83,6 +83,31 @@ test.describe('first screen (O7)', () => {
   }
 });
 
+test.describe('closing call (O6)', () => {
+  // The call has every block's padding (here the FAQ's): its title stands as far below the project
+  // facts band's bottom rule as a block's title below its own top rule, and the same padding
+  // closes it below its button.
+  for (const width of [320, 390, 720, 721, 1024, 1025, 1440]) {
+    test(`${width}px: the call has the blocks' padding`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await openLanding(page);
+      const gaps = await page.evaluate(() => {
+        const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+        const style = (selector: string) => getComputedStyle(document.querySelector(selector)!);
+        return {
+          aboveTitle: box('#closing-title').top - box('.quad-sec .quad').bottom,
+          blockAboveTitle: box('#faq-title').top - box('#faq').top - parseFloat(style('#faq').borderTopWidth),
+          bottom: style('#community > .wrap').paddingBottom,
+          blockBottom: style('#faq > .wrap').paddingBottom,
+        };
+      });
+      expect(gaps.blockAboveTitle).toBeGreaterThan(0);
+      expect(Math.round(gaps.aboveTitle)).toBe(Math.round(gaps.blockAboveTitle));
+      expect(gaps.bottom).toBe(gaps.blockBottom);
+    });
+  }
+});
+
 test('/contact 1440x900: step 1 of the form is in the first screen', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openLanding(page, '/contact');
