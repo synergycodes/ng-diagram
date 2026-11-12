@@ -1,0 +1,55 @@
+---
+title: CAD Mouse Controls Example
+description: Example of CAD-like mouse controls in ngDiagram - middle mouse panning, wheel zooming and directional box selection
+version: 'since v1.1.0'
+sidebar:
+  order: 7
+  label: CAD Mouse Controls
+  badge: New
+---
+
+import CodeViewer from '@components/code-viewer/code-viewer.astro';
+import CadMouseControls from '@examples/cad-mouse-controls/cad-mouse-controls.astro';
+
+This example shows mouse controls known from CAD tools: the middle mouse button pans the viewport, the wheel zooms, and a drag on the background draws a selection box.
+
+Drag from left to right to draw a blue **window** box - it selects only the nodes that are fully inside. Drag from right to left to draw a green **crossing** box - it selects every node it touches. In both modes an edge is selected when the nodes at both of its ends are. You can change the direction during the drag. A press on a node or an edge still selects and moves it, and a press on a port still draws an edge.
+
+<br />
+
+<CadMouseControls />
+<CodeViewer dirName="examples/cad-mouse-controls" />
+
+## Additional Explanation
+
+The example uses only the public API. Two directives sit on the element that wraps `<ng-diagram>`. Their `pointerdown` listeners use the capture phase, so they run before the listeners of the diagram.
+
+- `MiddleMousePanDirective` handles a middle button press and stops it, so the diagram does not see it. It captures the pointer and moves the viewport with [`NgDiagramViewportService.moveViewportBy()`](/docs/api/services/ngdiagramviewportservice/#moveviewportby) on every move. It also prevents the browser autoscroll.
+- `DirectionalBoxSelectionDirective` decides on every press if a drag without a modifier starts a box selection. The diagram checks the `boxSelection` shortcut when the press reaches it. The directive adds a binding without a modifier for a left button press on the background, and keeps only the <kbd>Shift</kbd> binding for other presses. Presses on nodes and edges, including ports and resize, rotate and relink handles, keep their default behavior.
+- While a box is drawn, the directive compares the pointer position with the start point and sets [`partialInclusion`](/docs/api/types/configuration/features/boxselectionconfig/#partialinclusion). The selection reads this option on every move, so the mode can change during the drag. The directive exposes the mode as a signal and as the `data-box-selection-mode` attribute. The styles use it to set the `--ngd-box-selection-*` CSS variables, and the legend uses it to highlight the active mode.
+
+<kbd>Shift</kbd> + drag still draws a box anywhere, also over nodes, as in the default configuration.
+<kbd>Ctrl/Cmd</kbd> + click still adds nodes to the selection.
+
+The wheel zoom needs only the config. The `zoom` shortcut gets a binding without a modifier, and the <kbd>Ctrl/Cmd</kbd> binding is kept:
+
+```typescript
+shortcuts: configureShortcuts([
+  {
+    actionName: 'zoom',
+    bindings: [{ modifiers: {} }, { modifiers: { primary: true } }],
+  },
+]),
+```
+
+With this binding a two-finger scroll on a trackpad also zooms. <kbd>Shift</kbd> + wheel and the arrow keys still pan.
+
+### Key Concepts
+
+- Changing the bindings of a shortcut with [`configureShortcuts()`](/docs/api/utilities/configureshortcuts/) in the config and at runtime with [`updateConfig()`](/docs/api/services/ngdiagramservice/#updateconfig)
+- Modifier-only bindings for pointer and wheel actions, see [`ShortcutDefinition`](/docs/api/types/configuration/shortcuts/shortcutdefinition/)
+- Switching between window and crossing selection with the [`boxSelection`](/docs/api/types/configuration/features/boxselectionconfig/) config
+- Moving the viewport with [`NgDiagramViewportService`](/docs/api/services/ngdiagramviewportservice/)
+- Styling the selection box with the `--ngd-box-selection-*` CSS variables
+
+**Learn more:** [Keyboard Shortcuts guide →](/docs/guides/shortcut-manager/) · [Box Selection guide →](/docs/guides/box-selection/)

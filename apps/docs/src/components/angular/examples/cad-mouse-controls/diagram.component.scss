@@ -1,0 +1,83 @@
+.diagram {
+  --cad-window-color: #1096e7;
+  --cad-window-background: rgba(16, 150, 231, 0.12);
+  --cad-crossing-color: #1fa463;
+  --cad-crossing-background: rgba(31, 164, 99, 0.12);
+
+  position: relative;
+  display: flex;
+  height: var(--ng-diagram-height);
+  border: var(--ng-diagram-border);
+
+  // The box is blue for a window and green for a crossing
+  --ngd-box-selection-border-color: var(--cad-window-color);
+  --ngd-box-selection-background: var(--cad-window-background);
+
+  &[data-box-selection-mode='crossing'] {
+    --ngd-box-selection-border-color: var(--cad-crossing-color);
+    --ngd-box-selection-background: var(--cad-crossing-background);
+  }
+
+  // A drag on the background selects, so it shows a crosshair and not the grab cursor of panning
+  ng-diagram {
+    cursor: crosshair;
+  }
+
+  &.middle-mouse-panning,
+  &.middle-mouse-panning ng-diagram {
+    cursor: grabbing;
+  }
+}
+
+.legend {
+  position: absolute;
+  z-index: 1;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--ngd-txt-primary-default);
+  background-color: var(--ngd-ui-bg-primary-default);
+  border: var(--ng-diagram-border);
+  // The legend only informs, so presses and the wheel go to the diagram below
+  pointer-events: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+
+    &.active {
+      background-color: var(--ngd-ui-bg-tertiary-default);
+      font-weight: 600;
+    }
+  }
+
+  .input {
+    min-width: 8.5rem;
+    opacity: 0.7;
+  }
+
+  .swatch {
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 1px solid;
+
+    &.window {
+      border-color: var(--cad-window-color);
+      background-color: var(--cad-window-background);
+    }
+
+    &.crossing {
+      border-color: var(--cad-crossing-color);
+      background-color: var(--cad-crossing-background);
+    }
+  }
+}

@@ -46,6 +46,14 @@ export const examples: ContentTile[] = [
     imageAlt: 'Screenshot of Context Menu example',
   },
   {
+    title: 'CAD Mouse Controls',
+    description:
+      'Pan with the middle mouse button, zoom with the wheel and select with a window or crossing box, depending on the drag direction.',
+    href: '/docs/examples/cad-mouse-controls',
+    image: '/docs/assets/examples/cad-mouse-controls.png',
+    imageAlt: 'Screenshot of CAD Mouse Controls example',
+  },
+  {
     title: 'Expand/Collapse Subtree',
     description: 'Collapse and expand tree subtrees, with ELK.js re-layouting the visible nodes.',
     href: '/docs/examples/expand-collapse',
