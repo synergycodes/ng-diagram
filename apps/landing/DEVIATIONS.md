@@ -104,6 +104,9 @@ repository. These are its intentional differences. Code comments and the `RULES`
     library stays free under Apache 2.0, with no relicensing".
   - The Business modeling text describes the BPMN Editor as its showcase does, and Engineering
     names production-line monitoring and the Assembly Line template (O2).
+  - The AI section's heading reads "Your AI agent already speaks ngDiagram": the skills give the
+    agent more than the docs.
+  - The podcast and article cards in the resources row describe what each one covers.
 - **O17 Paging rows below 45em.**
   - A row's paging buttons and the skip link to them stay below 45em wherever there is a mouse,
     trackpad or pen, or no pointer at all, so a narrow window or a zoomed-in page can still page

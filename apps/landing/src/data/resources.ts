@@ -61,14 +61,14 @@ export const resources: Resource[] = [
     meta: ['Podcast', 'NG Poland', '55 min'],
     title: 'Angular diagramming library built from scratch – ngDiagram',
     description:
-      'Jakub Kubacki and Łukasz Jaźwa on why the team built its own engine instead of wrapping React Flow, GoJS, or JointJS.',
+      'Jakub Kubacki and Łukasz Jaźwa on building an Angular-first diagramming engine from scratch, from API design to canvas performance.',
     image: podcast,
     youtubeId: 'FbMcwWR4Ppw',
   },
   {
     meta: ['Article', 'dev.to'],
     title: "I've used GoJS for years. Here's what happened when I built an org chart with ngDiagram",
-    description: 'Org chart in 3 weeks: what beat GoJS and what you build yourself.',
+    description: 'An org chart in 3 weeks: what ngDiagram gives you and what you build yourself.',
     image: articleGojs,
     href: 'https://dev.to/ngdiagram-dev/ive-used-gojs-for-years-heres-what-happened-when-i-built-an-org-chart-with-ngdiagram-1gkn',
     linkLabel: 'Read on dev.to',
