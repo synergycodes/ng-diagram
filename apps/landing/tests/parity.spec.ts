@@ -245,6 +245,9 @@ const RULES: Rule[] = [
   { register: 'O6', section: '.native-sec', widths: [0, 720] },
   // "Ask the ngDiagram team" leads to a page of this site: same tab, no arrow.
   { register: 'O10', section: '.tpl-ask', kinds: ['probes'] },
+  // The paging buttons stay below 45em with a mouse, as in this run (in .tpl, O2 already allows
+  // every difference).
+  { register: 'O17', section: '.res', kinds: ['height'], widths: [0, 720] },
   // The kind, source and length of a resource stand under its description.
   { register: 'O15', section: '.res' },
   // FAQ answers are at most 72ch wide.

@@ -20,6 +20,18 @@
 /* O2: a domain with up to three templates is a card grid (the mockup had placeholders to page
    through in every domain); a domain with more pages them in the mockup's row (RowScroller). */
 
+/* O17: below 45em the mockup drops a row's paging buttons and the skip link to them, as a swipe
+   pages the row. They stay wherever there is a mouse, trackpad or pen, or no pointer at all, so
+   a narrow window or a zoomed-in page can still be paged; touch-only devices swipe. */
+@media (max-width: 45em) and (any-pointer: fine), (max-width: 45em) and (pointer: none) {
+  .tpl-foot {
+    display: flex;
+  }
+  .skip-row {
+    display: inline-flex;
+  }
+}
+
 /* O15: the newer sections held to the design system's rules. */
 /* Resources: kind, source and length as a quiet line under the description, in sentence case,
    instead of an uppercase label above the title; a part never breaks inside. */

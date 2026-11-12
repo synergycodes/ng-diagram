@@ -94,6 +94,12 @@ repository. These are its intentional differences. Code comments and the `RULES`
     library stays free under Apache 2.0, with no relicensing".
   - The Business modeling text describes the BPMN Editor as its showcase does, and Engineering
     names production-line monitoring and the Assembly Line template (O2).
+- **O17 Paging rows below 45em.**
+  - A row's paging buttons and the skip link to them stay below 45em wherever there is a mouse,
+    trackpad or pen, or no pointer at all, so a narrow window or a zoomed-in page can still page
+    the row.
+  - On touch-only devices they go, as in the mockup, and a swipe pages the row.
+  - Where one card fits, the position reads "Templates 2 of 4" (the mockup: "Templates 2–2 of 4").
 - **Link previews**, which the mockup does not have:
   - both pages share one image for Open Graph and a large Twitter card: `SHARE_IMAGE` in
     `src/config/landing.ts` (`src/assets/og-image.jpg`, 1200 × 631, with its alt text).

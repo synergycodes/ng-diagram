@@ -21,8 +21,9 @@ const Noun = noun.charAt(0).toUpperCase() + noun.slice(1);
   /*
    * The mockup's paging row (variant A2): a real horizontal scroller (wheel, trackpad, touch and
    * keyboard all scroll it) with three cards and a part of the fourth, and two buttons below it
-   * that page by the visible width. The buttons and the skip link go below 45em, where one card
-   * and a part of the next carry the affordance. Script: scripts/scroller.ts.
+   * that page by the visible width. Below 45em, on touch-only devices, the buttons and the skip
+   * link go: a swipe pages the row, and one card and a part of the next carry the affordance.
+   * With a mouse, trackpad or pen they stay (O17). Script: scripts/scroller.ts.
    */
 }
 <div class="tpl-rowwrap">

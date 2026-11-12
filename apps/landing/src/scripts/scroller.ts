@@ -38,7 +38,10 @@ export function initScrollers(): void {
       next.setAttribute('aria-disabled', String(scroller.scrollLeft >= max - 1));
     };
 
-    /** "Templates 1–3 of 4", from the first card at the scroll position and the cards that fit. */
+    /**
+     * "Templates 1–3 of 4", from the first card at the scroll position and the cards that fit;
+     * "Templates 2 of 4" where one card fits (O17).
+     */
     const position = (): string => {
       const card = scroller.querySelector<HTMLElement>('.tpl-card');
       if (!card || !scroller.clientWidth) {
@@ -47,7 +50,7 @@ export function initScrollers(): void {
       const step = card.offsetWidth + GAP;
       const first = Math.min(total, Math.round(scroller.scrollLeft / step) + 1);
       const last = Math.min(total, first + Math.max(1, Math.floor((scroller.clientWidth + GAP) / step)) - 1);
-      return `${noun} ${first}–${last} of ${total}`;
+      return first === last ? `${noun} ${first} of ${total}` : `${noun} ${first}–${last} of ${total}`;
     };
 
     const settle = (): void => {

@@ -284,6 +284,42 @@ test.describe('tabs, segment and copy (1440px)', () => {
   });
 });
 
+test.describe('paging rows below 45em (O17)', () => {
+  const displays = (page: Page, selector: string) =>
+    page.$$eval(selector, (elements) => elements.map((element) => getComputedStyle(element).display));
+
+  test('with a mouse: the buttons and the skip link stay, and a press pages one card', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openLanding(page);
+    const row = page.locator('#tpl-scroller-engineering');
+    const next = page.getByRole('button', { name: 'Next templates' });
+    await expect(next).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Next videos and articles' })).toBeVisible();
+
+    await next.click();
+    await expect.poll(() => row.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+    // One card fits, so the position names it alone.
+    await expect(page.locator('[data-announcer]')).toHaveText('Templates 2 of 4');
+
+    const skip = page.locator('#templates .skip-row');
+    await skip.focus();
+    await expect(skip).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#tpl-scroller-engineering-controls')).toBeFocused();
+  });
+
+  test('on a touch-only phone: the buttons and the skip link go, and the row still scrolls', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    const page = await context.newPage();
+    await openLanding(page);
+    expect(new Set(await displays(page, '.tpl-foot, .skip-row'))).toEqual(new Set(['none']));
+    for (const id of ['#tpl-scroller-engineering', '#res-scroller']) {
+      expect(await page.locator(id).evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+    }
+    await context.close();
+  });
+});
+
 test('without JavaScript: every panel, no script-only controls, a static menu', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
