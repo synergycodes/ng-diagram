@@ -1,0 +1,34 @@
+---
+import PageLink from '../components/PageLink.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { LINKS, SITE } from '../config/landing';
+import Layout from '../layouts/Layout.astro';
+import '../styles/pages/not-found.css';
+---
+
+<Layout
+  title="Page not found – ngDiagram"
+  description="This page does not exist. Head back to the ngDiagram home page, the docs or the examples."
+  canonical={`${SITE}/404`}
+  noindex
+>
+  <SiteHeader />
+  <main id="main" tabindex="-1">
+    <section class="block not-found" aria-labelledby="not-found-title">
+      <div class="not-found-fx" aria-hidden="true"></div>
+      <div class="wrap">
+        <p class="not-found-code" aria-hidden="true">404</p>
+        <h1 id="not-found-title" class="grad">This page is not on the diagram</h1>
+        <p class="lead">
+          The link may be outdated or mistyped. Start from the home page, or jump straight into the documentation.
+        </p>
+        <div class="cta-row">
+          <PageLink class="btn btn-primary" href="/">Back to home</PageLink>
+          <PageLink class="btn btn-secondary" href={LINKS.docs}>Read the docs</PageLink>
+        </div>
+      </div>
+    </section>
+  </main>
+  <SiteFooter />
+</Layout>

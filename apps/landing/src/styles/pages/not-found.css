@@ -1,0 +1,80 @@
+/*
+ * The 404 page. Not in the landing mockup: it reuses the hero's backdrop (two purple glows, the dot
+ * grid, edges fading into the page) and the landing's buttons, headings and tokens.
+ */
+@layer tokens, mockup, deviations, pages;
+
+@layer pages {
+  /* The page fills the window, so the footer stays at the bottom. */
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+  main {
+    flex: 1 0 auto;
+    display: flex;
+  }
+  footer {
+    margin-top: auto;
+  }
+
+  .not-found {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    border-top: 0;
+    text-align: center;
+    background:
+      radial-gradient(42% 50% at 70% 48%, rgba(150, 46, 229, 0.22), transparent 70%),
+      radial-gradient(40% 40% at 20% 85%, rgba(150, 46, 229, 0.12), transparent 70%);
+  }
+  .not-found::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      var(--bg) 0,
+      rgba(9, 9, 15, 0) 96px,
+      rgba(9, 9, 15, 0) calc(100% - 120px),
+      var(--bg) 100%
+    );
+  }
+  .not-found-fx {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.14) 1px, transparent 1.4px);
+    background-size: 24px 24px;
+    background-position: center 12px;
+  }
+  .not-found > .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding-block: 72px;
+  }
+  .not-found-code {
+    margin: 0 0 8px;
+    color: var(--purple-2);
+    font-family: var(--font-roboto-mono, monospace);
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+  }
+  .not-found h1 + .lead {
+    max-width: 52ch;
+    margin: 24px auto 0;
+    text-wrap: balance;
+  }
+  .not-found .cta-row {
+    justify-content: center;
+    margin-top: 36px;
+  }
+}
