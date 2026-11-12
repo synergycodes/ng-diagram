@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Edges lose `selected` on load and save, like nodes** — `initializeModel()`, `initializeModelAdapter()` and `toJSON()` of the default model now remove `selected` from edges too, and so does a custom `ModelAdapter` whose `toJSON()` calls the exported `stripEdgeRuntimeProperties`, so saved data no longer restores the selection of edges; to keep it, wrap `stripEdgeRuntimeProperties` in your own strip function ([#845](https://github.com/synergycodes/ng-diagram/pull/845))
+
 ## [1.4.0] - 2026-10-02
 
 ### Deprecated

@@ -120,7 +120,7 @@ export class TaskNodeComponent implements NgDiagramNodeTemplate<TaskData> {
 
 ## Edge cases
 
-- Switching virtualization re-initializes the diagram: node selection is cleared (`toJSON()` drops node `selected` but keeps edge `selected`), `diagramInit` fires again, and `zoom.zoomToFit.onInit` runs again (with virtualization on, it only logs the warning).
+- Switching virtualization re-initializes the diagram: the selection is cleared (`toJSON()` drops `selected` from nodes and edges), `diagramInit` fires again, and `zoom.zoomToFit.onInit` runs again (with virtualization on, it only logs the warning).
 - Your middlewares run on every update pass, including each drag frame. Return early (`next()`) when the update does not concern them; never `await` service calls inside a middleware (see `ng-diagram-middleware`).
 - While the user pans, viewport updates skip the middleware chain, so middlewares cost nothing during pans.
 - Many template `[ngDiagramHidden]` bindings changing in one change detection cycle are processed together, but the model flag is still cheaper.

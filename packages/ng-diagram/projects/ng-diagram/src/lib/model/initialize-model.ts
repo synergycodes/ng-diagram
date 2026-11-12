@@ -46,6 +46,10 @@ export interface InitializeModelOptions {
    * Overriding this function and keeping such properties is unsupported
    * territory; prefer wrapping the default and re-adding only the properties
    * you know you need.
+   *
+   * The default also drops `selected`, so edges load unselected. Keeping the
+   * selection of edges is supported: wrap the default and re-add
+   * `selected: edge.selected`.
    */
   stripEdgeRuntimeProperties?: StripEdgeRuntimePropertiesFn;
 }

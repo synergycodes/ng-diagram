@@ -141,7 +141,7 @@ async exportPng(): Promise<void> {
   }
 }
 
-// toJSON() drops computed values (measured*, computed*, node selection); details in ng-diagram-persistence
+// toJSON() drops computed values (measured*, computed*, selection of nodes and edges); details in ng-diagram-persistence
 exportJson(): void {
   const blob = new Blob([this.modelService.toJSON()], { type: 'application/json' });
   const anchor = document.createElement('a');

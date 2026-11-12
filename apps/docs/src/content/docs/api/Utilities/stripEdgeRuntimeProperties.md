@@ -9,10 +9,15 @@ title: "stripEdgeRuntimeProperties"
 > **stripEdgeRuntimeProperties**(`edge`): [`Edge`](/docs/api/types/model/edge/)
 
 Strips runtime-computed properties from an edge
-(`sourcePosition`, `targetPosition`, `measuredLabels`, `computedZIndex`, `computedHidden`, `_internalId`).
+(`sourcePosition`, `targetPosition`, `measuredLabels`, `computedZIndex`, `computedHidden`, `_internalId`)
+and its selection state (`selected`).
 
-These properties are recomputed during initialization and stale values
+The runtime-computed properties are recomputed during initialization and stale values
 from persistence cause the measurement system to skip fresh DOM measurement.
+
+`selected` is dropped and never restored, so a loaded edge starts unselected.
+To keep the selection of edges, use a custom strip function that wraps this one
+and re-adds `selected: edge.selected`.
 
 Free endpoints of dangling edges are the exception: when `source` or `target`
 is empty, the corresponding `sourcePosition`/`targetPosition` is authored data

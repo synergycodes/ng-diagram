@@ -20,13 +20,13 @@ Saving with `toJSON()`, restoring by creating a new model, what is kept and stri
 
 ## What `toJSON()` keeps and strips
 
-| | Stripped (runtime values, rebuilt after load except node `selected`) | Kept |
+| | Stripped (runtime values, rebuilt after load except `selected`) | Kept |
 | --- | --- | --- |
 | Nodes | `selected`, `measuredPorts`, `measuredBounds`, `computedZIndex`, `computedHidden`, internal id | everything else: `id`, `position`, `data`, `type`, `size`, `hidden`, `groupId`, `zOrder`, `angle`, flags, ... |
-| Edges | `sourcePosition`, `targetPosition`, `measuredLabels`, `computedZIndex`, `computedHidden`, internal id | everything else, including `points`, `selected`, `hidden`, `routing`, `routingMode`, and the `sourcePosition`/`targetPosition` of a free end (empty `source`/`target`, since 1.3.0) |
+| Edges | `selected`, `sourcePosition`, `targetPosition`, `measuredLabels`, `computedZIndex`, `computedHidden`, internal id | everything else, including `points`, `hidden`, `routing`, `routingMode`, and the `sourcePosition`/`targetPosition` of a free end (empty `source`/`target`, since 1.3.0) |
 | Metadata | nothing | the whole object: `viewport` (`x`, `y`, `scale`, size) and your `metadata.data` |
 
-`initializeModel` and `initializeModelAdapter` strip the same properties from whatever they receive, so a model serialized another way still loads correctly. Node `selected` is dropped both on save and on load, but edge `selected` is kept, so edges that were selected come back selected.
+`initializeModel` and `initializeModelAdapter` strip the same properties from whatever they receive, so a model serialized another way still loads correctly. `selected` is dropped from nodes and edges both on save and on load, so a saved selection does not come back.
 
 ## Save and load
 
@@ -148,7 +148,7 @@ The default model logs `Undo is not implemented in the current model. Please imp
 | Symptom | Cause and fix |
 | --- | --- |
 | Ctrl+Z / Ctrl+Y do nothing; console `Undo is not implemented in the current model...` | Default model. Implement `undo()`/`redo()` in a custom adapter. |
-| Node selection is lost after load | `selected` is stripped on save and load. Select again after `(diagramInit)`, or keep it with a custom strip function (at your own risk). |
+| Selection of nodes and edges is lost after load | `selected` is stripped on save and load. Select again after `(diagramInit)`, or keep it with a custom strip function (at your own risk). |
 | Calls right after a load do nothing | They reached the old engine. Wait for `(diagramInit)`. |
 | A middleware added with `registerMiddleware` stops running after load | New engine. Register it again after `(diagramInit)` or use the `[middlewares]` input (`ng-diagram-middleware`). |
 | Settings changed with `updateConfig()` are back to their old values after a load | The new engine starts from `[config]`. Keep `[config]` in sync or re-apply after `(diagramInit)` (`ng-diagram-config`). |
