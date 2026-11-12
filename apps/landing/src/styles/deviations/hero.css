@@ -7,6 +7,14 @@
 .hero {
   user-select: auto;
 }
+/* O4: the mockup lets the pointer through the whole copy to the diagram host underneath, and only
+   the links take it. The headline and the lead take it too, so a mouse drag or a long press
+   selects them; around and between them the pointer still reaches the diagram. A drag that starts
+   on the diagram goes on over the text, because the library follows it on the document. */
+.hero-copy h1,
+.hero-copy .lead {
+  pointer-events: auto;
+}
 
 .hero-diagram {
   position: absolute;
@@ -24,11 +32,25 @@
   }
 }
 
-/* O7: the stage is also limited by the window height, so on 1280 x 720 and 1366 x 768 the stage
-   and the calls to action fit in the first screen. The island scales the diagram to fit. */
-@media (min-width: 45.0625em) {
-  .hero-stage {
-    max-width: clamp(320px, 100svh - var(--nav-h) - 160px, 640px);
+/* O7: the stage keeps the mockup's size at every window height. In two columns the copy is centred
+   on it, so in a short window the buttons would fall below the first screen: there the copy moves
+   up just far enough that they end 24px above its edge, and never above the top of the row.
+   - The row starts under the bar, its 1px rule and the block's 100px padding; centred, the buttons
+     end half the stage plus half the copy below it.
+   - The stage is the right column (7 of 12 parts of the window less the wrap's two 24px gutters
+     and the 56px gap), at most 640px. The copy is at most about 23.5rem tall.
+   - In a tall enough window (about 705px with a 640px stage) the shift is 0, as in the mockup. */
+@media (min-width: 64.0625em) {
+  .hero-copy {
+    --hero-stage: min(640px, (100vw - 104px) * 7 / 12);
+    --hero-copy-height: 23.5rem;
+    top: min(
+      0px,
+      max(
+        (var(--hero-copy-height) - var(--hero-stage)) / 2,
+        100svh - var(--nav-h) - 1px - 100px - 24px - (var(--hero-stage) + var(--hero-copy-height)) / 2
+      )
+    );
   }
 }
 

@@ -74,6 +74,15 @@ const structuredData = {
     {LANDING_ANALYTICS && <Analytics />}
     <script is:inline>
       document.documentElement.classList.add('js');
+      // O8: in-page jumps glide only after the first click or key press, so the restore after a
+      // reload and the jump to a #fragment land at once (styles/deviations/a11y.css).
+      for (const type of ['pointerdown', 'keydown']) {
+        addEventListener(type, () => document.documentElement.setAttribute('data-smooth-scroll', ''), {
+          capture: true,
+          once: true,
+          passive: true,
+        });
+      }
     </script>
     <noscript>
       <style>

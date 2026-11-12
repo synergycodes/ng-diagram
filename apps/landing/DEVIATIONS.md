@@ -26,7 +26,8 @@ repository. These are its intentional differences. Code comments and the `RULES`
     `aria-hidden`.
   - Ctrl + wheel stays with the browser.
   - The watermark is off by config.
-  - The hero text stays selectable.
+  - The hero text stays selectable: the headline and the lead take the pointer. The mockup lets
+    the pointer through its whole copy to the diagram underneath, and only the buttons take it.
 - **O5 Tab names on phones.**
   - A name wraps between words, never inside one.
   - The count moves under the name only when the longest word and the count do not fit side by
@@ -43,12 +44,17 @@ repository. These are its intentional differences. Code comments and the `RULES`
   - Elsewhere, and on Save-Data, without JavaScript or after a failed load, the stage shows a
     still image of the diagram (`heroStill`) instead of the mockup's screenshot.
   - On phones the stage takes the still's proportions instead of 4:3.
-  - The stage is also limited by the window height.
+  - In two columns, in a window too short to centre the copy on the stage with its buttons in the
+    first screen (under about 705px tall), the copy moves up just far enough to keep them there,
+    24px above its edge. The stage keeps the mockup's size at every height.
 - **O8 Forced colours and motion.**
   - The menu lines, mask markers, the selected tab and segment, `.copy.done` and the disabled
     states stay visible in forced colours.
   - `100vh` comes before `100dvh`.
   - Smooth scrolling and transitions run only without reduced motion.
+  - Smooth scrolling starts with the visitor's first click or key press. A reload, or an address
+    with a #fragment, then shows its place at once; the mockup scrolls smoothly from the first
+    paint, so the page glides down from the top.
 - **O9 Semantics.**
   - The facts strip is a list.
   - Code blocks are named regions, and copy buttons have a hidden suffix.

@@ -2,12 +2,15 @@
  * O8 Forced colours and motion.
  */
 
-/* Smooth scrolling only when the visitor has not asked for less motion. */
+/* Smooth scrolling only when the visitor has not asked for less motion, and only after their first
+   click or key press (data-smooth-scroll, set by the inline script in Layout.astro). The browser
+   restores the position after a reload, and jumps to the address's #fragment, with the same
+   behaviour: smooth from the first paint, the page would glide down from the top. */
 html {
   scroll-behavior: auto;
 }
 @media (prefers-reduced-motion: no-preference) {
-  html {
+  html[data-smooth-scroll] {
     scroll-behavior: smooth;
   }
 }

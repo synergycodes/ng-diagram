@@ -89,6 +89,40 @@ const stillShown = (page: Page) =>
       (stage) => stage.getClientRects().length > 0 && getComputedStyle(stage).backgroundImage.includes('hero-still')
     );
 
+/** First and last glyph of `selector`'s text, in viewport px. */
+const textEnds = (page: Page, selector: string) =>
+  page.evaluate((selector) => {
+    const range = document.createRange();
+    range.selectNodeContents(document.querySelector(selector)!);
+    const rects = [...range.getClientRects()];
+    const first = rects[0]!;
+    const last = rects[rects.length - 1]!;
+    return {
+      first: { x: first.left + 2, y: first.top + first.height / 2 },
+      last: { x: last.right - 2, y: last.top + last.height / 2 },
+    };
+  }, selector);
+
+/** What a pointer reaches on the first glyph of `selector`: its text, the diagram host, or another element. */
+const pointerTarget = (page: Page, selector: string) =>
+  page.evaluate((selector) => {
+    const element = document.querySelector(selector)!;
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const line = range.getClientRects()[0]!;
+    const target = document.elementFromPoint(line.left + 2, line.top + line.height / 2);
+    if (target?.closest('[data-hero-diagram]')) {
+      return 'diagram';
+    }
+    return target && element.contains(target) ? 'text' : String(target?.nodeName);
+  }, selector);
+
+/** The page's selection with white space collapsed. */
+const selectedText = (page: Page) => page.evaluate(() => String(window.getSelection()).replace(/\s+/g, ' ').trim());
+
+const textOf = async (page: Page, selector: string) =>
+  ((await page.locator(selector).textContent()) ?? '').replace(/\s+/g, ' ').trim();
+
 async function expectNodesInStage(page: Page): Promise<void> {
   await expect
     .poll(async () => {
@@ -261,4 +295,67 @@ test('390px: the stage takes the proportions of the still (O7)', async ({ page }
     return { ratio: width! / height!, stage: box.width / box.height };
   });
   expect(Math.abs(stage - ratio)).toBeLessThan(0.01);
+});
+
+test('1440px: the headline and the lead can be selected over the live diagram, which keeps its drags (O4)', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openLanding(page);
+  expect(await waitForHeroSettled(page)).toBe('live');
+
+  for (const selector of ['.hero-copy h1', '.hero .lead']) {
+    expect(await pointerTarget(page, selector), selector).toBe('text');
+  }
+  // Between the headline and the lead the pointer still reaches the diagram.
+  const gap = await page.evaluate(() => {
+    const headline = document.querySelector('.hero-copy h1')!.getBoundingClientRect();
+    const lead = document.querySelector('.hero .lead')!.getBoundingClientRect();
+    return !!document
+      .elementFromPoint(headline.left + 2, (headline.bottom + lead.top) / 2)
+      ?.closest('[data-hero-diagram]');
+  });
+  expect(gap).toBe(true);
+
+  // A mouse drag over the headline selects it; a triple click selects the lead.
+  const headline = await textEnds(page, '.hero-copy h1');
+  await page.mouse.move(headline.first.x, headline.first.y);
+  await page.mouse.down();
+  await page.mouse.move(headline.last.x, headline.last.y, { steps: 12 });
+  await page.mouse.up();
+  expect(await selectedText(page)).toBe(await textOf(page, '.hero-copy h1'));
+
+  const lead = await textEnds(page, '.hero .lead');
+  await page.mouse.click(lead.first.x, lead.first.y, { clickCount: 3 });
+  expect(await selectedText(page)).toBe(await textOf(page, '.hero .lead'));
+
+  // A node dragged over the headline follows the pointer and stays where it is released.
+  await page.evaluate(() => window.getSelection()?.removeAllRanges());
+  const node = page.locator('ng-diagram-node[data-node-id="proceed-if-true"]');
+  const before = (await node.boundingBox())!;
+  // Its header, clear of the ports on its sides.
+  const grab = { x: before.x + before.width / 2, y: before.y + 30 };
+  const box = (await page.locator('.hero-copy h1').boundingBox())!;
+  const drop = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  await page.mouse.move(grab.x, grab.y);
+  await page.mouse.down();
+  await page.mouse.move(drop.x, drop.y, { steps: 20 });
+  await page.mouse.up();
+  const after = (await node.boundingBox())!;
+  expect(Math.abs(after.x - before.x - (drop.x - grab.x))).toBeLessThanOrEqual(TOLERANCE);
+  expect(Math.abs(after.y - before.y - (drop.y - grab.y))).toBeLessThanOrEqual(TOLERANCE);
+  await page.mouse.move(drop.x + 80, drop.y + 40, { steps: 4 });
+  const moved = (await node.boundingBox())!;
+  expect(Math.abs(moved.x - after.x) + Math.abs(moved.y - after.y)).toBeLessThanOrEqual(TOLERANCE);
+  expect(await selectedText(page)).toBe('');
+});
+
+test('390px phone: the headline and the lead take the pointer, not the diagram host (O4)', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  const page = await context.newPage();
+  await openLanding(page);
+  for (const selector of ['.hero-copy h1', '.hero .lead']) {
+    expect(await pointerTarget(page, selector), selector).toBe('text');
+  }
+  await context.close();
 });
