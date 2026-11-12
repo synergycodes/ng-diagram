@@ -26,7 +26,8 @@ repository. These are its intentional differences. Code comments and the `RULES`
     `aria-hidden`.
   - Ctrl + wheel stays with the browser.
   - The watermark is off by config.
-  - The hero text stays selectable.
+  - The hero text stays selectable: the headline and the lead take the pointer. The mockup lets
+    the pointer through its whole copy to the diagram underneath, and only the buttons take it.
 - **O5 Tab names on phones.**
   - A name wraps between words, never inside one.
   - The count moves under the name only when the longest word and the count do not fit side by

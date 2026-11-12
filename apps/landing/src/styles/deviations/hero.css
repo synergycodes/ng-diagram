@@ -7,6 +7,14 @@
 .hero {
   user-select: auto;
 }
+/* O4: the mockup lets the pointer through the whole copy to the diagram host underneath, and only
+   the links take it. The headline and the lead take it too, so a mouse drag or a long press
+   selects them; around and between them the pointer still reaches the diagram. A drag that starts
+   on the diagram goes on over the text, because the library follows it on the document. */
+.hero-copy h1,
+.hero-copy .lead {
+  pointer-events: auto;
+}
 
 .hero-diagram {
   position: absolute;
