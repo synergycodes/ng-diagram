@@ -6,7 +6,7 @@ import favicon from '../../../docs/public/favicon.svg?url';
 import Analytics from '../components/Analytics.astro';
 import Sprite from '../components/Sprite.astro';
 import { GTM_ID } from '../config/analytics';
-import { SITE } from '../config/landing';
+import { SHARE_IMAGE, SITE } from '../config/landing';
 import { type GraphNode, type PageNode, siteEntities, webPage } from '../data/structured-data';
 import '../styles/global.css';
 
@@ -25,6 +25,8 @@ interface Props {
 
 const { title, description } = Astro.props;
 const canonical = Astro.props.canonical ?? new URL(Astro.url.pathname, SITE).href;
+// Link previews need an absolute image URL.
+const shareImage = new URL(SHARE_IMAGE.image.src, SITE).href;
 
 const structuredData = {
   '@context': 'https://schema.org',
@@ -50,9 +52,14 @@ const structuredData = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content={String(SHARE_IMAGE.image.width)} />
+    <meta property="og:image:height" content={String(SHARE_IMAGE.image.height)} />
+    <meta property="og:image:alt" content={SHARE_IMAGE.alt} />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image:alt" content={SHARE_IMAGE.alt} />
     <link rel="icon" href={favicon} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={appleTouchIcon} />
     {

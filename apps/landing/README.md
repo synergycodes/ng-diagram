@@ -350,5 +350,8 @@ Differences from the mockup (V7), on purpose. `parity.spec.ts` allows exactly th
   modeling text describes the BPMN Editor as its showcase does, and Engineering names
   production-line monitoring and the Assembly Line template (O2). The shorter lines make those
   blocks lower on narrow screens.
-- **Missing assets (slots in `src/config/landing.ts`):** `stackblitzUrl` (O3) and the OG image
-  (not a slot) are still open.
+- **Link previews:** both pages share one image for Open Graph and a large Twitter card
+  (`SHARE_IMAGE` in `src/config/landing.ts`: `src/assets/og-image.jpg`, 1200 × 631, with its alt
+  text). The mockups' heads have no image, and the contact mockup has a small card.
+- **Slot not set (`src/config/landing.ts`):** `stackblitzUrl` (O3), so the Quick Start shows no
+  StackBlitz button.

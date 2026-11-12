@@ -1,5 +1,6 @@
 import type { ImageMetadata } from 'astro';
 import heroStill from '../assets/hero-still.png';
+import shareImage from '../assets/og-image.jpg';
 import teamPhoto from '../assets/team-three-laptop.jpg';
 
 /**
@@ -54,3 +55,12 @@ export interface LandingSlots {
 }
 
 export const slots: LandingSlots = { heroStill, teamPhoto };
+
+/**
+ * The image of link previews on every page: Open Graph and the large Twitter card (1200 × 631).
+ * The build serves it under `/_landing/` with a hashed name; `Layout` makes its URL absolute.
+ */
+export const SHARE_IMAGE = {
+  image: shareImage,
+  alt: 'ngDiagram – Diagramming for Angular. Native. Flexible. Designed for scale. Beside it, a workflow diagram built with ngDiagram.',
+} as const;

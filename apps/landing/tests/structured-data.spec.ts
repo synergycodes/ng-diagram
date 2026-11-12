@@ -120,3 +120,24 @@ test('/: the FAQPage asks the questions of the FAQ section, in the same order', 
   expect(shown.length).toBeGreaterThan(0);
   expect(faqPage?.mainEntity.map((question) => question.name)).toEqual(shown);
 });
+
+for (const path of PAGES) {
+  test(`${path}: link previews show the share image, which the build serves`, async ({ page, request }) => {
+    await page.goto(path);
+    const meta = (key: string): Promise<string | null> =>
+      page.locator(`meta[property="${key}"], meta[name="${key}"]`).getAttribute('content');
+
+    const image = (await meta('og:image')) ?? '';
+    expect(image).toMatch(/^https:\/\/www\.ngdiagram\.dev\/_landing\/og-image\.[\w-]+\.jpg$/);
+    expect(await meta('og:image:width')).toBe('1200');
+    expect(await meta('og:image:height')).toBe('631');
+    expect(await meta('og:image:alt')).toMatch(/^ngDiagram – Diagramming for Angular\./);
+    expect(await meta('twitter:card')).toBe('summary_large_image');
+    expect(await meta('twitter:image:alt')).toBe(await meta('og:image:alt'));
+
+    // The absolute URL points at the served host; the preview serves the same path.
+    const response = await request.get(new URL(image).pathname);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toBe('image/jpeg');
+  });
+}
