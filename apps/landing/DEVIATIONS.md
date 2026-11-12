@@ -50,6 +50,9 @@ repository. These are its intentional differences. Code comments and the `RULES`
     states stay visible in forced colours.
   - `100vh` comes before `100dvh`.
   - Smooth scrolling and transitions run only without reduced motion.
+  - Smooth scrolling starts with the visitor's first click or key press. A reload, or an address
+    with a #fragment, then shows its place at once; the mockup scrolls smoothly from the first
+    paint, so the page glides down from the top.
 - **O9 Semantics.**
   - The facts strip is a list.
   - Code blocks are named regions, and copy buttons have a hidden suffix.
