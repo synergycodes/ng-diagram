@@ -1,6 +1,9 @@
-import { signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Node } from '../../core/src';
+import { ActionStateManager } from '../../core/src/action-state-manager/action-state-manager';
+import { EventManager } from '../../core/src/event-manager/event-manager';
 import {
   DEFAULT_DEBOUNCE_TIMEOUT,
   DEFAULT_DISCOVERY_WINDOW_TIMEOUT,
@@ -228,6 +231,105 @@ describe('NgDiagramService', () => {
       expect(() => service.invalidateMeasurements({ nodes: [{ nodeId: 'n1' }] })).toThrow(
         'Library engine not initialized yet'
       );
+    });
+  });
+
+  describe('actionState', () => {
+    interface FakeEngine {
+      eventManager: EventManager;
+      actionStateManager: ActionStateManager;
+      config: object;
+    }
+
+    let isInitialized: WritableSignal<boolean>;
+
+    const createEngine = (): FakeEngine => {
+      const eventManager = new EventManager();
+      return { eventManager, actionStateManager: new ActionStateManager(eventManager), config: {} };
+    };
+
+    const node = (id: string): Node => ({ id, position: { x: 0, y: 0 }, data: {} });
+
+    // Assigning through the proxy emits 'actionStateChanged' synchronously.
+    const copy = (engine: FakeEngine, nodeId: string) => {
+      engine.actionStateManager.copyPaste = { copiedNodes: [node(nodeId)], copiedEdges: [] };
+    };
+
+    const copiedNodeIds = () => service.actionState().copyPaste?.copiedNodes.map(({ id }) => id);
+
+    const attach = (engine: FakeEngine) => {
+      provide.mockReturnValue(engine);
+      isInitialized.set(true);
+      TestBed.flushEffects();
+    };
+
+    // Mirrors NgDiagramComponent on a [model] change: isInitialized goes false,
+    // a new engine is created, and isInitialized goes true after its diagramInit.
+    const switchModel = (next: FakeEngine, whileDetached?: () => void) => {
+      isInitialized.set(false);
+      TestBed.flushEffects();
+      whileDetached?.();
+      attach(next);
+    };
+
+    beforeEach(() => {
+      isInitialized = TestBed.inject(RendererService).isInitialized;
+    });
+
+    it('should expose the new engine action state as soon as the diagram reinitializes with a new model', () => {
+      const engineA = createEngine();
+      const engineB = createEngine();
+
+      attach(engineA);
+      copy(engineA, 'a1');
+      expect(service.actionState().copyPaste).toBeDefined();
+
+      switchModel(engineB);
+
+      expect(service.actionState().copyPaste).toBeUndefined();
+      expect(service.actionState()).toEqual({});
+    });
+
+    it('should seed the action state the new engine already holds when the service attaches to it', () => {
+      const engineA = createEngine();
+      const engineB = createEngine();
+
+      attach(engineA);
+      copy(engineA, 'a1');
+      expect(copiedNodeIds()).toEqual(['a1']);
+
+      // Nobody listens to engine B yet, so this change emits to no one.
+      switchModel(engineB, () => copy(engineB, 'b1'));
+
+      expect(copiedNodeIds()).toEqual(['b1']);
+      expect(service.actionState()).toEqual({ copyPaste: { copiedNodes: [node('b1')], copiedEdges: [] } });
+      expect(service.actionState()).not.toBe(engineB.actionStateManager.getState());
+    });
+
+    it('should follow actionStateChanged events of the new engine and ignore the previous engine after a model switch', () => {
+      const engineA = createEngine();
+      const engineB = createEngine();
+
+      attach(engineA);
+      switchModel(engineB);
+
+      copy(engineB, 'b2');
+      expect(copiedNodeIds()).toEqual(['b2']);
+
+      // Engine A's listeners are left in place, so only the effect cleanup keeps this event out.
+      copy(engineA, 'a2');
+      expect(copiedNodeIds()).toEqual(['b2']);
+    });
+
+    it('should not read the engine action state while the diagram is not initialized', () => {
+      const engine = createEngine();
+      copy(engine, 'x1');
+      provide.mockReturnValue(engine);
+
+      TestBed.flushEffects();
+
+      expect(provide).not.toHaveBeenCalled();
+      expect(service.actionState()).toEqual({});
     });
   });
 });
