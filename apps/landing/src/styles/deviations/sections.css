@@ -16,6 +16,14 @@
 .comm-head .lead {
   margin-inline: auto;
 }
+/* Below 45em the mockup drops the closing call's top padding, which only works with the quotes'
+   bottom padding right above its title. The project facts band stands between them, so the call
+   takes the blocks' padding of these widths, like every other section. */
+@media (max-width: 45em) {
+  #community > .wrap {
+    padding-block: 64px;
+  }
+}
 
 /* O2: a domain with up to three templates is a card grid (the mockup had placeholders to page
    through in every domain); a domain with more pages them in the mockup's row (RowScroller). */

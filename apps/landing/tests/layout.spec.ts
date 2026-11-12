@@ -83,6 +83,29 @@ test.describe('first screen (O7)', () => {
   }
 });
 
+test.describe('closing call (O6)', () => {
+  // On phones the call's title stands as far below the project facts band's bottom rule as every
+  // block's title below its own top rule (here the FAQ's).
+  for (const width of [320, 390, 720]) {
+    test(`${width}px: the title stands as far below the band's rule as the FAQ title below its rule`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await openLanding(page);
+      const gaps = await page.evaluate(() => {
+        const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+        const faqRule = parseFloat(getComputedStyle(document.querySelector('#faq')!).borderTopWidth);
+        return {
+          closing: box('#closing-title').top - box('.quad-sec .quad').bottom,
+          faq: box('#faq-title').top - box('#faq').top - faqRule,
+        };
+      });
+      expect(gaps.faq).toBeGreaterThan(0);
+      expect(Math.round(gaps.closing)).toBe(Math.round(gaps.faq));
+    });
+  }
+});
+
 test('/contact 1440x900: step 1 of the form is in the first screen', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openLanding(page, '/contact');

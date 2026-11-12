@@ -243,6 +243,8 @@ const RULES: Rule[] = [
   { register: 'O2', section: '.tpl' },
   // Top padding of .native-sec on phones.
   { register: 'O6', section: '.native-sec', widths: [0, 720] },
+  // The closing call has the blocks' padding on phones.
+  { register: 'O6', section: '.comm', widths: [0, 720] },
   // "Ask the ngDiagram team" leads to a page of this site: same tab, no arrow.
   { register: 'O10', section: '.tpl-ask', kinds: ['probes'] },
   // The paging buttons stay below 45em with a mouse, as in this run (in .tpl, O2 already allows
