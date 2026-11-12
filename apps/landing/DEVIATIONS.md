@@ -35,9 +35,9 @@ repository. These are its intentional differences. Code comments and the `RULES`
 - **O6 Cascade bugs fixed.**
   - `.btn-secondary:active`, the Synergy Codes logo hover in `#talk`, the top padding of
     `.native-sec` below 45em, and the centred lead of `.comm-head`.
-  - Below 45em the closing call ("You're never stuck alone") has the blocks' padding: 64px
-    between the project facts band's rule and its title, and 64px below its button (the mockup:
-    none above, 100px below).
+  - The closing call ("You're never stuck alone") has the blocks' padding between the project
+    facts band's rule and its title, and below its button: 100px, and 64px below 45em. The mockup
+    has 44px above the title (none below 45em) and 100px below the button.
 - **O7 Where the live diagram runs.**
   - The live diagram runs only where `HERO_DIAGRAM_MEDIA` matches.
   - Elsewhere, and on Save-Data, without JavaScript or after a failed load, the stage shows a

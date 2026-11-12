@@ -16,9 +16,12 @@
 .comm-head .lead {
   margin-inline: auto;
 }
-/* Below 45em the mockup drops the closing call's top padding, which only works with the quotes'
-   bottom padding right above its title. The project facts band stands between them, so the call
-   takes the blocks' padding of these widths, like every other section. */
+/* The closing call has every block's padding (base.css, below-45em.css). The mockup gives it 44px
+   above its title, and none below 45em, which only works with the quotes' bottom padding right
+   above the title; the project facts band stands between them. */
+#community > .wrap {
+  padding-block: 100px;
+}
 @media (max-width: 45em) {
   #community > .wrap {
     padding-block: 64px;
