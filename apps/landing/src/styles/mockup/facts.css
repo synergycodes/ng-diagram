@@ -1,0 +1,22 @@
+.facts {
+  border-bottom: 1px solid var(--line);
+}
+.facts .wrap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding-block: 0;
+  font-size: 0.9375rem;
+  color: var(--txt-2);
+  font-variant-numeric: tabular-nums;
+}
+.facts .wrap > li {
+  text-align: center;
+  padding: 28px 24px;
+}
+.facts .wrap > li + li {
+  border-left: 1px solid var(--line);
+}
+.facts b {
+  color: var(--txt);
+  font-weight: 500;
+}

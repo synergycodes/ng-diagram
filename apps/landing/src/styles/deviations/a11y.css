@@ -1,0 +1,37 @@
+/*
+ * O8 Forced colours and motion.
+ */
+
+/* Smooth scrolling only when the visitor has not asked for less motion. */
+html {
+  scroll-behavior: auto;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (forced-colors: active) {
+  /* Markers drawn with a mask over a background colour. */
+  .creds li::before,
+  .qs-end-mark i {
+    background: CanvasText;
+    forced-color-adjust: none;
+  }
+  /* Selected tab and package manager: the lime state is a colour only. */
+  .tpl-tab[aria-selected='true'] {
+    border-bottom-color: Highlight;
+  }
+  .pm-seg[aria-checked='true'] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  .copy.done {
+    border-color: Highlight;
+  }
+  [aria-disabled='true'],
+  :disabled {
+    color: GrayText;
+  }
+}

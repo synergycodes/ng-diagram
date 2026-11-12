@@ -1,0 +1,27 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  /** Id of the <pre>, also the copy target. */
+  id: string;
+  /** Id of the step heading that names the code region. */
+  labelledBy: string;
+  /** Hidden end of the copy button's name ("Copy install command"). */
+  copyLabel: string;
+  /** Plain code, rendered as text. */
+  code?: string;
+  /** Highlighted HTML (escaped markup), used instead of `code`. */
+  html?: string;
+}
+
+const { id, labelledBy, copyLabel, code, html } = Astro.props;
+---
+
+{/* O9: a named region; the script makes the <pre> focusable only while it scrolls sideways. */}
+<div class="code" role="region" aria-labelledby={labelledBy}>
+  {/* set:text / set:html keep the <pre> free of the template's indentation. */}
+  {html ? <pre id={id} set:html={html} /> : <pre id={id} set:text={code} />}
+  <button class="copy" type="button" data-copy={`#${id}`}>
+    <Icon name="i-copy" /><span data-copy-text>Copy</span><span class="sr-only"> {copyLabel}</span>
+  </button>
+</div>

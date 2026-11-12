@@ -1,0 +1,72 @@
+---
+import AgentBeat from '../components/AgentBeat.astro';
+import Community from '../components/Community.astro';
+import Examples from '../components/Examples.astro';
+import Facts from '../components/Facts.astro';
+import Faq from '../components/Faq.astro';
+import Hero from '../components/Hero.astro';
+import NativeList from '../components/NativeList.astro';
+import ProjectFacts from '../components/ProjectFacts.astro';
+import QuickStart from '../components/QuickStart.astro';
+import Resources from '../components/Resources.astro';
+import Services from '../components/Services.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import Talk from '../components/Talk.astro';
+import TemplateAsk from '../components/TemplateAsk.astro';
+import Templates from '../components/Templates.astro';
+import Voices from '../components/Voices.astro';
+import WhatIs from '../components/WhatIs.astro';
+import { HERO_STILL_MEDIA } from '../config/hero';
+import { getHeroStill } from '../data/hero-still';
+import { faqPage, quotations } from '../data/structured-data';
+import Layout from '../layouts/Layout.astro';
+
+// On phones the hero still is the largest element of the first screen: fetch it with the page.
+const still = await getHeroStill();
+---
+
+<Layout
+  title="ngDiagram – open-source Angular diagram library"
+  description="ngDiagram is an open-source Angular diagram library. Build interactive diagrams, node-based editors, and workflow editors with your Angular components."
+  structuredData={[faqPage, ...quotations]}
+  preloadImages={still ? [{ href: still.avif, type: 'image/avif', media: HERO_STILL_MEDIA }] : []}
+>
+  <SiteHeader />
+  <main id="main" tabindex="-1">
+    {/* Chapters draw the page's vertical rules; the hero is its own chapter with open sides. */}
+    <div class="chapter chapter--open-sides" id="ch-start">
+      <Hero />
+    </div>
+    <div class="chapter" id="ch-facts">
+      <Facts />
+    </div>
+    <div class="chapter" id="ch-whatis">
+      <WhatIs />
+      <NativeList />
+    </div>
+    <div class="chapter" id="ch-get-started">
+      <QuickStart />
+      <AgentBeat />
+    </div>
+    <div class="chapter" id="ch-domain">
+      <Templates />
+      <TemplateAsk />
+    </div>
+    <div class="chapter" id="ch-yours">
+      <Examples />
+      <Resources />
+      <Services />
+      <Talk />
+    </div>
+    <div class="chapter" id="ch-close">
+      <Voices />
+      <ProjectFacts />
+      <Community />
+    </div>
+    <div class="chapter" id="ch-faq">
+      <Faq />
+    </div>
+  </main>
+  <SiteFooter />
+</Layout>

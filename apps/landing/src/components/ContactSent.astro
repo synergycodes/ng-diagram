@@ -1,0 +1,57 @@
+---
+import { LINKS } from '../config/landing';
+import ExtLink from './ExtLink.astro';
+import PageLink from './PageLink.astro';
+---
+
+{
+  /*
+   * The page after sending: it replaces the intro, the form and the community block
+   * (`data-contact-hide`), shows the address the reply goes to, and offers the next steps.
+   * Shown by scripts/contact-form.ts.
+   */
+}
+<section class="block contact-sent" id="contact-sent" aria-labelledby="contact-sent-title" hidden data-contact-sent>
+  <div class="contact-fx" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="sent-head">
+      <h1 id="contact-sent-title" class="grad" tabindex="-1" data-done-title>
+        Thanks – we’ll be in touch within 24 hours
+      </h1>
+      <p class="lead">
+        An engineer from the ngDiagram team will read your message and reply to <span
+          class="contact-sent-email"
+          data-sent-email></span>.
+      </p>
+    </div>
+    <div class="sent-cards">
+      <article class="tpl-card">
+        <div class="body">
+          <h2>Documentation</h2>
+          <p>Everything from the first node to custom middleware, with copyable snippets.</p>
+          <div class="links">
+            <PageLink class="text-link" href={LINKS.docs}>Read the docs</PageLink>
+          </div>
+        </div>
+      </article>
+      <article class="tpl-card">
+        <div class="body">
+          <h2>Examples</h2>
+          <p>Working diagrams you can open, read, and lift straight into a project.</p>
+          <div class="links">
+            <PageLink class="text-link" href={LINKS.examples}>See examples</PageLink>
+          </div>
+        </div>
+      </article>
+      <article class="tpl-card">
+        <div class="body">
+          <h2>Community</h2>
+          <p>The team and other users answer questions on Discord, usually the same day.</p>
+          <div class="links">
+            <ExtLink class="text-link" href={LINKS.discord}>Join Discord</ExtLink>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

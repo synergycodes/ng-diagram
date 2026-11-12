@@ -1,0 +1,63 @@
+.hero {
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+
+  background:
+    radial-gradient(58% 52% at 72% 32%, rgba(150, 46, 229, 0.28), transparent 70%),
+    radial-gradient(46% 46% at 16% 78%, rgba(150, 46, 229, 0.2), transparent 70%),
+    radial-gradient(40% 40% at 45% 96%, rgba(77, 101, 255, 0.14), transparent 70%);
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--bg) 0,
+    rgba(9, 9, 15, 0) 96px,
+    rgba(9, 9, 15, 0) calc(100% - 200px),
+    var(--bg) 100%
+  );
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+.hero-copy a {
+  pointer-events: auto;
+}
+.grad {
+  background: linear-gradient(115deg, var(--lime-soft), var(--lime));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero .lead {
+  max-width: 42ch;
+  margin: 22px 0 32px;
+}
+
+.hero-stage {
+  position: relative;
+  z-index: 2;
+  aspect-ratio: 1;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  pointer-events: none;
+
+  background: var(--hero-shot) center / contain no-repeat;
+  border-radius: 0;
+}

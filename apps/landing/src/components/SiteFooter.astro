@@ -1,0 +1,43 @@
+---
+import { LINKS } from '../config/landing';
+import { footerNav } from '../data/sections';
+import ExtLink from './ExtLink.astro';
+import PageLink from './PageLink.astro';
+
+interface Props {
+  /** The page that renders the footer; its own link gets `aria-current`. */
+  current?: 'home' | 'contact';
+}
+
+const { current = 'home' } = Astro.props;
+// The year of the build, so the notice needs no edit in January.
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <span class="logo">ngDiagram</span>
+      <nav aria-label="Footer">
+        {
+          footerNav.map((link) => (
+            <PageLink href={link.href} current={link.href === LINKS.contact && current === 'contact'}>
+              {link.label}
+            </PageLink>
+          ))
+        }
+      </nav>
+    </div>
+    <div class="foot-bottom">
+      <span
+        >© {year} ngDiagram. Made for the Angular community by <ExtLink href={LINKS.synergyCodes}>Synergy Codes</ExtLink
+        >.</span
+      >
+      <span>
+        <ExtLink href={LINKS.privacy}>Privacy policy (Synergy Codes)</ExtLink>{' · '}<ExtLink href={LINKS.license}
+          >License: Apache 2.0</ExtLink
+        >
+      </span>
+    </div>
+  </div>
+</footer>

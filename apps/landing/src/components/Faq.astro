@@ -1,0 +1,38 @@
+---
+import { faq } from '../data/sections';
+import ExtLink from './ExtLink.astro';
+import PageLink from './PageLink.astro';
+---
+
+{/* Native disclosure widgets: keyboard and screen reader support come with the element. */}
+<section class="faq-sec block" id="faq" aria-labelledby="faq-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="faq-title">Questions about ngDiagram</h2>
+    </div>
+    <div class="faq-list">
+      {
+        faq.map((item) => (
+          <details class="faq-item">
+            <summary>{item.question}</summary>
+            <div class="faq-a">
+              <p>
+                {item.answer.map((part) =>
+                  typeof part === 'string' ? (
+                    part
+                  ) : 'code' in part ? (
+                    <code>{part.code}</code>
+                  ) : part.external ? (
+                    <ExtLink href={part.href}>{part.label}</ExtLink>
+                  ) : (
+                    <PageLink href={part.href}>{part.label}</PageLink>
+                  )
+                )}
+              </p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>

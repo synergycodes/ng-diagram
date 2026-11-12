@@ -1,0 +1,45 @@
+:root {
+  --bg: #09090f;
+  --panel: #17171b;
+  --panel-2: #0d0d13;
+  --line: #27272a;
+  --line-2: #2c2c31;
+  --line-3: #3a3a44;
+
+  --grid-line: #4a4a54;
+  --lime: #8afb33;
+  --lime-soft: #daffa7;
+  --lime-dim: rgba(138, 251, 51, 0.12);
+  --lime-dim-2: rgba(138, 251, 51, 0.22);
+  --lime-line: rgba(138, 251, 51, 0.45);
+
+  --txt-line: rgba(255, 255, 255, 0.6);
+  --txt: #ffffff;
+  --txt-2: #a0a0a9;
+  --txt-3: #858590;
+  --lime-press: #7ae426;
+  --num-bg: #1a1030;
+  --txt-code: #e4e4e7;
+  --syntax-keyword: #c792ea;
+  --syntax-function: #7ab5ff;
+  --shot-bg: #0a0a10;
+  --purple-2: #9140ff;
+
+  /* Form fields of the contact page (not in the mockup). --field-line is 3.7:1 against --bg and
+     3.6:1 against --panel-2 (WCAG 1.4.11); --warn is the mockup's amber, for errors only. */
+  --field-line: #6a6a76;
+  --field-line-hover: #858590;
+  --warn: #ffb224;
+
+  --r-md: 0;
+
+  --arrow-right: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 14'%3E%3Cpath d='M1 7h16M12 2l5 5-5 5' fill='none' stroke='%23fff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --font: var(--font-roboto);
+  --mono: var(--font-roboto-mono);
+  --wrap: 1200px;
+  --gutter: 24px;
+
+  --nav-h: 72px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: dark;
+}

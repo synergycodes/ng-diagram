@@ -1,0 +1,46 @@
+header {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: var(--bg);
+  border-bottom: 1px solid var(--grid-line);
+}
+header::before,
+header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--grid-line);
+  pointer-events: none;
+  z-index: 3;
+}
+header::before {
+  left: max(0px, calc(50% - var(--wrap) / 2));
+}
+header::after {
+  right: max(0px, calc(50% - var(--wrap) / 2));
+}
+.navbar {
+  margin-top: 0;
+  min-height: var(--nav-h);
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.hero {
+  background:
+    radial-gradient(42% 50% at 70% 48%, rgba(150, 46, 229, 0.22), transparent 70%),
+    radial-gradient(40% 40% at 20% 85%, rgba(150, 46, 229, 0.12), transparent 70%);
+}
+.hero-fx {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.14) 1px, transparent 1.4px);
+  background-size: 24px 24px;
+  background-position: center 12px;
+}

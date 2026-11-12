@@ -1,0 +1,39 @@
+---
+import { Image } from 'astro:assets';
+import { LINKS, slots } from '../config/landing';
+import { credentials } from '../data/sections';
+import ExtLink from './ExtLink.astro';
+
+const photo = slots.teamPhoto;
+---
+
+<section class="services block" id="services">
+  <div class:list={['wrap', 'services-grid', { 'services-grid--no-photo': !photo }]}>
+    {
+      /* O11: an image that loads when it nears the screen, in the mockup's crop (the mockup's background loads with the page). */
+      photo && (
+        <div class="services-photo" aria-hidden="true">
+          <Image
+            src={photo}
+            alt=""
+            format="webp"
+            widths={[600, 900, 1200].filter((width) => width <= photo.width)}
+            sizes="(max-width: 64em) calc(100vw - 48px), 600px"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      )
+    }
+    <div class="services-copy">
+      <h2 class="services-title">Created by diagramming veterans</h2>
+      <p class="lead">
+        ngDiagram is developed and maintained by <ExtLink href={LINKS.synergyCodes}>Synergy Codes</ExtLink> – a team with
+        15+ years of diagramming expertise who:
+      </p>
+      <ul class="creds">
+        {credentials.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>

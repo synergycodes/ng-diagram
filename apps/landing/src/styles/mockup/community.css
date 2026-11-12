@@ -1,0 +1,101 @@
+.comm-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+
+  gap: 144px;
+  align-items: start;
+}
+
+.comm-head {
+  max-width: 720px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.comm-head h2 {
+  font-size: clamp(1.625rem, 2.6vw, 2.25rem);
+  line-height: 1.15;
+}
+.comm-head .lead {
+  margin-top: 14px;
+}
+.comm-grid .cta-row {
+  margin-top: 48px;
+  justify-content: center;
+}
+
+#community > .wrap {
+  padding-top: 44px;
+  padding-bottom: 0;
+}
+#community .quad::after {
+  content: none;
+}
+
+.quad {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.quad::before,
+.quad::after,
+.quad > li::before {
+  content: '';
+  position: absolute;
+  left: -50vw;
+  right: -50vw;
+  height: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+.quad::before {
+  top: 0;
+}
+.quad::after {
+  bottom: 0;
+}
+
+.quad > li {
+  position: relative;
+  padding: 34px 30px;
+  border-left: 1px solid var(--line);
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.quad > li::before {
+  content: none;
+  top: 0;
+}
+.quad > li:first-child {
+  border-left: 0;
+}
+.quad b {
+  display: block;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.quad span {
+  display: block;
+  color: var(--txt-2);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.quad a {
+  color: var(--txt);
+  text-decoration-line: underline;
+  text-decoration-color: var(--txt-line);
+  transition: text-decoration-color 0.15s;
+}
+.quad a:hover,
+.quad a:focus-visible {
+  text-decoration-color: var(--txt);
+  text-decoration-thickness: 2px;
+}

@@ -1,0 +1,9 @@
+.ex .shot {
+  aspect-ratio: 16 / 9;
+}
+.ex .tpl-card .links {
+  min-height: 0;
+}
+.ex .cta-row {
+  margin-top: 64px;
+}

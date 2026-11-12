@@ -1,0 +1,54 @@
+---
+import { LINKS } from '../config/landing';
+import { externalNav, primaryNav } from '../data/sections';
+import ExtLink from './ExtLink.astro';
+import Icon from './Icon.astro';
+import PageLink from './PageLink.astro';
+
+interface Props {
+  /** The page that renders the header: on the contact page the logo leads home and the CTA to the form. */
+  current?: 'home' | 'contact';
+}
+
+const { current = 'home' } = Astro.props;
+const onContact = current === 'contact';
+---
+
+<header>
+  <div class="wrap">
+    <div class="navbar">
+      <a class="logo" href={onContact ? '/' : '#main'}>ngDiagram</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-menu" id="nav-menu">
+        <nav class="nav-main" aria-label="Primary">
+          {primaryNav.map((link) => <PageLink href={link.href}>{link.label}</PageLink>)}
+        </nav>
+        <div class="nav-ext">
+          {
+            externalNav.map((link) => (
+              <ExtLink href={link.href} label={link.label} title={link.label} arrow={false}>
+                <Icon name={link.icon} class="icon-brand" />
+              </ExtLink>
+            ))
+          }
+        </div>
+      </div>
+      {
+        /* O1: outside the menu panel, so the path to the team stays in the bar on every width. O14: on the contact page it leads to the form. */
+      }
+      <PageLink
+        class="btn btn-secondary btn-sm nav-cta"
+        href={onContact ? '#contact-form' : LINKS.contact}
+        current={onContact}>Talk to the team</PageLink
+      >
+    </div>
+  </div>
+</header>
+
+<script>
+  import { initNav } from '../scripts/nav';
+
+  initNav();
+</script>

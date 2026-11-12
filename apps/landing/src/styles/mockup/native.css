@@ -1,0 +1,121 @@
+.native-sec {
+  position: relative;
+  border-top: 0;
+}
+
+.native-sec > .wrap {
+  padding-top: 0;
+}
+#examples {
+  border-top: 0;
+}
+
+#examples > .wrap {
+  padding-top: 100px;
+}
+
+.native {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.native::before,
+.native::after,
+.native > li::before {
+  content: '';
+  position: absolute;
+  left: -50vw;
+  right: -50vw;
+  height: 1px;
+  background: var(--grid-line);
+  pointer-events: none;
+}
+.native::before {
+  top: 0;
+}
+.native::after {
+  bottom: 0;
+}
+
+.native li {
+  position: relative;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  border-left: 1px solid var(--grid-line);
+  padding: 34px 30px;
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid;
+  align-content: start;
+}
+
+@supports not (grid-template-rows: subgrid) {
+  .native li {
+    grid-template-rows: auto auto 1fr;
+  }
+  .native li b {
+    min-height: 2.6em;
+  }
+}
+
+.native > li::before {
+  content: none;
+  top: 0;
+}
+.native li:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.native li:last-child {
+  padding-right: 0;
+}
+
+.native .top {
+  display: flex;
+  margin-bottom: 16px;
+}
+.native li b {
+  display: block;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+.native li p {
+  color: var(--txt-2);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+.native li p code {
+  font: 500 0.875em var(--mono);
+  color: var(--txt);
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  border-radius: 0;
+  padding: 1px 5px;
+}
+
+.n-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 0;
+  border: 1px solid var(--lime-line);
+  background: var(--lime-dim);
+  display: grid;
+  place-items: center;
+  color: var(--lime);
+  flex: none;
+}
+.n-icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

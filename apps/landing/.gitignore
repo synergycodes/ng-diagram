@@ -1,0 +1,5 @@
+.astro/
+dist/
+test-results/
+playwright-report/
+reports/

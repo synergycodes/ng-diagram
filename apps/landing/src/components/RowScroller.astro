@@ -1,0 +1,69 @@
+---
+interface Props {
+  /** Id of the scroller; the skip link, the controls and the script find it by this. */
+  id: string;
+  /** Name of the row, e.g. "Engineering templates". */
+  label: string;
+  /** Number of cards in the row. */
+  count: number;
+  /** Plural noun of the position message and the buttons, e.g. "templates". */
+  noun: string;
+  /** Singular noun of the skip link, e.g. "template": "Skip to template controls". */
+  item: string;
+}
+
+const { id, label, count, noun, item } = Astro.props;
+const controlsId = `${id}-controls`;
+const Noun = noun.charAt(0).toUpperCase() + noun.slice(1);
+---
+
+{
+  /*
+   * The mockup's paging row (variant A2): a real horizontal scroller (wheel, trackpad, touch and
+   * keyboard all scroll it) with three cards and a part of the fourth, and two buttons below it
+   * that page by the visible width. Below 45em, on touch-only devices, the buttons and the skip
+   * link go: a swipe pages the row, and one card and a part of the next carry the affordance.
+   * With a mouse, trackpad or pen they stay (O17). Script: scripts/scroller.ts.
+   */
+}
+<div class="tpl-rowwrap">
+  <a class="skip-row" href={`#${controlsId}`}>Skip to {item} controls</a>
+  <div class="tpl-scroller" id={id} tabindex="0" role="group" aria-label={`${label}, ${count} items`} data-scroller>
+    <div class="tpl-track">
+      <slot />
+    </div>
+  </div>
+</div>
+<div class="tpl-foot">
+  <div
+    class="tpl-nav"
+    id={controlsId}
+    tabindex="-1"
+    role="group"
+    aria-label={`${Noun} row controls`}
+    data-scroller-nav={id}
+    data-noun={Noun}
+  >
+    <button
+      class="nav-btn"
+      type="button"
+      data-dir="-1"
+      aria-disabled="true"
+      aria-label={`Previous ${noun}`}
+      title={`Previous ${noun}`}
+      aria-controls={id}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 5 8 12l7 7"></path></svg>
+    </button>
+    <button
+      class="nav-btn"
+      type="button"
+      data-dir="1"
+      aria-label={`Next ${noun}`}
+      title={`Next ${noun}`}
+      aria-controls={id}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7"></path></svg>
+    </button>
+  </div>
+</div>

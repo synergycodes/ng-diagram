@@ -1,0 +1,28 @@
+---
+import { LINKS } from '../config/landing';
+import ExtLink from './ExtLink.astro';
+import PageLink from './PageLink.astro';
+import SynergyCodesLogo from './SynergyCodesLogo.astro';
+---
+
+<section class="block talk" id="talk">
+  <div class="wrap talk-grid">
+    <div class="talk-hold">
+      <ExtLink class="sc-logo-link" href={LINKS.synergyCodes} label="Synergy Codes" arrow={false}
+        ><SynergyCodesLogo /></ExtLink
+      >
+      <p class="talk-open">
+        The same engineers can join your team: onboarding, implementation support, or a complete diagram editor for your
+        domain on a deadline.
+      </p>
+    </div>
+    <div class="talk-act">
+      <h3>Let's talk</h3>
+      <p>
+        Tell us about your project – a schematic editor, a workflow editor, an org chart, or a monitoring canvas. We'll
+        get back to you within 24 hours.
+      </p>
+      <PageLink class="btn btn-primary" href={LINKS.contact}>Talk to the team</PageLink>
+    </div>
+  </div>
+</section>

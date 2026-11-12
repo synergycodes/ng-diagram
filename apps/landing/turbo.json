@@ -1,0 +1,18 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": ["LANDING_ANALYTICS"],
+      "inputs": [
+        "$TURBO_EXTENDS$",
+        "$TURBO_ROOT$/apps/docs/src/components/angular/examples/landing-page-diagram/**",
+        "$TURBO_ROOT$/apps/docs/public/assets/examples/**",
+        "$TURBO_ROOT$/apps/docs/src/content/docs/examples/examples.ts",
+        "$TURBO_ROOT$/apps/docs/public/assets/templates/**",
+        "$TURBO_ROOT$/apps/docs/public/favicon.svg",
+        "$TURBO_ROOT$/apps/docs/public/apple-touch-icon.png"
+      ]
+    }
+  }
+}

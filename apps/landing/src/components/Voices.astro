@@ -1,0 +1,34 @@
+---
+import { getImage, Image } from 'astro:assets';
+import voicesGround from '../assets/voices-gradient.jpg';
+import { quotes } from '../data/sections';
+
+// O11: the section ground is self-hosted (the mockup loads it from the Webflow CDN).
+const avif = await getImage({ src: voicesGround, format: 'avif' });
+const jpg = await getImage({ src: voicesGround, format: 'jpg' });
+const ground = `image-set(url('${avif.src}') type('image/avif'), url('${jpg.src}') type('image/jpeg'))`;
+---
+
+<section class="voices block block--open" style={`--voices-bg: ${ground}`}>
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Teams are already building with ngDiagram</h2>
+    </div>
+    <div class="quotes">
+      {
+        quotes.map((quote) => (
+          <figure>
+            <blockquote>{quote.text}</blockquote>
+            <figcaption>
+              <Image class="avatar" src={quote.avatar} alt="" width={64} height={64} densities={[1.5]} loading="lazy" />
+              <span>
+                <b>{quote.name}</b>
+                <small>{quote.role}</small>
+              </span>
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>

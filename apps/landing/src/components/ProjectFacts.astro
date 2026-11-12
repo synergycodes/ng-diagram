@@ -1,0 +1,28 @@
+---
+import { projectFacts } from '../data/sections';
+import PageLink from './PageLink.astro';
+---
+
+{/* Reasons to trust the project, between the quotes and the closing call. */}
+<section class="quad-sec block" aria-label="Project facts">
+  <div class="wrap">
+    <ul class="quad">
+      {
+        projectFacts.map((point) => (
+          <li>
+            <b>{point.title}</b>
+            <span>
+              {point.text}
+              {point.link && (
+                <>
+                  <br />
+                  <PageLink href={point.link.href}>{point.link.label}</PageLink>.
+                </>
+              )}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

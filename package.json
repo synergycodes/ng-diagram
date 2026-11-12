@@ -3,10 +3,13 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "cross-env NODE_ENV=development turbo watch dev --filter=!docs --filter=!@ng-diagram-package/e2e",
-    "dev:mobile": "cross-env NODE_ENV=development turbo watch dev --filter=!docs --filter=!@ng-diagram-package/e2e -- --host 0.0.0.0 --port 6011",
+    "dev": "cross-env NODE_ENV=development turbo watch dev --filter=!docs --filter=!@ng-diagram-package/e2e --filter=!landing",
+    "dev:mobile": "cross-env NODE_ENV=development turbo watch dev --filter=!docs --filter=!@ng-diagram-package/e2e --filter=!landing -- --host 0.0.0.0 --port 6011",
     "docs:dev": "cross-env NODE_ENV=development turbo watch docs:dev",
     "docs:build": "turbo run build --filter=docs",
+    "landing:dev": "cross-env NODE_ENV=development turbo watch dev --filter=landing",
+    "landing:build": "turbo run build --filter=landing",
+    "landing:preview": "pnpm --filter landing preview",
     "lint:check": "turbo run lint:check",
     "lint:fix": "turbo run lint:fix",
     "format:check": "prettier . --check",
@@ -39,6 +42,13 @@
   "pnpm": {
     "overrides": {
       "stylus": "0.0.1-security"
+    },
+    "packageExtensions": {
+      "starlight-auto-sidebar": {
+        "peerDependencies": {
+          "astro": "*"
+        }
+      }
     }
   }
 }

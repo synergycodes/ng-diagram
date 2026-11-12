@@ -1,0 +1,59 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+import ExtLink from './ExtLink.astro';
+import PageLink from './PageLink.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  image: ImageMetadata;
+  imageAlt: string;
+  /** `external`: another site or a template demo (new tab, ↗); otherwise a page of ngdiagram.dev. */
+  links: { label: string; href: string; quiet?: boolean; external?: boolean }[];
+  /** Rendered widths of the card's image, for `sizes`. */
+  sizes?: string;
+}
+
+const {
+  title,
+  description,
+  image,
+  imageAlt,
+  links,
+  sizes = '(max-width: 45em) 100vw, (max-width: 64em) 50vw, 376px',
+} = Astro.props;
+---
+
+<article class="tpl-card">
+  <div class="shot">
+    <Picture
+      src={image}
+      alt={imageAlt}
+      formats={['avif', 'webp']}
+      widths={[400, 800, 1200].filter((w) => w <= image.width)}
+      sizes={sizes}
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+  <div class="body">
+    <h3>{title}</h3>
+    <p>{description}</p>
+    <div class="links">
+      {
+        links.map((link) =>
+          link.external ? (
+            <ExtLink class:list={['text-link', { 'text-link--quiet': link.quiet }]} href={link.href} context={title}>
+              {link.label}
+            </ExtLink>
+          ) : (
+            <PageLink class:list={['text-link', { 'text-link--quiet': link.quiet }]} href={link.href} context={title}>
+              {link.label}
+            </PageLink>
+          )
+        )
+      }
+    </div>
+  </div>
+</article>

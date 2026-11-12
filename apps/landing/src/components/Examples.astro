@@ -1,0 +1,31 @@
+---
+import { LINKS } from '../config/landing';
+import { examples, examplesLead } from '../data/examples';
+import PageLink from './PageLink.astro';
+import TemplateCard from './TemplateCard.astro';
+---
+
+<section class="ex block block--open" id="examples">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Make the diagram yours, one example at a time</h2>
+      <p class="lead">{examplesLead}</p>
+    </div>
+    <div class="tpl-grid">
+      {
+        examples.map((example) => (
+          <TemplateCard
+            title={example.title}
+            description={example.description}
+            image={example.image}
+            imageAlt={`Screenshot of the ${example.title} example`}
+            links={[{ label: 'Open the example', href: example.href }]}
+          />
+        ))
+      }
+    </div>
+    <div class="cta-row">
+      <PageLink class="btn btn-secondary" href={LINKS.examples}>Show all examples</PageLink>
+    </div>
+  </div>
+</section>

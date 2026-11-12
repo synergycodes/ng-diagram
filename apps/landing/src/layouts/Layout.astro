@@ -1,0 +1,153 @@
+---
+import { Font } from 'astro:assets';
+import { LANDING_ANALYTICS } from 'astro:env/server';
+import appleTouchIcon from '../../../docs/public/apple-touch-icon.png?url';
+import favicon from '../../../docs/public/favicon.svg?url';
+import Analytics from '../components/Analytics.astro';
+import Sprite from '../components/Sprite.astro';
+import { GTM_ID } from '../config/analytics';
+import { SHARE_IMAGE, SITE } from '../config/landing';
+import { type GraphNode, type PageNode, siteEntities, webPage } from '../data/structured-data';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Absolute canonical URL; by default the site URL of the current path. */
+  canonical?: string;
+  /** schema.org type of the page node in the structured data. */
+  pageType?: PageNode['type'];
+  /** Further structured data of the page (schema.org nodes), after the site's entities and the page node. */
+  structuredData?: GraphNode[];
+  /** Images to fetch early, each only where its media query matches (the hero still on phones). */
+  preloadImages?: { href: string; type: string; media: string }[];
+}
+
+const { title, description } = Astro.props;
+const canonical = Astro.props.canonical ?? new URL(Astro.url.pathname, SITE).href;
+// Link previews need an absolute image URL.
+const shareImage = new URL(SHARE_IMAGE.image.src, SITE).href;
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    ...siteEntities,
+    webPage({ type: Astro.props.pageType ?? 'WebPage', url: canonical, name: title, description }),
+    ...(Astro.props.structuredData ?? []),
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#09090f" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ngDiagram" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content={String(SHARE_IMAGE.image.width)} />
+    <meta property="og:image:height" content={String(SHARE_IMAGE.image.height)} />
+    <meta property="og:image:alt" content={SHARE_IMAGE.alt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image:alt" content={SHARE_IMAGE.alt} />
+    <link rel="icon" href={favicon} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={appleTouchIcon} />
+    {
+      Astro.props.preloadImages?.map((image) => (
+        <link rel="preload" as="image" href={image.href} type={image.type} media={image.media} fetchpriority="high" />
+      ))
+    }
+    <Font cssVariable="--font-roboto" preload={[{ weight: 400 }, { weight: 700 }]} />
+    <Font cssVariable="--font-roboto-mono" />
+    {LANDING_ANALYTICS && <Analytics />}
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+    <noscript>
+      <style>
+        /* Without JavaScript: every template domain is listed, controls that need a script are gone. */
+        .tpl-tabs,
+        .pm-switch,
+        .copy {
+          display: none;
+        }
+        .tpl-panel[hidden] {
+          display: block;
+        }
+        .tpl-panel + .tpl-panel {
+          margin-top: 48px;
+        }
+        /* The paging rows still scroll; their buttons need the script. */
+        .tpl-foot,
+        .skip-row {
+          display: none;
+        }
+        /* No live diagram either (O7): the still image stands in on every screen, or without one
+           the hero is copy only; the loading sketch (O13) never shows. */
+        .hero-sketch {
+          display: none;
+        }
+        .hero--still .hero-stage {
+          background: var(--hero-shot) center / contain no-repeat;
+        }
+        .hero:not(.hero--still) .hero-stage {
+          display: none;
+        }
+        .hero:not(.hero--still) .hero-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        @media (max-width: 64em) {
+          .nav-toggle {
+            display: none;
+          }
+          .navbar {
+            flex-wrap: wrap;
+          }
+          .nav-menu {
+            position: static;
+            height: auto;
+            visibility: visible;
+            padding: 0 0 12px;
+            border: 0;
+            flex-basis: 100%;
+            order: 3;
+          }
+          header {
+            position: static;
+          }
+        }
+      </style>
+    </noscript>
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+  </head>
+  <body>
+    {
+      LANDING_ANALYTICS && (
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            title="Google Tag Manager"
+            height="0"
+            width="0"
+            style="display: none; visibility: hidden"
+          />
+        </noscript>
+      )
+    }
+    <a class="skip-main" href="#main">Skip to main content</a>
+    <Sprite />
+    <slot />
+    {/* The one polite live region of the page (scripts/announce.ts). */}
+    <div class="sr-only" role="status" data-announcer></div>
+  </body>
+</html>

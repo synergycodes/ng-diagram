@@ -1,0 +1,175 @@
+/*
+ * Section-level deviations. Each block names its entry in DEVIATIONS.md.
+ */
+
+/* O6: cascade bugs of the mockup, fixed to their evident intent. */
+.btn-secondary:active {
+  background: var(--lime-dim-2);
+}
+.talk-hold .sc-logo-link:hover,
+.talk-hold .sc-logo-link:focus-visible {
+  opacity: 1;
+}
+.native-sec > .wrap {
+  padding-top: 0;
+}
+.comm-head .lead {
+  margin-inline: auto;
+}
+
+/* O2: a domain with up to three templates is a card grid (the mockup had placeholders to page
+   through in every domain); a domain with more pages them in the mockup's row (RowScroller). */
+
+/* O17: below 45em the mockup drops a row's paging buttons and the skip link to them, as a swipe
+   pages the row. They stay wherever there is a mouse, trackpad or pen, or no pointer at all, so
+   a narrow window or a zoomed-in page can still be paged; touch-only devices swipe. */
+@media (max-width: 45em) and (any-pointer: fine), (max-width: 45em) and (pointer: none) {
+  .tpl-foot {
+    display: flex;
+  }
+  .skip-row {
+    display: inline-flex;
+  }
+}
+
+/* O15: the newer sections held to the design system's rules. */
+/* Resources: kind, source and length as a quiet line under the description, in sentence case,
+   instead of an uppercase label above the title; a part never breaks inside. */
+.res .res-meta {
+  min-height: 0;
+  color: var(--txt-3);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+.res-meta span {
+  white-space: nowrap;
+}
+/* FAQ answers keep a reading measure inside the wide list. */
+.faq-item .faq-a p {
+  max-width: 72ch;
+}
+/* Inline code in an answer looks like the Angular-native cards' (the mockup left it unstyled). */
+.faq-item .faq-a code {
+  font: 500 0.875em var(--mono);
+  color: var(--txt);
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  border-radius: 0;
+  padding: 1px 5px;
+}
+/* Drawn icons instead of the "+", "–" and "×" characters; the toggle keeps the box of the
+   mockup's "+" (1.25rem Roboto Mono), so the questions wrap as in the mockup. */
+.faq-item summary::after {
+  content: '';
+  width: 0.75rem;
+  height: 1.25rem;
+  color: var(--txt-3);
+  background:
+    linear-gradient(currentColor, currentColor) center / 100% 1.5px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 1.5px 0.75rem no-repeat;
+}
+.faq-item[open] summary::after {
+  content: '';
+  background-size:
+    100% 1.5px,
+    1.5px 0;
+}
+.res-lb-close .icon {
+  width: 24px;
+  height: 24px;
+}
+/* The play button's growth on hover animates only without reduced motion (O15). */
+@media (prefers-reduced-motion: reduce) {
+  .res .res-play-ic {
+    transition: none;
+  }
+}
+
+/* O9: the video player is a native modal dialog (focus stays inside, Escape closes, the page
+   behind is inert). The mockup's .res-lb box is kept; the browser's dialog box is reset. */
+.res-lb {
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  color: var(--txt);
+}
+.res-lb:not([open]) {
+  display: none;
+}
+.res-lb::backdrop {
+  background: transparent;
+}
+.res-lb-close {
+  min-width: 40px;
+  min-height: 40px;
+}
+
+/* O5: on phones a tab name wraps between words and never inside one (the mockup used
+   overflow-wrap: anywhere). The name's flex base is its longest word, so the count moves under
+   the name only when that word and the count do not fit side by side; otherwise the name grows
+   up to its full length, as in the mockup. The count is at least 12px. */
+@media (max-width: 45em) {
+  .tpl-tab {
+    flex-wrap: wrap;
+  }
+  .tpl-name {
+    flex: 1 1 0;
+    min-width: min-content;
+    max-width: max-content;
+    overflow-wrap: normal;
+  }
+  .tpl-count {
+    font-size: 0.75rem;
+  }
+}
+
+/* O11: the team photo is a lazily loaded image that fills the mockup's photo cell, in its crop. */
+.services-photo {
+  position: relative;
+  overflow: hidden;
+}
+.services-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 25%;
+}
+
+/* Services without the team photo (config slot `teamPhoto`): one column, as the mockup was
+   before the photo layout. */
+.services-grid--no-photo {
+  grid-template-columns: minmax(0, 1fr);
+}
+.services-grid--no-photo .services-copy {
+  padding-right: 0;
+}
+.services-grid--no-photo .services-copy > .lead {
+  max-width: 62ch;
+}
+
+/* The Quick Start drawing uses the page font, which has a generated family name. */
+.qs-art text {
+  font-family: var(--font);
+}
+
+/* O9: code blocks are focusable only while they scroll sideways; show where focus is. */
+.code pre:focus-visible {
+  outline-offset: -2px;
+}
+
+/* O10: footer links are at least 24px tall targets on every width. */
+.foot-top nav a,
+.foot-bottom a {
+  display: inline-block;
+  padding-block: 4px;
+}
+
+/* O9: the facts strip is a list (the mockup used spans in a div with aria-label). */
+.facts ul.wrap {
+  list-style: none;
+}

@@ -1,0 +1,117 @@
+---
+import { HERO_DIAGRAM_MEDIA, type HeroDiagramState } from '../config/hero';
+
+const initialState: HeroDiagramState = 'idle';
+---
+
+<!--
+  Host of the live hero diagram. Covers the whole hero; the diagram content is fitted into
+  .hero-stage. The diagram is a pointer-only illustration (no Tab stop, no shortcuts), so the
+  host is hidden from assistive technology; the hero copy and the Live Demo link carry the
+  content.
+-->
+<div
+  class="hero-diagram"
+  data-hero-diagram
+  data-state={initialState}
+  data-media={HERO_DIAGRAM_MEDIA}
+  aria-hidden="true"
+>
+</div>
+
+<script>
+  import { HERO_DIAGRAM_MEDIA, type HeroDiagramState } from '../config/hero';
+  import type { HeroDiagramHandle } from '../hero/bootstrap';
+
+  type Connection = { saveData?: boolean };
+
+  const host = document.querySelector<HTMLElement>('[data-hero-diagram]');
+  const hero = host?.closest<HTMLElement>('.hero');
+  const stage = hero?.querySelector<HTMLElement>('.hero-stage');
+
+  if (host && hero && stage) {
+    const setState = (state: HeroDiagramState): void => {
+      host.dataset['state'] = state;
+    };
+
+    // Ctrl + wheel (and touchpad pinch) stays with the browser's page zoom: stopping the event
+    // in the capture phase keeps it away from the diagram, which would otherwise cancel it.
+    hero.addEventListener(
+      'wheel',
+      (event) => {
+        if (event.ctrlKey) {
+          event.stopPropagation();
+        }
+      },
+      { capture: true, passive: true }
+    );
+
+    let mounted: Promise<HeroDiagramHandle | null> | null = null;
+    let generation = 0;
+
+    const start = (): void => {
+      if (mounted) {
+        return;
+      }
+      const current = ++generation;
+      setState('loading');
+      mounted = import('../hero/bootstrap')
+        .then(({ mountHeroDiagram }) => mountHeroDiagram(host, stage))
+        .then(async (handle) => {
+          await handle.fitted;
+          if (current === generation) {
+            setState('live');
+          }
+          return handle;
+        })
+        .catch((error: unknown) => {
+          console.error('[landing] The hero diagram failed to load.', error);
+          if (current === generation) {
+            setState('failed');
+          }
+          return null;
+        });
+    };
+
+    const stop = (): void => {
+      if (!mounted) {
+        return;
+      }
+      generation++;
+      const pending = mounted;
+      mounted = null;
+      setState('idle');
+      void pending.then((handle) => handle?.destroy());
+    };
+
+    const media = window.matchMedia(HERO_DIAGRAM_MEDIA);
+    const saveData = (navigator as Navigator & { connection?: Connection }).connection?.saveData === true;
+
+    const whenIdle = (callback: () => void): void => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(callback, { timeout: 3000 });
+      } else {
+        setTimeout(callback, 200);
+      }
+    };
+
+    const init = (): void => {
+      if (saveData) {
+        setState('off');
+        return;
+      }
+      whenIdle(() => {
+        if (media.matches) {
+          start();
+        }
+        media.addEventListener('change', (event) => (event.matches ? start() : stop()));
+      });
+    };
+
+    if (document.readyState === 'complete') {
+      init();
+    } else {
+      window.addEventListener('load', init, { once: true });
+    }
+  }
+</script>

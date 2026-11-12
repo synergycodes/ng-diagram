@@ -1,0 +1,19 @@
+---
+interface Props {
+  href: string;
+  class?: string;
+  /** Hidden text that tells repeated links apart ("Open the example" of which example). */
+  context?: string;
+  /** Marks the link to the page the visitor is on. */
+  current?: boolean;
+}
+
+const { href, class: className, context, current = false } = Astro.props;
+---
+
+{
+  /* O10: a page of ngdiagram.dev (docs, examples, the template list, the contact page) opens in the same tab, without an arrow; the browser's back button returns. */
+}
+<a class={className} href={href} aria-current={current ? 'page' : undefined}
+  ><slot />{context && <span class="sr-only">: {context}</span>}</a
+>

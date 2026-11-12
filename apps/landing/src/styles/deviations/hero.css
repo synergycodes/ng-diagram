@@ -1,0 +1,230 @@
+/*
+ * O4 / O7 Hero. The live diagram replaces the mockup's production widget: same place (over
+ * the whole hero, under the copy), positioned on .hero-stage by the island itself.
+ */
+
+/* Text in the hero stays selectable; only the diagram, where a drag moves nodes, is not. */
+.hero {
+  user-select: auto;
+}
+
+.hero-diagram {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  user-select: none;
+}
+.hero-diagram[data-state='live'] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-diagram[data-state='live'] {
+    transition: opacity 0.4s var(--ease);
+  }
+}
+
+/* O7: the stage is also limited by the window height, so on 1280 x 720 and 1366 x 768 the stage
+   and the calls to action fit in the first screen. The island scales the diagram to fit. */
+@media (min-width: 45.0625em) {
+  .hero-stage {
+    max-width: clamp(320px, 100svh - var(--nav-h) - 160px, 640px);
+  }
+}
+
+/* O7: where the live diagram runs (HERO_DIAGRAM_MEDIA), the stage shows the loading sketch (O13)
+   until the diagram is live, never the still. */
+@media (min-width: 45.0625em) and (min-height: 35em) and (pointer: fine) {
+  .hero--still .hero-stage {
+    background: none;
+  }
+}
+/* O7: where it does not run (phones, touch, short windows), the still image of the diagram (config
+   slot `heroStill`, the mockup's background on .hero-stage) stands in, and the sketch is not drawn.
+   Without a still, the hero is copy and calls to action only. */
+@media not all and (min-width: 45.0625em) and (min-height: 35em) and (pointer: fine) {
+  .hero-sketch {
+    display: none;
+  }
+  .hero:not(.hero--still) .hero-stage {
+    display: none;
+  }
+  .hero:not(.hero--still) .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* The same after a failed load or with Save-Data, on any screen. */
+.hero:has(.hero-diagram[data-state='failed']) .hero-sketch,
+.hero:has(.hero-diagram[data-state='off']) .hero-sketch {
+  display: none;
+}
+.hero--still:has(.hero-diagram[data-state='failed']) .hero-stage,
+.hero--still:has(.hero-diagram[data-state='off']) .hero-stage {
+  background: var(--hero-shot) center / contain no-repeat;
+}
+.hero:not(.hero--still):has(.hero-diagram[data-state='failed']) .hero-stage,
+.hero:not(.hero--still):has(.hero-diagram[data-state='off']) .hero-stage {
+  display: none;
+}
+.hero:not(.hero--still):has(.hero-diagram[data-state='failed']) .hero-grid,
+.hero:not(.hero--still):has(.hero-diagram[data-state='off']) .hero-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+/* O7: on phones the stage takes the still's own proportions (the mockup's 4:3 was those of its
+   screenshot), so the diagram runs from gutter to gutter without a letterbox. */
+@media (max-width: 45em) {
+  .hero--still .hero-stage {
+    aspect-ratio: var(--hero-shot-ratio, 4 / 3);
+  }
+}
+
+/*
+ * O13 Loading sketch (components/HeroSketch.astro). Until the live diagram is ready the stage
+ * shows the same diagram as a sketch: nodes and ports from the first paint, then the edges and
+ * the chart line draw themselves, and while the wait goes on a pulse runs along each edge. The
+ * live diagram fades in on top of it with the same geometry, and the sketch goes.
+ */
+.hero-sketch {
+  /* Ghost fills and lines are white at a low alpha, so the hero's purple field shows through. */
+  --sketch-ink: 255 255 255;
+  /* The docs example's purples (landing-page-diagram/diagram/tokens.scss): 100, 300, 400, 500, 700. */
+  --sketch-purple-100: 233 213 255;
+  --sketch-purple-300: 192 132 252;
+  --sketch-purple-400: 168 85 247;
+  --sketch-purple-500: 139 92 246;
+  --sketch-purple-700: 124 58 237;
+
+  /* At its natural size, at most the stage, centred: the island's fit, which never scales up. */
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: visible;
+}
+.hero-sketch .sk-card {
+  fill: rgb(var(--sketch-ink) / 0.035);
+  stroke: rgb(var(--sketch-ink) / 0.13);
+  stroke-width: 1.5;
+}
+.hero-sketch .sk-card--group {
+  fill: rgb(var(--sketch-ink) / 0.015);
+  stroke: url(#hero-sketch-group);
+  stroke-opacity: 0.55;
+  stroke-width: 2;
+}
+.hero-sketch .sk-stop-1 {
+  stop-color: rgb(var(--sketch-purple-400));
+}
+.hero-sketch .sk-stop-2 {
+  stop-color: rgb(var(--sketch-purple-100) / 0.8);
+}
+.hero-sketch .sk-stop-3 {
+  stop-color: rgb(var(--sketch-purple-500) / 0.8);
+}
+.hero-sketch .sk-stop-4 {
+  stop-color: rgb(var(--sketch-purple-700) / 0.9);
+}
+.hero-sketch .sk-rule {
+  stroke: rgb(var(--sketch-purple-400) / 0.3);
+  stroke-width: 1.5;
+}
+.hero-sketch .sk-panel {
+  fill: rgb(var(--sketch-ink) / 0.025);
+  stroke: rgb(var(--sketch-ink) / 0.08);
+  stroke-width: 1.5;
+}
+.hero-sketch .sk-icon {
+  fill: rgb(var(--sketch-ink) / 0.055);
+  stroke: rgb(var(--sketch-ink) / 0.09);
+  stroke-width: 1.5;
+}
+.hero-sketch .sk-bar {
+  fill: rgb(var(--sketch-ink) / 0.09);
+}
+.hero-sketch .sk-grid {
+  stroke: rgb(var(--sketch-ink) / 0.05);
+  stroke-width: 1.5;
+}
+.hero-sketch .sk-chart {
+  fill: none;
+  stroke: rgb(var(--sketch-purple-500) / 0.75);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.hero-sketch .sk-edge {
+  fill: none;
+  stroke: rgb(var(--sketch-ink) / 0.26);
+  stroke-width: 2;
+}
+.hero-sketch .sk-port {
+  fill: var(--bg);
+  stroke: rgb(var(--sketch-ink) / 0.4);
+  stroke-width: 2;
+}
+.hero-sketch .sk-pulse {
+  display: none;
+}
+
+/* The live diagram fades in (opacity of .hero-diagram) while the sketch goes. */
+.hero:has(.hero-diagram[data-state='live']) .hero-sketch {
+  opacity: 0;
+  visibility: hidden;
+}
+/* Forced colours keep only the port dots and two purple lines of a sketch drawn in alpha. */
+@media (forced-colors: active) {
+  .hero-sketch {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-sketch {
+    transition:
+      opacity 0.4s var(--ease),
+      visibility 0s linear 0.4s;
+  }
+  /* The paths have pathLength="1", so a dash of 1 is the whole path. */
+  .hero-sketch .sk-edge {
+    stroke-dasharray: 1;
+    animation: sketch-draw 0.55s cubic-bezier(0.65, 0, 0.35, 1) both;
+    animation-delay: calc(150ms + var(--i) * 90ms);
+  }
+  .hero-sketch .sk-chart {
+    stroke-dasharray: 1;
+    animation: sketch-draw 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.5s both;
+  }
+  /* One short dash per edge, source to target; the gap is longer than the path, so a second
+     dash never shows. */
+  .hero-sketch .sk-pulse {
+    display: inline;
+    fill: none;
+    stroke: rgb(var(--sketch-purple-300) / 0.85);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 0.08 1;
+    stroke-dashoffset: 0.08;
+    animation: sketch-flow 1.8s linear infinite;
+    animation-delay: calc(1.1s + var(--i) * 0.22s);
+  }
+  .hero:has(.hero-diagram[data-state='live']) .hero-sketch * {
+    animation-play-state: paused;
+  }
+}
+@keyframes sketch-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes sketch-flow {
+  from {
+    stroke-dashoffset: 0.08;
+  }
+  to {
+    stroke-dashoffset: -1;
+  }
+}

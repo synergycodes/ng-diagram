@@ -1,0 +1,24 @@
+---
+import { nativePoints } from '../data/sections';
+import Icon from './Icon.astro';
+---
+
+<section class="native-sec block" id="angular-native" aria-label="Angular native">
+  <div class="wrap">
+    <ul class="native">
+      {
+        nativePoints.map((point) => (
+          <li>
+            <div class="top">
+              <span class="n-icon" aria-hidden="true">
+                <Icon name={point.icon} class="" />
+              </span>
+            </div>
+            <b>{point.title}</b>
+            <p set:html={point.html} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

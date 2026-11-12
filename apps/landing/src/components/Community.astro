@@ -1,0 +1,20 @@
+---
+import { LINKS } from '../config/landing';
+import ExtLink from './ExtLink.astro';
+---
+
+{/* The page's one closing call; the project facts stand above it (ProjectFacts). */}
+<section class="comm block" id="community" aria-labelledby="closing-title">
+  <div class="wrap comm-grid">
+    <div class="comm-head">
+      <h2 id="closing-title">You're never stuck alone</h2>
+      <p class="lead">
+        Ask on Discord – the people who build and use ngDiagram answer there. Bring a question or share what you are
+        building.
+      </p>
+      <div class="cta-row">
+        <ExtLink class="btn btn-primary" href={LINKS.discord}>Join Discord</ExtLink>
+      </div>
+    </div>
+  </div>
+</section>
