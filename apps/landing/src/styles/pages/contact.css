@@ -1,8 +1,8 @@
 /*
  * The contact page (/contact). Not in the landing mockup: it extends the landing's world with the
  * Quick Start rail as a form (ContactForm.astro reuses the rail's classes; the `contact-*` classes
- * add the form, its states and the page's sections). Its look follows the contact mockup of the
- * marketing review of 2026-11-10.
+ * add the form, its states and the page's sections). Its look follows the contact page's design
+ * mockup.
  */
 @layer tokens, mockup, deviations, pages;
 

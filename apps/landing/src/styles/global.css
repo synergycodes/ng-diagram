@@ -1,12 +1,11 @@
 /*
- * Page styles, ported from the approved mockup: V6 (makieta-ngdiagram-landing-redesign.html), updated
- * to V7, the marketing review of 2026-11-10.
+ * Page styles, ported from the approved design mockup.
  *
  * - tokens: the mockup's custom properties.
  * - mockup: the mockup's rules without comments, in their original order. The cascade depends on
  *   that order; keep it when editing.
- * - deviations: every intentional difference from the mockup. Each block names its entry in the
- *   register in README.md. Later layers win regardless of selector specificity.
+ * - deviations: every intentional difference from the mockup. Each block names its entry in
+ *   DEVIATIONS.md. Later layers win regardless of selector specificity.
  * - pages: pages the mockup does not have (pages/*.css, imported by their page).
  *
  * Components render the mockup's class names; there are no scoped styles for ported rules.

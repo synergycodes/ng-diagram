@@ -6,12 +6,11 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { WIDTHS } from './support';
 
 /**
- * Parity with the approved mockup (local only: MOCKUP_PATH points at the mockup HTML, V7: the
- * index.html of the marketing review of 2026-11-10, opened with `?clean`, which hides the review's
- * comments). Both pages run with the same local fonts, reduced motion and a classic scrollbar; the
- * mockup's external hosts and its diagram widget are blocked and the landing's island is held back,
- * so both show an empty stage. Every difference must be covered by an entry of the deviation
- * register (README.md).
+ * Parity with the approved design mockup (local only: MOCKUP_PATH points at the mockup's HTML,
+ * opened with `?clean`, which hides its annotations). Both pages run with the same local fonts,
+ * reduced motion and a classic scrollbar; the mockup's external hosts and its diagram widget are
+ * blocked and the landing's island is held back, so both show an empty stage. Every difference
+ * must be covered by an entry of DEVIATIONS.md.
  */
 
 const MOCKUP_PATH = process.env['MOCKUP_PATH'];
@@ -72,7 +71,7 @@ const FONT_CSS = Object.keys(FONT_FILES)
   })
   .join('\n');
 
-/** The mockup's address: `?clean` hides the review's comments and highlights. */
+/** The mockup's address: `?clean` hides its annotations and highlights. */
 const mockupUrl = (): string => `${pathToFileURL(MOCKUP_PATH!).href}?clean`;
 
 /**

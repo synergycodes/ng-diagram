@@ -131,7 +131,7 @@ export interface FaqItem {
  * Questions people ask AI assistants about ngDiagram, each answered so it can be quoted on its
  * own. The FAQPage structured data (data/structured-data.ts) repeats this text word for word.
  * Every claim is backed by the repository: LICENSE, the package's peer dependencies, README and
- * the docs (checked 2026-11-10).
+ * the docs.
  */
 export const faq: FaqItem[] = [
   {

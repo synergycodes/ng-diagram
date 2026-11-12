@@ -1,5 +1,5 @@
 /*
- * Section-level deviations. Each block names its entry in the register (README.md).
+ * Section-level deviations. Each block names its entry in DEVIATIONS.md.
  */
 
 /* O6: cascade bugs of the mockup, fixed to their evident intent. */
@@ -20,7 +20,7 @@
 /* O2: a domain with up to three templates is a card grid (the mockup had placeholders to page
    through in every domain); a domain with more pages them in the mockup's row (RowScroller). */
 
-/* O15: the V7 sections held to DESIGN.md (impeccable polish, 2026-11-10). */
+/* O15: the newer sections held to the design system's rules. */
 /* Resources: kind, source and length as a quiet line under the description, in sentence case,
    instead of an uppercase label above the title; a part never breaks inside. */
 .res .res-meta {
@@ -66,7 +66,7 @@
   width: 24px;
   height: 24px;
 }
-/* The play button's growth on hover animates only without reduced motion (DESIGN.md). */
+/* The play button's growth on hover animates only without reduced motion (O15). */
 @media (prefers-reduced-motion: reduce) {
   .res .res-play-ic {
     transition: none;

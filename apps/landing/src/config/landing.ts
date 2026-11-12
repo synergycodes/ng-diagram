@@ -30,7 +30,7 @@ export const LINKS = {
   liveDemo: 'https://synergycodes.github.io/ng-diagram-demo/',
   github: 'https://github.com/synergycodes/ng-diagram',
   npm: 'https://www.npmjs.com/package/ng-diagram',
-  // The README's invite. The V6 mockup's discord.gg/8HfMTZ4Qx was "Unknown Invite" (2026-11-04).
+  // The invite from the repository's README.
   discord: 'https://discord.com/invite/FDMjRuarFb',
   license: 'https://github.com/synergycodes/ng-diagram/blob/main/LICENSE',
   synergyCodes: 'https://www.synergycodes.com/',
