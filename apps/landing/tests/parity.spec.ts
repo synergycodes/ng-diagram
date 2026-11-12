@@ -258,6 +258,7 @@ const RULES: Rule[] = [
   { register: 'O16', section: '.facts', kinds: ['height'] },
   { register: 'O16', section: '.whatis' },
   { register: 'O16', section: '.quad-sec' },
+  { register: 'O16', section: '.agent' },
   // The team photo is an image in the photo cell (it loads lazily), not the cell's background.
   { register: 'O11', section: '.services', kinds: ['probes'] },
   // Footer links are at least 24px tall.
