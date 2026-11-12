@@ -118,4 +118,14 @@ export const showcaseProjects: ShowcaseProject[] = [
     author: 'Synergy Codes',
     authorUrl: 'https://www.synergycodes.com/',
   },
+  {
+    title: 'AV Floorplan',
+    description:
+      'An AV system planner that imports a DXF floor plan with per-layer roles and lets you drop displays, speakers, cameras, and network gear from a device library onto it, with coverage overlays, orthogonally routed typed cable runs with computed lengths, design warnings, a live bill of materials, and DXF export.',
+    image: 'av-floorplan.png',
+    imageAlt: 'Screenshot of the AV Floorplan showing devices and cable runs placed on an imported floor plan',
+    href: 'https://www.ngdiagram.dev/templates/av-floorplan/',
+    author: 'Synergy Codes',
+    authorUrl: 'https://www.synergycodes.com/',
+  },
 ];
